@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="logback/logback-sentry.xml"/>
+    <springProperty scope="context" name="port" source="server.port"/>
+
+    <appender name="ConsoleJson" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.rainist.common.log.LogbackPatternLayout">
+                <pattern>{"application_time":"%d{yyyy:MM:dd HH:mm:ss.SSS,Asia/Seoul}","level":"%-5level","request_id":"%request" ,"session_id":"%session","thread":"%thread","class":"%C{36}","method":"%M","line":"%line","log":"%msg"}%n</pattern>
+            </layout>
+        </encoder>
+    </appender>
+
+    <appender name="File" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${application.log.dir:-logs}/application.${port:-default}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${application.log.dir:-logs}/application.%d{yyyy-MM-dd}_${port:-default}.log</fileNamePattern>
+            <maxHistory>90</maxHistory>
+        </rollingPolicy>
+
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.rainist.common.log.LogbackPatternLayout">
+                <pattern>[%d{yyyy:MM:dd HH:mm:ss.SSS}] [%-5level] [%session] [%thread] [%C{36}] [%M] [%line] - %msg %n</pattern>
+            </layout>
+        </encoder>
+    </appender>
+
+    <logger name="org.springframework" level="INFO"/>
+
+    <root level="INFO">
+        <appender-ref ref="Sentry"/>
+        <appender-ref ref="File" />
+        <appender-ref ref="ConsoleJson" />
+    </root>
+</configuration>

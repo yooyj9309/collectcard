@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="logback/logback-sentry.xml"/>
+    <springProperty scope="context" name="port" source="server.port"/>
+
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.rainist.common.log.LogbackPatternLayout">
+                <pattern>[%d{yyyy:MM:dd HH:mm:ss.SSS}] [%-5level] [%session] [%thread] [%C{36}] [%M] [%line] - %msg %n</pattern>
+            </layout>
+        </encoder>
+    </appender>
+
+    <logger name="org.springframework" level="INFO"/>
+
+    <root level="INFO">
+        <appender-ref ref="Console"/>
+    </root>
+</configuration>

@@ -1,0 +1,26 @@
+spring:
+  profiles:
+    active: production
+  jpa:
+    show-sql: false
+
+sentry:
+  servername: simpleloan
+  dsn: ${SENTRY_DATA_SOURCE_NAME}
+  level: ERROR
+  environment: production
+  stacktrace.app.packages: com.rainist.collectcard.*
+
+mydata:
+  datasource:
+    url: jdbc:mysql://dev-barista-cluster.cluster-cejbmksulyv2.ap-northeast-2.rds.amazonaws.com:3306/connectcard?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
+    username: connectcard_was
+    password: ${MYDATA_DB_PASSWORD}
+    hikari:
+      hikari:
+        idle-timeout: 30000
+        minimum-idle: 10
+        maximum-pool-size: 30
+        connection-timeout: 5000
+        validation-timeout: 4000
+        max-lifetime: 1800000

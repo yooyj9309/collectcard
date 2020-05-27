@@ -1,1 +1,58 @@
+server:
+  name: collectcard
 
+spring:
+  profiles:
+    active: local
+  main:
+    web-application-type: none
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+
+connectcard:
+  datasource:
+    url: jdbc:mysql://dev-barista-cluster.cluster-cejbmksulyv2.ap-northeast-2.rds.amazonaws.com:3306/connectcard?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
+    username: connectcard_was
+    password: ${COLLECTCARD_DB_PASSWORD}
+    hikari:
+      idle-timeout: 30000
+      minimum-idle: 10
+      maximum-pool-size: 30
+      connection-timeout: 5000
+      validation-timeout: 4000
+      max-lifetime: 1800000
+
+mydata:
+  datasource:
+    url: jdbc:mysql://dev-barista-cluster.cluster-cejbmksulyv2.ap-northeast-2.rds.amazonaws.com:3306/connectcard?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
+    username: connectcard_was
+    password: ${MYDATA_DB_PASSWORD}
+    hikari:
+      hikari:
+        idle-timeout: 30000
+        minimum-idle: 10
+        maximum-pool-size: 30
+        connection-timeout: 5000
+        validation-timeout: 4000
+        max-lifetime: 1800000
+
+logging:
+  config: classpath:logback/logback-${spring.profiles.active}.xml
+  level:
+    com.zaxxer.hikari.HikariConfig: WARN
+    com.zaxxer.hikari: TRACE
+
+application:
+  log:
+    dir: ./logs
+
+sentry:
+  servername: collectcard
+  dsn: ${SENTRY_DATA_SOURCE_NAME}
+  level: ERROR
+  stacktrace.app.packages: com.rainist.simpleloan.*
