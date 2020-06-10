@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  - push
+
+jobs:
+  tests:
+    name: Lint and Test
+    runs-on: ubuntu-18.04
+    container: gradle:6.2.1-jdk8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 5
+          token: ${{ secrets.GH_ACCESS_TOKEN }}
+          submodules: true
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+
+      - name: Lint, Test, Coverage
+        env:
+          GH_USERNAME: ${{ secrets.GH_USERNAME }}
+          GH_DAAS_PACKAGES_TOKEN: ${{ secrets.GH_DAAS_PACKAGES_TOKEN }}
+        run: ./gradlew -s lintKotlin check jacocoTestReport
+
+#        TODO(sangmin): codecov token 추가 후 주석 해제
+#      - name: Send to codecov
+#        uses: codecov/codecov-action@v1
+#        with:
+#          token: ${{ secrets.CODECOV_TOKEN }}
+
+  build:
+    name: Build and Push
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 5
+          token: ${{ secrets.GH_ACCESS_TOKEN }}
+          submodules: true
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+
+      - name: Build collectcard
+        env:
+          GH_USERNAME: ${{ secrets.GH_USERNAME }}
+          GH_DAAS_PACKAGES_TOKEN: ${{ secrets.GH_DAAS_PACKAGES_TOKEN }}
+        run: |
+          ./gradlew clean build -x test
+          docker build -t rainist/collectcard:$GITHUB_SHA .
+
+      - name: Build collectcard-grpc-gateway
+        working-directory: ./grpc-gateway
+        run: docker build --build-arg GH_ACCESS_TOKEN=${{ secrets.GH_ACCESS_TOKEN }} -t rainist/collectcard-grpc-gateway:$GITHUB_SHA .
+
+      - name: Login docker
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+
+      - name: Push images
+        run: |
+          docker push rainist/collectcard:$GITHUB_SHA
+          docker push rainist/collectcard-grpc-gateway:$GITHUB_SHA
