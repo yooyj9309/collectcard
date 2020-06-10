@@ -29,6 +29,10 @@ github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4/go.mod h1:
 github.com/rainist/idl v0.0.0-20200428022427-8ed0a3168f55/go.mod h1:D7T03kjL53YTmPFK5wMyBR19skpXjdsInE8m8caGQwg=
 github.com/rainist/idl v0.0.0-20200526052103-ecaaec182bdc h1:NXpGjuXWt7vo0rlPWHQCVSPrY5V1vFV63IJmvdqkAKI=
 github.com/rainist/idl v0.0.0-20200526052103-ecaaec182bdc/go.mod h1:D7T03kjL53YTmPFK5wMyBR19skpXjdsInE8m8caGQwg=
+github.com/rainist/idl v0.0.0-20200603050816-3c65f601aea1 h1:sWqeX4Vbf695uyS6ByE6K5lDIyrtIZaf6JBFcLf8mSM=
+github.com/rainist/idl v0.0.0-20200603050816-3c65f601aea1/go.mod h1:D7T03kjL53YTmPFK5wMyBR19skpXjdsInE8m8caGQwg=
+github.com/rainist/idl v0.0.0-20200603061257-9bef4343a7e4 h1:JGNMiHFPT1qt8bYe1fTLoLjBy+XXT6lXvS3iQV0Kl/k=
+github.com/rainist/idl v0.0.0-20200603061257-9bef4343a7e4/go.mod h1:D7T03kjL53YTmPFK5wMyBR19skpXjdsInE8m8caGQwg=
 github.com/rogpeppe/fastuuid v1.2.0/go.mod h1:jVj6XXZzXRy/MSR5jhDC/2q6DgLz+nrA6LYCDYWNEvQ=
 github.com/sirupsen/logrus v1.5.0/go.mod h1:+F7Ogzej0PZc/94MaYx/nvG9jOFMD2osvC3s+Squfpo=
 github.com/sirupsen/logrus v1.6.0 h1:UBcNElsrwanuuMsnGSlYmtmgbb23qDR5dG+6X6Oo89I=

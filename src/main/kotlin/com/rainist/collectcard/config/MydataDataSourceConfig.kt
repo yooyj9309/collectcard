@@ -9,49 +9,48 @@ import org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
 import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Primary
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.EnableTransactionManagement
+import java.util.*
 import javax.persistence.EntityManagerFactory
 import javax.sql.DataSource
 
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(
+        entityManagerFactoryRef = "mydataEntityManagerFactory",
+        transactionManagerRef = "mydataTransactionManager",
         basePackages = ["com.rainist.collectcard.db.mydata.repository"]
 )
 class MydataDataSourceConfig {
-    @Primary
     @Bean(name = ["mydataProperties"])
     @ConfigurationProperties("mydata.datasource")
     fun dataSourceProperties(): DataSourceProperties {
         return DataSourceProperties()
     }
 
-    @Primary
     @Bean(name = ["mydataDataSource"])
     @ConfigurationProperties("mydata.datasource.hikari")
-    fun dataSource(@Qualifier("mydataProperties") mydataProperties: DataSourceProperties): DataSource {
-        return mydataProperties
+    fun dataSource(@Qualifier("mydataProperties") dataSourceProperties: DataSourceProperties): DataSource {
+        return dataSourceProperties
                 .initializeDataSourceBuilder()
                 .type(HikariDataSource::class.java)
                 .build()
     }
 
-    @Primary
     @Bean(name = ["mydataEntityManagerFactory"])
     fun entityManagerFactory(builder: EntityManagerFactoryBuilder, @Qualifier("mydataDataSource") dataSource: DataSource): LocalContainerEntityManagerFactoryBean {
         return builder
                 .dataSource(dataSource)
                 .packages("com.rainist.collectcard.db.mydata.entity")
+                .persistenceUnit("mydata")
                 .properties(jpaProperties())
                 .build()
     }
 
-    @Primary
     @Bean(name = ["mydataTransactionManager"])
     fun transactionManager(@Qualifier("mydataEntityManagerFactory") entityManagerFactory: EntityManagerFactory): PlatformTransactionManager {
         return JpaTransactionManager(entityManagerFactory)

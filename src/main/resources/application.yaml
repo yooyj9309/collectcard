@@ -14,7 +14,7 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
 
 
-connectcard:
+collectcard:
   datasource:
     url: jdbc:mysql://dev-barista-cluster.cluster-cejbmksulyv2.ap-northeast-2.rds.amazonaws.com:3306/connectcard?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
     username: connectcard_was

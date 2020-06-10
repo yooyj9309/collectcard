@@ -15,45 +15,49 @@ import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.EnableTransactionManagement
+import java.util.*
 import javax.persistence.EntityManagerFactory
 import javax.sql.DataSource
 
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(
-        basePackages = ["com.rainist.collectcard.db.connectcard.repository"]
+        entityManagerFactoryRef = "collectCardEntityManagerFactory",
+        transactionManagerRef = "collectCardTransactionManager",
+        basePackages = ["com.rainist.collectcard.db.collectcard.repository"]
 )
-class ConnectcardDataSourceConfig {
+class CollectCardDataSourceConfig {
     @Primary
-    @Bean(name = ["connectCardProperties"])
-    @ConfigurationProperties("connectcard.datasource")
+    @Bean(name = ["collectCardProperties"])
+    @ConfigurationProperties("collectcard.datasource")
     fun dataSourceProperties(): DataSourceProperties {
         return DataSourceProperties()
     }
 
     @Primary
-    @Bean(name = ["connectCardDataSource"])
-    @ConfigurationProperties("connectcard.datasource.hikari")
-    fun dataSource(@Qualifier("connectCardProperties") connectCardProperties: DataSourceProperties): DataSource {
-        return connectCardProperties
+    @Bean(name = ["collectCardDataSource"])
+    @ConfigurationProperties("collectcard.datasource.hikari")
+    fun dataSource(@Qualifier("collectCardProperties") collectCardProperties: DataSourceProperties): DataSource {
+        return collectCardProperties
                 .initializeDataSourceBuilder()
                 .type(HikariDataSource::class.java)
                 .build()
     }
 
     @Primary
-    @Bean(name = ["connectCardEntityManagerFactory"])
-    fun entityManagerFactory(builder: EntityManagerFactoryBuilder, @Qualifier("connectCardDataSource") dataSource: DataSource): LocalContainerEntityManagerFactoryBean {
+    @Bean(name = ["collectCardEntityManagerFactory"])
+    fun entityManagerFactory(builder: EntityManagerFactoryBuilder, @Qualifier("collectCardDataSource") dataSource: DataSource): LocalContainerEntityManagerFactoryBean {
         return builder
                 .dataSource(dataSource)
-                .packages("com.rainist.collectcard.db.connectcard.entity")
+                .packages("com.rainist.collectcard.db.collectcard.entity")
+                .persistenceUnit("collectcard")
                 .properties(jpaProperties())
                 .build()
     }
 
     @Primary
-    @Bean(name = ["connectCardTransactionManager"])
-    fun transactionManager(@Qualifier("connectCardEntityManagerFactory") entityManagerFactory: EntityManagerFactory): PlatformTransactionManager {
+    @Bean(name = ["collectCardTransactionManager"])
+    fun transactionManager(@Qualifier("collectCardEntityManagerFactory") entityManagerFactory: EntityManagerFactory): PlatformTransactionManager {
         return JpaTransactionManager(entityManagerFactory)
     }
 

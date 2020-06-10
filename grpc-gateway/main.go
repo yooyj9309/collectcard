@@ -7,13 +7,11 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/sirupsen/logrus"
-	// TODO(sangmin): collectcard proto 작성 후 주석 해제
-	// "google.golang.org/grpc"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 
 	"github.com/rainist/idl/gen/go/apis/external/v1/result"
-	// TODO(sangmin): collectcard proto 작성 후 주석 해제
-	// "github.com/rainist/idl/gen/go/apis/v1/collectcard"
+	"github.com/rainist/idl/gen/go/apis/v1/collectcard"
 )
 
 func wildcardHeaderMatcher(key string) (string, bool) {
@@ -57,19 +55,18 @@ func ServeHTTP(grpcHost string, httpPort string) error {
 		runtime.WithIncomingHeaderMatcher(wildcardHeaderMatcher),
 	)
 
-	// TODO(sangmin): collectcard proto 작성 후 주석 해제
-	//options := []grpc.DialOption{
-	//	grpc.WithInsecure(),
-	//}
+	options := []grpc.DialOption{
+		grpc.WithInsecure(),
+	}
 
-	//if err := connectbank.RegisterCollectcardHandlerFromEndpoint(
-	//	ctx,
-	//	mux,
-	//	grpcHost,
-	//	options,
-	//); err != nil {
-	//	return err
-	//}
+	if err := collectcard.RegisterCollectcardHandlerFromEndpoint(
+		ctx,
+		mux,
+		grpcHost,
+		options,
+	); err != nil {
+		return err
+	}
 
 	return http.ListenAndServe(":"+httpPort, mux)
 }

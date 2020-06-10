@@ -35,6 +35,7 @@ val grpc_spring_boot_version = "3.5.2"
 dependencies {
     // TODO(sangmin): java-banksalad github package 구성 후 주석 해제
     // implementation("com.rainist:java-banksalad:1.0.0.RELEASE")
+    implementation("com.rainist:kotlin-banksalad:1.0.11.RELEASE")
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
