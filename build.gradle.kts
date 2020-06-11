@@ -30,6 +30,14 @@ repositories {
             password = System.getenv("GH_DAAS_PACKAGES_TOKEN")
         }
     }
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/rainist/java-banksalad")
+        credentials {
+            username = System.getenv("GH_USERNAME")
+            password = System.getenv("GH_DAAS_PACKAGES_TOKEN")
+        }
+    }
 }
 
 val grpc_spring_boot_version = "3.5.2"
@@ -38,6 +46,7 @@ dependencies {
     // TODO(sangmin): java-banksalad github package 구성 후 주석 해제
     // implementation("com.rainist:java-banksalad:1.0.0.RELEASE")
     implementation("com.rainist:kotlin-banksalad:1.0.11.RELEASE")
+    implementation("com.rainist:collect:1.0.00.RELEASE")
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
