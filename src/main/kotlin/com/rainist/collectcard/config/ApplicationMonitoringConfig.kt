@@ -14,7 +14,6 @@ class ApplicationMonitoringConfig {
     fun meterFilter(): MeterFilter {
         return object : MeterFilter {
             override fun accept(id: Meter.Id): MeterFilterReply {
-                println(id)
                 return MonitoringValue.isTrace(id.name)
             }
         }
