@@ -1,0 +1,363 @@
+{{ $service_name := "collectcard" }}
+
+{{ $service_grpc_port := "18081" }}
+{{ $service_http_port := "18082" }}
+
+{{ $telegraf_tag := "1.11.5" }}
+
+{{ $sidecar_tag := "3485019fd394c1247f58b63afb5b6876dec8b8ea" }}
+{{ $sidecar_port_for_internal := "8081" }}
+
+{{ $env := .Env.ENV }}
+{{ $sub_env_id := .Env.SUB_ENV_ID }}
+
+{{ assert (ne .Env.IMAGE_TAG "") }}
+
+{{ $no_sub_env_id_envs := slice "production" "staging" }}
+{{ if has $no_sub_env_id_envs $env }}
+  {{ assert (eq $env $sub_env_id) }}
+{{ end }}
+
+{{ $namespace := $env }}
+
+# ^/health$
+# ^/v1/collectcard/users/{user_id}/cards$
+# ^/v1/collectcard/users/{user_id}/card-bills$
+# ^/v1/collectcard/users/{user_id}/card-loans$
+# ^/v1/collectcard/users/{user_id}/card-transactions$
+# ^/v1/collectcard/users/{user_id}/credit-limits$
+
+{{ $sidecar_normalized_path_regexps := "^/health$,^/v1/collectcard/users/{user_id}/cards$,^/v1/collectcard/users/{user_id}/card-bills$,^/v1/collectcard/users/{user_id}/card-loans$,^/v1/collectcard/users/{user_id}/card-transactions$,^/v1/collectcard/users/{user_id}/credit-limits$" }}
+
+{{ if ne $env $sub_env_id }}
+  {{ $namespace = join (slice $env $sub_env_id) "-" }}
+{{ end }}
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ $service_name }}-sidecar-telegraf
+  namespace: {{ $namespace }}
+data:
+  telegraf.conf: |
+    [global_tags]
+
+    [agent]
+      interval = "10s"
+      round_interval = true
+      metric_batch_size = 1000
+      metric_buffer_limit = 10000
+      collection_jitter = "0s"
+      flush_interval = "10s"
+      flush_jitter = "0s"
+      precision = ""
+      hostname = ""
+      omit_hostname = false
+
+    [[outputs.influxdb]]
+      urls = ["http://observability-influxdb
+        {{- if eq $env $sub_env_id -}}
+          .production
+        {{- end -}}
+      :8086"]
+      database = "observability-telegraf"
+
+    [[inputs.statsd]]
+      protocol = "udp"
+      max_tcp_connections = 250
+      tcp_keep_alive = false
+      service_address = ":8125"
+      delete_gauges = true
+      delete_counters = true
+      delete_sets = true
+      delete_timings = true
+      percentiles = [99, 95, 90, 50]
+      metric_separator = "."
+      parse_data_dog_tags = false
+      datadog_extensions = false
+      allowed_pending_messages = 10000
+      percentile_limit = 1000
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ $service_name }}-telegraf
+  namespace: {{ $namespace }}
+data:
+  telegraf.conf: |
+    [global_tags]
+
+    [agent]
+      interval = "10s"
+      round_interval = true
+      metric_batch_size = 1000
+      metric_buffer_limit = 10000
+      collection_jitter = "0s"
+      flush_interval = "10s"
+      flush_jitter = "0s"
+      precision = ""
+      hostname = ""
+      omit_hostname = false
+
+    [[outputs.influxdb]]
+      urls = ["http://observability-influxdb
+        {{- if eq $env $sub_env_id -}}
+          .production
+        {{- end -}}
+      :8086"]
+      database = "collect"
+
+    [[inputs.statsd]]
+      protocol = "udp"
+      max_tcp_connections = 250
+      tcp_keep_alive = false
+      service_address = ":8126"
+      delete_gauges = true
+      delete_counters = true
+      delete_sets = true
+      delete_timings = true
+      percentiles = [99, 95, 90, 50]
+      metric_separator = "."
+      parse_data_dog_tags = false
+      datadog_extensions = false
+      allowed_pending_messages = 10000
+      percentile_limit = 1000
+
+---
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: {{ $service_name }}
+  namespace: {{ $namespace }}
+  labels:
+    app: {{ $service_name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ $service_name }}
+  template:
+    metadata:
+      name: {{ $service_name }}
+      labels:
+        app: {{ $service_name }}
+    spec:
+      volumes:
+        - name: telegraf-conf
+          configMap:
+            name: {{ $service_name }}-sidecar-telegraf
+            defaultMode: 420
+      containers:
+        - name: telegraf
+          image: telegraf:{{ $telegraf_tag }}
+          ports:
+            - containerPort: 8125
+              protocol: UDP
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              cpu: 500m
+              memory: 128Mi
+          volumeMounts:
+            - name: telegraf-conf
+              mountPath: "/etc/telegraf"
+          terminationMessagePath: "/dev/termination-log"
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+        - name: {{ $service_name }}-telegraf
+          image: telegraf:{{ $telegraf_tag }}
+          ports:
+            - containerPort: 8126
+              protocol: UDP
+          resources:
+            limits:
+              cpu: 1
+              memory: 500Mi
+            requests:
+              cpu: 500m
+              memory: 300Mi
+          volumeMounts:
+            - name: {{ $service_name }}-telegraf-conf
+              mountPath: "/etc/telegraf"
+          terminationMessagePath: "/dev/termination-log"
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+        - name: sidecar-for-internal
+          image: rainist/sidecar:{{ $sidecar_tag }}
+          ports:
+            - containerPort: {{ $sidecar_port_for_internal }}
+              protocol: TCP
+          env:
+            - name: SIDECAR_HTTP_PORT
+              value: "{{ $sidecar_port_for_internal }}"
+            - name: SERVICE_HTTP_HOSTNAME
+              value: localhost
+            - name: SERVICE_HTTP_PORT
+              value: "{{ $service_http_port }}"
+            - name: SERVICE_NAME
+              value: {{ $service_name }}
+            - name: ENV
+              value: {{ $env }}
+            - name: SUB_ENV_ID
+              value: {{ $sub_env_id }}
+            - name: NAMESPACE
+              value: {{ $namespace }}
+            - name: IS_SERVICE_HTTP2
+              value: "false"
+            - name: PATH_REGEXPS
+              value: "{{ $sidecar_normalized_path_regexps }}"
+          resources:
+            limits:
+              memory: 2Gi
+            requests:
+              cpu: 250m
+              memory: 512Mi
+          terminationMessagePath: "/dev/termination-log"
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+        - name: {{ $service_name }}
+          image: rainist/{{ $service_name }}:{{ getenv "IMAGE_TAG" }}
+          ports:
+            - containerPort: {{ $service_grpc_port }}
+              protocol: TCP
+            - containerPort: {{ $service_http_port }}
+              protocol: TCP
+          env:
+            - name: ENV
+              value: {{ $env }}
+            - name: SUB_ENV_ID
+              value: {{ $sub_env_id }}
+            - name: NAMESPACE
+              value: {{ $namespace }}
+          resources:
+            limits:
+              memory: 1Gi
+            requests:
+              cpu: 250m
+              memory: 512Mi
+          terminationMessagePath: "/dev/termination-log"
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+        - name: {{ $service_name }}-grpc-gateway
+          image: rainist/{{ $service_name }}-grpc-gateway:{{ getenv "IMAGE_TAG" }}
+          ports:
+            - containerPort: {{ $service_http_port }}
+              protocol: TCP
+          env:
+            - name: SERVICE_GRPC_PORT
+              value: "{{ $service_grpc_port }}"
+            - name: SERVICE_HTTP_PORT
+              value: "{{ $service_http_port }}"
+          resources:
+            limits:
+              cpu: 200m
+              memory: 100Mi
+            requests:
+              cpu: 20m
+              memory: 40Mi
+          livenessProbe:
+            httpGet:
+              path: "/health"
+              port: {{ $service_http_port }}
+              scheme: HTTP
+            initialDelaySeconds: 5
+            timeoutSeconds: 2
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: "/health"
+              port: {{ $service_http_port }}
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 1
+            periodSeconds: 3
+            successThreshold: 1
+            failureThreshold: 2
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: false
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      dnsConfig:
+        options:
+          - name: single-request-reopen
+      securityContext: {}
+      imagePullSecrets:
+        - name: docker-hub-registry-credential
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+
+---
+kind: HorizontalPodAutoscaler
+apiVersion: autoscaling/v1
+metadata:
+  name: {{ $service_name }}
+  namespace: {{ $namespace }}
+spec:
+  scaleTargetRef:
+    kind: Deployment
+    name: {{ $service_name }}
+    apiVersion: extensions/v1beta1
+{{ if eq $env "production" }}
+  minReplicas: 3
+  maxReplicas: 5
+{{ else }}
+  minReplicas: 2
+  maxReplicas: 2
+{{ end }}
+  targetCPUUtilizationPercentage: 60
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ $service_name }}
+  namespace: {{ $namespace }}
+  labels:
+    app: {{ $service_name }}
+spec:
+  ports:
+    - name: http-for-internal
+      protocol: TCP
+      port: 80
+      targetPort: {{ $sidecar_port_for_internal }}
+    - name: grpc
+      protocol: TCP
+      port: 8080
+      targetPort: {{ $service_grpc_port }}
+  selector:
+    app: {{ $service_name }}
+  type: ClusterIP
+  sessionAffinity: None
+
+{{ if and (eq $env "development") (eq $sub_env_id "local") }}
+---
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  name: {{ $service_name }}
+  namespace: {{ $namespace }}
+spec:
+  rules:
+    - host: {{ $service_name }}.
+        {{- if not (has $no_sub_env_id_envs $env) -}}
+        {{ $sub_env_id }}.{{ $env }}.
+        {{- end -}}
+        banksalad.com
+      http:
+        paths:
+          - backend:
+              serviceName: {{ $service_name }}
+              servicePort: 80
+{{ end }}

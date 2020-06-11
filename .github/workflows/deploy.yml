@@ -1,0 +1,59 @@
+name: Deploy
+
+on:
+  - deployment
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 5
+          token: ${{ secrets.GH_ACCESS_TOKEN }}
+          submodules: true
+
+      - name: Set deployment status to in_progress
+        uses: ./.github/actions/github-deploy-status
+        with:
+          state: 'in_progress'
+          description: 'deployment started'
+        env:
+          GITHUB_DEPLOY_EVENT_URL: ${{ github.event.deployment.statuses_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clone k8s-ticket
+        run: git clone https://${{ secrets.GH_ACCESS_TOKEN }}@github.com/Rainist/k8s-ticket.git
+
+      - name: Update kubeconfig
+        run: |
+          cd k8s-ticket
+          make create-user USER=${{ secrets.GH_USERNAME }} TOKEN=${{ secrets.GH_ACCESS_TOKEN }}
+          make seoul USER=${{ secrets.GH_USERNAME }}
+          kubectl config use-context banksalad-seoul-cluster
+
+      - name: Deploy
+        run: |
+          cat k8s.yaml.tmpl | \
+          docker run --rm -i \
+          -e ENV \
+          -e SUB_ENV_ID \
+          -e IMAGE_TAG=$GITHUB_SHA \
+          \
+          hairyhenderson/gomplate:v3.5.0-slim -f - | \
+          kubectl apply -f -
+        env:
+          ENV: ${{ github.event.deployment.environment }}
+          SUB_ENV_ID: ${{ github.event.deployment.environment }}
+
+      - name: Set deployment status to success
+        if: always()
+        uses: ./.github/actions/github-deploy-status
+        with:
+          state: '${{ job.status }}'
+          description: 'deployment ${{ job.status }}'
+        env:
+          GITHUB_DEPLOY_EVENT_URL: ${{ github.event.deployment.statuses_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
