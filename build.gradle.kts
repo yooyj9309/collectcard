@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.springframework.boot") version "2.3.0.RELEASE"
+    id("org.springframework.boot") version "2.2.5.RELEASE"
     id("io.spring.dependency-management") version "1.0.9.RELEASE"
     id("org.jmailen.kotlinter") version "2.3.2"
     kotlin("jvm") version "1.3.72"
@@ -63,6 +63,11 @@ dependencies {
 
     // sentry
     implementation("io.sentry:sentry-logback:1.7.30")
+
+    // application monitoring
+    implementation("io.micrometer:micrometer-registry-statsd:1.4.0")
+    implementation("io.micrometer:micrometer-core:1.4.0")
+
 
 }
 

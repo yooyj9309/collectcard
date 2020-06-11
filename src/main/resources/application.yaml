@@ -55,4 +55,20 @@ sentry:
   servername: collectcard
   dsn: ${SENTRY_DATA_SOURCE_NAME}
   level: ERROR
-  stacktrace.app.packages: com.rainist.simpleloan.*
+  stacktrace.app.packages: com.rainist.collectcard.*
+
+
+management:
+  metrics:
+    export:
+      statsd:
+        enabled: true
+        flavor: telegraf
+        polling-frequency: 5s
+        max-packet-length: 5000
+        host: localhost
+        port: 8126
+        publish-unchanged-meters: true
+    tags:
+      application: ${server.name}
+      active: ${spring.profiles.active}
