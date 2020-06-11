@@ -1,6 +1,3 @@
-server:
-  name: collectcard
-
 spring:
   profiles:
     active: local
@@ -12,6 +9,8 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
+  application:
+    name: collectcard
 
 
 collectcard:
@@ -70,5 +69,5 @@ management:
         port: 8126
         publish-unchanged-meters: true
     tags:
-      application: ${server.name}
+      application: ${spring.application.name}
       active: ${spring.profiles.active}
