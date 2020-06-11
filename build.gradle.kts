@@ -26,7 +26,7 @@ repositories {
         name = "GitHubPackages"
         url = uri("https://maven.pkg.github.com/rainist/kotlin-banksalad")
         credentials {
-            username = System.getenv("GIT_USERNAME")
+            username = System.getenv("GH_USERNAME")
             password = System.getenv("GH_DAAS_PACKAGES_TOKEN")
         }
     }
