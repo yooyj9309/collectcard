@@ -148,6 +148,10 @@ spec:
           configMap:
             name: {{ $service_name }}-sidecar-telegraf
             defaultMode: 420
+        - name: {{ $service_name }}-telegraf-conf
+          configMap:
+            name: {{ $service_name }}-telegraf
+            defaultMode: 420
       containers:
         - name: telegraf
           image: telegraf:{{ $telegraf_tag }}

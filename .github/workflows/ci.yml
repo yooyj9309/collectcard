@@ -54,6 +54,7 @@ jobs:
         env:
           GH_USERNAME: ${{ secrets.GH_USERNAME }}
           GH_DAAS_PACKAGES_TOKEN: ${{ secrets.GH_DAAS_PACKAGES_TOKEN }}
+          DEVELOPMENT_COLLECTCARD_DB_PASSWORD: ${{ secrets.DEVELOPMENT_COLLECTCARD_DB_PASSWORD }}
         run: |
           ./gradlew clean build -x test
           docker build -t rainist/collectcard:$GITHUB_SHA .
