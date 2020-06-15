@@ -8,32 +8,38 @@ import org.lognet.springboot.grpc.GRpcService
 @GRpcService
 class CollectcardGrpcService : CollectcardGrpc.CollectcardImplBase() {
     override fun healthCheck(request: CollectcardProto.HealthCheckRequest?, responseObserver: StreamObserver<CollectcardProto.HealthCheckResponse>?) {
-        try {
-            val resp = CollectcardProto.HealthCheckResponse.newBuilder().build()
-            responseObserver?.onNext(resp)
-            responseObserver?.onCompleted()
-        } catch (e: Exception) {
-            responseObserver?.onError(e)
-        }
+        val resp = CollectcardProto.HealthCheckResponse.newBuilder().build()
+        responseObserver?.onNext(resp)
+        responseObserver?.onCompleted()
     }
 
     override fun listCards(request: CollectcardProto.ListCardsRequest?, responseObserver: StreamObserver<CollectcardProto.ListCardsResponse>?) {
-        super.listCards(request, responseObserver)
+        val resp = CollectcardProto.ListCardsResponse.newBuilder().build()
+        responseObserver?.onNext(resp)
+        responseObserver?.onCompleted()
     }
 
     override fun listCardTransactions(request: CollectcardProto.ListCardTransactionsRequest?, responseObserver: StreamObserver<CollectcardProto.ListCardTransactionsResponse>?) {
-        super.listCardTransactions(request, responseObserver)
+        val resp = CollectcardProto.ListCardTransactionsResponse.newBuilder().build()
+        responseObserver?.onNext(resp)
+        responseObserver?.onCompleted()
     }
 
     override fun listCardBills(request: CollectcardProto.ListCardBillsRequest?, responseObserver: StreamObserver<CollectcardProto.ListCardBillsResponse>?) {
-        super.listCardBills(request, responseObserver)
+        val resp = CollectcardProto.ListCardBillsResponse.newBuilder().build()
+        responseObserver?.onNext(resp)
+        responseObserver?.onCompleted()
     }
 
     override fun listCardLoans(request: CollectcardProto.ListCardLoansRequest?, responseObserver: StreamObserver<CollectcardProto.ListCardLoansResponse>?) {
-        super.listCardLoans(request, responseObserver)
+        val resp = CollectcardProto.ListCardLoansResponse.newBuilder().build()
+        responseObserver?.onNext(resp)
+        responseObserver?.onCompleted()
     }
 
     override fun getCreditLimit(request: CollectcardProto.GetCreditLimitRequest?, responseObserver: StreamObserver<CollectcardProto.GetCreditLimitResponse>?) {
-        super.getCreditLimit(request, responseObserver)
+        val resp = CollectcardProto.GetCreditLimitResponse.newBuilder().build()
+        responseObserver?.onNext(resp)
+        responseObserver?.onCompleted()
     }
 }

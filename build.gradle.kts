@@ -61,6 +61,7 @@ dependencies {
 
     // grpc
     implementation("io.github.lognet:grpc-spring-boot-starter:$grpc_spring_boot_version")
+    testImplementation("io.grpc:grpc-testing:1.30.0")
 
     // db
     implementation("com.vladmihalcea:hibernate-types-52:2.9.2")
