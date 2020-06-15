@@ -7,39 +7,39 @@ import org.lognet.springboot.grpc.GRpcService
 
 @GRpcService
 class CollectcardGrpcService : CollectcardGrpc.CollectcardImplBase() {
-    override fun healthCheck(request: CollectcardProto.HealthCheckRequest?, responseObserver: StreamObserver<CollectcardProto.HealthCheckResponse>?) {
+    override fun healthCheck(request: CollectcardProto.HealthCheckRequest, responseObserver: StreamObserver<CollectcardProto.HealthCheckResponse>) {
         val resp = CollectcardProto.HealthCheckResponse.newBuilder().build()
-        responseObserver?.onNext(resp)
-        responseObserver?.onCompleted()
+        responseObserver.onNext(resp)
+        responseObserver.onCompleted()
     }
 
-    override fun listCards(request: CollectcardProto.ListCardsRequest?, responseObserver: StreamObserver<CollectcardProto.ListCardsResponse>?) {
+    override fun listCards(request: CollectcardProto.ListCardsRequest, responseObserver: StreamObserver<CollectcardProto.ListCardsResponse>) {
         val resp = CollectcardProto.ListCardsResponse.newBuilder().build()
-        responseObserver?.onNext(resp)
-        responseObserver?.onCompleted()
+        responseObserver.onNext(resp)
+        responseObserver.onCompleted()
     }
 
-    override fun listCardTransactions(request: CollectcardProto.ListCardTransactionsRequest?, responseObserver: StreamObserver<CollectcardProto.ListCardTransactionsResponse>?) {
+    override fun listCardTransactions(request: CollectcardProto.ListCardTransactionsRequest, responseObserver: StreamObserver<CollectcardProto.ListCardTransactionsResponse>) {
         val resp = CollectcardProto.ListCardTransactionsResponse.newBuilder().build()
-        responseObserver?.onNext(resp)
-        responseObserver?.onCompleted()
+        responseObserver.onNext(resp)
+        responseObserver.onCompleted()
     }
 
-    override fun listCardBills(request: CollectcardProto.ListCardBillsRequest?, responseObserver: StreamObserver<CollectcardProto.ListCardBillsResponse>?) {
+    override fun listCardBills(request: CollectcardProto.ListCardBillsRequest, responseObserver: StreamObserver<CollectcardProto.ListCardBillsResponse>) {
         val resp = CollectcardProto.ListCardBillsResponse.newBuilder().build()
-        responseObserver?.onNext(resp)
-        responseObserver?.onCompleted()
+        responseObserver.onNext(resp)
+        responseObserver.onCompleted()
     }
 
-    override fun listCardLoans(request: CollectcardProto.ListCardLoansRequest?, responseObserver: StreamObserver<CollectcardProto.ListCardLoansResponse>?) {
+    override fun listCardLoans(request: CollectcardProto.ListCardLoansRequest, responseObserver: StreamObserver<CollectcardProto.ListCardLoansResponse>) {
         val resp = CollectcardProto.ListCardLoansResponse.newBuilder().build()
-        responseObserver?.onNext(resp)
-        responseObserver?.onCompleted()
+        responseObserver.onNext(resp)
+        responseObserver.onCompleted()
     }
 
-    override fun getCreditLimit(request: CollectcardProto.GetCreditLimitRequest?, responseObserver: StreamObserver<CollectcardProto.GetCreditLimitResponse>?) {
+    override fun getCreditLimit(request: CollectcardProto.GetCreditLimitRequest, responseObserver: StreamObserver<CollectcardProto.GetCreditLimitResponse>) {
         val resp = CollectcardProto.GetCreditLimitResponse.newBuilder().build()
-        responseObserver?.onNext(resp)
-        responseObserver?.onCompleted()
+        responseObserver.onNext(resp)
+        responseObserver.onCompleted()
     }
 }
