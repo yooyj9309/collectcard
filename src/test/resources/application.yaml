@@ -1,0 +1,12 @@
+spring:
+  profiles:
+    active: local
+  main:
+    web-application-type: none
+
+logging:
+  config: classpath:logback/logback.xml
+
+endpoint:
+  card:
+    shinhancard: https://devopenapi.shinhancard.com:8443

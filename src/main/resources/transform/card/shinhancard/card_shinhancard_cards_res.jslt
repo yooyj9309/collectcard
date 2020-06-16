@@ -1,0 +1,51 @@
+let CardOwnerType = {
+    "1": "CARD_OWNER_TYPE_SELF",
+    "3": "CARD_OWNER_TYPE_FAMILY"
+}
+
+let CardType = {
+    "": "CARD_TYPE_UNKNOWN",
+    "1": "CARD_TYPE_CREDIT",
+    "5": "CARD_TYPE_DEBIT",
+    "3": "CARD_TYPE_MICROPAYMENT"
+}
+
+let brands = {
+    "": "CARD_INTERNATIONAL_BRAND_UNKNOWN",
+    "0": "CARD_INTERNATIONAL_BRAND_NOT_EXISTS",
+    "1": "CARD_INTERNATIONAL_BRAND_MASTERCARD",
+    "2": "CARD_INTERNATIONAL_BRAND_VISA",
+    "3": "CARD_INTERNATIONAL_BRAND_JCB",
+    "4": "CARD_INTERNATIONAL_BRAND_AMEX",
+    "5": "CARD_INTERNATIONAL_BRAND_UNIONPAY",
+
+    "6": "CARD_INTERNATIONAL_BRAND_UNKNOWN",
+    "7": "CARD_INTERNATIONAL_BRAND_BCGLOBAL",
+
+    "8": "CARD_INTERNATIONAL_BRAND_UNKNOWN",
+
+    "9": "CARD_INTERNATIONAL_BRAND_UNKNOWN",
+    "Z": "CARD_INTERNATIONAL_BRAND_UNKNOWN"
+}
+
+let cardholder_name = .dataBody.clnHgNm
+
+{
+    "dataHeader": {
+        "resultCode": .dataHeader.resultCode,
+        "resultMessage": .dataHeader.resultMessage
+    },
+    "dataBody": {
+        "cards": [for (.dataBody.grp001)
+            {
+                "cardId": .enccardno,
+                "cardOwnerName": .clnHgNm,
+                "cardOwnerType": get-key($CardOwnerType, .cardgubun, "CARD_OWNER_TYPE_SELF"),
+                "cardName": .cardname,
+                "cardNumberMask": .cardno,
+                "cardType": get-key($CardType, .cardgubun, "CARD_TYPE_CREDIT"),
+                "internationalBrandName": get-key($brands, .cardbrand, "CARD_INTERNATIONAL_BRAND_UNKNOWN")
+            }
+        ]
+    }
+}

@@ -24,3 +24,9 @@ mydata:
         connection-timeout: 5000
         validation-timeout: 4000
         max-lifetime: 1800000
+
+
+host:
+  card:
+    shinhancard: https://openapi.shinhancard.com:8443
+

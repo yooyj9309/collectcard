@@ -1,0 +1,6 @@
+{
+    "dataHeader":{},
+    "dataBody":{
+        "nxtQyKey": .nextQueryKey
+    }
+}

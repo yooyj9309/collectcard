@@ -1,0 +1,7 @@
+{
+    "reqKey": .clientId,
+    "transNo": .transactionNumber,
+    "appName": .clientName,
+    "subChannel": .clientChannelName,
+    "Authorization": .authorization
+}

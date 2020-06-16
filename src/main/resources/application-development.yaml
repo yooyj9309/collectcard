@@ -8,3 +8,7 @@ logging:
     com.zaxxer.hikari: TRACE
     org.hibernate.SQL: debug
     org.hibernate.type.descriptor.sql.BasicBinder: trace
+
+host:
+  card:
+    shinhancard: https://devopenapi.shinhancard.com:8443

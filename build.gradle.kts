@@ -41,16 +41,21 @@ repositories {
 }
 
 val grpc_spring_boot_version = "3.5.2"
+val http_client_version = "4.5.11"
+val camel_version = "3.2.0"
 
 dependencies {
-    // TODO(sangmin): java-banksalad github package 구성 후 주석 해제
-    // implementation("com.rainist:java-banksalad:1.0.0.RELEASE")
     implementation("com.rainist:kotlin-banksalad:1.0.11.RELEASE")
-    implementation("com.rainist:collect:1.0.00.RELEASE")
+
+    // collect
+    implementation("com.rainist:collect:1.0.3.RELEASE")
+    implementation("org.apache.camel:camel-jslt:${camel_version}")
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
+    implementation("org.apache.httpcomponents:httpclient:$http_client_version")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
@@ -77,8 +82,6 @@ dependencies {
     // application monitoring
     implementation("io.micrometer:micrometer-registry-statsd:1.4.0")
     implementation("io.micrometer:micrometer-core:1.4.0")
-
-
 }
 
 tasks.withType<Test> {
