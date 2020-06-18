@@ -2,7 +2,7 @@ package com.rainist.collectcard.card
 
 import com.rainist.collectcard.card.dto.ListCardsRequest
 import com.rainist.collectcard.card.dto.ListCardsRequestDataBody
-import com.rainist.collectcard.common.collect.Apis
+import com.rainist.collectcard.common.collect.api.ShinhancardApis
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
 import org.junit.jupiter.api.DisplayName
@@ -43,7 +43,7 @@ class CardServiceImplTest {
     }
 
     private fun setupServer() {
-        val api = Apis.card_shinhancard_cards
+        val api = ShinhancardApis.card_shinhancard_cards
         val server = MockRestServiceServer.bindTo(commonRestTemplate).ignoreExpectOrder(true).build()
 
         server.expect(ExpectedCount.manyTimes(), requestTo(api.endpoint))

@@ -7,6 +7,6 @@ spring:
 logging:
   config: classpath:logback/logback.xml
 
-endpoint:
+host:
   card:
     shinhancard: https://devopenapi.shinhancard.com:8443

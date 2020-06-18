@@ -5,10 +5,10 @@ import com.rainist.collect.common.dto.ApiResponse
 import com.rainist.collect.executor.service.CollectExecutorService
 import com.rainist.collectcard.card.dto.ListCardsRequest
 import com.rainist.collectcard.card.dto.ListCardsResponse
-import com.rainist.collectcard.common.collect.BusinessType
-import com.rainist.collectcard.common.collect.Executions
-import com.rainist.collectcard.common.collect.Organization
-import com.rainist.collectcard.common.collect.Transaction
+import com.rainist.collectcard.common.collect.api.BusinessType
+import com.rainist.collectcard.common.collect.api.Organization
+import com.rainist.collectcard.common.collect.api.Transaction
+import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.common.log.Log
 import org.springframework.stereotype.Service
 
