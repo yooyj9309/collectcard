@@ -17,7 +17,7 @@ let CardTransactionType = {
         "transactions": [for (.dataBody.grp001)
             {
                 "approvalDay" : if(size(.aprvtime) >= 14) .aprvtime[ 0 : 8 ] else "",   // 승인일자
-                "approvalTime" : if(size(.aprvtime) >= 14) .aprvtime[ 8 : 14 ] else "",  // 승인시간
+                "approvalTime" : if(size(.aprvtime) >= 14) .aprvtime[ 8 : 14 ] else "", // 승인시간
                 "approvalNumber": .aprvno,                                              // 승인번호
                 "amount": .aprvamt,                                                     // 승인금액
                 "cardNumber": .cardno,                                                  // 카드번호

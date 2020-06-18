@@ -1,7 +1,17 @@
 let CardTransactionType = {
-    "1": "SINGLE_PAYMENT",                  //  일시불
-    "2": "CASH_SERVICE",                    //  현금서비스
+    "": "APPROVAL",                         //  승인
+    "1": "PURCHASE",                        //  매입
+    "2": "APPROVAL_CANCEL",                 //  승인취소
+    "3": "PURCHASE_CANCEL",                 //  매입취소
+    "4": "PURCHASE_PART_CANCEL",            //  매입부분취소
     "99": "CARD_TRANSACTION_TYPE_UNKNOWN",  //  알수없음
+}
+
+let CardType = {
+    "1" : "DEBIT",
+    "2" : "CREDIT",
+    "3" : "MICROPAYMENT",
+    "99" : "CARD_TYPE_UNKNOWN"
 }
 
 {
@@ -17,17 +27,17 @@ let CardTransactionType = {
                 "approvalTime" : if(size(.aprvtime) >= 14) .aprvtime[ 8 : 14] else "",  // 승인시간 HHmmss
                 "approvalNumber": .aprvno,                                              // 승인번호
                 "amount": .aprvamt,                                                     // 승인금액
-                "cardNumber": .cardno,                                                  // 카드번호
+                "cardNumber": .usecardno,                                               // 카드번호
                 "storeName" : .retlname,                                                // 가맹점명
-                "paymentDay": .stldate,                                                 // 결제예정일자
+                "paymentDay": .settlday,                                                // 결제일자
                 "storeNumber": .retlno,                                                 // 가맹점번호
                 "canceledAmount": .subCla,                                              // 부분취소 금액
                 "storeCategory" : .ryCd,                                                // 업종코드명
-                "currencyCode" : .engcrcycd,                                            // 통화코드
-                "transactionCountry" : .nation,                                         // 사용국가
-                "cardTransactionType": get-key($CardTransactionType, .trantype, "CARD_TRANSACTION_TYPE_UNKNOWN")  // 상태
+                "cardType" : get-key($CardType, .settlgubun, "CARD_TYPE_UNKNOWN"),      // 거래구분 TODO 예상국 이게 여기서 왜 필요한지 내부 처리 로직 확인
+                "cardTransactionType": get-key($CardTransactionType, .status, "CARD_TRANSACTION_TYPE_UNKNOWN")  // 상태
             }
         ],
-        "nextKey" : .dataBody.nxtQyKey  // 다음 조회 키
-    }
+        "nextKey" : .dataBody.nxtQyKey,  // 다음 조회 키
+        "isBC" : .dataBody.bctgubun
+   }
 }
