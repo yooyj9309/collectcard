@@ -26,7 +26,7 @@ let CardTransactionType = {
                 "storeNumber": .retlno,                                                 // 가맹점번호
                 "canceledAmount": .subCla,                                              // 부분취소 금액
                 "cardTransactionType": get-key($CardTransactionType, .status, "CARD_TRANSACTION_TYPE_UNKNOWN")  // 상태
-                //"이용구분" : .ueC // TODO 예상국 JG, 정경서님께 확인하여 추가 할것인지 말것인지 확인
+                //"이용구분" : .ueC // TODO 예상국 내부에서는 쓰지 않으나 모든 데이터를 수집하기 위하여 표준에 적용
             }
         ],
         "nextKey" : .dataBody.nxtQyKey  // 다음 조회 키

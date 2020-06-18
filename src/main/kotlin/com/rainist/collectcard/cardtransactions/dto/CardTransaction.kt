@@ -19,7 +19,7 @@ data class CardTransaction(
 
     var cardType: String? = null, //  7. 카드타입 (신용카드, 체크카드)
 
-    var cardTransactionType: String? = null, //  8. 내역타입 ( 승인, 전체 취소, 부분취소, 거절 )월
+    var cardTransactionType: CardTransactionType? = null, //  8. 내역타입 ( 승인, 전체 취소, 부분취소, 거절 )월
 
     var currencyCode: String? = null, //  9. 통화코드
 

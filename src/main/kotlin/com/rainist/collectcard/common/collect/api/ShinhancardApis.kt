@@ -22,7 +22,7 @@ class ShinhancardApis {
             .algorithm(SignaturePolicy.Algorithm.NONE)
             .build()
 
-        // 유효카드 정보조회 SHC_HPG00548_EXT
+        // 유효카드 정보조회 SHC_HPG00548
         val card_shinhancard_cards: Api =
             Api.builder()
                 .business(BusinessType.card.name)
@@ -31,11 +31,27 @@ class ShinhancardApis {
                 .signaturePolicy(signaturePolicyShinhancard)
                 .endpoint("$hostCardShinhancard/v1.0/EXT/mycard/searchavailablecard")
                 .method(Api.HttpMethod.POST)
-                .transformRequestHeader(readText("classpath:transform/card/shinhancard/card_shinhancard_header_req.jslt"))
-                .transformRequestBody(readText("classpath:transform/card/shinhancard/card_shinhancard_cards_req.jslt"))
-                .transformResponseHeader(readText("classpath:transform/card/shinhancard/card_shinhancard_header_res.jslt"))
-                .transformResponseBody(readText("classpath:transform/card/shinhancard/card_shinhancard_cards_res.jslt"))
+                .transformRequestHeader(readText("classpath:transform/card/shinhancard/header_req.jslt"))
+                .transformRequestBody(readText("classpath:transform/card/shinhancard/cards_req.jslt"))
+                .transformResponseHeader(readText("classpath:transform/card/shinhancard/header_res.jslt"))
+                .transformResponseBody(readText("classpath:transform/card/shinhancard/cards_res.jslt"))
                 .name("보유카드조회")
+                .build()
+
+        // 신용 국내사용내역조회-일시불/할부 SHC_HPG00428
+        val card_shinhancard_credit_domestic_transactions: Api =
+            Api.builder()
+                .business(BusinessType.card.name)
+                .agency(Organization.shinhancard.name)
+                .transaction(Transaction.cardTransaction.name)
+                .signaturePolicy(signaturePolicyShinhancard)
+                .endpoint("$hostCardShinhancard/v1.0/EXT/usecreditcard/searchusefordomestic")
+                .method(Api.HttpMethod.POST)
+                .transformRequestHeader(readText("classpath:transform/card/shinhancard/header_req.jslt"))
+                .transformRequestBody(readText("classpath:transform/card/shinhancard/transaction_SHC_HPG00428_req.jslt"))
+                .transformResponseHeader(readText("classpath:transform/card/shinhancard/header_res.jslt"))
+                .transformResponseBody(readText("classpath:transform/card/shinhancard/transaction_SHC_HPG00428_res.jslt"))
+                .name("신용 국내사용내역 조회-일시불/할부(SHC_HPG00428)")
                 .build()
     }
 }
