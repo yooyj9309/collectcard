@@ -1,7 +1,6 @@
 package com.rainist.collectcard.cardtransactions.dto
 
 import java.math.BigDecimal
-import java.time.LocalDateTime
 
 data class CardTransaction(
 
@@ -55,5 +54,9 @@ data class CardTransaction(
 
     var isOverseaUse: Boolean? = null, //  25. 해외사용여부
 
-    var paymentDay: LocalDateTime? = null //  26. 결제예정일
+    var paymentDay: String? = null, //  26. 결제예정일
+
+    var storeCategory: String? = null, // 27. 업종타입
+
+    var transactionCountry: String? = null // 28. 사용국가
 )

@@ -11,6 +11,8 @@ enum class CardTransactionType(
     PURCHASE(4, "매입"),
     PURCHASE_CANCEL(5, "매입 취소"),
     PURCHASE_PART_CANCEL(6, "매입 부분 취소"),
-    CARD_TRANSACTION_TYPE_UNKNOWN(7, "모르는 타입")
+    CARD_TRANSACTION_TYPE_UNKNOWN(7, "모르는 타입"),
+    SINGLE_PAYMENT(8, "일시불"),
+    CASH_SERVICE(9, "현금서비스")
     ;
 }

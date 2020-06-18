@@ -1,9 +1,6 @@
 let CardTransactionType = {
-    "": "APPROVAL",                         //  승인
-    "1": "PURCHASE",                        //  매입
-    "2": "APPROVAL_CANCEL",                 //  승인취소
-    "3": "PURCHASE_CANCEL",                 //  매입취소
-    "4": "PURCHASE_PART_CANCEL",            //  매입부분취소
+    "1": "SINGLE_PAYMENT",                  //  일시불
+    "2": "CASH_SERVICE",                    //  현금서비스
     "99": "CARD_TRANSACTION_TYPE_UNKNOWN",  //  알수없음
 }
 
@@ -16,17 +13,20 @@ let CardTransactionType = {
    "dataBody": {
         "transactions": [for (.dataBody.grp001)
             {
-                "approvalDay" : if(size(.aprvtime) >= 14) .aprvtime[ 0 : 8 ] else "",   // 승인일자
-                "approvalTime" : if(size(.aprvtime) >= 14) .aprvtime[ 8 : 14 ] else "",  // 승인시간
+                "approvalDay" : if(size(.aprvtime) >= 14) .aprvtime[ 0 : 8 ] else "",   // 승인일자 yyyyMMdd
+                "approvalTime" : if(size(.aprvtime) >= 14) .aprvtime[ 8 : 14] else "",  // 승인시간 HHmmss
                 "approvalNumber": .aprvno,                                              // 승인번호
                 "amount": .aprvamt,                                                     // 승인금액
                 "cardNumber": .cardno,                                                  // 카드번호
-                "installment": .insmon,                                                 // 할부개월
+                "storeName" : .retlname,                                                // 가맹점명
                 "paymentDay": .stldate,                                                 // 결제예정일자
                 "storeNumber": .retlno,                                                 // 가맹점번호
                 "canceledAmount": .subCla,                                              // 부분취소 금액
-                "cardTransactionType": get-key($CardTransactionType, .status, "CARD_TRANSACTION_TYPE_UNKNOWN")  // 상태
-                //"이용구분" : .ueC // TODO 예상국 내부에서는 쓰지 않으나 모든 데이터를 수집하기 위하여 표준에 적용
+                "storeCategory" : .ryCd,                                                // 업종코드명
+                "paymentDay" : .stldate,                                                // 결제예정일
+                "currencyCode" : .engcrcycd,                                            // 통화코드
+                "transactionCountry" : .nation,                                         // 사용국가
+                "cardTransactionType": get-key($CardTransactionType, .trantype, "CARD_TRANSACTION_TYPE_UNKNOWN")  // 상태
             }
         ],
         "nextKey" : .dataBody.nxtQyKey  // 다음 조회 키
