@@ -1,3 +1,8 @@
 package com.rainist.collectcard.cardtransactions
 
-interface CardTransactionService
+import com.rainist.collectcard.card.dto.ListCardsRequest
+import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponse
+
+interface CardTransactionService {
+    fun listTransactions(listCardsRequest: ListCardsRequest): ListTransactionsResponse
+}
