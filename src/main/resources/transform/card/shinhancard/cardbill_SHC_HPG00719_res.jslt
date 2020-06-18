@@ -1,0 +1,29 @@
+{
+  "dataHeader": {
+    "resultCode": .dataHeader.resultCode,
+    "resultMessage": .dataHeader.resultMessage,
+    "successCode": .dataHeader.successCode
+  },
+  "dataBody": {
+    "cardBills": [
+      for
+      (.dataBody.grp001)
+      {
+        "billId": .setlTypeNo,
+        "userName": "",
+        "userGrade": "",
+        "billNumber": .setlDay,
+        "paymentDate": .aowDuD,
+        "nextPaymentDate": "",
+        "billingAmount": .bllAmt,
+        "prepayedAmount": "",
+        "paymentBankId": .bankno,
+        "paymentAccountNumber": "",
+        "billedYearMonth": "",
+        "totalPoint": "",
+        "expiringPoints": ""
+      }
+    ],
+    "nextKey": .dataBody.nxtQyKey
+  }
+}
