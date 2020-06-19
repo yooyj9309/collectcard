@@ -1,0 +1,32 @@
+let CardType = {
+    "1" : "DEBIT",
+    "2" : "CREDIT",
+    "3" : "MICROPAYMENT",
+    "99" : "CARD_TYPE_UNKNOWN"
+}
+
+{
+   "dataHeader": {
+        "resultCode": .dataHeader.resultCode,           // 결과 코드
+        "resultMessage": .dataHeader.resultMessage,     // 결과 메세지
+        "successCode": .dataHeader.successCode          // 성공 코드
+   },
+   "dataBody": {
+        "transactions": [for (.dataBody.grp001)
+            {
+                "approvalDay" : if(size(.apvDt) >= 14) .apvDt[ 0 : 8 ] else "",   // 승인일자 yyyyMMdd
+                "approvalTime" : if(size(.apvDt) >= 14) .apvDt[ 8 : 14 ] else "", // 승인시간 HHmmss
+                "approvalNumber": .apvN,                                          // 승인번호
+                "amount": .apva,                                                  // 승인금액
+                "cardNumber": .crdN,                                              // 카드번호
+                "storeName" : .mctNm,                                             // 가맹점명
+                "paymentDay": .stDuD,                                             // 결제예정일자
+                "storeCategory" : .ryCd,                                          // 업종코드명
+                "transactionCountry" : .ntn,                                      // 사용국가
+                "cardType" : get-key($CardType, .ccd, "CARD_TYPE_UNKNOWN"),       // 거래구분 TODO 예상국 이게 여기서 왜 필요한지 내부 처리 로직 확인 ccd? cusccd?
+            }
+        ],
+        "nextKey" : .dataBody.nxtQyKey,  // 다음 조회 키
+        "isBC" : .dataBody.bccF
+    }
+}
