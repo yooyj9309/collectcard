@@ -2,10 +2,11 @@ package com.rainist.collectcard.grpc.handler
 
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardGrpc
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
+import com.rainist.common.interceptor.StatsUnaryServerInterceptor
 import io.grpc.stub.StreamObserver
 import org.lognet.springboot.grpc.GRpcService
 
-@GRpcService
+@GRpcService(interceptors = [StatsUnaryServerInterceptor::class])
 class CollectcardGrpcService : CollectcardGrpc.CollectcardImplBase() {
     override fun healthCheck(request: CollectcardProto.HealthCheckRequest, responseObserver: StreamObserver<CollectcardProto.HealthCheckResponse>) {
         val resp = CollectcardProto.HealthCheckResponse.newBuilder().build()

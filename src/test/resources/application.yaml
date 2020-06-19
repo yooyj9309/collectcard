@@ -1,8 +1,11 @@
 spring:
   profiles:
     active: local
+  application:
+    name: collectcard
   main:
     web-application-type: none
+
 
 logging:
   config: classpath:logback/logback.xml
