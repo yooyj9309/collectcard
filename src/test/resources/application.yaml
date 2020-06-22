@@ -13,3 +13,8 @@ logging:
 host:
   card:
     shinhancard: https://devopenapi.shinhancard.com:8443
+
+
+connect:
+  host: connect
+  port: 8080

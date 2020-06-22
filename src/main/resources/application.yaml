@@ -71,3 +71,7 @@ management:
     tags:
       application: ${spring.application.name}
       active: ${spring.profiles.active}
+
+connect:
+  host: connect
+  port: 8080
