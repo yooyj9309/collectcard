@@ -45,7 +45,7 @@ val http_client_version = "4.5.11"
 val camel_version = "3.2.0"
 
 dependencies {
-    implementation("com.rainist:kotlin-banksalad:1.0.15.RELEASE")
+    implementation("com.rainist:kotlin-banksalad:1.0.16.RELEASE")
 
     // collect
     implementation("com.rainist:collect:1.0.4.RELEASE")

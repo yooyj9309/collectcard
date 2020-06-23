@@ -6,7 +6,7 @@ data class ListTransactionsRequest(
 )
 
 data class ListTransactionsRequestDataHeader(
-    var empty: Any
+    var empty: Any? = null
 )
 
 data class ListTransactionsRequestDataBody(

@@ -53,5 +53,53 @@ class ShinhancardApis {
                 .transformResponseBody(readText("classpath:transform/card/shinhancard/transaction_SHC_HPG00428_res.jslt"))
                 .name("신용 국내사용내역 조회-일시불/할부(SHC_HPG00428)")
                 .build()
+
+        // 신용 해외사용내역조회-일시불조회 SHC_HPG01612
+        val card_shinhancard_credit_oversea_transactions: Api =
+            Api.builder()
+                .business(BusinessType.card.name)
+                .agency(Organization.shinhancard.name)
+                .transaction(Transaction.cardTransaction.name)
+                .signaturePolicy(signaturePolicyShinhancard)
+                .endpoint("$hostCardShinhancard/v1.0/EXT/usecreditcard/searchuseforoverseas")
+                .method(Api.HttpMethod.POST)
+                .transformRequestHeader(readText("classpath:transform/card/shinhancard/header_req.jslt"))
+                .transformRequestBody(readText("classpath:transform/card/shinhancard/transaction_SHC_HPG01612_req.jslt"))
+                .transformResponseHeader(readText("classpath:transform/card/shinhancard/header_res.jslt"))
+                .transformResponseBody(readText("classpath:transform/card/shinhancard/transaction_SHC_HPG01612_res.jslt"))
+                .name("신용 해외사용내역조회-일시불조회(SHC_HPG01612)")
+                .build()
+
+        // 체크 국내사용내역 조회 SHC_HPG01030
+        val card_shinhancard_check_domestic_transactions: Api =
+            Api.builder()
+                .business(BusinessType.card.name)
+                .agency(Organization.shinhancard.name)
+                .transaction(Transaction.cardTransaction.name)
+                .signaturePolicy(signaturePolicyShinhancard)
+                .endpoint("$hostCardShinhancard/v1.0/EXT/usedebitcard/searchusefordomestic")
+                .method(Api.HttpMethod.POST)
+                .transformRequestHeader(readText("classpath:transform/card/shinhancard/header_req.jslt"))
+                .transformRequestBody(readText("classpath:transform/card/shinhancard/transaction_SHC_HPG01030_req.jslt"))
+                .transformResponseHeader(readText("classpath:transform/card/shinhancard/header_res.jslt"))
+                .transformResponseBody(readText("classpath:transform/card/shinhancard/transaction_SHC_HPG01030_res.jslt"))
+                .name("체크 국내사용내역(SHC_HPG01030)")
+                .build()
+
+        // 체크 해외사용내역 조회 SHC_HPG01031
+        val card_shinhancard_check_oversea_transactions: Api =
+            Api.builder()
+                .business(BusinessType.card.name)
+                .agency(Organization.shinhancard.name)
+                .transaction(Transaction.cardTransaction.name)
+                .signaturePolicy(signaturePolicyShinhancard)
+                .endpoint("$hostCardShinhancard/v1.0/EXT/usedebitcard/searchuseforoverseas")
+                .method(Api.HttpMethod.POST)
+                .transformRequestHeader(readText("classpath:transform/card/shinhancard/header_req.jslt"))
+                .transformRequestBody(readText("classpath:transform/card/shinhancard/transaction_SHC_HPG01031_req.jslt"))
+                .transformResponseHeader(readText("classpath:transform/card/shinhancard/header_res.jslt"))
+                .transformResponseBody(readText("classpath:transform/card/shinhancard/transaction_SHC_HPG01031_res.jslt"))
+                .name("체크 국내사용내역(SHC_HPG01031)")
+                .build()
     }
 }

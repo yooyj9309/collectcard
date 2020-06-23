@@ -6,6 +6,7 @@ import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardCards
+import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardTransactions
 
 class Executions() {
 
@@ -19,11 +20,20 @@ class Executions() {
         }
 
         private val map = mapOf<Api, Execution>(
+            // 보유카드
             Api.builder()
                 .business(BusinessType.card.name)
                 .agency(Organization.shinhancard.name)
                 .transaction(Transaction.cards.name)
-                .build() to cardShinhancardCards
+                .build() to cardShinhancardCards,
+
+            // 승인내역
+            Api.builder()
+                .business(BusinessType.card.name)
+                .agency(Organization.shinhancard.name)
+                .transaction(Transaction.cardTransaction.name)
+                .build() to cardShinhancardTransactions
+
         )
     }
 }

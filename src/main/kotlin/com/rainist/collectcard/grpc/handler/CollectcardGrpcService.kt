@@ -2,12 +2,15 @@ package com.rainist.collectcard.grpc.handler
 
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardGrpc
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
+import com.rainist.collectcard.cardtransactions.CardTransactionServiceImpl
 import com.rainist.common.interceptor.StatsUnaryServerInterceptor
 import io.grpc.stub.StreamObserver
 import org.lognet.springboot.grpc.GRpcService
 
 @GRpcService(interceptors = [StatsUnaryServerInterceptor::class])
-class CollectcardGrpcService : CollectcardGrpc.CollectcardImplBase() {
+class CollectcardGrpcService(
+    val cardTransactionService: CardTransactionServiceImpl
+) : CollectcardGrpc.CollectcardImplBase() {
     override fun healthCheck(request: CollectcardProto.HealthCheckRequest, responseObserver: StreamObserver<CollectcardProto.HealthCheckResponse>) {
         val resp = CollectcardProto.HealthCheckResponse.newBuilder().build()
         responseObserver.onNext(resp)
@@ -21,6 +24,21 @@ class CollectcardGrpcService : CollectcardGrpc.CollectcardImplBase() {
     }
 
     override fun listCardTransactions(request: CollectcardProto.ListCardTransactionsRequest, responseObserver: StreamObserver<CollectcardProto.ListCardTransactionsResponse>) {
+
+        kotlin.runCatching {
+            cardTransactionService.listTransactions(request)
+        }
+        .onSuccess {
+            // TODO 예상국 테스트 코드 작성후 주석 풀기
+            /*responseObserver.onNext(it)
+            responseObserver.onCompleted()*/
+        }
+        .onFailure {
+            // TODO 예상국 exception  처리 코드 추가 하기
+            // responseObserver.onError(it)
+        }
+
+        // TODO 테스트 코드 작성후 삭제 
         val resp = CollectcardProto.ListCardTransactionsResponse.newBuilder().build()
         responseObserver.onNext(resp)
         responseObserver.onCompleted()
