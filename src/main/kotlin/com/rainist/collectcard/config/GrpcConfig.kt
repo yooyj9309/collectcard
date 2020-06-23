@@ -1,5 +1,6 @@
 package com.rainist.collectcard.config
 
+import com.github.rainist.idl.apis.external.v1.connect.ConnectGrpc
 import com.rainist.common.log.Log
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
@@ -25,5 +26,10 @@ class GrpcConfig(
         return ManagedChannelBuilder.forAddress(connectHost, connectPort)
             .usePlaintext()
             .build()
+    }
+
+    @Bean
+    fun connectStub(connectChannel: ManagedChannel): ConnectGrpc.ConnectBlockingStub {
+        return ConnectGrpc.newBlockingStub(connectChannel)
     }
 }
