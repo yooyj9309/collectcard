@@ -9,10 +9,10 @@
       for
       (.dataBody.grp001)
       {
-        "billId": .setlTypeNo,
+        "billId": .setlDay + .setlTypeNo,
         "userName": "",
         "userGrade": "",
-        "billNumber": .setlDay,
+        "billNumber": .setlTypeNo,
         "paymentDate": .aowDuD,
         "nextPaymentDate": "",
         "billingAmount": .bllAmt,

@@ -1,0 +1,10 @@
+{
+  "dataBody": {
+    "setlTypeNo": .dataBody.billId [ 8 : 12 ],
+    "setlDay": .dataBody.billId [ 0 : 8 ],
+    "nxtQyKey": .dataBody.nextKey
+  },
+   "dataHeader":{
+       "EMPTY" : ""
+   }
+}

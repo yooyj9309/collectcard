@@ -1,0 +1,20 @@
+{
+   "dataHeader": {
+        "resultCode": .dataBody.resCd,
+        "resultMessage": .dataHeader.resultMessage,
+        "successCode": .dataHeader.successCode
+   },
+   "dataBody": {
+        "transactions": [for (.dataBody.grp001)
+            {
+                "approvalDay" : .comm,
+                "amount": .capital,
+                "serviceChargeAmount": .commission,
+                "cardNumber": .class,
+                "storeName": .joinnm,
+                "discountAmount": .dcntamt
+            }
+        ],
+        "nextKey" : .dataBody.nxtQyKey  // 다음 조회 키
+    }
+}

@@ -1,0 +1,10 @@
+{
+  "dataBody": {
+    "seqN": .dataBody.billId [ 8 : 12 ],
+    "inqdate": .dataBody.billId [ 0 : 8 ],
+    "nxtQyKey": .dataBody.nextKey
+  },
+   "dataHeader":{
+       "EMPTY" : ""
+   }
+}
