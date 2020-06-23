@@ -6,7 +6,9 @@ import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardCards
+import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardListUserCardBillsExpected
 import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardTransactions
+import com.rainist.collectcard.common.exception.CollectcardException
 
 class Executions() {
 
@@ -16,7 +18,7 @@ class Executions() {
                 .business(businessType.name)
                 .agency(organization.name)
                 .transaction(transaction.name)
-                .build()] ?: throw RuntimeException()
+                .build()] ?: throw CollectcardException("execution not found")
         }
 
         private val map = mapOf<Api, Execution>(
@@ -32,8 +34,14 @@ class Executions() {
                 .business(BusinessType.card.name)
                 .agency(Organization.shinhancard.name)
                 .transaction(Transaction.cardTransaction.name)
-                .build() to cardShinhancardTransactions
+                .build() to cardShinhancardTransactions,
 
+            // 결제예정금액조회
+            Api.builder()
+                .business(BusinessType.card.name)
+                .agency(Organization.shinhancard.name)
+                .transaction(Transaction.cardBillsExpected.name)
+                .build() to cardShinhancardListUserCardBillsExpected
         )
     }
 }

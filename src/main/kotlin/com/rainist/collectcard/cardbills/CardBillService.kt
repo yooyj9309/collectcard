@@ -1,3 +1,5 @@
 package com.rainist.collectcard.cardbills
 
-interface CardBillService
+interface CardBillService {
+//    fun listUserCardBills(listCardBillsRequest: ListCardBillsRequest): ListCardBillsResponse
+}

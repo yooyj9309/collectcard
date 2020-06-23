@@ -31,4 +31,7 @@ class CollectConfig(
 
     @Bean
     fun executorService() = CollectExecutorServiceImpl(transferClient, idGenerator, apiLogger, objectMapper())
+
+    @Bean
+    fun collectExecutorService() = CollectExecutorServiceImpl(transferClient, idGenerator, apiLogger, objectMapper())
 }

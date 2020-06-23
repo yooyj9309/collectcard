@@ -101,5 +101,20 @@ class ShinhancardApis {
                 .transformResponseBody(readText("classpath:transform/card/shinhancard/transaction_SHC_HPG01031_res.jslt"))
                 .name("체크 국내사용내역(SHC_HPG01031)")
                 .build()
+
+        val card_shinhancard_list_user_card_bills_expected: Api =
+            Api.builder()
+                .business(BusinessType.card.name)
+                .agency(Organization.shinhancard.name)
+                .transaction(Transaction.cardBillsExpected.name)
+                .signaturePolicy(signaturePolicyShinhancard)
+                .endpoint("$hostCardShinhancard/v1.0/EXT/usecard/searchtotalpayments")
+                .method(Api.HttpMethod.POST)
+                .transformRequestHeader(readText("classpath:transform/card/shinhancard/header_req.jslt"))
+                .transformRequestBody(readText("classpath:transform/card/shinhancard/cardbilltransactions_SHC_HPG01096_req.jslt"))
+                .transformResponseHeader(readText("classpath:transform/card/shinhancard/header_res.jslt"))
+                .transformResponseBody(readText("classpath:transform/card/shinhancard/cardbilltransactions_SHC_HPG01096_res.jslt"))
+                .name("카드_[EXT] 결제예정금액 총괄(SHC_HPG01096_EXT)")
+                .build()
     }
 }

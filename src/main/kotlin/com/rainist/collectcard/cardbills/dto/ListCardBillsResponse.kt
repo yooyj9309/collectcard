@@ -11,5 +11,8 @@ data class ListCardBillsResponseDataHeader(
 )
 
 data class ListCardBillsResponseDataBody(
-    var cardBills: List<CardBill>
+    // 결제 예정 상세 내역
+    var cardBills: List<CardBill>,
+    // 다음 조회 key
+    var nextKey: String?
 )
