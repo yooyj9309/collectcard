@@ -27,9 +27,9 @@ class CardBillServiceImpl(val collectExecutorService: CollectExecutorService) : 
         )
     }
 
-//    override fun listUserCardBills(listCardBillsRequest: ListCardBillsRequest): ListCardBillsResponse {
-//        return ListCardBillsResponse();
-//    }
+    override fun listUserCardBills(listCardBillsRequest: ListCardBillsRequest): ListCardBillsResponse {
+        return this.listCardBills(listCardBillsRequest)
+    }
 
     fun listUserCardBillsExpected(listCardBillsRequest: ListCardBillsRequest): ListCardBillsResponse {
 
@@ -43,6 +43,22 @@ class CardBillServiceImpl(val collectExecutorService: CollectExecutorService) : 
             )
         }.onFailure {
             logger.error("Failed to retrieve bills expected list: ${it.message}")
+            throw CollectcardException("exception", it)
+        }.getOrThrow().response
+    }
+
+    fun listCardBills(listCardBillsRequest: ListCardBillsRequest): ListCardBillsResponse {
+
+        return runCatching<ApiResponse<ListCardBillsResponse>> {
+            collectExecutorService.execute(
+                Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.cardbills),
+                ApiRequest.builder<ListCardBillsRequest>()
+                    .headers(makeHeader())
+                    .request(listCardBillsRequest)
+                    .build()
+            )
+        }.onFailure {
+            logger.error("Failed to retrieve bills list: ${it.message}")
             throw CollectcardException("exception", it)
         }.getOrThrow().response
     }

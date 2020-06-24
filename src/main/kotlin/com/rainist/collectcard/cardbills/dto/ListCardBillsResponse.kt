@@ -1,8 +1,8 @@
 package com.rainist.collectcard.cardbills.dto
 
 data class ListCardBillsResponse(
-    var dataHeader: ListCardBillsResponseDataHeader,
-    var dataBody: ListCardBillsResponseDataBody
+    var dataHeader: ListCardBillsResponseDataHeader? = null,
+    var dataBody: ListCardBillsResponseDataBody? = null
 )
 
 data class ListCardBillsResponseDataHeader(

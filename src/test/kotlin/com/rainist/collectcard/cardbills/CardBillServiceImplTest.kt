@@ -42,7 +42,7 @@ class CardBillServiceImplTest {
             )
         )
 
-        MatcherAssert.assertThat(response.dataHeader.resultCode, Matchers.`is`("0004"))
+        MatcherAssert.assertThat(response.dataHeader?.resultCode, Matchers.`is`("0004"))
 //        MatcherAssert.assertThat(response.dataBody.cardBills.size, Matchers.`is`(3))
     }
 

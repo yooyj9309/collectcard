@@ -15,13 +15,13 @@ class ShinhancardExecutions {
     companion object {
         val mergeBills =
             BinaryOperator { listCardBillsResponse1: ListCardBillsResponse, listCardBillsResponse2: ListCardBillsResponse ->
-                var cardBills = ArrayList<CardBill>()
-                cardBills.addAll(listCardBillsResponse1.dataBody.cardBills)
-                cardBills.addAll(listCardBillsResponse2.dataBody.cardBills)
+                val cardBills = ArrayList<CardBill>()
+                cardBills.addAll(listCardBillsResponse1.dataBody?.cardBills ?: ArrayList())
+                cardBills.addAll(listCardBillsResponse2.dataBody?.cardBills ?: ArrayList())
 
                 ListCardBillsResponse(
                     listCardBillsResponse1.dataHeader,
-                    ListCardBillsResponseDataBody(cardBills, listCardBillsResponse2.dataBody.nextKey)
+                    ListCardBillsResponseDataBody(cardBills, listCardBillsResponse2.dataBody?.nextKey)
                 )
             }
 
@@ -111,6 +111,34 @@ class ShinhancardExecutions {
                         .nextkey(".dataBody.nextKey")
                         .build()
                 )
+                .merge(mergeBills)
+                .build()
+
+        val cardShinhancardBills =
+            Execution.create()
+                .exchange(ShinhancardApis.card_shinhancard_check_bills)
+                .to(ListCardBillsResponse::class.java)
+                .pagination(
+                    Pagination.builder()
+                        .method(Pagination.Method.NEXTKEY)
+                        .nextkey(".dataBody.nextKey")
+                        .build()
+                )
+                .merge(mergeBills)
+                .with(
+                    Execution.create()
+                        .exchange(ShinhancardApis.card_shinhancard_credit_bills)
+                        .to(ListCardBillsResponse::class.java)
+                        .pagination(
+                            Pagination.builder()
+                                .method(Pagination.Method.NEXTKEY)
+                                .nextkey(".dataBody.nextKey")
+                                .build()
+                        )
+                        .merge(mergeBills)
+                        .build()
+                )
+                .with(cardShinhancardListUserCardBillsExpected)
                 .merge(mergeBills)
                 .build()
     }
