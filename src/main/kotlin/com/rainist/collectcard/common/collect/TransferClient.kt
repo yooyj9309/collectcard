@@ -3,28 +3,50 @@ package com.rainist.collectcard.common.collect
 import com.rainist.collect.common.dto.Api
 import com.rainist.collect.common.dto.TransferResponseEntity
 import com.rainist.collect.executor.service.ITransferClient
+import com.rainist.common.log.Log
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
+import org.springframework.http.MediaType
+import org.springframework.http.RequestEntity
 import org.springframework.stereotype.Component
+import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestTemplate
+import org.springframework.web.util.UriComponentsBuilder
 
 @Component
-class TransferClient(val commonRestTemplate: RestTemplate) : ITransferClient {
+class TransferClient(
+    val commonRestTemplate: RestTemplate
+) : ITransferClient {
+    companion object : Log
+
     override fun execute(
         url: String,
         httpMethod: Api.HttpMethod,
         headers: MutableMap<String, String>,
         body: String
     ): TransferResponseEntity {
-        try {
-            val responseEntity = commonRestTemplate.postForEntity(url, body, String::class.java)
 
-            return TransferResponseEntity.builder()
-                .httpStatusCode(responseEntity.statusCodeValue)
-                .headers(responseEntity.headers.toSingleValueMap() as Map<String, String>?)
-                .body(responseEntity.body)
+        return kotlin.runCatching {
+            val header = LinkedMultiValueMap<String, String>()
+            header.setAll(headers)
+
+            val req = RequestEntity
+                .method(HttpMethod.valueOf(httpMethod.name), UriComponentsBuilder.fromHttpUrl(url).build().toUri())
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(HttpHeaders(header))
+                .body(body)
+
+            val res = commonRestTemplate.exchange(req, String::class.java)
+
+            TransferResponseEntity.builder()
+                .httpStatusCode(res.statusCodeValue)
+                .headers(res.headers.toSingleValueMap() as Map<String, String>?)
+                .body(res.body)
                 .build()
-        } catch (t: Throwable) {
-            t.printStackTrace()
-            throw RuntimeException(t)
         }
+        .onFailure {
+            logger.withFieldError("TransferClientError", it.localizedMessage, it)
+        }
+        .getOrThrow()
     }
 }

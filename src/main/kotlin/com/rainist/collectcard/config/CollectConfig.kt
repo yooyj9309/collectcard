@@ -19,7 +19,7 @@ class CollectConfig(
     private val apiLogger: IApiLogger
 ) {
 
-    fun objectMapper(): ObjectMapper {
+    fun collectObjectMapper(): ObjectMapper {
         val objectMapper = ObjectMapper()
         val jdk8Module = Jdk8Module().configureAbsentsAsNulls(true)
         objectMapper.registerModule(jdk8Module)
@@ -30,8 +30,8 @@ class CollectConfig(
     }
 
     @Bean
-    fun executorService() = CollectExecutorServiceImpl(transferClient, idGenerator, apiLogger, objectMapper())
+    fun executorService() = CollectExecutorServiceImpl(transferClient, idGenerator, apiLogger, collectObjectMapper())
 
     @Bean
-    fun collectExecutorService() = CollectExecutorServiceImpl(transferClient, idGenerator, apiLogger, objectMapper())
+    fun collectExecutorService() = CollectExecutorServiceImpl(transferClient, idGenerator, apiLogger, collectObjectMapper())
 }

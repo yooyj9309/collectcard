@@ -16,7 +16,9 @@ class ShinhancardApis {
     }
 
     companion object {
-        var hostCardShinhancard: String? = ""
+
+        // TODO 신한카드 URL static 제거
+        var hostCardShinhancard: String? = "https://devopenapi.shinhancard.com:8443"
 
         private val signaturePolicyShinhancard = SignaturePolicy.builder()
             .algorithm(SignaturePolicy.Algorithm.NONE)
