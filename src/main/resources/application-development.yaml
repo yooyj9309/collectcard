@@ -12,3 +12,6 @@ logging:
 host:
   card:
     shinhancard: https://devopenapi.shinhancard.com:8443
+
+shinhancard:
+  clientId: ${DEVELOPMENT_SHINHANCARD_CLIENT_ID}

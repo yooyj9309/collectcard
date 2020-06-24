@@ -1,10 +1,10 @@
 {
    "dataBody":{
-      "bctag": if( size(.tag) > 0) .tag else "0",
-      "inqterm": .startAt+.endAt,
-      "pagetag": if (size(.nextKey) > 0) "2" else "1",
-      "nxtQyKey": .nextKey,
-      "cardNoEnc" : .cardId
+      "bctag": if( size(.dataBody.tag) > 0) .dataBody.tag else "0",
+      "inqterm": .dataBody.startAt+.dataBody.endAt,
+      "pagetag": if (size(.dataBody.nextKey) > 0) "2" else "1",
+      "nxtQyKey": .dataBody.nextKey,
+      "cardNoEnc" : .dataBody.cardId
    },
    "dataHeader":{
        "EMPTY" : ""

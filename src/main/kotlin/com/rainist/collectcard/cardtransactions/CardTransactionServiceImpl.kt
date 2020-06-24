@@ -14,43 +14,38 @@ import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
+import com.rainist.collectcard.header.ShinhancardHeaderService
 import com.rainist.common.exception.UnknownException
 import com.rainist.common.log.Log
 import com.rainist.common.model.ObjectOf
 import com.rainist.common.service.ValidationService
 import com.rainist.common.util.DateTimeUtil
-import java.time.ZoneId
 import org.springframework.stereotype.Service
 
 @Service
 class CardTransactionServiceImpl(
     val collectExecutorService: CollectExecutorService,
     val listCardRequestValidator: ListCardRequestValidator,
-    val validationService: ValidationService
+    val validationService: ValidationService,
+    val shinhancardHeaderService: ShinhancardHeaderService
 ) : CardTransactionService {
 
     companion object : Log
 
-    // TODO : implement proper header fields
-    fun makeHeader(): MutableMap<String, String> {
-        return mutableMapOf<String, String>(
-            "Authorization" to "bearer",
-            "userDeviceId" to "4b7626ac-a43a-4dd3-905f-66e31aa5c2b3",
-            "deviceOs" to "Android"
+    fun execute(header: MutableMap<String, String>, listTransactionsRequest: ListTransactionsRequest): ApiResponse<ListTransactionsResponse> {
+        return collectExecutorService.execute(
+            Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.cardTransaction),
+            ApiRequest.builder<ListTransactionsRequest>()
+                .headers(header)
+                .request(listTransactionsRequest)
+                .build()
         )
     }
 
-    override fun listTransactions(listTransactionsRequest: ListTransactionsRequest): ListTransactionsResponse {
+    override fun listTransactions(header: MutableMap<String, String>, listTransactionsRequest: ListTransactionsRequest): ListTransactionsResponse {
 
         return kotlin.runCatching {
-            val res: ApiResponse<ListTransactionsResponse> = collectExecutorService.execute(
-                Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.cardTransaction),
-                ApiRequest.builder<ListTransactionsRequest>()
-                    .headers(makeHeader())
-                    .request(listTransactionsRequest)
-                    .build()
-            )
-
+            val res = execute(header, listTransactionsRequest)
             validationService.validateOrThrows(res.response)
         }
         .onFailure {
@@ -67,27 +62,17 @@ class CardTransactionServiceImpl(
                 listCardRequestValidator.isValid(ObjectOf(request))
             }
             ?.let {
-                // TODO 예상국 날짜 전체 기간중 async 하게 req 변경
-
                 ListTransactionsRequest().apply {
                     dataHeader = ListTransactionsRequestDataHeader()
                     dataBody = ListTransactionsRequestDataBody().apply {
-                        // TODO 예상국 kotlin banksalad 에 util function 만들기
-                        startAt = takeIf { request.hasFromMs() }
-                            ?.let { request.fromMs.value }
-                            ?.let { DateTimeUtil.epochMilliSecondToDatetime(it, ZoneId.of("Asia/Seoul")) }
-                            ?.let { DateTimeUtil.datetimeToDateString(it, "yyyyMMdd") }
-                            ?: kotlin.run {
-                                // TODO 예상국 default 최대 기간 넣기
-                                ""
-                            }
+                        startAt = let { DateTimeUtil.kstNowLocalDate().minusMonths(6L) }.let { DateTimeUtil.localDateToString(it, "yyyyMMdd") }
                         endAt = DateTimeUtil.kstNowLocalDateString("yyyyMMdd")
                         nextKey = ""
                     }
                 }
             }
             ?.let {
-                listTransactions(it)
+                listTransactions(shinhancardHeaderService.getHeader(request.userId, request.companyId.value), it)
             }
             ?.toListCardsReponseProto()
             ?: kotlin.run {

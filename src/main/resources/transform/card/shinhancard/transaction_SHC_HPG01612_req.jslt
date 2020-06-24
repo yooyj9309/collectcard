@@ -3,7 +3,7 @@
       "bctag": if( size(.tag) > 0) .tag else "0",
       "inqterm": .startAt+.endAt,
       "pagetag": if (size(.nextKey) > 0) "2" else "1",
-      "nxtQyKey": .nextKey,
+      "nxtQyKey": if( size(.nextKey) == 0 ) "" else .nextKey,
       "fmlOCrdC" : .cardOwnerType,
       "cardNoEnc" : .cardId
    },

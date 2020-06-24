@@ -30,3 +30,5 @@ host:
   card:
     shinhancard: https://openapi.shinhancard.com:8443
 
+shinhancard:
+  clientId: ${PRODUCTION_SHINHANCARD_CLIENT_ID}

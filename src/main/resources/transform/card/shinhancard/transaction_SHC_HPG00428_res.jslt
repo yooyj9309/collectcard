@@ -1,34 +1,33 @@
 let CardTransactionType = {
-    "": "APPROVAL",                         //  승인
-    "1": "PURCHASE",                        //  매입
-    "2": "APPROVAL_CANCEL",                 //  승인취소
-    "3": "PURCHASE_CANCEL",                 //  매입취소
-    "4": "PURCHASE_PART_CANCEL",            //  매입부분취소
-    "99": "CARD_TRANSACTION_TYPE_UNKNOWN",  //  알수없음
+    "": "APPROVAL",
+    "1": "PURCHASE",
+    "2": "APPROVAL_CANCEL",
+    "3": "PURCHASE_CANCEL",
+    "4": "PURCHASE_PART_CANCEL",
+    "99": "CARD_TRANSACTION_TYPE_UNKNOWN",
 }
 
 {
    "dataHeader": {
-        "resultCode": .dataHeader.resultCode,           // 결과 코드
-        "resultMessage": .dataHeader.resultMessage,     // 결과 메세지
-        "successCode": .dataHeader.successCode          // 성공 코드
+        "resultCode": .dataHeader.resultCode,
+        "resultMessage": .dataHeader.resultMessage,
+        "successCode": .dataHeader.successCode
    },
    "dataBody": {
         "transactions": [for (.dataBody.grp001)
             {
-                "approvalDay" : if(size(.aprvtime) >= 14) .aprvtime[ 0 : 8 ] else "",   // 승인일자
-                "approvalTime" : if(size(.aprvtime) >= 14) .aprvtime[ 8 : 14 ] else "", // 승인시간
-                "approvalNumber": .aprvno,                                              // 승인번호
-                "amount": .aprvamt,                                                     // 승인금액
-                "cardNumber": .cardno,                                                  // 카드번호
-                "installment": .insmon,                                                 // 할부개월
-                "paymentDay": .stldate,                                                 // 결제예정일자
-                "storeNumber": .retlno,                                                 // 가맹점번호
-                "canceledAmount": .subCla,                                              // 부분취소 금액
-                "cardTransactionType": get-key($CardTransactionType, .status, "CARD_TRANSACTION_TYPE_UNKNOWN")  // 상태
-                //"이용구분" : .ueC // TODO 예상국 내부에서는 쓰지 않으나 모든 데이터를 수집하기 위하여 표준에 적용
+                "approvalDay" : if(size(.aprvtime) >= 14) .aprvtime[ 0 : 8 ] else "",
+                "approvalTime" : if(size(.aprvtime) >= 14) .aprvtime[ 8 : 14 ] else "",
+                "approvalNumber": .aprvno,
+                "amount": .aprvamt,
+                "cardNumber": .cardno,
+                "installment": .insmon,
+                "paymentDay": .stldate,
+                "storeNumber": .retlno,
+                "canceledAmount": .subCla,
+                "cardTransactionType": get-key($CardTransactionType, .status, "CARD_TRANSACTION_TYPE_UNKNOWN")
             }
         ],
-        "nextKey" : .dataBody.nxtQyKey  // 다음 조회 키
+        "nextKey" : if(.dataBody.nxtQyKey) .dataBody.nxtQyKey else ""
     }
 }

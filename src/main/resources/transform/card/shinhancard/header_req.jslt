@@ -1,4 +1,5 @@
 {
+    "Content-Type" : .contentType,
     "reqKey": .clientId,
     "transNo": .transactionNumber,
     "appName": .clientName,

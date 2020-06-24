@@ -56,8 +56,9 @@ class ShinhancardExecutions {
                         .build()
                 )
                 .merge(cardShinhancardTransactionsMerge)
+                // TODO 주석 풀기
                 // 신용 해외사용내역조회-일시불조회 SHC_HPG01612
-                .with(
+                /*.with(
                     Execution.create()
                         .exchange(ShinhancardApis.card_shinhancard_credit_oversea_transactions)
                         .to(ListTransactionsResponse::class.java)
@@ -98,7 +99,7 @@ class ShinhancardExecutions {
                         .merge(cardShinhancardTransactionsMerge)
                         .build()
                 )
-                .merge(cardShinhancardTransactionsMerge)
+                .merge(cardShinhancardTransactionsMerge)*/
                 .build()
 
         val cardShinhancardListUserCardBillsExpected =

@@ -14,6 +14,6 @@ data class ListTransactionsRequestDataBody(
     var endAt: String? = null, // 조회기간 종료일 YYYYMMDD
     var cardId: String? = null, // 카드 구분자 ( 카드번호, 암호화된 카드번호 , CID 등등 )
     var tag: String? = null, // Custom tag ( 신한 : bc tag )
-    var nextKey: String? = null, // pagination 방식 중 nextKey
-    var cardOwnerType: String? = null // 카드 소유주 타입 ( 본인 , 가족 )
+    var cardOwnerType: String? = null, // 카드 소유주 타입 ( 본인 , 가족 )
+    var nextKey: String? = "" // pagination 방식 중 nextKey
 )

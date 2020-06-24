@@ -75,3 +75,6 @@ management:
 connect:
   host: connect
   port: 8080
+
+shinhancard:
+  clientId: ${DEVELOPMENT_SHINHANCARD_CLIENT_ID}
