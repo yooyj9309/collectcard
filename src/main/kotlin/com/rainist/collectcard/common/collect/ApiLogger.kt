@@ -13,10 +13,16 @@ class ApiLogger : IApiLogger {
     companion object : Log
 
     override fun log(id: String, api: Api, apiRequest: ApiRequest<Any>) {
-        logger.info("req apiRequset : {}", apiRequest.request)
+        apiRequest.headers.iterator().forEach {
+            logger.info("req header : {} , {}", it.key, it.value)
+        }
+        logger.info("req header : {} , apiRequset : {}", apiRequest.headers, apiRequest.request)
     }
 
     override fun log(id: String, api: Api, apiResponse: ApiResponse<Any>) {
+        apiResponse.headers.iterator().forEach {
+            logger.info("res header : {} , {}", it.key, it.value)
+        }
         logger.info("res : apiResponse {}", apiResponse.response)
     }
 }

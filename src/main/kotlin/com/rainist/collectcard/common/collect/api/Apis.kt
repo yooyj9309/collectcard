@@ -1,6 +1,6 @@
 package com.rainist.collectcard.common.collect.api
 
-import org.springframework.util.ResourceUtils
+import org.springframework.core.io.ClassPathResource
 
 enum class BusinessType {
     card
@@ -19,7 +19,10 @@ class Apis {
     companion object {
 
         fun readText(fileInClassPath: String): String {
-            return ResourceUtils.getFile(fileInClassPath).readText(Charsets.UTF_8)
+            val classPathResource = ClassPathResource(fileInClassPath)
+
+            var inputStream = classPathResource.getInputStream()
+            return inputStream.bufferedReader().use { it.readText() }
         }
     }
 }

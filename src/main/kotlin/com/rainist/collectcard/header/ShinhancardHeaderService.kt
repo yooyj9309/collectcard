@@ -22,6 +22,11 @@ class ShinhancardHeaderService(
                 "clientId" to clientId
             )
         }
+        .onSuccess {
+            it.iterator().forEach {
+                logger.info("shinhan header : {} , {}", it.key, it.value)
+            }
+        }
         .onFailure {
             logger.withFieldError("ShinhancardHeaderServiceGetHeader", it.localizedMessage, it)
         }
