@@ -5,7 +5,7 @@ spring:
     show-sql: false
 
 sentry:
-  servername: simpleloan
+  servername: collectcard
   dsn: ${SENTRY_DATA_SOURCE_NAME}
   level: ERROR
   environment: production
