@@ -5,27 +5,17 @@ import com.rainist.collect.common.dto.SignaturePolicy
 import com.rainist.collectcard.common.collect.api.Apis.Companion.readText
 import javax.annotation.PostConstruct
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
 
+@Component
 class ShinhancardApis {
     @Value("\${host.card.shinhancard}")
-    lateinit var mHostCardShinhancard: String
+    lateinit var hostCardShinhancard: String
 
     @PostConstruct
     fun init() {
-        ShinhancardApis.hostCardShinhancard = mHostCardShinhancard
-    }
-
-    companion object {
-
-        // TODO 신한카드 URL static 제거
-        var hostCardShinhancard: String? = "https://devopenapi.shinhancard.com:8443"
-
-        private val signaturePolicyShinhancard = SignaturePolicy.builder()
-            .algorithm(SignaturePolicy.Algorithm.NONE)
-            .build()
-
         // 유효카드 정보조회 SHC_HPG00548
-        val card_shinhancard_cards: Api =
+        card_shinhancard_cards =
             Api.builder()
                 .business(BusinessType.card.name)
                 .agency(Organization.shinhancard.name)
@@ -41,7 +31,7 @@ class ShinhancardApis {
                 .build()
 
         // 신용 국내사용내역조회-일시불/할부 SHC_HPG00428
-        val card_shinhancard_credit_domestic_transactions: Api =
+        card_shinhancard_credit_domestic_transactions =
             Api.builder()
                 .business(BusinessType.card.name)
                 .agency(Organization.shinhancard.name)
@@ -57,7 +47,7 @@ class ShinhancardApis {
                 .build()
 
         // 신용 해외사용내역조회-일시불조회 SHC_HPG01612
-        val card_shinhancard_credit_oversea_transactions: Api =
+        card_shinhancard_credit_oversea_transactions =
             Api.builder()
                 .business(BusinessType.card.name)
                 .agency(Organization.shinhancard.name)
@@ -73,7 +63,7 @@ class ShinhancardApis {
                 .build()
 
         // 체크 국내사용내역 조회 SHC_HPG01030
-        val card_shinhancard_check_domestic_transactions: Api =
+        card_shinhancard_check_domestic_transactions =
             Api.builder()
                 .business(BusinessType.card.name)
                 .agency(Organization.shinhancard.name)
@@ -89,7 +79,7 @@ class ShinhancardApis {
                 .build()
 
         // 체크 해외사용내역 조회 SHC_HPG01031
-        val card_shinhancard_check_oversea_transactions: Api =
+        card_shinhancard_check_oversea_transactions =
             Api.builder()
                 .business(BusinessType.card.name)
                 .agency(Organization.shinhancard.name)
@@ -104,7 +94,7 @@ class ShinhancardApis {
                 .name("체크 국내사용내역(SHC_HPG01031)")
                 .build()
 
-        val card_shinhancard_list_user_card_bills_expected: Api =
+        card_shinhancard_list_user_card_bills_expected =
             Api.builder()
                 .business(BusinessType.card.name)
                 .agency(Organization.shinhancard.name)
@@ -119,7 +109,8 @@ class ShinhancardApis {
                 .name("카드_[EXT] 결제예정금액 총괄(SHC_HPG01096_EXT)")
                 .build()
 
-        val card_shinhancard_check_bills: Api =
+        // 체크카드 월별 청구내역(SHC_HPG01226)
+        card_shinhancard_check_bills =
             Api.builder()
                 .business(BusinessType.card.name)
                 .agency(Organization.shinhancard.name)
@@ -135,7 +126,7 @@ class ShinhancardApis {
                 .build()
 
         // 신용카드 월별 청구내역(SHC_HPG00719)
-        val card_shinhancard_credit_bills: Api =
+        card_shinhancard_credit_bills =
             Api.builder()
                 .business(BusinessType.card.name)
                 .agency(Organization.shinhancard.name)
@@ -181,5 +172,35 @@ class ShinhancardApis {
 //                .transformResponseBody(readText("classpath:transform/card/shinhancard/.jslt"))
 //                .name("신용카드 월별 청구내역 상세(SHC_HPG00698)")
 //                .build()
+    }
+
+    companion object {
+        private val signaturePolicyShinhancard = SignaturePolicy.builder()
+            .algorithm(SignaturePolicy.Algorithm.NONE)
+            .build()
+
+        // 유효카드 정보조회 SHC_HPG00548
+        lateinit var card_shinhancard_cards: Api
+
+        // 신용 국내사용내역조회-일시불/할부 SHC_HPG00428
+        lateinit var card_shinhancard_credit_domestic_transactions: Api
+
+        // 신용 해외사용내역조회-일시불조회 SHC_HPG01612
+        lateinit var card_shinhancard_credit_oversea_transactions: Api
+
+        // 체크 국내사용내역 조회 SHC_HPG01030
+        lateinit var card_shinhancard_check_domestic_transactions: Api
+
+        // 체크 해외사용내역 조회 SHC_HPG01031
+        lateinit var card_shinhancard_check_oversea_transactions: Api
+
+        // 카드_[EXT] 결제예정금액총괄 SHC_HPG01096_EXT
+        lateinit var card_shinhancard_list_user_card_bills_expected: Api
+
+        // 체크카드 월별 청구내역(SHC_HPG01226)
+        lateinit var card_shinhancard_check_bills: Api
+
+        // 신용카드 월별 청구내역(SHC_HPG00719)
+        lateinit var card_shinhancard_credit_bills: Api
     }
 }
