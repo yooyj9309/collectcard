@@ -4,6 +4,7 @@ import com.github.rainist.idl.apis.v1.collectcard.CollectcardGrpc
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
 import com.rainist.collectcard.cardtransactions.CardTransactionServiceImpl
 import com.rainist.common.interceptor.StatsUnaryServerInterceptor
+import com.rainist.common.log.Log
 import io.grpc.stub.StreamObserver
 import org.lognet.springboot.grpc.GRpcService
 
@@ -11,6 +12,9 @@ import org.lognet.springboot.grpc.GRpcService
 class CollectcardGrpcService(
     val cardTransactionService: CardTransactionServiceImpl
 ) : CollectcardGrpc.CollectcardImplBase() {
+
+    companion object : Log
+
     override fun healthCheck(request: CollectcardProto.HealthCheckRequest, responseObserver: StreamObserver<CollectcardProto.HealthCheckResponse>) {
         val resp = CollectcardProto.HealthCheckResponse.newBuilder().build()
         responseObserver.onNext(resp)
@@ -24,24 +28,18 @@ class CollectcardGrpcService(
     }
 
     override fun listCardTransactions(request: CollectcardProto.ListCardTransactionsRequest, responseObserver: StreamObserver<CollectcardProto.ListCardTransactionsResponse>) {
+        logger.info("listCardTransactions : {}", request.toString())
 
         kotlin.runCatching {
             cardTransactionService.listTransactions(request)
         }
         .onSuccess {
-            // TODO 예상국 테스트 코드 작성후 주석 풀기
-            /*responseObserver.onNext(it)
-            responseObserver.onCompleted()*/
+            responseObserver.onNext(it)
+            responseObserver.onCompleted()
         }
         .onFailure {
-            // TODO 예상국 exception  처리 코드 추가 하기
-            // responseObserver.onError(it)
+            responseObserver.onError(it)
         }
-
-        // TODO 테스트 코드 작성후 삭제 
-        val resp = CollectcardProto.ListCardTransactionsResponse.newBuilder().build()
-        responseObserver.onNext(resp)
-        responseObserver.onCompleted()
     }
 
     override fun listCardBills(request: CollectcardProto.ListCardBillsRequest, responseObserver: StreamObserver<CollectcardProto.ListCardBillsResponse>) {

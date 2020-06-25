@@ -12,9 +12,9 @@ import org.springframework.context.annotation.DependsOn
 @Configuration
 @DependsOn("nettyPidSetting")
 class GrpcConfig(
-    @Value("\${connect.host}")
+    @Value("\${connect-server.host}")
     private var connectHost: String,
-    @Value("\${connect.port}")
+    @Value("\${connect-server.port}")
     private var connectPort: Int
 ) {
 

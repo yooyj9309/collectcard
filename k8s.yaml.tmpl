@@ -20,6 +20,12 @@
 
 {{ $namespace := $env }}
 
+{{ $development_collectcard_db_password := getenv "DEVELOPMENT_COLLECTCARD_DB_PASSWORD" }}
+{{ $development_mydata_db_password := getenv "DEVELOPMENT_MYDATA_DB_PASSWORD" }}
+{{ $development_shinhancard_client_id := getenv "DEVELOPMENT_SHINHANCARD_CLIENT_ID" }}
+
+
+
 # ^/health$
 # ^/v1/collectcard/users/{user_id}/cards$
 # ^/v1/collectcard/users/{user_id}/card-bills$
@@ -235,6 +241,12 @@ spec:
               value: {{ $sub_env_id }}
             - name: NAMESPACE
               value: {{ $namespace }}
+            - name: DEVELOPMENT_COLLECTCARD_DB_PASSWORD
+              value: {{ $development_collectcard_db_password }}
+            - name: DEVELOPMENT_MYDATA_DB_PASSWORD
+              value: {{ $development_mydata_db_password }}
+            - name: DEVELOPMENT_SHINHANCARD_CLIENT_ID
+              value: {{ $development_shinhancard_client_id }}
           resources:
             limits:
               memory: 1Gi

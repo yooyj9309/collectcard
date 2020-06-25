@@ -17,7 +17,7 @@ collectcard:
   datasource:
     url: jdbc:mysql://dev-barista-cluster.cluster-cejbmksulyv2.ap-northeast-2.rds.amazonaws.com:3306/connectcard?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
     username: connectcard_was
-    password: "${DEVELOPMENT_COLLECTCARD_DB_PASSWORD}"
+    password: ${DEVELOPMENT_COLLECTCARD_DB_PASSWORD}
     hikari:
       idle-timeout: 30000
       minimum-idle: 10
@@ -30,7 +30,7 @@ mydata:
   datasource:
     url: jdbc:mysql://dev-barista-cluster.cluster-cejbmksulyv2.ap-northeast-2.rds.amazonaws.com:3306/connectcard?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
     username: connectcard_was
-    password: "${DEVELOPMENT_MYDATA_DB_PASSWORD}"
+    password: ${DEVELOPMENT_MYDATA_DB_PASSWORD}
     hikari:
       hikari:
         idle-timeout: 30000
@@ -72,9 +72,15 @@ management:
       application: ${spring.application.name}
       active: ${spring.profiles.active}
 
-connect:
+connect-server:
   host: connect
   port: 8080
 
 shinhancard:
   clientId: ${DEVELOPMENT_SHINHANCARD_CLIENT_ID}
+
+grpc:
+  port: 18081
+  enable-reflection: true
+  enabled: true
+  in-process-server-name: collect-server-process

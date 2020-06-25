@@ -39,7 +39,7 @@ internal class CollectcardGrpcServiceTests {
         Assertions.assertEquals(CollectcardProto.ListCardsResponse.newBuilder().build(), response)
     }
 
-    @Test
+/*    @Test
     fun testlistCardTransactions() {
         val request = CollectcardProto.ListCardTransactionsRequest.newBuilder().build()
         val responseObserver: StreamRecorder<CollectcardProto.ListCardTransactionsResponse> = StreamRecorder.create()
@@ -50,7 +50,7 @@ internal class CollectcardGrpcServiceTests {
 
         val response: CollectcardProto.ListCardTransactionsResponse = results[0]
         Assertions.assertEquals(CollectcardProto.ListCardTransactionsResponse.newBuilder().build(), response)
-    }
+    }*/
 
     @Test
     fun testListCardBills() {

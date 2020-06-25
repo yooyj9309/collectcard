@@ -15,7 +15,7 @@ host:
     shinhancard: https://devopenapi.shinhancard.com:8443
 
 
-connect:
+connect-server:
   host: connect
   port: 8080
 
