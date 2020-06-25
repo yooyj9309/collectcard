@@ -18,7 +18,7 @@ class ShinhancardHeaderService(
         return kotlin.runCatching {
             mutableMapOf(
                 "contentType" to "application/json",
-                "authorization" to "Bearer ${connectClient.getAccessToken(banksaladUserId, organizationObjectId)}",
+                "authorization" to "Bearer ${connectClient.getAccessToken(banksaladUserId, organizationObjectId)?.accessToken}",
                 "clientId" to clientId
             )
         }
