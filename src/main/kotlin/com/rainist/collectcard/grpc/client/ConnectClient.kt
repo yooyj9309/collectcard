@@ -14,6 +14,23 @@ class ConnectClient(
 ) {
     companion object : Log
 
+    fun refreshToken(banksaladUserId: String?, organizationObjectId: String?): ConnectProto.RefreshTokenResponse? {
+        return kotlin.runCatching {
+            ConnectProto.RefreshTokenRequest
+                .newBuilder()
+                .setBanksaladUserId(banksaladUserId)
+                .setOrganizationObjectid(organizationObjectId)
+                .build()
+                .run {
+                    ConnectGrpc.newBlockingStub(connectChannel).refreshToken(this)
+                }
+        }
+        .onFailure {
+            logger.withFieldError("refreshTokenError", it.localizedMessage, it)
+        }
+        .getOrThrow()
+    }
+
     fun issueToken(authorizationCode: String, banksaladUserId: String, organizationObjectId: String): ConnectProto.IssueTokenResponse? {
         return kotlin.runCatching {
             ConnectProto.IssueTokenRequest
