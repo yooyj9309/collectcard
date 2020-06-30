@@ -31,15 +31,15 @@ class CardServiceImplTest {
     lateinit var commonRestTemplate: RestTemplate
 
     @Autowired
-    lateinit var cardService: CardService
+    lateinit var cardService: CardServiceImpl
 
     @Test
     fun listCard_success() {
         setupServer()
         val response = cardService.listCards(ListCardsRequest(ListCardsRequestDataBody("")))
 
-        assertThat(response.dataHeader.resultCode, `is`("0004"))
-        assertThat(response.dataBody.cards.size, `is`(4))
+        assertThat(response.dataHeader?.resultCode, `is`("0004"))
+        assertThat(response.dataBody?.cards?.size, `is`(4))
     }
 
     private fun setupServer() {

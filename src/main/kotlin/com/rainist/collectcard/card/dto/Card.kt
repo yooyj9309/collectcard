@@ -1,6 +1,24 @@
 package com.rainist.collectcard.card.dto
 
 import java.math.BigDecimal
+import java.time.ZonedDateTime
+
+enum class Brand {
+    ShinhanCard
+}
+
+enum class CardStatus {
+    REGISTERED,
+    TERMINATED,
+    DORMANT,
+    SUSPENDED
+}
+
+enum class CardOwnerType {
+    SELF,
+    FAMILY,
+    BUSINESS
+}
 
 data class Card(
     var cardId: String?,
@@ -11,7 +29,7 @@ data class Card(
     var cardOwnerName: String?,
 
     // 카드 소유자 구분
-    var cardOwnerType: String?,
+    var cardOwnerType: CardOwnerType?,
 
     // 카드 이름 (e.g. 나라사랑카드)
     var cardName: String?,
@@ -32,16 +50,16 @@ data class Card(
     var cardType: String?,
 
     // 카드 발급일자
-    var issuedAt: String?,
+    var issuedAt: ZonedDateTime?,
 
     // 카드 만료일자
-    var expiresAt: String?,
+    var expiresAt: ZonedDateTime?,
 
     // 카드 상태 (e.g. 등록, 해지, 휴면, 거래정지)
-    var cardStatus: String?,
+    var cardStatus: CardStatus?,
 
     // 마지막 이용일
-    var lastUseDate: String?,
+    var lastUseDate: ZonedDateTime?,
 
     // 연회비
     var annualFee: BigDecimal?,

@@ -24,12 +24,16 @@ class ShinhancardExecutions {
                     ListCardBillsResponseDataBody(cardBills, listCardBillsResponse2.dataBody?.nextKey)
                 )
             }
+        val mergeCards =
+            BinaryOperator { listCardsResponse1: ListCardsResponse, listCardsResponse2: ListCardsResponse ->
 
-        val cardShinhancardCards =
-            Execution.create()
-                .exchange(ShinhancardApis.card_shinhancard_cards)
-                .to(ListCardsResponse::class.java)
-                .build()
+                listCardsResponse2.dataBody?.cards?.addAll(
+                    0,
+                    listCardsResponse1.dataBody?.cards ?: mutableListOf()
+                )
+
+                listCardsResponse2
+            }
 
         val cardShinhancardTransactionsMerge =
             BinaryOperator { prevTransactions: ListTransactionsResponse, nextTransactions: ListTransactionsResponse ->
@@ -43,6 +47,19 @@ class ShinhancardExecutions {
                     dataBody = prevTransactions.dataBody
                 }
             }
+
+        val cardShinhancardCards =
+            Execution.create()
+                .exchange(ShinhancardApis.card_shinhancard_cards)
+                .to(ListCardsResponse::class.java)
+                .pagination(
+                    Pagination.builder()
+                        .method(Pagination.Method.NEXTKEY)
+                        .nextkey(".dataBody.nextKey")
+                        .build()
+                )
+                .merge(mergeCards)
+                .build()
 
         val cardShinhancardTransactions =
             Execution.create()

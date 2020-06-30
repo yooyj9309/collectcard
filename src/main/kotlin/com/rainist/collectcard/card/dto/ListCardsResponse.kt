@@ -1,8 +1,8 @@
 package com.rainist.collectcard.card.dto
 
 data class ListCardsResponse(
-    var dataHeader: ListCardsResponseDataHeader,
-    var dataBody: ListCardsResponseDataBody
+    var dataHeader: ListCardsResponseDataHeader?,
+    var dataBody: ListCardsResponseDataBody?
 )
 
 data class ListCardsResponseDataHeader(
@@ -11,5 +11,6 @@ data class ListCardsResponseDataHeader(
 )
 
 data class ListCardsResponseDataBody(
-    var cards: List<Card>
+    var cards: MutableList<Card>?,
+    var nextKey: String?
 )

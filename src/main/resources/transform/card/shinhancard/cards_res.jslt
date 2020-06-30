@@ -1,6 +1,6 @@
 let CardOwnerType = {
-    "1": "CARD_OWNER_TYPE_SELF",
-    "3": "CARD_OWNER_TYPE_FAMILY"
+    "1": "SELF",
+    "3": "FAMILY"
 }
 
 let CardType = {
@@ -40,12 +40,13 @@ let cardholder_name = .dataBody.clnHgNm
             {
                 "cardId": .enccardno,
                 "cardOwnerName": .clnHgNm,
-                "cardOwnerType": get-key($CardOwnerType, .cardgubun, "CARD_OWNER_TYPE_SELF"),
+                "cardOwnerType": get-key($CardOwnerType, .cardgubun, "SELF"),
                 "cardName": .cardname,
                 "cardNumberMask": .cardno,
                 "cardType": get-key($CardType, .cardgubun, "CARD_TYPE_CREDIT"),
                 "internationalBrandName": get-key($brands, .cardbrand, "CARD_INTERNATIONAL_BRAND_UNKNOWN")
             }
-        ]
+        ],
+        "nextKey" : .nxtQyKey
     }
 }

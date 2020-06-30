@@ -5,5 +5,5 @@ data class ListCardsRequest(
 )
 
 data class ListCardsRequestDataBody(
-    var nextQueryKey: String? = null
+    var nextKey: String? = ""
 )

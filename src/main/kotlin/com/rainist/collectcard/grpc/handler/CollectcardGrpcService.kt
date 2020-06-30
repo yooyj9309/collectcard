@@ -2,6 +2,9 @@ package com.rainist.collectcard.grpc.handler
 
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardGrpc
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
+import com.rainist.collectcard.card.CardServiceImpl
+import com.rainist.collectcard.card.dto.ListCardsRequest
+import com.rainist.collectcard.card.dto.ListCardsRequestDataBody
 import com.rainist.collectcard.cardtransactions.CardTransactionServiceImpl
 import com.rainist.common.interceptor.StatsUnaryServerInterceptor
 import com.rainist.common.log.Log
@@ -10,6 +13,7 @@ import org.lognet.springboot.grpc.GRpcService
 
 @GRpcService(interceptors = [StatsUnaryServerInterceptor::class])
 class CollectcardGrpcService(
+    val cardService: CardServiceImpl,
     val cardTransactionService: CardTransactionServiceImpl
 ) : CollectcardGrpc.CollectcardImplBase() {
 
@@ -22,6 +26,21 @@ class CollectcardGrpcService(
     }
 
     override fun listCards(request: CollectcardProto.ListCardsRequest, responseObserver: StreamObserver<CollectcardProto.ListCardsResponse>) {
+        val req = ListCardsRequest().apply {
+            dataBody = ListCardsRequestDataBody()
+        }
+        kotlin.runCatching {
+            cardService.listCards(req)
+        }
+//           TODO: dto to proto 구현 후 주석 해제
+//           .onSuccess {
+//                responseObserver.onNext(it)
+//                responseObserver.onCompleted()
+//            }
+//            .onFailure {
+//                responseObserver.onError(it)
+//            }
+
         val resp = CollectcardProto.ListCardsResponse.newBuilder().build()
         responseObserver.onNext(resp)
         responseObserver.onCompleted()
@@ -33,13 +52,20 @@ class CollectcardGrpcService(
         kotlin.runCatching {
             cardTransactionService.listTransactions(request)
         }
-        .onSuccess {
-            responseObserver.onNext(it)
-            responseObserver.onCompleted()
-        }
-        .onFailure {
-            responseObserver.onError(it)
-        }
+            .onSuccess {
+                // TODO 예상국 테스트 코드 작성후 주석 풀기
+                /*responseObserver.onNext(it)
+                responseObserver.onCompleted()*/
+            }
+            .onFailure {
+                // TODO 예상국 exception  처리 코드 추가 하기
+                // responseObserver.onError(it)
+            }
+
+        // TODO 테스트 코드 작성후 삭제
+        val resp = CollectcardProto.ListCardTransactionsResponse.newBuilder().build()
+        responseObserver.onNext(resp)
+        responseObserver.onCompleted()
     }
 
     override fun listCardBills(request: CollectcardProto.ListCardBillsRequest, responseObserver: StreamObserver<CollectcardProto.ListCardBillsResponse>) {
