@@ -14,12 +14,14 @@ import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
-import com.rainist.collectcard.header.ShinhancardHeaderService
+import com.rainist.collectcard.header.HeaderService
+import com.rainist.collectcard.header.dto.HeaderInfo
 import com.rainist.common.exception.UnknownException
 import com.rainist.common.log.Log
 import com.rainist.common.model.ObjectOf
 import com.rainist.common.service.ValidationService
 import com.rainist.common.util.DateTimeUtil
+import java.time.LocalDate
 import org.springframework.stereotype.Service
 
 @Service
@@ -27,12 +29,14 @@ class CardTransactionServiceImpl(
     val collectExecutorService: CollectExecutorService,
     val listCardRequestValidator: ListCardRequestValidator,
     val validationService: ValidationService,
-    val shinhancardHeaderService: ShinhancardHeaderService
+    val headerService: HeaderService
 ) : CardTransactionService {
 
-    companion object : Log
+    companion object : Log {
+        const val MAX_MONTH = 6L
+    }
 
-    fun execute(header: MutableMap<String, String>, listTransactionsRequest: ListTransactionsRequest): ApiResponse<ListTransactionsResponse> {
+    fun execute(header: MutableMap<String, String?>, listTransactionsRequest: ListTransactionsRequest): ApiResponse<ListTransactionsResponse> {
         return collectExecutorService.execute(
             Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.cardTransaction),
             ApiRequest.builder<ListTransactionsRequest>()
@@ -42,11 +46,18 @@ class CardTransactionServiceImpl(
         )
     }
 
-    override fun listTransactions(header: MutableMap<String, String>, listTransactionsRequest: ListTransactionsRequest): ListTransactionsResponse {
+    override fun listTransactions(header: MutableMap<String, String?>, listTransactionsRequest: ListTransactionsRequest): ListTransactionsResponse {
 
         return kotlin.runCatching {
             val res = execute(header, listTransactionsRequest)
-            validationService.validateOrThrows(res.response)
+
+            // TODO 금융사의 response code 에 따른 exception 분기처리
+            res.response.dataBody?.transactions
+            ?.forEach {
+                validationService.validateOrThrows(it)
+            }
+
+            res.response
         }
         .onFailure {
             logger.withFieldError("listTransactions", it.localizedMessage, it)
@@ -65,14 +76,28 @@ class CardTransactionServiceImpl(
                 ListTransactionsRequest().apply {
                     dataHeader = ListTransactionsRequestDataHeader()
                     dataBody = ListTransactionsRequestDataBody().apply {
-                        startAt = let { DateTimeUtil.kstNowLocalDate().minusMonths(6L) }.let { DateTimeUtil.localDateToString(it, "yyyyMMdd") }
+                        startAt = takeIf { request.hasFromMs() }
+                            ?.let { DateTimeUtil.epochMilliSecondToKSTLocalDateTime(request.fromMs.value) }
+                            ?.let { localDateTime -> LocalDate.of(localDateTime.year, localDateTime.month, localDateTime.dayOfMonth) }
+                            ?.let { DateTimeUtil.localDateToString(it, "yyyyMMdd") }
+                            ?: kotlin.run {
+                                DateTimeUtil.kstNowLocalDate().minusMonths(MAX_MONTH)
+                                    .let { DateTimeUtil.localDateToString(it, "yyyyMMdd") }
+                            }
                         endAt = DateTimeUtil.kstNowLocalDateString("yyyyMMdd")
                         nextKey = ""
                     }
                 }
             }
-            ?.let {
-                listTransactions(shinhancardHeaderService.getHeader(request.userId, request.companyId.value), it)
+            ?.let { listTransactionRequest ->
+                HeaderInfo().apply {
+                    this.banksaladUserId = request.userId
+                    this.organizationObjectId = request.companyId.value
+                }.let { headerInfo ->
+                    headerService.getHeader(headerInfo)
+                }.let { header ->
+                    listTransactions(header, listTransactionRequest)
+                }
             }
             ?.toListCardsReponseProto()
             ?: kotlin.run {

@@ -32,7 +32,7 @@ class ConnectClient(
         .getOrThrow()
     }
 
-    fun getAccessToken(banksaladUserId: String, organizationObjectId: String): ConnectProto.GetAccessTokenResponse? {
+    fun getAccessToken(banksaladUserId: String?, organizationObjectId: String?): ConnectProto.GetAccessTokenResponse? {
         return kotlin.runCatching {
             ConnectProto.GetAccessTokenRequest
                 .newBuilder()

@@ -43,8 +43,8 @@ class ShinhancardExecutions {
                 )
 
                 ListTransactionsResponse().apply {
-                    dataHeader = prevTransactions.dataHeader
-                    dataBody = prevTransactions.dataBody
+                    dataHeader = nextTransactions.dataHeader
+                    dataBody = nextTransactions.dataBody
                 }
             }
 
