@@ -9,6 +9,7 @@ import com.rainist.collectcard.cardtransactions.CardTransactionServiceImpl
 import com.rainist.common.interceptor.StatsUnaryServerInterceptor
 import com.rainist.common.log.Log
 import io.grpc.stub.StreamObserver
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.lognet.springboot.grpc.GRpcService
 
 @GRpcService(interceptors = [StatsUnaryServerInterceptor::class])
@@ -46,6 +47,7 @@ class CollectcardGrpcService(
         responseObserver.onCompleted()
     }
 
+    @ExperimentalCoroutinesApi
     override fun listCardTransactions(request: CollectcardProto.ListCardTransactionsRequest, responseObserver: StreamObserver<CollectcardProto.ListCardTransactionsResponse>) {
         logger.info("listCardTransactions : {}", request.toString())
 

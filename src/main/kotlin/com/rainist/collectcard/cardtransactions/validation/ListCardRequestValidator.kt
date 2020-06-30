@@ -11,9 +11,9 @@ class ListCardRequestValidator : ValidatorIfs<CollectcardProto.ListCardTransacti
 
     override fun isValid(obj: ObjectOf<CollectcardProto.ListCardTransactionsRequest>): Boolean {
 
-        if (!obj.data.hasCompanyId()) throw ValidationException(obj.toString())
+        if (!obj.data.hasCompanyId()) throw ValidationException("CompanyId는 필수 입니다")
 
-        if (obj.data.userId.isNullOrEmpty()) throw ValidationException(obj.toString())
+        if (obj.data.userId.isNullOrEmpty()) throw ValidationException("UserId는 필수 입니다")
 
         return true
     }

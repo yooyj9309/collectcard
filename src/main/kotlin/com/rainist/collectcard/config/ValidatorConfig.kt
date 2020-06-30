@@ -1,6 +1,7 @@
 package com.rainist.collectcard.config
 
 import com.rainist.common.listener.ValidationListener
+import com.rainist.common.log.Log
 import com.rainist.common.service.ValidationService
 import javax.validation.Validation
 import javax.validation.Validator
@@ -25,8 +26,10 @@ class ValidatorConfig {
 
 @Component
 class ValidationEventListener : ValidationListener {
+    companion object : Log
 
     override fun callBack(`object`: Any?, validationMsg: String) {
-        // TODO DB INSERT LOGIC
+        logger.withFieldError("Validation Error EventListener Object", `object` ?: "")
+        logger.withFieldError("Validation Error EventListener Msg", validationMsg)
     }
 }

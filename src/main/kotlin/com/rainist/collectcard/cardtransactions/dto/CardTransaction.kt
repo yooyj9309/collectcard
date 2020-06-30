@@ -3,20 +3,19 @@ package com.rainist.collectcard.cardtransactions.dto
 import com.rainist.common.annotation.validation.StringDateFormat
 import com.rainist.common.annotation.validation.StringTimeFormat
 import java.math.BigDecimal
-import javax.validation.constraints.DecimalMin
 import javax.validation.constraints.NotEmpty
+import javax.validation.constraints.NotNull
+import org.springframework.format.annotation.NumberFormat
 
 data class CardTransaction(
 
     var cardTransactionId: String? = null, //  1. 카드 트렌젝션 Id
 
-    @field:NotEmpty
     var cardName: String? = null, //  2. 카드이름
 
     @field:NotEmpty
     var cardNumber: String? = null, //  3. 카드번호
 
-    @field:NotEmpty
     var businessNumber: String? = null, //  4. 사업자 번호
 
     @field:NotEmpty
@@ -24,15 +23,13 @@ data class CardTransaction(
 
     var storeNumber: String? = null, //  6. 가맹점 번호
 
-    @field:NotEmpty
     var cardType: String? = null, //  7. 카드타입 (신용카드, 체크카드)
 
     // TODO 예상국 카드 거래 타입에 대한 명세 추가 ( 신용, 체크 )
 
-    @field:NotEmpty
+    @field:NotNull(message = "cardTransactionType는 필수 값입니다")
     var cardTransactionType: CardTransactionType? = null, //  8. 내역타입 ( 승인, 전체 취소, 부분취소, 거절 )월
 
-    @field:NotEmpty
     var currencyCode: String? = null, //  9. 통화코드
 
     var isInstallmentPayment: Boolean? = null, //  10. 할부여부
@@ -54,7 +51,7 @@ data class CardTransaction(
     var discountAmount: BigDecimal? = null, //  18. 할인금액
 
     // TODO 예상국 숫자체크로 변경
-    @field:DecimalMin(value = "0.0")
+    @field:NumberFormat(style = NumberFormat.Style.CURRENCY)
     var amount: BigDecimal? = null, //  19. 매출액
 
     var canceledAmount: BigDecimal? = null, //  20. 취소금액
@@ -62,15 +59,14 @@ data class CardTransaction(
     @field:NotEmpty
     var approvalNumber: String? = null, //  21. 승인번호
 
-    @field:StringDateFormat
+    @field:StringDateFormat(pattern = "yyyyMMdd")
     var approvalDay: String? = null, //  22. 승인일자
 
-    @field:StringTimeFormat
+    @field:StringTimeFormat(pattern = "HHmmss")
     var approvalTime: String? = null, //  23. 승인시간
 
     var pointsToEarn: Float? = null, //  24. 적립예정포인트
 
-    @field:NotEmpty
     var isOverseaUse: Boolean? = null, //  25. 해외사용여부
 
     var paymentDay: String? = null, //  26. 결제예정일

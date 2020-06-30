@@ -25,6 +25,7 @@ let CardTransactionType = {
                 "paymentDay": .stldate,
                 "storeNumber": .retlno,
                 "canceledAmount": .subCla,
+                "storeName": .retlname,
                 "cardTransactionType": get-key($CardTransactionType, .status, "CARD_TRANSACTION_TYPE_UNKNOWN")
             }
         ],

@@ -82,6 +82,9 @@ dependencies {
     // application monitoring
     implementation("io.micrometer:micrometer-registry-statsd:1.4.0")
     implementation("io.micrometer:micrometer-core:1.4.0")
+
+    // coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
 }
 
 tasks.withType<Test> {
