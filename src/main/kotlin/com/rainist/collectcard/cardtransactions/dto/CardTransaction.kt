@@ -27,6 +27,8 @@ data class CardTransaction(
     @field:NotEmpty
     var cardType: String? = null, //  7. 카드타입 (신용카드, 체크카드)
 
+    // TODO 예상국 카드 거래 타입에 대한 명세 추가 ( 신용, 체크 )
+
     @field:NotEmpty
     var cardTransactionType: CardTransactionType? = null, //  8. 내역타입 ( 승인, 전체 취소, 부분취소, 거절 )월
 
@@ -51,6 +53,7 @@ data class CardTransaction(
 
     var discountAmount: BigDecimal? = null, //  18. 할인금액
 
+    // TODO 예상국 숫자체크로 변경
     @field:DecimalMin(value = "0.0")
     var amount: BigDecimal? = null, //  19. 매출액
 
