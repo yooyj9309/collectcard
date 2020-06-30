@@ -21,8 +21,16 @@ class Apis {
         fun readText(fileInClassPath: String): String {
             val classPathResource = ClassPathResource(fileInClassPath)
 
-            var inputStream = classPathResource.getInputStream()
-            return inputStream.bufferedReader().use { it.readText() }
+            val inputStream = classPathResource.getInputStream()
+
+            val builder = StringBuilder()
+            (inputStream.bufferedReader()).use {
+                it.forEachLine { line ->
+                    builder.append(if (line.contains("//")) line.substring(0, line.indexOf("//")) else line)
+                }
+            }
+
+            return builder.toString()
         }
     }
 }
