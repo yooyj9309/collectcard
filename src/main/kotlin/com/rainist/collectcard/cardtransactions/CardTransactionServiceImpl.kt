@@ -46,40 +46,59 @@ class CardTransactionServiceImpl(
         const val DIVISION = 3
     }
 
-    fun execute(header: MutableMap<String, String?>, listTransactionsRequest: ListTransactionsRequest): List<ApiResponse<ListTransactionsResponse>> {
-        val startDate = DateTimeUtil.stringToLocalDate(listTransactionsRequest.dataBody?.startAt ?: DateTimeUtil.kstNowLocalDateString("yyyyMMdd"), "yyyyMMdd")
-        val endDate = DateTimeUtil.stringToLocalDate(listTransactionsRequest.dataBody?.endAt ?: DateTimeUtil.kstNowLocalDateString("yyyyMMdd"), "yyyyMMdd")
+    fun execute(header: MutableMap<String, String?>, listTransactionsRequest: ListTransactionsRequest): List<ApiResponse<ListTransactionsResponse>>? {
 
-        val searchDateList = DateTimeUtil.splitLocalDateRangeByMonth(startDate, endDate, DIVISION)
+        return kotlin.runCatching {
 
-        val responseList = runBlocking(executor.asCoroutineDispatcher()) {
+            let {
+                validationService.validateOrThrows(listTransactionsRequest.dataBody)
+            }
+            ?.let {
+                val startDate = DateTimeUtil.stringToLocalDate(it.startAt, "yyyyMMdd")
+                val endDate = DateTimeUtil.stringToLocalDate(it.endAt, "yyyyMMdd")
 
-            searchDateList.map {
-                ListTransactionsRequest().apply {
-                    dataHeader = ListTransactionsRequestDataHeader()
-                    dataBody = ListTransactionsRequestDataBody().apply {
-                        startAt = DateTimeUtil.localDateToString(it.startDate, "yyyyMMdd")
-                        endAt = DateTimeUtil.localDateToString(it.endDate, "yyyyMMdd")
-                        nextKey = ""
+                Pair(startDate, endDate)
+            }
+            ?.let {
+                DateTimeUtil.splitLocalDateRangeByMonth(it.first, it.second, DIVISION)
+            }
+            ?.let { searchDateList ->
+                runBlocking(executor.asCoroutineDispatcher()) {
+
+                    searchDateList.map {
+                        ListTransactionsRequest().apply {
+                            dataHeader = ListTransactionsRequestDataHeader()
+                            dataBody = ListTransactionsRequestDataBody().apply {
+                                startAt = DateTimeUtil.localDateToString(it.startDate, "yyyyMMdd")
+                                endAt = DateTimeUtil.localDateToString(it.endDate, "yyyyMMdd")
+                                nextKey = ""
+                            }
+                        }
+                    }
+                    .map {
+                        async {
+                            val res: ApiResponse<ListTransactionsResponse> = collectExecutorService.execute(
+                                Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.cardTransaction),
+                                ApiRequest.builder<ListTransactionsRequest>()
+                                    .headers(header)
+                                    .request(it)
+                                    .build()
+                            )
+                            res
+                        }
                     }
                 }
-            }.map {
-                async {
-                    val res: ApiResponse<ListTransactionsResponse> = collectExecutorService.execute(
-                        Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.cardTransaction),
-                        ApiRequest.builder<ListTransactionsRequest>()
-                            .headers(header)
-                            .request(it)
-                            .build()
-                    )
-                    res
+            }
+            ?.let {
+                it.map { deferred ->
+                    deferred.getCompleted()
                 }
             }
         }
-
-        return responseList.map {
-            it.getCompleted()
+        .onFailure {
+            logger.withFieldError("ExecuteError", it.localizedMessage, it)
         }
+        .getOrThrow()
     }
 
     override fun listTransactions(header: MutableMap<String, String?>, listTransactionsRequest: ListTransactionsRequest): ListTransactionsResponse {
@@ -87,21 +106,21 @@ class CardTransactionServiceImpl(
         return kotlin.runCatching {
             val response = execute(header, listTransactionsRequest)
 
-            val headerValidations = response.filter {
+            val headerValidations = response?.filter {
                 // TODO 예상국 각 금융사별 OK 사인 코드 넣기 ( 제대로 온 내역만 파싱하고 나머지는 로그 알림이 맞지 않나? ) Body Validation 으로 처리 가능 쉐도잉시 정책 적용
                 true
             }
 
-            val bodyValidation = headerValidations.flatMap {
+            val bodyValidation = headerValidations?.flatMap {
                 it.response.dataBody?.transactions?.toMutableList() ?: mutableListOf()
             }
-            .filter {
+            ?.filter {
                 it.cardNumber?.length ?: 0 > 0
             }
-            .mapNotNull {
+            ?.mapNotNull {
                 validationService.validateOrNull(it)
             }
-            .toMutableList()
+            ?.toMutableList()
 
             ListTransactionsResponse().apply {
                 this.dataBody = ListTransactionsResponseDataBody().apply {
@@ -110,7 +129,7 @@ class CardTransactionServiceImpl(
             }
         }
         .onFailure {
-            logger.withFieldError("listTransactions", it.localizedMessage, it)
+            logger.withFieldError("ListTransactionsError", it.localizedMessage, it)
         }
         .getOrThrow()
     }
@@ -127,15 +146,9 @@ class CardTransactionServiceImpl(
                     dataHeader = ListTransactionsRequestDataHeader()
                     dataBody = ListTransactionsRequestDataBody().apply {
                         startAt = takeIf { request.hasFromMs() }
-                            ?.let { DateTimeUtil.epochMilliSecondToKSTLocalDateTime(request.fromMs.value) }
-                            ?.let { localDateTime -> LocalDate.of(localDateTime.year, localDateTime.month, localDateTime.dayOfMonth) }
-                            ?.let { DateTimeUtil.localDateToString(it, "yyyyMMdd") }
-                            ?: kotlin.run {
-                                DateTimeUtil.kstNowLocalDate().minusMonths(MAX_MONTH)
-                                    .let { DateTimeUtil.localDateToString(it, "yyyyMMdd") }
-                            }
-                        endAt = DateTimeUtil.kstNowLocalDateString("yyyyMMdd")
-                        nextKey = ""
+                            .let { DateTimeUtil.epochMilliSecondToKSTLocalDateTime(request.fromMs.value) }
+                            .let { localDateTime -> LocalDate.of(localDateTime.year, localDateTime.month, localDateTime.dayOfMonth) }
+                            .let { DateTimeUtil.localDateToString(it, "yyyyMMdd") }
                     }
                 }
             }
@@ -156,7 +169,7 @@ class CardTransactionServiceImpl(
             }
         }
         .onFailure {
-            logger.withFieldError("listTransactions", it.localizedMessage, it)
+            logger.withFieldError("ListTransactionsError", it.localizedMessage, it)
         }
         .getOrThrow()
     }
