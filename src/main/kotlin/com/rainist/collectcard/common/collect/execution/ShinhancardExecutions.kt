@@ -38,14 +38,11 @@ class ShinhancardExecutions {
         val cardShinhancardTransactionsMerge =
             BinaryOperator { prevTransactions: ListTransactionsResponse, nextTransactions: ListTransactionsResponse ->
 
-                prevTransactions.dataBody?.transactions?.addAll(
-                    nextTransactions.dataBody?.transactions ?: mutableListOf()
+                nextTransactions.dataBody?.transactions?.addAll(
+                    0, prevTransactions.dataBody?.transactions ?: mutableListOf()
                 )
 
-                ListTransactionsResponse().apply {
-                    dataHeader = nextTransactions.dataHeader
-                    dataBody = nextTransactions.dataBody
-                }
+                nextTransactions
             }
 
         val cardShinhancardCards =
