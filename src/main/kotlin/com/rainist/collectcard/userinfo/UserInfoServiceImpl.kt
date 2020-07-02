@@ -7,6 +7,7 @@ import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
+import com.rainist.collectcard.common.organization.Organizations
 import com.rainist.collectcard.header.HeaderService
 import com.rainist.collectcard.header.dto.HeaderInfo
 import com.rainist.collectcard.userinfo.dto.UserInfoRequest
@@ -30,7 +31,8 @@ class UserInfoServiceImpl(
             .let { userInfoRequest ->
                 HeaderInfo().apply {
                     this.banksaladUserId = userInfoRequest.banksaladUserId
-                    this.organizationObjectId = userInfoRequest.organizationObjectId
+                    this.organizationObjectid = userInfoRequest.organizationObjectid
+                    this.clientId = Organizations.valueOf(userInfoRequest.organizationObjectid)?.clientId
                 }
             }
             .let { headerInfo ->

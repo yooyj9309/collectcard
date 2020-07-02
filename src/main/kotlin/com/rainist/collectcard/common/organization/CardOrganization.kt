@@ -1,5 +1,7 @@
 package com.rainist.collectcard.common.organization
 
+import com.rainist.collectcard.cardtransactions.CardTransactionServiceImpl.Companion.DEFAULT_DIVISION
+import com.rainist.collectcard.cardtransactions.CardTransactionServiceImpl.Companion.DEFAULT_MAX_MONTH
 import javax.validation.constraints.NotEmpty
 
 data class CardOrganization(
@@ -12,6 +14,6 @@ data class CardOrganization(
     @field:NotEmpty
     var organizationObjectId: String? = null,
 
-    var maxMonth: Int = 12,
-    var division: Long = 4
+    var maxMonth: Long = DEFAULT_MAX_MONTH,
+    var division: Int = DEFAULT_DIVISION
 )

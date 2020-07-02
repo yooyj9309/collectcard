@@ -15,6 +15,7 @@ import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
+import com.rainist.collectcard.common.organization.Organizations
 import com.rainist.collectcard.header.HeaderService
 import com.rainist.collectcard.header.dto.HeaderInfo
 import com.rainist.common.exception.UnknownException
@@ -42,8 +43,8 @@ class CardTransactionServiceImpl(
 ) : CardTransactionService {
 
     companion object : Log {
-        const val MAX_MONTH = 12L
-        const val DIVISION = 3
+        const val DEFAULT_MAX_MONTH = 12L
+        const val DEFAULT_DIVISION = 3
     }
 
     fun execute(header: MutableMap<String, String?>, listTransactionsRequest: ListTransactionsRequest): List<ApiResponse<ListTransactionsResponse>>? {
@@ -60,7 +61,8 @@ class CardTransactionServiceImpl(
                 Pair(startDate, endDate)
             }
             ?.let {
-                DateTimeUtil.splitLocalDateRangeByMonth(it.first, it.second, DIVISION)
+                val cardOrganization = Organizations.valueOf(listTransactionsRequest.organizationObjectid)
+                DateTimeUtil.splitLocalDateRangeByMonth(it.first, it.second, cardOrganization?.division ?: DEFAULT_DIVISION)
             }
             ?.let { searchDateList ->
                 runBlocking(executor.asCoroutineDispatcher()) {
@@ -142,14 +144,22 @@ class CardTransactionServiceImpl(
                 listCardRequestValidator.isValid(ObjectOf(request))
             }
             ?.let {
+
                 ListTransactionsRequest().apply {
-                    dataHeader = ListTransactionsRequestDataHeader()
-                    dataBody = ListTransactionsRequestDataBody().apply {
-                        startAt = takeIf { request.hasFromMs() }
+                    this.organizationObjectid = request.companyId.value
+                    this.dataHeader = ListTransactionsRequestDataHeader()
+                    this.dataBody = ListTransactionsRequestDataBody().apply {
+                        this.startAt = takeIf { request.hasFromMs() }
                             ?.let { DateTimeUtil.epochMilliSecondToKSTLocalDateTime(request.fromMs.value) }
                             ?.let { localDateTime -> LocalDate.of(localDateTime.year, localDateTime.month, localDateTime.dayOfMonth) }
                             ?.let { DateTimeUtil.localDateToString(it, "yyyyMMdd") }
-                            ?: kotlin.run { DateTimeUtil.kstNowLocalDate().minusMonths(MAX_MONTH).let { DateTimeUtil.localDateToString(it, "yyyyMMdd") } }
+                            ?: kotlin.run {
+                                val cardOrganization = Organizations.valueOf(request.companyId.value)
+                                DateTimeUtil.kstNowLocalDate().minusMonths(cardOrganization?.maxMonth ?: DEFAULT_MAX_MONTH)
+                                    .let {
+                                        DateTimeUtil.localDateToString(it, "yyyyMMdd")
+                                    }
+                            }
                     }
                 }
             }
@@ -157,7 +167,8 @@ class CardTransactionServiceImpl(
 
                 HeaderInfo().apply {
                     this.banksaladUserId = request.userId
-                    this.organizationObjectId = request.companyId.value
+                    this.organizationObjectid = request.companyId.value
+                    this.clientId = Organizations.valueOf(request.companyId.value)?.clientId
                 }.let { headerInfo ->
                     headerService.getHeader(headerInfo)
                 }.let { header ->

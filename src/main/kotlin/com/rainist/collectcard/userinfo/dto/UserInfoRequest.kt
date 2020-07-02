@@ -8,7 +8,7 @@ data class UserInfoRequest(
     var banksaladUserId: String? = null,
 
     @field:NotEmpty
-    var organizationObjectId: String? = null,
+    var organizationObjectid: String? = null,
 
     var dataHeader: UserInfoRequestDataHeader? = null,
     var dataBody: UserInfoRequestDataBody? = null

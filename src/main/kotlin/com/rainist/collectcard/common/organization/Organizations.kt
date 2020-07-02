@@ -14,8 +14,8 @@ class Organizations(
     @Value("\${shinhancard.clientId}")
     lateinit var shinhancardClientId: String
 
-    @Value("\${shinhancard.organizationObjectId}")
-    lateinit var shinhancardOrganizationObjectId: String
+    @Value("\${shinhancard.organizationObjectid}")
+    lateinit var shinhancardOrganizationObjectid: String
 
     @PostConstruct
     fun init() {
@@ -24,11 +24,11 @@ class Organizations(
                 this.name = "신한카드"
                 this.code = "SHC"
                 this.clientId = shinhancardClientId
-                this.organizationObjectId = shinhancardOrganizationObjectId
+                this.organizationObjectId = shinhancardOrganizationObjectid
             }.also {
                 validationService.validateOrThrows(it)
             }.also {
-                map[shinhancardOrganizationObjectId] = it
+                map[shinhancardOrganizationObjectid] = it
             }
         }
         .onFailure {
@@ -41,8 +41,12 @@ class Organizations(
     companion object : Log {
         private val map = LinkedHashMap<String, CardOrganization>()
 
-        fun valueOf(organizationObjectId: String): CardOrganization {
-            return map[organizationObjectId] ?: throw Exception("Organizations not found")
+        fun valueOf(organizationObjectid: String?): CardOrganization? {
+            return map[organizationObjectid]
+                ?: kotlin.run {
+                    logger.withFieldError("OrganizationsNotFound", organizationObjectid ?: "null")
+                    null
+                }
         }
 
         // 신한카드

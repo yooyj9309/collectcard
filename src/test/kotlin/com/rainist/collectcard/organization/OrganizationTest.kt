@@ -17,14 +17,14 @@ class OrganizationTest {
     @Value("\${shinhancard.clientId}")
     lateinit var shinhancardClientId: String
 
-    @Value("\${shinhancard.organizationObjectId}")
-    lateinit var shinhancardOrganizationObjectId: String
+    @Value("\${shinhancard.organizationObjectid}")
+    lateinit var shinhancardOrganizationObjectid: String
 
     @Test
     fun shinhancardOrganizationTest() {
-        val cardOrganization = Organizations.valueOf(shinhancardOrganizationObjectId)
+        val cardOrganization = Organizations.valueOf(shinhancardOrganizationObjectid)
 
-        Assert.assertEquals(shinhancardClientId, cardOrganization.clientId)
-        Assert.assertEquals(shinhancardOrganizationObjectId, cardOrganization.organizationObjectId)
+        Assert.assertEquals(shinhancardClientId, cardOrganization?.clientId)
+        Assert.assertEquals(shinhancardOrganizationObjectid, cardOrganization?.organizationObjectId)
     }
 }

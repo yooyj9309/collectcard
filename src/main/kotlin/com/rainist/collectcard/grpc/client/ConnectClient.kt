@@ -14,12 +14,12 @@ class ConnectClient(
 ) {
     companion object : Log
 
-    fun refreshToken(banksaladUserId: String?, organizationObjectId: String?): ConnectProto.RefreshTokenResponse? {
+    fun refreshToken(banksaladUserId: String?, organizationObjectid: String?): ConnectProto.RefreshTokenResponse? {
         return kotlin.runCatching {
             ConnectProto.RefreshTokenRequest
                 .newBuilder()
                 .setBanksaladUserId(banksaladUserId)
-                .setOrganizationObjectid(organizationObjectId)
+                .setOrganizationObjectid(organizationObjectid)
                 .build()
                 .run {
                     ConnectGrpc.newBlockingStub(connectChannel).refreshToken(this)
@@ -31,13 +31,13 @@ class ConnectClient(
         .getOrThrow()
     }
 
-    fun issueToken(authorizationCode: String, banksaladUserId: String, organizationObjectId: String): ConnectProto.IssueTokenResponse? {
+    fun issueToken(authorizationCode: String, banksaladUserId: String, organizationObjectid: String): ConnectProto.IssueTokenResponse? {
         return kotlin.runCatching {
             ConnectProto.IssueTokenRequest
                 .newBuilder()
                 .setAuthorizationCode(authorizationCode)
                 .setBanksaladUserId(banksaladUserId)
-                .setOrganizationObjectid(organizationObjectId)
+                .setOrganizationObjectid(organizationObjectid)
                 .build()
                 .run {
                     ConnectGrpc.newBlockingStub(connectChannel).issueToken(this)
@@ -49,12 +49,12 @@ class ConnectClient(
         .getOrThrow()
     }
 
-    fun getAccessToken(banksaladUserId: String?, organizationObjectId: String?): ConnectProto.GetAccessTokenResponse? {
+    fun getAccessToken(banksaladUserId: String?, organizationObjectid: String?): ConnectProto.GetAccessTokenResponse? {
         return kotlin.runCatching {
             ConnectProto.GetAccessTokenRequest
                 .newBuilder()
                 .setBanksaladUserId(banksaladUserId)
-                .setOrganizationObjectid(organizationObjectId)
+                .setOrganizationObjectid(organizationObjectid)
                 .build()
                 .run {
                     ConnectGrpc.newBlockingStub(connectChannel).getAccessToken(this)

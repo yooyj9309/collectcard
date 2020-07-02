@@ -15,5 +15,5 @@ host:
 
 shinhancard:
   clientId: ${DEVELOPMENT_SHINHANCARD_CLIENT_ID}
-  organizationObjectId: 596d66692c4069c168b57c59
+  organizationObjectid: 596d66692c4069c168b57c59
 
