@@ -5,9 +5,9 @@ import com.rainist.collect.common.dto.Execution
 import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
+import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardBillTransactionExpected
 import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardBills
 import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardCards
-import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardListUserCardBillsExpected
 import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardLoan
 import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardTransactions
 import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardUserInfo
@@ -43,8 +43,8 @@ class Executions() {
             Api.builder()
                 .business(BusinessType.card.name)
                 .agency(Organization.shinhancard.name)
-                .transaction(Transaction.cardBillsExpected.name)
-                .build() to cardShinhancardListUserCardBillsExpected,
+                .transaction(Transaction.billTransactionExpected.name)
+                .build() to cardShinhancardBillTransactionExpected,
             // 청구서
             Api.builder()
                 .business(BusinessType.card.name)

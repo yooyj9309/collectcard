@@ -8,7 +8,7 @@
       for (.dataBody.grp001)
           if (.setlTypeNo != "") (
               {
-                "billId": .setlTypeNo,
+                "billId": .setlDay + .setlTypeNo,
                 "userName": "",
                 "userGrade": "",
                 "billNumber": .setlDay,

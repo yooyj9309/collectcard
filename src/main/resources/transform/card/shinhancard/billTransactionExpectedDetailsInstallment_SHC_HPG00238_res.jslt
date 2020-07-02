@@ -1,0 +1,26 @@
+//카드_[EXT] 결제예정금액(일시불,현금서비스 상세) SHC_HPG00237
+
+{
+   "dataHeader": {
+        "resultCode": .dataBody.resultCode,
+        "resultMessage": .dataHeader.resultMessage,
+        "successCode": .dataHeader.successCode
+   },
+   "dataBody": {
+        "transactions": [for (.dataBody.grp001)
+            {
+                "cardNumber": .crdN,                    // 마스킹 카드번호
+                "approvalDay" : .useDate,               // 이용일자
+                "amount": .amount,                      // 이용원금금액
+                "storeName": ".merchant,                // 가맹점명
+                "billingRound": ".monthCount,           // 청구회차
+                "thisMonthBilledAmount": .monthAmt,     // 원금금액
+                "thisMonthBilledFee": .monthFee,        // 수수료금액
+                "installment": .useMonth,               // 할부개월수
+                "remainingAmount": .dueReamin,          // 미도래금액
+                "pointsRate": .point                    // 적립예정포인트율
+            }
+        ],
+        "nextKey" : .dataBody.nxtQyKey
+    }
+}

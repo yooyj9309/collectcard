@@ -94,19 +94,52 @@ class ShinhancardApis {
                 .name("체크 국내사용내역(SHC_HPG01031)")
                 .build()
 
+        // 카드_[EXT] 결제예정금액 총괄 SHC_HPG01096_EXT
         card_shinhancard_list_user_card_bills_expected =
             Api.builder()
                 .business(BusinessType.card.name)
                 .agency(Organization.shinhancard.name)
-                .transaction(Transaction.cardBillsExpected.name)
+                .transaction(Transaction.billTransactionExpected.name)
                 .signaturePolicy(signaturePolicyShinhancard)
                 .endpoint("$hostCardShinhancard/v1.0/EXT/usecard/searchtotalpayments")
                 .method(Api.HttpMethod.POST)
                 .transformRequestHeader(readText("transform/card/shinhancard/header_req.jslt"))
-                .transformRequestBody(readText("transform/card/shinhancard/cardbilltransactions_SHC_HPG01096_req.jslt"))
+                .transformRequestBody(readText("transform/card/shinhancard/billTransactionExpected_SHC_HPG01096_req.jslt"))
                 .transformResponseHeader(readText("transform/card/shinhancard/header_res.jslt"))
-                .transformResponseBody(readText("transform/card/shinhancard/cardbilltransactions_SHC_HPG01096_res.jslt"))
+                .transformResponseBody(readText("transform/card/shinhancard/billTransactionExpected_SHC_HPG01096_res.jslt"))
                 .name("카드_[EXT] 결제예정금액 총괄(SHC_HPG01096_EXT)")
+                .build()
+
+        // 결제예정금액(일시불,현금서비스 상세) (SHC_HPG00237)
+        card_shinhancard_list_user_card_bills_expected_detail_lump_sum =
+            Api.builder()
+                .business(BusinessType.card.name)
+                .agency(Organization.shinhancard.name)
+                .transaction(Transaction.billTransactionExpectedDetailsLumpSum.name)
+                .signaturePolicy(signaturePolicyShinhancard)
+                .endpoint("$hostCardShinhancard/v1.0/EXT/usecard/searchpaymentsdetail")
+                .method(Api.HttpMethod.POST)
+                .transformRequestHeader(readText("transform/card/shinhancard/header_req.jslt"))
+                .transformRequestBody(readText("transform/card/shinhancard/billTransactionExpectedDetailsLumpSum_SHC_HPG00237_req.jslt"))
+                .transformResponseHeader(readText("transform/card/shinhancard/header_res.jslt"))
+                .transformResponseBody(readText("transform/card/shinhancard/billTransactionExpectedDetailsLumpSum_SHC_HPG00237_res.jslt"))
+                .name("카드_[EXT] 결제예정금액(일시불,현금서비스 상세)(SHC_HPG00237)")
+                .build()
+
+        // (할부) 결제예정금액(할부, 론 상세) (SHC_HPG00238)
+        card_shinhancard_list_user_card_bills_expected_detail_installment =
+            Api.builder()
+                .business(BusinessType.card.name)
+                .agency(Organization.shinhancard.name)
+                .transaction(Transaction.billTransactionExpectedDetailsInstallment.name)
+                .signaturePolicy(signaturePolicyShinhancard)
+                .endpoint("$hostCardShinhancard/v1.0/EXT/useinstallment/searchpaymentsdetai")
+                .method(Api.HttpMethod.POST)
+                .transformRequestHeader(readText("transform/card/shinhancard/header_req.jslt"))
+                .transformRequestBody(readText("transform/card/shinhancard/billTransactionExpectedDetailsInstallment_SHC_HPG00238_req.jslt"))
+                .transformResponseHeader(readText("transform/card/shinhancard/header_res.jslt"))
+                .transformResponseBody(readText("transform/card/shinhancard/billTransactionExpectedDetailsInstallment_SHC_HPG00238_req.jslt"))
+                .name("카드_[EXT] (할부) 결제예정금액(할부, 론 상세)(SHC_HPG00238)")
                 .build()
 
         // 체크카드 월별 청구내역(SHC_HPG01226)
@@ -244,6 +277,12 @@ class ShinhancardApis {
 
         // 카드_[EXT] 결제예정금액총괄 SHC_HPG01096_EXT
         lateinit var card_shinhancard_list_user_card_bills_expected: Api
+
+        // 카드_[EXT] 결제예정금액(일시불,현금서비스 상세) SHC_HPG00237
+        lateinit var card_shinhancard_list_user_card_bills_expected_detail_lump_sum: Api
+
+        // (할부) 결제예정금액(할부, 론 상세) (SHC_HPG00238)
+        lateinit var card_shinhancard_list_user_card_bills_expected_detail_installment: Api
 
         // 체크카드 월별 청구내역(SHC_HPG01226)
         lateinit var card_shinhancard_check_bills: Api

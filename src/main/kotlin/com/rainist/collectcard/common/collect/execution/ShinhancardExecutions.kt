@@ -4,6 +4,7 @@ import com.rainist.collect.common.dto.Execution
 import com.rainist.collect.common.dto.Pagination
 import com.rainist.collectcard.card.dto.ListCardsResponse
 import com.rainist.collectcard.cardbills.dto.CardBill
+import com.rainist.collectcard.cardbills.dto.CardBillTransaction
 import com.rainist.collectcard.cardbills.dto.ListCardBillsResponse
 import com.rainist.collectcard.cardbills.dto.ListCardBillsResponseDataBody
 import com.rainist.collectcard.cardloans.dto.ListLoansResponse
@@ -50,6 +51,28 @@ class ShinhancardExecutions {
                     ListCardBillsResponseDataBody(cardBills, listCardBillsResponse2.dataBody?.nextKey)
                 )
             }
+
+        val mergeBillTransaction =
+            BiConsumer { master: CardBillTransaction, detail: CardBillTransaction ->
+                master.cardNumber = detail.cardNumber
+                master.approvalDay = detail.approvalDay
+                master.amount = detail.amount
+                master.storeName = detail.storeName
+                master.cardNumber = detail.cardNumber
+                master.thisMonthBilledAmount = detail.thisMonthBilledAmount
+                master.thisMonthBilledFee = detail.thisMonthBilledFee
+                master.isPaidFull = detail.isPaidFull
+                master.cardName = detail.cardName
+                master.pointsRate = detail.pointsRate
+
+                master.billingRound = detail.billingRound
+                master.thisMonthBilledAmount = detail.thisMonthBilledAmount
+                master.thisMonthBilledFee = detail.thisMonthBilledFee
+                master.installment = detail.installment
+                master.remainingAmount = detail.remainingAmount
+                master.pointsRate = detail.pointsRate
+            }
+
         val mergeCards =
             BinaryOperator { listCardsResponse1: ListCardsResponse, listCardsResponse2: ListCardsResponse ->
 
@@ -138,7 +161,7 @@ class ShinhancardExecutions {
                 .merge(cardShinhancardTransactionsMerge)*/
                 .build()
 
-        val cardShinhancardListUserCardBillsExpected =
+        val cardShinhancardBillTransactionExpected =
             Execution.create()
                 .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected)
                 .to(ListCardBillsResponse::class.java)
@@ -148,7 +171,39 @@ class ShinhancardExecutions {
                         .nextkey(".dataBody.nextKey")
                         .merge(mergeBills)
                         .build()
-                ).build()
+                )
+                .fetch { listCardBillResponse ->
+                    listCardBillResponse as ListCardBillsResponse
+                    listCardBillResponse.dataBody?.cardBills?.iterator()
+                }.then(
+                    Execution.create()
+                        .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_lump_sum)
+                        .to(ListLoansResponse::class.java)
+                        .build()
+                ).merge(mergeBillTransaction)
+                .with(
+                    Execution.create()
+                        .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected)
+                        .to(ListCardBillsResponse::class.java)
+                        .paging(
+                            Pagination.builder()
+                                .method(Pagination.Method.NEXTKEY)
+                                .nextkey(".dataBody.nextKey")
+                                .merge(mergeBills)
+                                .build()
+                        )
+                        .fetch { listCardBillResponse ->
+                            listCardBillResponse as ListCardBillsResponse
+                            listCardBillResponse.dataBody?.cardBills?.iterator()
+                        }.then(
+                            Execution.create()
+                                .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_installment)
+                                .to(ListLoansResponse::class.java)
+                                .build()
+                        ).merge(mergeBillTransaction)
+                        .build()
+                )
+                .build()
 
         val cardShinhancardBills =
             Execution.create()
@@ -173,7 +228,6 @@ class ShinhancardExecutions {
                                 .build()
                         ).build()
                 )
-                .with(cardShinhancardListUserCardBillsExpected)
                 .merge(mergeBills)
                 .build()
 

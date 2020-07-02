@@ -35,7 +35,7 @@ class CardBillServiceImpl(val collectExecutorService: CollectExecutorService) : 
 
         return runCatching<ApiResponse<ListCardBillsResponse>> {
             collectExecutorService.execute(
-                Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.cardBillsExpected),
+                Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.billTransactionExpected),
                 ApiRequest.builder<ListCardBillsRequest>()
                     .headers(makeHeader())
                     .request(listCardBillsRequest)
