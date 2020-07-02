@@ -12,9 +12,9 @@ class ThreadPoolConfig {
     fun threadPoolConfig(): Executor {
         val executor = ThreadPoolTaskExecutor()
         executor.setThreadNamePrefix("Async-Thread-")
-        executor.corePoolSize = 100
-        executor.maxPoolSize = 500
-        executor.setQueueCapacity(50)
+        executor.corePoolSize = 5
+        executor.maxPoolSize = 10
+        executor.setQueueCapacity(10)
         executor.keepAliveSeconds = 20
         executor.setWaitForTasksToCompleteOnShutdown(true)
         executor.setAwaitTerminationSeconds(15)
