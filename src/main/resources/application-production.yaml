@@ -32,3 +32,4 @@ host:
 
 shinhancard:
   clientId: ${PRODUCTION_SHINHANCARD_CLIENT_ID}
+  organizationObjectId: 5880ec0575c8e8fbdc00aced
