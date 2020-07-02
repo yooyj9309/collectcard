@@ -172,6 +172,22 @@ class ShinhancardApis {
 //                .transformResponseBody(readText("transform/card/shinhancard/.jslt"))
 //                .name("신용카드 월별 청구내역 상세(SHC_HPG00698)")
 //                .build()
+
+        // 사용자 거래정보 조회 (SHC_EXT_00001)
+        card_shinhancard_user_info =
+            Api.builder()
+                .business(BusinessType.card.name)
+                .agency(Organization.shinhancard.name)
+                .transaction(Transaction.userInfo.name)
+                .signaturePolicy(signaturePolicyShinhancard)
+                .endpoint("$hostCardShinhancard/v1.0/EXT/myinfo/searchtransinfo")
+                .method(Api.HttpMethod.POST)
+                .transformRequestHeader(readText("transform/card/shinhancard/header_req.jslt"))
+                .transformRequestBody(readText("transform/card/shinhancard/userinfo_SHC_EXT00001_req.jslt"))
+                .transformResponseHeader(readText("transform/card/shinhancard/header_res.jslt"))
+                .transformResponseBody(readText("transform/card/shinhancard/userinfo_SHC_EXT00001_res.jslt"))
+                .name("사용자 거래정보 조회 (SHC_EXT_00001)")
+                .build()
     }
 
     companion object {
@@ -202,5 +218,8 @@ class ShinhancardApis {
 
         // 신용카드 월별 청구내역(SHC_HPG00719)
         lateinit var card_shinhancard_credit_bills: Api
+
+        // 개인 거래 정보 조회 (SHC_EXT_00001)
+        lateinit var card_shinhancard_user_info: Api
     }
 }

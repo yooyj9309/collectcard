@@ -9,6 +9,7 @@ import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Co
 import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardCards
 import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardListUserCardBillsExpected
 import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardTransactions
+import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardUserInfo
 import com.rainist.collectcard.common.exception.CollectcardException
 
 class Executions() {
@@ -48,8 +49,14 @@ class Executions() {
                 .business(BusinessType.card.name)
                 .agency(Organization.shinhancard.name)
                 .transaction(Transaction.cardbills.name)
-                .build() to cardShinhancardBills
+                .build() to cardShinhancardBills,
 
+            // 개인정보조회
+            Api.builder()
+                .business(BusinessType.card.name)
+                .agency(Organization.shinhancard.name)
+                .transaction(Transaction.userInfo.name)
+                .build() to cardShinhancardUserInfo
         )
     }
 }

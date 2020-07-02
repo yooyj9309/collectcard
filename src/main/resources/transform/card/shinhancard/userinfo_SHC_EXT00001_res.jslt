@@ -1,0 +1,13 @@
+{
+   "dataHeader": {
+        "resultCode": .dataHeader.resultCode,           // 결과 코드
+        "resultMessage": .dataHeader.resultMessage,     // 결과 메세지
+        "successCode": .dataHeader.successCode          // 성공 코드
+   },
+    "dataBody": {
+        "hasLoan": if(.dataBody.useLoan == 'Y') true else false  // 론 사용여부
+        // .dataBody.useCredit  // 신용고객여부 (미사용)
+        // .dataBody.useCheck   // 체크고객여부 (미사용)
+        // .dataBody.useInst    // 할부고객여부 (미사용)
+    }
+}

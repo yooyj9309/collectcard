@@ -150,5 +150,13 @@ class ShinhancardExecutions {
                 .with(cardShinhancardListUserCardBillsExpected)
                 .merge(mergeBills)
                 .build()
+
+        // 사용자 정보 조회 (SHC_EXT_00001)
+        val cardShinhancardUserInfo =
+            Execution.create()
+                .exchange(ShinhancardApis.card_shinhancard_user_info)
+                // TODO 예상국 DTO merge 후 적용하기
+                // .to(UserInfoResponse::class.java)
+                .build()
     }
 }
