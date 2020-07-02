@@ -1,8 +1,15 @@
 package com.rainist.collectcard.userinfo.dto
 
 import com.rainist.collectcard.common.dto.Empty
+import javax.validation.constraints.NotEmpty
 
 data class UserInfoRequest(
+    @field:NotEmpty
+    var banksaladUserId: String? = null,
+
+    @field:NotEmpty
+    var organizationObjectId: String? = null,
+
     var dataHeader: UserInfoRequestDataHeader? = null,
     var dataBody: UserInfoRequestDataBody? = null
 )
