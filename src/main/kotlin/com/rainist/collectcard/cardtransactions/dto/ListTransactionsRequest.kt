@@ -3,7 +3,7 @@ package com.rainist.collectcard.cardtransactions.dto
 import com.rainist.collectcard.cardtransactions.CardTransactionServiceImpl
 import com.rainist.common.annotation.validation.StringDateFormat
 import com.rainist.common.util.DateTimeUtil
-import javax.validation.constraints.NotEmpty
+import javax.validation.constraints.NotNull
 
 data class ListTransactionsRequest(
     var dataHeader: ListTransactionsRequestDataHeader? = null,
@@ -30,6 +30,6 @@ data class ListTransactionsRequestDataBody(
 
     var cardOwnerType: String? = null, // 카드 소유주 타입 ( 본인 , 가족 )
 
-    @field:NotEmpty
-    var nextKey: String? = "" // pagination 방식 중 nextKey
+    @field:NotNull
+    var nextKey: String = "" // pagination 방식 중 nextKey
 )

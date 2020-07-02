@@ -8,6 +8,7 @@ import com.rainist.collectcard.cardbills.dto.ListCardBillsResponse
 import com.rainist.collectcard.cardbills.dto.ListCardBillsResponseDataBody
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponse
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
+import com.rainist.collectcard.userinfo.dto.UserInfoResponse
 import java.util.function.BinaryOperator
 
 class ShinhancardExecutions {
@@ -155,8 +156,7 @@ class ShinhancardExecutions {
         val cardShinhancardUserInfo =
             Execution.create()
                 .exchange(ShinhancardApis.card_shinhancard_user_info)
-                // TODO 예상국 DTO merge 후 적용하기
-                // .to(UserInfoResponse::class.java)
+                .to(UserInfoResponse::class.java)
                 .build()
     }
 }

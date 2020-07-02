@@ -146,9 +146,10 @@ class CardTransactionServiceImpl(
                     dataHeader = ListTransactionsRequestDataHeader()
                     dataBody = ListTransactionsRequestDataBody().apply {
                         startAt = takeIf { request.hasFromMs() }
-                            .let { DateTimeUtil.epochMilliSecondToKSTLocalDateTime(request.fromMs.value) }
-                            .let { localDateTime -> LocalDate.of(localDateTime.year, localDateTime.month, localDateTime.dayOfMonth) }
-                            .let { DateTimeUtil.localDateToString(it, "yyyyMMdd") }
+                            ?.let { DateTimeUtil.epochMilliSecondToKSTLocalDateTime(request.fromMs.value) }
+                            ?.let { localDateTime -> LocalDate.of(localDateTime.year, localDateTime.month, localDateTime.dayOfMonth) }
+                            ?.let { DateTimeUtil.localDateToString(it, "yyyyMMdd") }
+                            ?: kotlin.run { DateTimeUtil.kstNowLocalDate().minusMonths(MAX_MONTH).let { DateTimeUtil.localDateToString(it, "yyyyMMdd") } }
                     }
                 }
             }

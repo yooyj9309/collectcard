@@ -2,7 +2,7 @@ package com.rainist.collectcard.common.organization
 
 import javax.validation.constraints.NotEmpty
 
-class CardOrganization(
+data class CardOrganization(
     var code: String? = null,
     var name: String? = null,
 
