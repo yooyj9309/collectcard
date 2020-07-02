@@ -6,7 +6,15 @@ import org.springframework.format.annotation.NumberFormat
 
 data class Loan(
 
+    var loanNumber: String? = null, // 대출번호
+
     var loanName: String? = null, // 상품명
+
+    @NumberFormat(style = NumberFormat.Style.NUMBER)
+    var loanAmount: BigDecimal? = null, // 대출금액
+
+    @NumberFormat(style = NumberFormat.Style.NUMBER)
+    var remainingAmount: BigDecimal? = null, // 대출잔액
 
     var paymentBankId: String? = null, // 결제기관
 

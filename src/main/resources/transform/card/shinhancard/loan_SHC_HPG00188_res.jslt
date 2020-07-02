@@ -1,0 +1,28 @@
+// 카드 인터넷대출-대출조건 조회 SHC_HPG00188 응답
+{
+   "dataHeader": {
+        "resultCode": .dataHeader.resultCode,           // 결과 코드
+        "resultMessage": .dataHeader.resultMessage,     // 결과 메세지
+        "successCode": .dataHeader.successCode          // 성공 코드
+   },
+   "dataBody": {
+        "loans":{
+            "loanNumber": .dataBody.loanNo,                 // 대출번호
+            "loanAmount": .dataBody.loanAmt,                // 대출금액
+            "issuedDate": .dataBody.loanDt,                 // 대출일자
+            "expirationDate": .dataBody.expireDt,           // 만기일
+            "interestRate": .dataBody.interestRt,           // 이자율
+            "repaymentMethod": .dataBody.repaymentMthd,     // 상환방법
+            "remainingAmount": .dataBody.loanBal,           // 대출잔액
+
+            //"": .dataBody.dfmMsCnt,                       // 거치개월수 (미사용)
+            //"": .dataBody.dfmRt,                          // 거치이자율 (미사용)
+            //"": .dataBody.settleDtQyDtCurrTa,             // 결제일조회일현재기준 (미사용)
+            //"": .dataBody.definiteDt,                     // 확정일자 (미사용)
+            //"": .dataBody.feeRt,                          // 수수료율 (미사용)
+            //"": .dataBody.loanTrm,                        // 대출기간 (미사용)
+            //"": .dataBody.delayRt,                        // 지연배상금액율 (미사용)
+        },
+        "nextKey" : .dataBody.nxtQyKey  // 다음 조회 키
+    }
+}

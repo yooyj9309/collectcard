@@ -8,6 +8,7 @@ import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardBills
 import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardCards
 import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardListUserCardBillsExpected
+import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardLoan
 import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardTransactions
 import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardUserInfo
 import com.rainist.collectcard.common.exception.CollectcardException
@@ -56,7 +57,14 @@ class Executions() {
                 .business(BusinessType.card.name)
                 .agency(Organization.shinhancard.name)
                 .transaction(Transaction.userInfo.name)
-                .build() to cardShinhancardUserInfo
+                .build() to cardShinhancardUserInfo,
+
+            // 대출정보조회
+            Api.builder()
+                .business(BusinessType.card.name)
+                .agency(Organization.shinhancard.name)
+                .transaction(Transaction.loan.name)
+                .build() to cardShinhancardLoan
         )
     }
 }

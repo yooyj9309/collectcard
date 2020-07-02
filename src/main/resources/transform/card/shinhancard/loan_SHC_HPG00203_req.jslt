@@ -1,0 +1,9 @@
+// 카드 인터넷대출-대출현황 조회 SHC_HPG00203 요청
+{
+    "dataBody":{
+        "nxtQyKey": .dataBody.nextKey,
+    },
+    "dataHeader":{
+        "EMPTY" : ""
+    }
+}

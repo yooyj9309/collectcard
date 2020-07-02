@@ -188,6 +188,38 @@ class ShinhancardApis {
                 .transformResponseBody(readText("transform/card/shinhancard/userinfo_SHC_EXT00001_res.jslt"))
                 .name("사용자 거래정보 조회 (SHC_EXT_00001)")
                 .build()
+
+        // 대출정보 현황 정보 조회 (SHC_HPG00203)
+        card_shinhancard_loan_info =
+            Api.builder()
+                .business(BusinessType.card.name)
+                .agency(Organization.shinhancard.name)
+                .transaction(Transaction.loan.name)
+                .signaturePolicy(signaturePolicyShinhancard)
+                .endpoint("$hostCardShinhancard/v1.0/EXT/uselongloan/searchproduct")
+                .method(Api.HttpMethod.POST)
+                .transformRequestHeader(readText("transform/card/shinhancard/header_req.jslt"))
+                .transformRequestBody(readText("transform/card/shinhancard/loan_SHC_HPG00203_req.jslt"))
+                .transformResponseHeader(readText("transform/card/shinhancard/header_res.jslt"))
+                .transformResponseBody(readText("transform/card/shinhancard/loan_SHC_HPG00203_res.jslt"))
+                .name("대출정보 현황 정보 조회 (SHC_HPG00203)")
+                .build()
+
+        // 대출 상세 정보 조회 (SHC_HPG00188)
+        card_shinhancard_loan_detail =
+            Api.builder()
+                .business(BusinessType.card.name)
+                .agency(Organization.shinhancard.name)
+                .transaction(Transaction.loan.name)
+                .signaturePolicy(signaturePolicyShinhancard)
+                .endpoint("$hostCardShinhancard/v1.0/EXT/uselongloan/loancondition")
+                .method(Api.HttpMethod.POST)
+                .transformRequestHeader(readText("transform/card/shinhancard/header_req.jslt"))
+                .transformRequestBody(readText("transform/card/shinhancard/loan_SHC_HPG00188_req.jslt"))
+                .transformResponseHeader(readText("transform/card/shinhancard/header_res.jslt"))
+                .transformResponseBody(readText("transform/card/shinhancard/loan_SHC_HPG00188_req.jslt"))
+                .name("대출 상세 정보 조회 (SHC_HPG00188)")
+                .build()
     }
 
     companion object {
@@ -221,5 +253,11 @@ class ShinhancardApis {
 
         // 개인 거래 정보 조회 (SHC_EXT_00001)
         lateinit var card_shinhancard_user_info: Api
+
+        // 대출 현황 정보 조회 (SHC_HPG00203)
+        lateinit var card_shinhancard_loan_info: Api
+
+        // 대출 상세 조회 (SHC_HPG00188)
+        lateinit var card_shinhancard_loan_detail: Api
     }
 }

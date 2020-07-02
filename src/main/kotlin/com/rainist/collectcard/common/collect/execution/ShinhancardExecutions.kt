@@ -6,14 +6,39 @@ import com.rainist.collectcard.card.dto.ListCardsResponse
 import com.rainist.collectcard.cardbills.dto.CardBill
 import com.rainist.collectcard.cardbills.dto.ListCardBillsResponse
 import com.rainist.collectcard.cardbills.dto.ListCardBillsResponseDataBody
+import com.rainist.collectcard.cardloans.dto.ListLoansResponse
+import com.rainist.collectcard.cardloans.dto.Loan
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponse
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
 import com.rainist.collectcard.userinfo.dto.UserInfoResponse
+import java.util.function.BiConsumer
 import java.util.function.BinaryOperator
 
 class ShinhancardExecutions {
 
     companion object {
+
+        // 대출 상세
+        val mergeLoansDetail =
+            BiConsumer { master: Loan, detail: Loan ->
+                master.loanNumber = detail.loanNumber
+                master.loanAmount = detail.loanAmount
+                master.issuedDate = detail.issuedDate
+                master.expirationDate = detail.expirationDate
+                master.interestRate = detail.interestRate
+                master.repaymentMethod = detail.repaymentMethod
+                master.remainingAmount = detail.remainingAmount
+            }
+
+        // 대출 정보
+        val mergeLoans =
+            BinaryOperator { prevListLoanResponse: ListLoansResponse, nextListLoanResponse: ListLoansResponse ->
+                nextListLoanResponse.dataBody?.loans?.addAll(
+                    0, prevListLoanResponse.dataBody?.loans ?: mutableListOf()
+                )
+                nextListLoanResponse
+            }
+
         val mergeBills =
             BinaryOperator { listCardBillsResponse1: ListCardBillsResponse, listCardBillsResponse2: ListCardBillsResponse ->
                 val cardBills = ArrayList<CardBill>()
@@ -157,6 +182,31 @@ class ShinhancardExecutions {
             Execution.create()
                 .exchange(ShinhancardApis.card_shinhancard_user_info)
                 .to(UserInfoResponse::class.java)
+                .build()
+
+        // 대출정보 조회
+        val cardShinhancardLoan =
+            Execution.create()
+                .exchange(ShinhancardApis.card_shinhancard_loan_info)
+                .to(ListLoansResponse::class.java)
+                .paging(
+                    Pagination.builder()
+                        .method(Pagination.Method.NEXTKEY)
+                        .nextkey(".dataBody.nextKey")
+                        .merge(mergeLoans)
+                        .build()
+                )
+                .fetch { listLoansResponse ->
+                    listLoansResponse as ListLoansResponse
+                    listLoansResponse.dataBody?.loans?.iterator()
+                }
+                .then(
+                    Execution.create()
+                        .exchange(ShinhancardApis.card_shinhancard_loan_detail)
+                        .to(ListLoansResponse::class.java)
+                        .build()
+                )
+                .merge(mergeLoansDetail)
                 .build()
     }
 }

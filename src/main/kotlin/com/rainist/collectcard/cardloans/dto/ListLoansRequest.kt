@@ -1,6 +1,6 @@
 package com.rainist.collectcard.cardloans.dto
 
-import javax.validation.constraints.NotEmpty
+import javax.validation.constraints.NotNull
 
 class ListLoansRequest(
     var dataHeader: ListLoansRequestDataHeader? = null,
@@ -15,8 +15,6 @@ data class ListLoansRequestDataBody(
 
     var loanNumber: String? = null, // 대출번호
 
-    var isCardLoan: Boolean? = null, // 론 고객 여부
-
-    @field:NotEmpty
+    @field:NotNull
     var nextKey: String? = "" // pagination 방식 중 nextKey
 )

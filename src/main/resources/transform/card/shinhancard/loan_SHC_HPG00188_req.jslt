@@ -1,0 +1,10 @@
+// 카드 인터넷대출-대출조건 조회 SHC_HPG00188 요청
+{
+   "dataBody":{
+      "loanNo": .loanNumber        // 대출번호
+      "cardLoanGbn": "1",          // 카드론구분자 사용자 정보조회에서 미리 조회함
+   },
+   "dataHeader":{
+       "EMPTY" : ""
+   }
+}
