@@ -47,6 +47,6 @@ let cardholder_name = .dataBody.clnHgNm
                 "internationalBrandName": get-key($brands, .cardbrand, "CARD_INTERNATIONAL_BRAND_UNKNOWN")
             }
         ],
-        "nextKey" : .nxtQyKey
+        "nextKey" : .dataBody.nxtQyKey
     }
 }

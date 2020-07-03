@@ -4,7 +4,6 @@ import com.github.rainist.idl.apis.v1.collectcard.CollectcardGrpc
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
 import com.rainist.collectcard.card.CardServiceImpl
 import com.rainist.collectcard.card.dto.ListCardsRequest
-import com.rainist.collectcard.card.dto.ListCardsRequestDataBody
 import com.rainist.collectcard.cardtransactions.CardTransactionServiceImpl
 import com.rainist.common.interceptor.StatsUnaryServerInterceptor
 import com.rainist.common.log.Log
@@ -27,24 +26,14 @@ class CollectcardGrpcService(
     }
 
     override fun listCards(request: CollectcardProto.ListCardsRequest, responseObserver: StreamObserver<CollectcardProto.ListCardsResponse>) {
-        val req = ListCardsRequest().apply {
-            dataBody = ListCardsRequestDataBody()
-        }
         kotlin.runCatching {
-            cardService.listCards(req)
+            cardService.listCards(request)
+        }.onSuccess {
+            responseObserver.onNext(it)
+            responseObserver.onCompleted()
+        }.onFailure {
+            responseObserver.onError(it)
         }
-//           TODO: dto to proto 구현 후 주석 해제
-//           .onSuccess {
-//                responseObserver.onNext(it)
-//                responseObserver.onCompleted()
-//            }
-//            .onFailure {
-//                responseObserver.onError(it)
-//            }
-
-        val resp = CollectcardProto.ListCardsResponse.newBuilder().build()
-        responseObserver.onNext(resp)
-        responseObserver.onCompleted()
     }
 
     @ExperimentalCoroutinesApi

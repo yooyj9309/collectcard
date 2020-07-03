@@ -6,8 +6,8 @@
     "resultMessage": "성공적으로 조회 되었습니다."
   },
   "clnHgNm": "599780ac2b285a1dc894291556901ad2120b24ef",
-  "nxtQyKey": "",
   "dataBody": {
+    "nxtQyKey": "",
     "resCd": "0004",
     "grp001": [
       {

@@ -36,7 +36,8 @@ class CardServiceImplTest {
     @Test
     fun listCard_success() {
         setupServer()
-        val response = cardService.listCards(ListCardsRequest(ListCardsRequestDataBody("")))
+        val header = mutableMapOf<String, String?>()
+        val response = cardService.listCards(header, ListCardsRequest(ListCardsRequestDataBody("")))
 
         assertThat(response.dataHeader?.resultCode, `is`("0004"))
         assertThat(response.dataBody?.cards?.size, `is`(4))

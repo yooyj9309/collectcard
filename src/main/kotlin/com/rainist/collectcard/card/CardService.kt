@@ -4,5 +4,5 @@ import com.rainist.collectcard.card.dto.ListCardsRequest
 import com.rainist.collectcard.card.dto.ListCardsResponse
 
 interface CardService {
-    fun listCards(listCardsRequest: ListCardsRequest): ListCardsResponse
+    fun listCards(header: MutableMap<String, String?>, listCardsRequest: ListCardsRequest): ListCardsResponse
 }
