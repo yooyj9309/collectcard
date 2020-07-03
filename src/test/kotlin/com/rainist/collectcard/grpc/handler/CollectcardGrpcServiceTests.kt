@@ -52,18 +52,18 @@ internal class CollectcardGrpcServiceTests {
         Assertions.assertEquals(CollectcardProto.ListCardTransactionsResponse.newBuilder().build(), response)
     }*/
 
-    @Test
-    fun testListCardBills() {
-        val request = CollectcardProto.ListCardBillsRequest.newBuilder().build()
-        val responseObserver: StreamRecorder<CollectcardProto.ListCardBillsResponse> = StreamRecorder.create()
-
-        service.listCardBills(request, responseObserver)
-        val results: List<CollectcardProto.ListCardBillsResponse> = responseObserver.values
-        Assertions.assertEquals(1, results.size)
-
-        val response: CollectcardProto.ListCardBillsResponse = results[0]
-        Assertions.assertEquals(CollectcardProto.ListCardBillsResponse.newBuilder().build(), response)
-    }
+//    @Test
+//    fun testListCardBills() {
+//        val request = CollectcardProto.ListCardBillsRequest.newBuilder().build()
+//        val responseObserver: StreamRecorder<CollectcardProto.ListCardBillsResponse> = StreamRecorder.create()
+//
+//        service.listCardBills(request, responseObserver)
+//        val results: List<CollectcardProto.ListCardBillsResponse> = responseObserver.values
+//        Assertions.assertEquals(1, results.size)
+//
+//        val response: CollectcardProto.ListCardBillsResponse = results[0]
+//        Assertions.assertEquals(CollectcardProto.ListCardBillsResponse.newBuilder().build(), response)
+//    }
 
 /*    @Test
     fun testListCardLoans() {

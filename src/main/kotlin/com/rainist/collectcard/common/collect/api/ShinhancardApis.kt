@@ -133,7 +133,7 @@ class ShinhancardApis {
                 .agency(Organization.shinhancard.name)
                 .transaction(Transaction.billTransactionExpectedDetailsInstallment.name)
                 .signaturePolicy(signaturePolicyShinhancard)
-                .endpoint("$hostCardShinhancard/v1.0/EXT/useinstallment/searchpaymentsdetai")
+                .endpoint("$hostCardShinhancard/v1.0/EXT/useinstallment/searchpaymentsdetail")
                 .method(Api.HttpMethod.POST)
                 .transformRequestHeader(readText("transform/card/shinhancard/header_req.jslt"))
                 .transformRequestBody(readText("transform/card/shinhancard/billTransactionExpectedDetailsInstallment_SHC_HPG00238_req.jslt"))
@@ -174,37 +174,37 @@ class ShinhancardApis {
                 .name("신용카드 월별 청구내역(SHC_HPG00719)")
                 .build()
 
-// TODO(sangmin) card bill transactions 구현 후 주석 해제
-//
-//        val card_shinhancard_check_bill_transactions: Api =
-//            Api.builder()
-//                .business(BusinessType.card.name)
-//                .agency(Organization.shinhancard.name)
-//                .transaction(Transaction.cardbills.name)
-//                .signaturePolicy(signaturePolicyShinhancard)
-//                .endpoint("$hostCardShinhancard/v1.0/EXT/userdebitcard/searchmonthlybillingdetail")
-//                .method(Api.HttpMethod.POST)
-//                .transformRequestHeader(readText("transform/card/shinhancard/header_req.jslt"))
-//                .transformRequestBody(readText("transform/card/shinhancard/.jslt"))
-//                .transformResponseHeader(readText("transform/card/shinhancard/header_res.jslt"))
-//                .transformResponseBody(readText("transform/card/shinhancard/.jslt"))
-//                .name("체크카드 월별 청구내역 상세(SHC_HPG00537)")
-//                .build()
-//
-//        val card_shinhancard_credit_bill_transactions: Api =
-//            Api.builder()
-//                .business(BusinessType.card.name)
-//                .agency(Organization.shinhancard.name)
-//                .transaction(Transaction.cardbills.name)
-//                .signaturePolicy(signaturePolicyShinhancard)
-//                .endpoint("$hostCardShinhancard/v1.0/EXT/usercreditcard/searchmonthlybillingdetail")
-//                .method(Api.HttpMethod.POST)
-//                .transformRequestHeader(readText("transform/card/shinhancard/header_req.jslt"))
-//                .transformRequestBody(readText("transform/card/shinhancard/.jslt"))
-//                .transformResponseHeader(readText("transform/card/shinhancard/header_res.jslt"))
-//                .transformResponseBody(readText("transform/card/shinhancard/.jslt"))
-//                .name("신용카드 월별 청구내역 상세(SHC_HPG00698)")
-//                .build()
+        // 체크카드 월별 청구내역(SHC_HPG00537)
+        card_shinhancard_check_bill_transactions =
+        Api.builder()
+            .business(BusinessType.card.name)
+            .agency(Organization.shinhancard.name)
+            .transaction(Transaction.cardbills.name)
+            .signaturePolicy(signaturePolicyShinhancard)
+            .endpoint("$hostCardShinhancard/v1.0/EXT/userdebitcard/searchmonthlybillingdetail")
+            .method(Api.HttpMethod.POST)
+            .transformRequestHeader(readText("transform/card/shinhancard/header_req.jslt"))
+            .transformRequestBody(readText("transform/card/shinhancard/billtransaction_SHC_HPG00537_req.jslt"))
+            .transformResponseHeader(readText("transform/card/shinhancard/header_res.jslt"))
+            .transformResponseBody(readText("transform/card/shinhancard/billtransaction_SHC_HPG00537_res.jslt"))
+            .name("체크카드 월별 청구내역 상세(SHC_HPG00537)")
+            .build()
+
+        // 체크카드 월별 청구내역(SHC_HPG00698)
+        card_shinhancard_credit_bill_transactions =
+        Api.builder()
+            .business(BusinessType.card.name)
+            .agency(Organization.shinhancard.name)
+            .transaction(Transaction.cardbills.name)
+            .signaturePolicy(signaturePolicyShinhancard)
+            .endpoint("$hostCardShinhancard/v1.0/EXT/usercreditcard/searchmonthlybillingdetail")
+            .method(Api.HttpMethod.POST)
+            .transformRequestHeader(readText("transform/card/shinhancard/header_req.jslt"))
+            .transformRequestBody(readText("transform/card/shinhancard/billtransaction_SHC_HPG00698_req.jslt"))
+            .transformResponseHeader(readText("transform/card/shinhancard/header_res.jslt"))
+            .transformResponseBody(readText("transform/card/shinhancard/billtransaction_SHC_HPG00698_res.jslt"))
+            .name("신용카드 월별 청구내역 상세(SHC_HPG00698)")
+            .build()
 
         // 사용자 거래정보 조회 (SHC_EXT_00001)
         card_shinhancard_user_info =
@@ -289,6 +289,12 @@ class ShinhancardApis {
 
         // 신용카드 월별 청구내역(SHC_HPG00719)
         lateinit var card_shinhancard_credit_bills: Api
+
+        // 체크카드 월별 청구내역(SHC_HPG00537)
+        lateinit var card_shinhancard_check_bill_transactions: Api
+
+        // 체크카드 월별 청구내역(SHC_HPG00698)
+        lateinit var card_shinhancard_credit_bill_transactions: Api
 
         // 개인 거래 정보 조회 (SHC_EXT_00001)
         lateinit var card_shinhancard_user_info: Api

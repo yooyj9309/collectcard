@@ -6,7 +6,7 @@ data class ListCardBillsRequest(
 )
 
 data class ListCardBillsRequestDataHeader(
-    var empty: Any
+    var empty: Any? = null
 )
 
 data class ListCardBillsRequestDataBody(

@@ -4,6 +4,7 @@ import com.github.rainist.idl.apis.v1.collectcard.CollectcardGrpc
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
 import com.rainist.collectcard.card.CardServiceImpl
 import com.rainist.collectcard.card.dto.ListCardsRequest
+import com.rainist.collectcard.cardbills.CardBillServiceImpl
 import com.rainist.collectcard.cardloans.CardLoanServiceImpl
 import com.rainist.collectcard.cardtransactions.CardTransactionServiceImpl
 import com.rainist.common.interceptor.StatsUnaryServerInterceptor
@@ -16,7 +17,8 @@ import org.lognet.springboot.grpc.GRpcService
 class CollectcardGrpcService(
     val cardService: CardServiceImpl,
     val cardTransactionService: CardTransactionServiceImpl,
-    val cardLoanServiceImpl: CardLoanServiceImpl
+    val cardLoanServiceImpl: CardLoanServiceImpl,
+    val cardBillService: CardBillServiceImpl
 ) : CollectcardGrpc.CollectcardImplBase() {
 
     companion object : Log
@@ -56,9 +58,14 @@ class CollectcardGrpcService(
     }
 
     override fun listCardBills(request: CollectcardProto.ListCardBillsRequest, responseObserver: StreamObserver<CollectcardProto.ListCardBillsResponse>) {
-        val resp = CollectcardProto.ListCardBillsResponse.newBuilder().build()
-        responseObserver.onNext(resp)
-        responseObserver.onCompleted()
+        kotlin.runCatching {
+            cardBillService.listUserCardBills(request)
+        }.onSuccess {
+            responseObserver.onNext(it)
+            responseObserver.onCompleted()
+        }.onFailure {
+            responseObserver.onError(it)
+        }
     }
 
     override fun listCardLoans(request: CollectcardProto.ListCardLoansRequest, responseObserver: StreamObserver<CollectcardProto.ListCardLoansResponse>) {

@@ -35,7 +35,9 @@ class CardBillServiceImplTest {
 //    @Test
     fun listUserCardBills_success() {
         setupServer()
+        val header = mutableMapOf<String, String?>()
         val response = cardBillService.listUserCardBillsExpected(
+            header,
             ListCardBillsRequest(
                 ListCardBillsRequestDataHeader(""),
                 ListCardBillsRequestDataBody(nextKey = "")

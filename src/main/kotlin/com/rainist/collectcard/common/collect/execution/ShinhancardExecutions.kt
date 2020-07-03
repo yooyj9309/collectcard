@@ -178,7 +178,7 @@ class ShinhancardExecutions {
                 }.then(
                     Execution.create()
                         .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_lump_sum)
-                        .to(ListLoansResponse::class.java)
+                        .to(ListCardBillsResponse::class.java)
                         .build()
                 ).merge(mergeBillTransaction)
                 .with(
@@ -198,7 +198,7 @@ class ShinhancardExecutions {
                         }.then(
                             Execution.create()
                                 .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_installment)
-                                .to(ListLoansResponse::class.java)
+                                .to(ListCardBillsResponse::class.java)
                                 .build()
                         ).merge(mergeBillTransaction)
                         .build()
@@ -216,6 +216,24 @@ class ShinhancardExecutions {
                         .merge(mergeBills)
                         .build()
                 )
+                .fetch { listCardBillsResponse ->
+                    listCardBillsResponse as ListCardBillsResponse
+                    listCardBillsResponse.dataBody?.cardBills?.iterator()
+                }
+                .then(
+                    Execution.create()
+                        .exchange(ShinhancardApis.card_shinhancard_check_bill_transactions)
+                        .to(ListCardBillsResponse::class.java)
+                        .paging(
+                            Pagination.builder()
+                                .method(Pagination.Method.NEXTKEY)
+                                .nextkey(".dataBody.nextKey")
+                                .merge(mergeBills)
+                                .build()
+                        )
+                        .build()
+                )
+                .merge(mergeBillTransaction)
                 .with(
                     Execution.create()
                         .exchange(ShinhancardApis.card_shinhancard_credit_bills)
@@ -226,7 +244,19 @@ class ShinhancardExecutions {
                                 .nextkey(".dataBody.nextKey")
                                 .merge(mergeBills)
                                 .build()
-                        ).build()
+                        )
+                        .fetch { listCardBillsResponse ->
+                            listCardBillsResponse as ListCardBillsResponse
+                            listCardBillsResponse.dataBody?.cardBills?.iterator()
+                        }
+                        .then(
+                            Execution.create()
+                                .exchange(ShinhancardApis.card_shinhancard_credit_bill_transactions)
+                                .to(ListCardBillsResponse::class.java)
+                                .build()
+                        )
+                        .merge(mergeBillTransaction)
+                        .build()
                 )
                 .merge(mergeBills)
                 .build()
