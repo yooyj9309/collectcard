@@ -1,6 +1,9 @@
 {
-    "dataHeader":{},
+    "dataHeader":{
+        "EMPTY" : ""
+    },
     "dataBody":{
-        "smonth": "6" // todo: how to make smonth using startAt, endAt
+        "smonth": "6", // todo: how to make smonth using startAt, endAt
+        "nxtQyKey": .dataBody.nextKey,
     }
 }

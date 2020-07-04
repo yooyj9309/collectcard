@@ -17,7 +17,7 @@ data class ListLoansResponseDataHeader(
 
 data class ListLoansResponseDataBody(
     var loans: MutableList<Loan>? = null,
-    var nextKey: String? = null
+    var nextKey: String = ""
 )
 
 fun ListLoansResponse.toListCardLoansResponseProto(): CollectcardProto.ListCardLoansResponse {

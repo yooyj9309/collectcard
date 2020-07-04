@@ -28,10 +28,10 @@ fun ListCardsResponse.toListCardsResponseProto(): CollectcardProto.ListCardsResp
             .setNumber(it.cardNumber)
             .setCardholderName(StringValue.of(it.cardOwnerName))
             .setIssuedDateMs(
-                it.issuedAt?.let { Int64Value.of(it.toEpochSecond()) }
+                it.issuedAt?.let { Int64Value.of(it.toEpochSecond()) } ?: Int64Value.getDefaultInstance()
             )
             .setExpirationDateMs(
-                it.expiresAt?.let { Int64Value.of(it.toEpochSecond()) }
+                it.expiresAt?.let { Int64Value.of(it.toEpochSecond()) } ?: Int64Value.getDefaultInstance()
             )
             .setType(StringValue.of(it.cardType))
             .setIsDormant(BoolValue.of(it.cardStatus == CardStatus.DORMANT))
@@ -41,6 +41,7 @@ fun ListCardsResponse.toListCardsResponseProto(): CollectcardProto.ListCardsResp
     }.let {
         CollectcardProto.ListCardsResponse
             .newBuilder()
+            .addAllCards(it)
             .build()
     }
 }

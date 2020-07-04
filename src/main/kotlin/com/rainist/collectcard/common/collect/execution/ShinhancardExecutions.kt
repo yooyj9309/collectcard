@@ -3,10 +3,8 @@ package com.rainist.collectcard.common.collect.execution
 import com.rainist.collect.common.dto.Execution
 import com.rainist.collect.common.dto.Pagination
 import com.rainist.collectcard.card.dto.ListCardsResponse
-import com.rainist.collectcard.cardbills.dto.CardBill
 import com.rainist.collectcard.cardbills.dto.CardBillTransaction
 import com.rainist.collectcard.cardbills.dto.ListCardBillsResponse
-import com.rainist.collectcard.cardbills.dto.ListCardBillsResponseDataBody
 import com.rainist.collectcard.cardloans.dto.ListLoansResponse
 import com.rainist.collectcard.cardloans.dto.Loan
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponse
@@ -41,15 +39,14 @@ class ShinhancardExecutions {
             }
 
         val mergeBills =
-            BinaryOperator { listCardBillsResponse1: ListCardBillsResponse, listCardBillsResponse2: ListCardBillsResponse ->
-                val cardBills = ArrayList<CardBill>()
-                cardBills.addAll(listCardBillsResponse1.dataBody?.cardBills ?: ArrayList())
-                cardBills.addAll(listCardBillsResponse2.dataBody?.cardBills ?: ArrayList())
+            BinaryOperator { prev: ListCardBillsResponse, next: ListCardBillsResponse ->
 
-                ListCardBillsResponse(
-                    listCardBillsResponse1.dataHeader,
-                    ListCardBillsResponseDataBody(cardBills, listCardBillsResponse2.dataBody?.nextKey)
+                prev.dataBody?.cardBills?.addAll(
+                    0,
+                    prev.dataBody?.cardBills ?: mutableListOf()
                 )
+
+                next
             }
 
         val mergeBillTransaction =

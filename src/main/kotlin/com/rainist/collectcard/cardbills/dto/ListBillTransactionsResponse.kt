@@ -7,7 +7,8 @@ data class ListBillTransactionsResponse(
 
 data class ListBillTransactionsResponseDataHeader(
     var resultCode: String? = null,
-    var resultMessage: String? = null
+    var resultMessage: String? = null,
+    var successCode: String? = null
 )
 
 data class ListBillTransactionsResponseDataBody(

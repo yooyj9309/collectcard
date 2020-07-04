@@ -30,28 +30,43 @@ class CollectcardGrpcService(
     }
 
     override fun listCards(request: CollectcardProto.ListCardsRequest, responseObserver: StreamObserver<CollectcardProto.ListCardsResponse>) {
+        logger.info("[사용자 카드 조회 시작 : {}]", request)
+
         kotlin.runCatching {
             cardService.listCards(request)
         }.onSuccess {
+            logger.info("[사용자 카드 조회 결과 success]")
+
+            for (card in it.cardsList) {
+                logger.info("[사용자 카드 조회 결과 : {}]", card)
+            }
+
             responseObserver.onNext(it)
             responseObserver.onCompleted()
         }.onFailure {
+            logger.error("[사용자 카드 조회 에러 : {}]", it.localizedMessage, it)
             responseObserver.onError(it)
         }
     }
 
     @ExperimentalCoroutinesApi
     override fun listCardTransactions(request: CollectcardProto.ListCardTransactionsRequest, responseObserver: StreamObserver<CollectcardProto.ListCardTransactionsResponse>) {
-        logger.info("listCardTransactions : {}", request.toString())
+        logger.info("[사용자 카드 내역 조회 시작 : {}]", request)
 
         kotlin.runCatching {
             cardTransactionService.listTransactions(request)
         }
         .onSuccess {
+            logger.info("[사용자 카드 내역 조회 결과 success]")
+            for (transaction in it.cardTransactionsList) {
+                logger.info("[사용자 카드 내역 조회 결과 : {}]", transaction)
+            }
+
             responseObserver.onNext(it)
             responseObserver.onCompleted()
         }
         .onFailure {
+            logger.error("[사용자 카드 내역 조회 에러 : {}]", it.localizedMessage, it)
             // TODO 예상국 exception  처리 코드 추가 하기
             responseObserver.onError(it)
         }
@@ -69,16 +84,23 @@ class CollectcardGrpcService(
     }
 
     override fun listCardLoans(request: CollectcardProto.ListCardLoansRequest, responseObserver: StreamObserver<CollectcardProto.ListCardLoansResponse>) {
-        logger.info("listCardLoans : {}", request.toString())
+        logger.info("[사용자 대출 내역 조회 시작 : {}]", request)
 
         kotlin.runCatching {
             cardLoanServiceImpl.listCardLoans(request)
         }
         .onSuccess {
+            logger.info("[사용자 대출내역 조회 결과 success]")
+            it?.let {
+                for (loan in it.cardLoansList) {
+                    logger.info("[사용자 대출내역 조회 결과 : {}]", loan)
+                }
+            }
             responseObserver.onNext(it)
             responseObserver.onCompleted()
         }
         .onFailure {
+            logger.error("[사용자 대출 내역 조회 에러 : {}]", it.localizedMessage, it)
             // TODO 예상국 exception  처리 코드 추가 하기
             responseObserver.onError(it)
         }

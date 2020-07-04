@@ -12,5 +12,5 @@ data class ListCardBillsRequestDataHeader(
 data class ListCardBillsRequestDataBody(
     var startAt: String? = null, // 조회기간 시작일 YYYYMMDD
     var endAt: String? = null, // 조회기간 종료일 YYYYMMDD
-    var nextKey: String? = null
+    var nextKey: String = ""
 )

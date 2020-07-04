@@ -9,14 +9,15 @@ data class ListCardBillsResponse(
 
 data class ListCardBillsResponseDataHeader(
     var resultCode: String?,
-    var resultMessage: String?
+    var resultMessage: String?,
+    var successCode: String?
 )
 
 data class ListCardBillsResponseDataBody(
     // 결제 예정 상세 내역
-    var cardBills: MutableList<CardBill>,
+    var cardBills: MutableList<CardBill>? = null,
     // 다음 조회 key
-    var nextKey: String?
+    var nextKey: String = ""
 )
 
 fun ListCardBillsResponse.toListCardBillsResponseProto(): CollectcardProto.ListCardBillsResponse {

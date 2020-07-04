@@ -16,8 +16,13 @@ host:
 
 
 connect-server:
-  host: connect
-  port: 8080
+  host: localhost
+  port: 6565
 
 shinhancard:
   clientId: ${DEVELOPMENT_SHINHANCARD_CLIENT_ID}
+server:
+  port: 9999
+
+grpc:
+  port: 18081
