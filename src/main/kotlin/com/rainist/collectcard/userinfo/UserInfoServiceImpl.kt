@@ -1,8 +1,8 @@
 package com.rainist.collectcard.userinfo
 
-import com.rainist.collect.common.dto.ApiRequest
-import com.rainist.collect.common.dto.ApiResponse
-import com.rainist.collect.executor.service.CollectExecutorService
+import com.rainist.collect.common.execution.ExecutionRequest
+import com.rainist.collect.common.execution.ExecutionResponse
+import com.rainist.collect.executor.CollectExecutorService
 import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
@@ -28,34 +28,34 @@ class UserInfoServiceImpl(
             let {
                 validationService.validateOrThrows(userInfoRequest)
             }
-            .let { userInfoRequest ->
-                HeaderInfo().apply {
-                    this.banksaladUserId = userInfoRequest.banksaladUserId
-                    this.organizationObjectid = userInfoRequest.organizationObjectid
-                    this.clientId = Organizations.valueOf(userInfoRequest.organizationObjectid)?.clientId
+                .let { userInfoRequest ->
+                    HeaderInfo().apply {
+                        this.banksaladUserId = userInfoRequest.banksaladUserId
+                        this.organizationObjectid = userInfoRequest.organizationObjectid
+                        this.clientId = Organizations.valueOf(userInfoRequest.organizationObjectid)?.clientId
+                    }
                 }
-            }
-            .let { headerInfo ->
-                headerService.getHeader(headerInfo)
-            }
-            .let { header ->
-                val res: ApiResponse<UserInfoResponse> = collectExecutorService.execute(
-                    Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.userInfo),
-                    ApiRequest.builder<UserInfoRequest>()
-                        .headers(header)
-                        .request(userInfoRequest)
-                        .build()
-                )
-                res
-            }
-            .takeIf { res ->
-                res.httpStatusCode == 200
-            }
-            ?.response
-            ?: kotlin.run {
-                throw Exception("GetUserInfo ApiResponse httpStatusCode Not 200")
-            }
+                .let { headerInfo ->
+                    headerService.getHeader(headerInfo)
+                }
+                .let { header ->
+                    val res: ExecutionResponse<UserInfoResponse> = collectExecutorService.execute(
+                        Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.userInfo),
+                        ExecutionRequest.builder<UserInfoRequest>()
+                            .headers(header)
+                            .request(userInfoRequest)
+                            .build()
+                    )
+                    res
+                }
+                .takeIf { res ->
+                    res.httpStatusCode == 200
+                }
+                ?.response
+                ?: kotlin.run {
+                    throw Exception("GetUserInfo ExecutionResponse httpStatusCode Not 200")
+                }
         }
-        .getOrThrow()
+            .getOrThrow()
     }
 }

@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import com.rainist.collect.executor.service.CollectExecutorServiceImpl
-import com.rainist.collect.executor.service.IApiLogger
-import com.rainist.collect.executor.service.IIdGenerator
-import com.rainist.collect.executor.service.ITransferClient
+import com.rainist.collect.executor.CollectExecutorServiceImpl
+import com.rainist.collect.executor.IApiLogger
+import com.rainist.collect.executor.IIdGenerator
+import com.rainist.collect.executor.ITransferClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -33,5 +33,6 @@ class CollectConfig(
     fun executorService() = CollectExecutorServiceImpl(transferClient, idGenerator, apiLogger, collectObjectMapper())
 
     @Bean
-    fun collectExecutorService() = CollectExecutorServiceImpl(transferClient, idGenerator, apiLogger, collectObjectMapper())
+    fun collectExecutorService() =
+        CollectExecutorServiceImpl(transferClient, idGenerator, apiLogger, collectObjectMapper())
 }

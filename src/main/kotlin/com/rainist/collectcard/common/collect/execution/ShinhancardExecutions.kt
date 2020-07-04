@@ -1,7 +1,7 @@
 package com.rainist.collectcard.common.collect.execution
 
-import com.rainist.collect.common.dto.Execution
-import com.rainist.collect.common.dto.Pagination
+import com.rainist.collect.common.api.Pagination
+import com.rainist.collect.common.execution.Execution
 import com.rainist.collectcard.card.dto.ListCardsResponse
 import com.rainist.collectcard.cardbills.dto.CardBillTransaction
 import com.rainist.collectcard.cardbills.dto.ListCardBillsResponse

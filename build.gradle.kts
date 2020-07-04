@@ -48,7 +48,7 @@ dependencies {
     implementation("com.rainist:kotlin-banksalad:1.0.17.RELEASE")
 
     // collect
-    implementation("com.rainist:collect:1.0.7.RELEASE")
+    implementation("com.rainist:collect:1.1.0.RELEASE")
 
     implementation("org.apache.camel:camel-jslt:${camel_version}")
 

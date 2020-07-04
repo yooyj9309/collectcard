@@ -1,9 +1,9 @@
 package com.rainist.collectcard.cardbills
 
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
-import com.rainist.collect.common.dto.ApiRequest
-import com.rainist.collect.common.dto.ApiResponse
-import com.rainist.collect.executor.service.CollectExecutorService
+import com.rainist.collect.common.execution.ExecutionRequest
+import com.rainist.collect.common.execution.ExecutionResponse
+import com.rainist.collect.executor.CollectExecutorService
 import com.rainist.collectcard.cardbills.dto.ListCardBillsRequest
 import com.rainist.collectcard.cardbills.dto.ListCardBillsRequestDataBody
 import com.rainist.collectcard.cardbills.dto.ListCardBillsRequestDataHeader
@@ -32,7 +32,10 @@ class CardBillServiceImpl(
         const val DEFAULT_MAX_MONTH = 6L
     }
 
-    override fun listUserCardBills(header: MutableMap<String, String?>, listCardBillsRequest: ListCardBillsRequest): ListCardBillsResponse {
+    override fun listUserCardBills(
+        header: MutableMap<String, String?>,
+        listCardBillsRequest: ListCardBillsRequest
+    ): ListCardBillsResponse {
         val cardBillsResponse = this.listCardBills(header, listCardBillsRequest)
         val cardExpectedBillsResponse = this.listCardBills(header, listCardBillsRequest)
 
@@ -41,12 +44,15 @@ class CardBillServiceImpl(
         return cardBillsResponse
     }
 
-    fun listUserCardBillsExpected(header: MutableMap<String, String?>, listCardBillsRequest: ListCardBillsRequest): ListCardBillsResponse {
+    fun listUserCardBillsExpected(
+        header: MutableMap<String, String?>,
+        listCardBillsRequest: ListCardBillsRequest
+    ): ListCardBillsResponse {
 
-        return runCatching<ApiResponse<ListCardBillsResponse>> {
+        return runCatching<ExecutionResponse<ListCardBillsResponse>> {
             collectExecutorService.execute(
                 Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.billTransactionExpected),
-                ApiRequest.builder<ListCardBillsRequest>()
+                ExecutionRequest.builder<ListCardBillsRequest>()
                     .headers(header)
                     .request(listCardBillsRequest)
                     .build()
@@ -57,12 +63,15 @@ class CardBillServiceImpl(
         }.getOrThrow().response
     }
 
-    fun listCardBills(header: MutableMap<String, String?>, listCardBillsRequest: ListCardBillsRequest): ListCardBillsResponse {
+    fun listCardBills(
+        header: MutableMap<String, String?>,
+        listCardBillsRequest: ListCardBillsRequest
+    ): ListCardBillsResponse {
 
-        return runCatching<ApiResponse<ListCardBillsResponse>> {
+        return runCatching<ExecutionResponse<ListCardBillsResponse>> {
             collectExecutorService.execute(
                 Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.cardbills),
-                ApiRequest.builder<ListCardBillsRequest>()
+                ExecutionRequest.builder<ListCardBillsRequest>()
                     .headers(header)
                     .request(listCardBillsRequest)
                     .build()
@@ -80,12 +89,20 @@ class CardBillServiceImpl(
                 this.dataBody = ListCardBillsRequestDataBody().apply {
                     this.startAt = takeIf { request.hasFromMs() }
                         ?.let { DateTimeUtil.epochMilliSecondToKSTLocalDateTime(request.fromMs.value) }
-                        ?.let { localDateTime -> LocalDate.of(localDateTime.year, localDateTime.month, localDateTime.dayOfMonth) }
+                        ?.let { localDateTime ->
+                            LocalDate.of(
+                                localDateTime.year,
+                                localDateTime.month,
+                                localDateTime.dayOfMonth
+                            )
+                        }
                         ?.let { DateTimeUtil.localDateToString(it, "yyyyMMdd") }
                         ?: kotlin.run {
                             val cardOrganization = Organizations.valueOf(request.companyId.value)
-                            DateTimeUtil.kstNowLocalDate().minusMonths(cardOrganization?.maxMonth
-                                ?: CardBillServiceImpl.DEFAULT_MAX_MONTH)
+                            DateTimeUtil.kstNowLocalDate().minusMonths(
+                                cardOrganization?.maxMonth
+                                    ?: CardBillServiceImpl.DEFAULT_MAX_MONTH
+                            )
                                 .let {
                                     DateTimeUtil.localDateToString(it, "yyyyMMdd")
                                 }

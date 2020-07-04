@@ -1,9 +1,9 @@
 package com.rainist.collectcard.cardtransactions
 
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
-import com.rainist.collect.common.dto.ApiRequest
-import com.rainist.collect.common.dto.ApiResponse
-import com.rainist.collect.executor.service.CollectExecutorService
+import com.rainist.collect.common.execution.ExecutionRequest
+import com.rainist.collect.common.execution.ExecutionResponse
+import com.rainist.collect.executor.CollectExecutorService
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsRequest
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsRequestDataBody
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsRequestDataHeader
@@ -47,63 +47,78 @@ class CardTransactionServiceImpl(
         const val DEFAULT_DIVISION = 3
     }
 
-    fun execute(header: MutableMap<String, String?>, listTransactionsRequest: ListTransactionsRequest): List<ApiResponse<ListTransactionsResponse>>? {
+    fun execute(
+        header: MutableMap<String, String?>,
+        listTransactionsRequest: ListTransactionsRequest
+    ): List<ExecutionResponse<ListTransactionsResponse>>? {
 
         return kotlin.runCatching {
 
             let {
                 validationService.validateOrThrows(listTransactionsRequest.dataBody)
             }
-            ?.let {
-                val startDate = DateTimeUtil.stringToLocalDate(it.startAt, "yyyyMMdd")
-                val endDate = DateTimeUtil.stringToLocalDate(it.endAt, "yyyyMMdd")
+                ?.let {
+                    val startDate = DateTimeUtil.stringToLocalDate(it.startAt, "yyyyMMdd")
+                    val endDate = DateTimeUtil.stringToLocalDate(it.endAt, "yyyyMMdd")
 
-                Pair(startDate, endDate)
-            }
-            ?.let {
-                val cardOrganization = Organizations.valueOf(listTransactionsRequest.organizationObjectid)
-                DateTimeUtil.splitLocalDateRangeByMonth(it.first, it.second, cardOrganization?.division ?: DEFAULT_DIVISION)
-            }
-            ?.let { searchDateList ->
-                runBlocking(executor.asCoroutineDispatcher()) {
+                    Pair(startDate, endDate)
+                }
+                ?.let {
+                    val cardOrganization = Organizations.valueOf(listTransactionsRequest.organizationObjectid)
+                    DateTimeUtil.splitLocalDateRangeByMonth(
+                        it.first,
+                        it.second,
+                        cardOrganization?.division ?: DEFAULT_DIVISION
+                    )
+                }
+                ?.let { searchDateList ->
+                    runBlocking(executor.asCoroutineDispatcher()) {
 
-                    searchDateList.map {
-                        ListTransactionsRequest().apply {
-                            dataHeader = ListTransactionsRequestDataHeader()
-                            dataBody = ListTransactionsRequestDataBody().apply {
-                                startAt = DateTimeUtil.localDateToString(it.startDate, "yyyyMMdd")
-                                endAt = DateTimeUtil.localDateToString(it.endDate, "yyyyMMdd")
-                                nextKey = ""
+                        searchDateList.map {
+                            ListTransactionsRequest().apply {
+                                dataHeader = ListTransactionsRequestDataHeader()
+                                dataBody = ListTransactionsRequestDataBody().apply {
+                                    startAt = DateTimeUtil.localDateToString(it.startDate, "yyyyMMdd")
+                                    endAt = DateTimeUtil.localDateToString(it.endDate, "yyyyMMdd")
+                                    nextKey = ""
+                                }
                             }
                         }
-                    }
-                    .map {
-                        async {
-                            val res: ApiResponse<ListTransactionsResponse> = collectExecutorService.execute(
-                                Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.cardTransaction),
-                                ApiRequest.builder<ListTransactionsRequest>()
-                                    .headers(header)
-                                    .request(it)
-                                    .build()
-                            )
-                            res
-                        }
+                            .map {
+                                async {
+                                    val res: ExecutionResponse<ListTransactionsResponse> =
+                                        collectExecutorService.execute(
+                                            Executions.valueOf(
+                                                BusinessType.card,
+                                                Organization.shinhancard,
+                                                Transaction.cardTransaction
+                                            ),
+                                            ExecutionRequest.builder<ListTransactionsRequest>()
+                                                .headers(header)
+                                                .request(it)
+                                                .build()
+                                        )
+                                    res
+                                }
+                            }
                     }
                 }
-            }
-            ?.let {
-                it.map { deferred ->
-                    deferred.getCompleted()
+                ?.let {
+                    it.map { deferred ->
+                        deferred.getCompleted()
+                    }
                 }
+        }
+            .onFailure {
+                logger.withFieldError("ExecuteError", it.localizedMessage, it)
             }
-        }
-        .onFailure {
-            logger.withFieldError("ExecuteError", it.localizedMessage, it)
-        }
-        .getOrThrow()
+            .getOrThrow()
     }
 
-    override fun listTransactions(header: MutableMap<String, String?>, listTransactionsRequest: ListTransactionsRequest): ListTransactionsResponse {
+    override fun listTransactions(
+        header: MutableMap<String, String?>,
+        listTransactionsRequest: ListTransactionsRequest
+    ): ListTransactionsResponse {
 
         return kotlin.runCatching {
             val response = execute(header, listTransactionsRequest)
@@ -116,13 +131,13 @@ class CardTransactionServiceImpl(
             val bodyValidation = headerValidations?.flatMap {
                 it.response.dataBody?.transactions?.toMutableList() ?: mutableListOf()
             }
-            ?.filter {
-                it.cardNumber?.length ?: 0 > 0
-            }
-            ?.mapNotNull {
-                validationService.validateOrNull(it)
-            }
-            ?.toMutableList()
+                ?.filter {
+                    it.cardNumber?.length ?: 0 > 0
+                }
+                ?.mapNotNull {
+                    validationService.validateOrNull(it)
+                }
+                ?.toMutableList()
 
             ListTransactionsResponse().apply {
                 this.dataBody = ListTransactionsResponseDataBody().apply {
@@ -130,10 +145,10 @@ class CardTransactionServiceImpl(
                 }
             }
         }
-        .onFailure {
-            logger.withFieldError("ListTransactionsError", it.localizedMessage, it)
-        }
-        .getOrThrow()
+            .onFailure {
+                logger.withFieldError("ListTransactionsError", it.localizedMessage, it)
+            }
+            .getOrThrow()
     }
 
     // Asset Gateway req
@@ -143,46 +158,53 @@ class CardTransactionServiceImpl(
             takeIf {
                 listCardRequestValidator.isValid(ObjectOf(request))
             }
-            ?.let {
+                ?.let {
 
-                ListTransactionsRequest().apply {
-                    this.organizationObjectid = request.companyId.value
-                    this.dataHeader = ListTransactionsRequestDataHeader()
-                    this.dataBody = ListTransactionsRequestDataBody().apply {
-                        this.startAt = takeIf { request.hasFromMs() }
-                            ?.let { DateTimeUtil.epochMilliSecondToKSTLocalDateTime(request.fromMs.value) }
-                            ?.let { localDateTime -> LocalDate.of(localDateTime.year, localDateTime.month, localDateTime.dayOfMonth) }
-                            ?.let { DateTimeUtil.localDateToString(it, "yyyyMMdd") }
-                            ?: kotlin.run {
-                                val cardOrganization = Organizations.valueOf(request.companyId.value)
-                                DateTimeUtil.kstNowLocalDate().minusMonths(cardOrganization?.maxMonth ?: DEFAULT_MAX_MONTH)
-                                    .let {
-                                        DateTimeUtil.localDateToString(it, "yyyyMMdd")
-                                    }
-                            }
+                    ListTransactionsRequest().apply {
+                        this.organizationObjectid = request.companyId.value
+                        this.dataHeader = ListTransactionsRequestDataHeader()
+                        this.dataBody = ListTransactionsRequestDataBody().apply {
+                            this.startAt = takeIf { request.hasFromMs() }
+                                ?.let { DateTimeUtil.epochMilliSecondToKSTLocalDateTime(request.fromMs.value) }
+                                ?.let { localDateTime ->
+                                    LocalDate.of(
+                                        localDateTime.year,
+                                        localDateTime.month,
+                                        localDateTime.dayOfMonth
+                                    )
+                                }
+                                ?.let { DateTimeUtil.localDateToString(it, "yyyyMMdd") }
+                                ?: kotlin.run {
+                                    val cardOrganization = Organizations.valueOf(request.companyId.value)
+                                    DateTimeUtil.kstNowLocalDate()
+                                        .minusMonths(cardOrganization?.maxMonth ?: DEFAULT_MAX_MONTH)
+                                        .let {
+                                            DateTimeUtil.localDateToString(it, "yyyyMMdd")
+                                        }
+                                }
+                        }
                     }
                 }
-            }
-            ?.let { listTransactionRequest ->
+                ?.let { listTransactionRequest ->
 
-                HeaderInfo().apply {
-                    this.banksaladUserId = request.userId
-                    this.organizationObjectid = request.companyId.value
-                    this.clientId = Organizations.valueOf(request.companyId.value)?.clientId
-                }.let { headerInfo ->
-                    headerService.getHeader(headerInfo)
-                }.let { header ->
-                    listTransactions(header, listTransactionRequest)
+                    HeaderInfo().apply {
+                        this.banksaladUserId = request.userId
+                        this.organizationObjectid = request.companyId.value
+                        this.clientId = Organizations.valueOf(request.companyId.value)?.clientId
+                    }.let { headerInfo ->
+                        headerService.getHeader(headerInfo)
+                    }.let { header ->
+                        listTransactions(header, listTransactionRequest)
+                    }
                 }
-            }
-            ?.toListCardsReponseProto()
-            ?: kotlin.run {
-                throw UnknownException()
-            }
+                ?.toListCardsReponseProto()
+                ?: kotlin.run {
+                    throw UnknownException()
+                }
         }
-        .onFailure {
-            logger.withFieldError("ListTransactionsError", it.localizedMessage, it)
-        }
-        .getOrThrow()
+            .onFailure {
+                logger.withFieldError("ListTransactionsError", it.localizedMessage, it)
+            }
+            .getOrThrow()
     }
 }

@@ -1,7 +1,7 @@
 package com.rainist.collectcard.common.collect
 
-import com.rainist.collect.common.dto.Api
-import com.rainist.collect.executor.service.IIdGenerator
+import com.rainist.collect.common.api.Api
+import com.rainist.collect.executor.IIdGenerator
 import java.util.UUID
 import org.springframework.stereotype.Component
 

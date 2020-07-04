@@ -1,9 +1,9 @@
 package com.rainist.collectcard.card
 
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
-import com.rainist.collect.common.dto.ApiRequest
-import com.rainist.collect.common.dto.ApiResponse
-import com.rainist.collect.executor.service.CollectExecutorService
+import com.rainist.collect.common.execution.ExecutionRequest
+import com.rainist.collect.common.execution.ExecutionResponse
+import com.rainist.collect.executor.CollectExecutorService
 import com.rainist.collectcard.card.dto.ListCardsRequest
 import com.rainist.collectcard.card.dto.ListCardsRequestDataBody
 import com.rainist.collectcard.card.dto.ListCardsResponse
@@ -26,10 +26,10 @@ class CardServiceImpl(
     companion object : Log
 
     override fun listCards(header: MutableMap<String, String?>, listCardsRequest: ListCardsRequest): ListCardsResponse {
-        return runCatching<ApiResponse<ListCardsResponse>> {
+        return runCatching<ExecutionResponse<ListCardsResponse>> {
             collectExecutorService.execute(
                 Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.cards),
-                ApiRequest.builder<ListCardsRequest>()
+                ExecutionRequest.builder<ListCardsRequest>()
                     .headers(header)
                     .request(listCardsRequest)
                     .build()

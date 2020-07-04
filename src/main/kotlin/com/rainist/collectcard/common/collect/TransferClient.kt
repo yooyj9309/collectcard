@@ -1,8 +1,8 @@
 package com.rainist.collectcard.common.collect
 
-import com.rainist.collect.common.dto.Api
-import com.rainist.collect.common.dto.TransferResponseEntity
-import com.rainist.collect.executor.service.ITransferClient
+import com.rainist.collect.common.api.Api
+import com.rainist.collect.common.api.ApiResponseEntity
+import com.rainist.collect.executor.ITransferClient
 import com.rainist.common.log.Log
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -24,7 +24,7 @@ class TransferClient(
         httpMethod: Api.HttpMethod,
         headers: MutableMap<String, String>,
         body: String
-    ): TransferResponseEntity {
+    ): ApiResponseEntity {
 
         return kotlin.runCatching {
             val header = LinkedMultiValueMap<String, String>()
@@ -38,15 +38,15 @@ class TransferClient(
 
             val res = commonRestTemplate.exchange(req, String::class.java)
 
-            TransferResponseEntity.builder()
+            ApiResponseEntity.builder()
                 .httpStatusCode(res.statusCodeValue)
                 .headers(res.headers.toSingleValueMap() as Map<String, String>?)
                 .body(res.body)
                 .build()
         }
-        .onFailure {
-            logger.withFieldError("TransferClientError", it.localizedMessage, it)
-        }
-        .getOrThrow()
+            .onFailure {
+                logger.withFieldError("TransferClientError", it.localizedMessage, it)
+            }
+            .getOrThrow()
     }
 }
