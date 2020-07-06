@@ -1,0 +1,22 @@
+{
+    "dataHeader": {
+        "resultCode": .dataHeader.resultCode,
+        "resultMessage": .dataHeader.resultMessage
+    },
+    "dataBody": {
+        "creditlimitInfo" : {
+           "totalAmount" : .dataBody.rTotAmt,
+           "remainedAmount" : .dataBody.xTotAmt,
+           "usedAmount" : .dataBody.uTotAmt,
+           "singleTotalAmount" : .dataBody.rAllAmt,
+           "singleRemainedAmount" : .dataBody.inLumpRmnAmt,
+           "singleUsedAmount" : .dataBody.inLumpUseAmt,
+           "installmentTotalAmount" : .dataBody.rInsAmt,
+           "installmentRemainedAmount" : .dataBody.installmentRmnAmt,
+           "installmentUsedAmount" : .dataBody.installmentUseAmt,
+           "loanTotalAmount" : .dataBody.rCashAmt,
+           "loanRemainedAmount" : .dataBody.csavRmnAmt,
+           "loanUsedAmount" : .dataBody.csavUseAmt
+       }
+    }
+}
