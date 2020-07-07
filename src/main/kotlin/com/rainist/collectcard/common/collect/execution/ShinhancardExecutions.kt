@@ -5,6 +5,7 @@ import com.rainist.collect.common.execution.Execution
 import com.rainist.collectcard.card.dto.ListCardsResponse
 import com.rainist.collectcard.cardbills.dto.CardBillTransaction
 import com.rainist.collectcard.cardbills.dto.ListCardBillsResponse
+import com.rainist.collectcard.cardcreditlimit.dto.CreditLimitResponse
 import com.rainist.collectcard.cardloans.dto.ListLoansResponse
 import com.rainist.collectcard.cardloans.dto.Loan
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponse
@@ -288,6 +289,12 @@ class ShinhancardExecutions {
                         .build()
                 )
                 .merge(mergeLoansDetail)
+                .build()
+
+        val cardShinhancardCreditLimit =
+            Execution.create()
+                .exchange(ShinhancardApis.card_shinhancard_credit_limit)
+                .to(CreditLimitResponse::class.java)
                 .build()
     }
 }

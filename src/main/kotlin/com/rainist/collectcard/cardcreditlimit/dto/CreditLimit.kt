@@ -1,4 +1,4 @@
-package com.rainist.collectcard.cardCreditLimit.dto
+package com.rainist.collectcard.cardcreditlimit.dto
 
 import java.math.BigDecimal
 

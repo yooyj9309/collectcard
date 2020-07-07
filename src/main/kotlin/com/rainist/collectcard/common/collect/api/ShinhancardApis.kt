@@ -284,6 +284,25 @@ class ShinhancardApis {
                         "transform/card/shinhancard/loan_SHC_HPG00188_req.jslt"
                     )
                 ).build()
+
+        // 개인 한도 조회 (SHC_HPG01730)
+        card_shinhancard_credit_limit =
+            Api.builder()
+                .name("개인 한도 조회 (SHC_HPG01730)")
+                .signaturePolicy(signaturePolicyShinhancard)
+                .endpoint("$hostCardShinhancard/v1.0/EXT/usecard/searchlimit")
+                .method(Api.HttpMethod.POST)
+                .transform(
+                    request(
+                        "transform/card/shinhancard/header_req.jslt",
+                        "transform/card/shinhancard/creditLimit_SHC_HPG01730_req.jslt"
+                    ),
+                    response(
+                        "transform/card/shinhancard/header_res.jslt",
+                        "transform/card/shinhancard/creditLimit_SHC_HPG01730_res.jslt"
+                    )
+                )
+                .build()
     }
 
     companion object {
@@ -335,5 +354,8 @@ class ShinhancardApis {
 
         // 대출 상세 조회 (SHC_HPG00188)
         lateinit var card_shinhancard_loan_detail: Api
+
+        // 개인한도조회 (SHC_HPG01730)
+        lateinit var card_shinhancard_credit_limit: Api
     }
 }

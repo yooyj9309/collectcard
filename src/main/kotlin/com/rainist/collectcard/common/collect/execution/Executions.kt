@@ -8,6 +8,7 @@ import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardBillTransactionExpected
 import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardBills
 import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardCards
+import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardCreditLimit
 import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardLoan
 import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardTransactions
 import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardUserInfo
@@ -64,7 +65,14 @@ class Executions() {
                 .business(BusinessType.card.name)
                 .organization(Organization.shinhancard.name)
                 .transaction(Transaction.loan.name)
-                .build() to cardShinhancardLoan
+                .build() to cardShinhancardLoan,
+
+                // 개인한도조회
+            ExecutionKey.builder()
+                .business(BusinessType.card.name)
+                .organization(Organization.shinhancard.name)
+                .transaction(Transaction.creditLimit.name)
+                .build() to cardShinhancardCreditLimit
         )
     }
 }
