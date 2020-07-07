@@ -91,7 +91,7 @@ func main() {
 	grpcHost := "localhost:" + grpcPort
 	httpPort := getEnv("SERVICE_HTTP_PORT", "8080")
 
-	log.WithField("grpcPort", grpcPort).WithField("httpPort", httpPort).Info("starting connectbank HTTP server")
+	log.WithField("grpcPort", grpcPort).WithField("httpPort", httpPort).Info("starting collectcard HTTP server")
 
 	if err := ServeHTTP(grpcHost, httpPort); err != nil {
 		log.Fatal(err)
