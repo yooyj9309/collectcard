@@ -40,4 +40,11 @@ class HeaderService(
         }
         .getOrThrow()
     }
+
+    fun getHeader(banksaladUserId: String?, organizationObjectid: String?): MutableMap<String, String?> {
+        return getHeader(HeaderInfo().apply {
+            this.banksaladUserId = banksaladUserId
+            this.organizationObjectid = organizationObjectid
+        })
+    }
 }
