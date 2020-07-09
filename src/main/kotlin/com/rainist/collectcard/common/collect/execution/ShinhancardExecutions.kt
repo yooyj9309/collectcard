@@ -280,7 +280,7 @@ class ShinhancardExecutions {
                 )
                 .fetch { listLoansResponse ->
                     listLoansResponse as ListLoansResponse
-                    listLoansResponse.dataBody?.loans?.iterator()
+                    listLoansResponse.dataBody?.loans?.iterator() ?: listOf<Any>().iterator()
                 }
                 .then(
                     Execution.create()

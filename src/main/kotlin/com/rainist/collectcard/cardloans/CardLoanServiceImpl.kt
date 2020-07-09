@@ -9,6 +9,7 @@ import com.rainist.collectcard.cardloans.dto.ListLoansRequestDataBody
 import com.rainist.collectcard.cardloans.dto.ListLoansRequestDataHeader
 import com.rainist.collectcard.cardloans.dto.ListLoansResponse
 import com.rainist.collectcard.cardloans.dto.ListLoansResponseDataBody
+import com.rainist.collectcard.cardloans.dto.Loan
 import com.rainist.collectcard.cardloans.dto.toListCardLoansResponseProto
 import com.rainist.collectcard.cardloans.validation.ListCardLoansRequestValidator
 import com.rainist.collectcard.common.collect.api.BusinessType
@@ -55,11 +56,14 @@ class CardLoanServiceImpl(
                     it.httpStatusCode == 200 // TODO 예상국 기존 에러 처리 로직 확인해서 반영하기
                 }
                 ?.let {
-                    it.response.dataBody?.loans
+                    it.response.dataBody?.loans ?: mutableListOf<Loan>()
                 }
-                ?.mapNotNull {
-                    validationService.validateOrNull(it)
-                }
+                // TODO 박두상 다른 카드도 성공의 경우 body를 장담할 수 없기 StatusCode?.ResponseCode 로 에러분기 필요해 보입니다.
+                // (신한카드 대출 응답 성공의 경우 body가 빈값([]) 이라 null로 내려오면서 에러발생.
+//                ?.mapNotNull {
+//                    validationService.validateOrNull(it)
+//                }
+
                 ?.toMutableList()
                 ?.let {
                     ListLoansResponse().apply {
