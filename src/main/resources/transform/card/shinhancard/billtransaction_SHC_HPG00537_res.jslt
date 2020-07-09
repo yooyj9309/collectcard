@@ -5,7 +5,7 @@
         "successCode": .dataHeader.successCode
    },
    "dataBody": {
-        "transactions": [for (.dataBody.grp001)
+        "billTransactions": [for (.dataBody.grp001)
             {
                 "approvalDay" : .comm,
                 "amount": .capital,

@@ -11,7 +11,8 @@
         "nextKey" : .dataBody.nxtQyKey      // 다음 조회 키
     },
     "dataHeader":{
-        "EMPTY" : ""
+        "resultCode": .dataHeader.resultCode,
+        "resultMessage": .dataHeader.resultMessage
     }
 }
 

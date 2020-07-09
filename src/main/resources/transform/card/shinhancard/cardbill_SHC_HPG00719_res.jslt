@@ -20,7 +20,7 @@
         "paymentBankId": .bankno,
         "paymentAccountNumber": "",
         "billedYearMonth": "",
-        "totalPoint": "",
+        "totalPoints": "",
         "expiringPoints": ""
       }
     ],
