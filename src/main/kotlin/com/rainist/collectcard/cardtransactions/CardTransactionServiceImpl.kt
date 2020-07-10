@@ -137,6 +137,7 @@ class CardTransactionServiceImpl(
                 ?.mapNotNull {
                     validationService.validateOrNull(it)
                 }
+                ?.sortedByDescending { cardTransaction -> cardTransaction.approvalDay + cardTransaction.approvalTime }
                 ?.toMutableList()
 
             ListTransactionsResponse().apply {
