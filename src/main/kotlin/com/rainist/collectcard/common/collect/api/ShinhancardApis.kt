@@ -218,7 +218,7 @@ class ShinhancardApis {
             Api.builder()
                 .name("신용카드 월별 청구내역 상세(SHC_HPG00698)")
                 .signaturePolicy(signaturePolicyShinhancard)
-                .endpoint("$hostCardShinhancard/v1.0/EXT/usercreditcard/searchmonthlybillingdetail")
+                .endpoint("$hostCardShinhancard/v1.0/EXT/usecreditcard/searchmonthlybillingdetail")
                 .method(Api.HttpMethod.POST)
                 .transform(
                     request(
@@ -343,7 +343,7 @@ class ShinhancardApis {
         // 체크카드 월별 청구내역(SHC_HPG00537)
         lateinit var card_shinhancard_check_bill_transactions: Api
 
-        // 체크카드 월별 청구내역(SHC_HPG00698)
+        // 신용카드 월별 청구내역(SHC_HPG00698)
         lateinit var card_shinhancard_credit_bill_transactions: Api
 
         // 개인 거래 정보 조회 (SHC_EXT_00001)

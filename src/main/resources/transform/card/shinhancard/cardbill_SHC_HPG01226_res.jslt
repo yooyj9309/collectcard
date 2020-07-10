@@ -1,29 +1,29 @@
 {
-  "dataHeader": {
-    "resultCode": .dataHeader.resultCode,
-    "resultMessage": .dataHeader.resultMessage,
-    "successCode": .dataHeader.successCode
-  },
-  "dataBody": {
-    "cardBills": [
-      for
-      (.dataBody.grp001)
-      {
-        "billId": .setlDay + .setlTypeNo,
-        "userName": "",
-        "userGrade": "",
-        "billNumber": .setlTypeNo,
-        "paymentDate": .aowDuD,
-        "nextPaymentDate": "",
-        "billingAmount": .bllAmt,
-        "prepayedAmount": "",
-        "paymentBankId": .bankno,
-        "paymentAccountNumber": "",
-        "billedYearMonth": "",
-        "totalPoints": "",
-        "expiringPoints": ""
-      }
-    ],
-    "nextKey": .dataBody.nxtQyKey
-  }
+    "dataHeader": {
+        "resultCode": .dataHeader.resultCode,
+        "resultMessage": .dataHeader.resultMessage,
+        "successCode": .dataHeader.successCode
+    },
+    "dataBody": {
+        "cardBills": [for(.dataBody.grp001)
+            if (.setlDay != "") (
+                {
+                    "billId": .setlDay + .setlTypeNo,
+                    "userName": "",
+                    "userGrade": "",
+                    "billNumber": .setlTypeNo,
+                    "paymentDate": .aowDuD,
+                    "nextPaymentDate": "",
+                    "billingAmount": .bllAmt,
+                    "prepayedAmount": "",
+                    "paymentBankId": .bankno,
+                    "paymentAccountNumber": "",
+                    "billedYearMonth": "",
+                    "totalPoints": "",
+                    "expiringPoints": ""
+                }
+            )
+        ],
+        "nextKey": .dataBody.nxtQyKey
+    }
 }

@@ -3,7 +3,9 @@ package com.rainist.collectcard.common.collect.execution
 import com.rainist.collect.common.api.Pagination
 import com.rainist.collect.common.execution.Execution
 import com.rainist.collectcard.card.dto.ListCardsResponse
+import com.rainist.collectcard.cardbills.dto.CardBill
 import com.rainist.collectcard.cardbills.dto.CardBillTransaction
+import com.rainist.collectcard.cardbills.dto.ListBillTransactionsResponse
 import com.rainist.collectcard.cardbills.dto.ListCardBillsResponse
 import com.rainist.collectcard.cardcreditlimit.dto.CreditLimitResponse
 import com.rainist.collectcard.cardloans.dto.ListLoansResponse
@@ -13,6 +15,7 @@ import com.rainist.collectcard.common.collect.api.ShinhancardApis
 import com.rainist.collectcard.userinfo.dto.UserInfoResponse
 import java.util.function.BiConsumer
 import java.util.function.BinaryOperator
+import kotlin.streams.toList
 
 class ShinhancardExecutions {
 
@@ -51,24 +54,8 @@ class ShinhancardExecutions {
             }
 
         val mergeBillTransaction =
-            BiConsumer { master: CardBillTransaction, detail: CardBillTransaction ->
-                master.cardNumber = detail.cardNumber
-                master.approvalDay = detail.approvalDay
-                master.amount = detail.amount
-                master.storeName = detail.storeName
-                master.cardNumber = detail.cardNumber
-                master.thisMonthBilledAmount = detail.thisMonthBilledAmount
-                master.thisMonthBilledFee = detail.thisMonthBilledFee
-                master.isPaidFull = detail.isPaidFull
-                master.cardName = detail.cardName
-                master.pointsRate = detail.pointsRate
-
-                master.billingRound = detail.billingRound
-                master.thisMonthBilledAmount = detail.thisMonthBilledAmount
-                master.thisMonthBilledFee = detail.thisMonthBilledFee
-                master.installment = detail.installment
-                master.remainingAmount = detail.remainingAmount
-                master.pointsRate = detail.pointsRate
+            BiConsumer { master: CardBill, detail: ListBillTransactionsResponse ->
+                master.transactions = detail.dataBody?.billTransactions ?: mutableListOf<CardBillTransaction>()
             }
 
         val mergeCards =
@@ -116,9 +103,8 @@ class ShinhancardExecutions {
                         .merge(cardShinhancardTransactionsMerge)
                         .build()
                 )
-                // TODO 주석 풀기
                 // 신용 해외사용내역조회-일시불조회 SHC_HPG01612
-                /*.with(
+                .with(
                     Execution.create()
                         .exchange(ShinhancardApis.card_shinhancard_credit_oversea_transactions)
                         .to(ListTransactionsResponse::class.java)
@@ -156,7 +142,7 @@ class ShinhancardExecutions {
                                 .build()
                         ).build()
                 )
-                .merge(cardShinhancardTransactionsMerge)*/
+                .merge(cardShinhancardTransactionsMerge)
                 .build()
 
         val cardShinhancardBillTransactionExpected =
@@ -216,12 +202,12 @@ class ShinhancardExecutions {
                 )
                 .fetch { listCardBillsResponse ->
                     listCardBillsResponse as ListCardBillsResponse
-                    listCardBillsResponse.dataBody?.cardBills?.iterator()
+                    listCardBillsResponse.dataBody?.cardBills?.stream()?.filter { it != null }?.toList()?.iterator() ?: mutableListOf<CardBill>().iterator()
                 }
                 .then(
                     Execution.create()
                         .exchange(ShinhancardApis.card_shinhancard_check_bill_transactions)
-                        .to(ListCardBillsResponse::class.java)
+                        .to(ListBillTransactionsResponse::class.java)
                         .paging(
                             Pagination.builder()
                                 .method(Pagination.Method.NEXTKEY)
@@ -245,12 +231,19 @@ class ShinhancardExecutions {
                         )
                         .fetch { listCardBillsResponse ->
                             listCardBillsResponse as ListCardBillsResponse
-                            listCardBillsResponse.dataBody?.cardBills?.iterator()
+                            listCardBillsResponse.dataBody?.cardBills?.stream()?.filter { it != null }?.toList()?.iterator() ?: mutableListOf<CardBill>().iterator()
                         }
                         .then(
                             Execution.create()
                                 .exchange(ShinhancardApis.card_shinhancard_credit_bill_transactions)
-                                .to(ListCardBillsResponse::class.java)
+                                .to(ListBillTransactionsResponse::class.java)
+                                .paging(
+                                    Pagination.builder()
+                                        .method(Pagination.Method.NEXTKEY)
+                                        .nextkey(".dataBody.nextKey")
+                                        .merge(mergeBills)
+                                        .build()
+                                )
                                 .build()
                         )
                         .merge(mergeBillTransaction)

@@ -12,5 +12,6 @@ data class ListBillTransactionsResponseDataHeader(
 )
 
 data class ListBillTransactionsResponseDataBody(
-    var billTransactions: MutableList<CardBillTransaction>? = null
+    var billTransactions: MutableList<CardBillTransaction>? = null,
+    var nextKey: String = ""
 )

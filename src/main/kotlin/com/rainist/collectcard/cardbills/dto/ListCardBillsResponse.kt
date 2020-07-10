@@ -21,5 +21,6 @@ data class ListCardBillsResponseDataBody(
 )
 
 fun ListCardBillsResponse.toListCardBillsResponseProto(): CollectcardProto.ListCardBillsResponse {
+    // TODO 응답값 받는 부분 추가.
     return CollectcardProto.ListCardBillsResponse.newBuilder().build()
 }

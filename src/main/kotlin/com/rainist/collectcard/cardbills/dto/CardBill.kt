@@ -1,6 +1,5 @@
 package com.rainist.collectcard.cardbills.dto
 
-import com.rainist.collectcard.cardtransactions.dto.CardTransaction
 import java.math.BigDecimal
 import java.time.ZonedDateTime
 
@@ -44,5 +43,5 @@ data class CardBill(
     var expiringPoints: Int?,
 
     // 결제예정금액 상세
-    var transactions: List<CardTransaction>?
+    var transactions: List<CardBillTransaction>?
 )
