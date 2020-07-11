@@ -80,6 +80,7 @@ class CollectcardGrpcService(
             responseObserver.onNext(it)
             responseObserver.onCompleted()
         }.onFailure {
+            logger.error("[청구서 조회 에러 : {}]", it.localizedMessage, it)
             responseObserver.onError(it)
         }
     }

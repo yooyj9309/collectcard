@@ -1,6 +1,9 @@
 package com.rainist.collectcard.cardbills.dto
 
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
+import com.google.protobuf.StringValue
+import com.rainist.common.util.DateTimeUtil
+import javax.smartcardio.CardException
 
 data class ListCardBillsResponse(
     var dataHeader: ListCardBillsResponseDataHeader? = null,
@@ -21,6 +24,47 @@ data class ListCardBillsResponseDataBody(
 )
 
 fun ListCardBillsResponse.toListCardBillsResponseProto(): CollectcardProto.ListCardBillsResponse {
-    // TODO 응답값 받는 부분 추가.
-    return CollectcardProto.ListCardBillsResponse.newBuilder().build()
+    // TODO 박두상 쉐도잉을 하면서 하나씩 맞춰봐야 할 것 같습니다. 추후 null 해당부분에서 고려하지않게 미리 제거하여 받는 방법도 구성이 필요할 것 같습니다.
+    return this?.dataBody?.cardBills?.filter { it != null }?.map { it ->
+        CollectcardProto.CardBill.newBuilder()
+            .setDueDateMs(DateTimeUtil.zoneDateTimeToEpochMilliSecond(safeValue(it.paymentDate))) // 1. 결제 예정 일자, 시간 정리에 대한 협의 필요.
+            .setCurrency("KRW") // TODO 3. iso 4217??  받아오는 값인지 의미잇는
+            .setBillType(StringValue.of(it.billNumber)) // 명세서제목 또는 발급사등 구분
+            .setLinkedAccount(
+                CollectcardProto.BankAccountSummary.newBuilder()
+                    .setNumber(it.paymentAccountNumber) // 계좌 번호
+                    .setBankCode(StringValue.of(it.paymentBankId)) // 은행 번호
+                    .build()
+            ) // 청구 계좌
+            .addAllTransactions( // 청구 내역
+                it.transactions?.filter { it -> it != null && !it?.approvalDay?.isEmpty()!! }?.map {
+                    CollectcardProto.CardBillTransaction.newBuilder()
+                        .setAmount2F(it.amount?.toLong() ?: throw Exception())
+                        .setCurrency(it.currencyCode ?: "KRW") // TODO 박두상 공통 상수 관리 부분으로 빼서 사용 필요.
+                        .setIsInstallment(false) // TODO 박두상 향후 해당부분 구현 필요
+                        .setFee2F(safeValue(it.serviceChargeAmount?.toLong()))
+                        .setCard(CollectcardProto.CardSummary.newBuilder()
+                            .setNumber(it.cardNumber)
+                            .build())
+                        .setStore(CollectcardProto.AffiliatedStoreSummary.newBuilder()
+                            .setName(it.storeName)
+                            .build()
+                        )
+                        .build()
+                }
+                    ?.toMutableList()
+                    ?: mutableListOf()
+            )
+            .setTotalAmount2F(it?.transactions?.map { safeValue(it.amount?.toLong()) }!!.sum()) // 2. 총 청구 금액
+            .build()
+    }.let {
+        CollectcardProto.ListCardBillsResponse
+            .newBuilder()
+            .addAllCardBills(it ?: mutableListOf())
+            .build()
+    }
+}
+
+fun <T : Any> safeValue(input: T?): T {
+    return input?.let { input } ?: throw CardException("parameter is null") // TODO 임시 코드 NULL CHECK를 하는부분을 공통으로 빼거나 하는 처리로직 필요.
 }
