@@ -26,7 +26,7 @@ let CardType = {
                 "cardType" : get-key($CardType, .ccd, "CARD_TYPE_UNKNOWN"),       // 거래구분 TODO 예상국 이게 여기서 왜 필요한지 내부 처리 로직 확인 ccd? cusccd?
             }
         ],
-        "nextKey" : .dataBody.nxtQyKey,  // 다음 조회 키
-        "isBC" : .dataBody.bccF
+        "nextKey" : .dataBody.nxtQyKey  // 다음 조회 키
+        //"isBC" : .dataBody.bccF TODO 현재 response에서 사용하지 않으며, 다른 카드와 공통성을 고려할때, 해당부분을 response에 추가하는것은 논의 필요. ( extrainfo같은 값으로 넣는다던가..)
     }
 }

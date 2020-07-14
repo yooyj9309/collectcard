@@ -29,7 +29,7 @@ data class ListTransactionsRequestDataBody(
 
     var tag: String? = null, // Custom tag ( 신한 : bc tag )
 
-    var cardOwnerType: String? = null, // 카드 소유주 타입 ( 본인 , 가족 )
+    var cardOwnerType: String? = "0", // 카드 소유주 타입 ( 본인 , 가족 ) , CONNECT_CARD 기준 NONE :0, 본인 : 1, 가족 : 2
 
     @field:NotNull
     var nextKey: String = "" // pagination 방식 중 nextKey

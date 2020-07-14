@@ -37,7 +37,7 @@ let CardType = {
                 "cardTransactionType": get-key($CardTransactionType, .status, "CARD_TRANSACTION_TYPE_UNKNOWN")  // 상태
             }
         ],
-        "nextKey" : .dataBody.nxtQyKey,  // 다음 조회 키
-        "isBC" : .dataBody.bctgubun
+        "nextKey" : .dataBody.nxtQyKey  // 다음 조회 키
+        //"isBC" : .dataBody.bctgubun
    }
 }

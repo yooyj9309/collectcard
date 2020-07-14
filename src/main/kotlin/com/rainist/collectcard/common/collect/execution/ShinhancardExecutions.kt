@@ -11,6 +11,7 @@ import com.rainist.collectcard.cardcreditlimit.dto.CreditLimitResponse
 import com.rainist.collectcard.cardloans.dto.ListLoansResponse
 import com.rainist.collectcard.cardloans.dto.Loan
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponse
+import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponseDataBody
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
 import com.rainist.collectcard.userinfo.dto.UserInfoResponse
 import java.util.function.BiConsumer
@@ -69,12 +70,15 @@ class ShinhancardExecutions {
                 listCardsResponse2
             }
 
+        // TODO 박두상 파악해본결과, 현재 해당 구조에서는 이전의 에러코드를 전부 덮어버리는 형태. 최소한의 기록을 위해서라도 따로 resultCode, Message를 기록할 방법 고려 (진짜 에러가 있을 수 있으니까)
         val cardShinhancardTransactionsMerge =
             BinaryOperator { prevTransactions: ListTransactionsResponse, nextTransactions: ListTransactionsResponse ->
-
+                var filteredTransactions = prevTransactions.dataBody?.transactions?.filter { it -> it.approvalDay != "" } ?: mutableListOf()
                 nextTransactions.dataBody?.transactions?.addAll(
-                    0, prevTransactions.dataBody?.transactions ?: mutableListOf()
-                )
+                    0, filteredTransactions
+                ) ?: kotlin.run {
+                    nextTransactions.dataBody = ListTransactionsResponseDataBody(filteredTransactions.toMutableList(), "")
+                }
 
                 nextTransactions
             }
@@ -129,6 +133,7 @@ class ShinhancardExecutions {
                                 .build()
                         ).build()
                 )
+
                 // 체크 해외사용내역 조회 SHC_HPG01031
                 .with(
                     Execution.create()
