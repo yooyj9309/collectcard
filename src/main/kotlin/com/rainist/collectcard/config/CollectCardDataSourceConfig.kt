@@ -10,21 +10,18 @@ import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder
 import org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
 import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean
 import org.springframework.transaction.PlatformTransactionManager
-import org.springframework.transaction.annotation.EnableTransactionManagement
 
-@Configuration
-@EnableTransactionManagement
-@EnableJpaRepositories(
-        entityManagerFactoryRef = "collectCardEntityManagerFactory",
-        transactionManagerRef = "collectCardTransactionManager",
-        basePackages = ["com.rainist.collectcard.db.collectcard.repository"]
-)
+// @Configuration
+// @EnableTransactionManagement
+// @EnableJpaRepositories(
+//        entityManagerFactoryRef = "collectCardEntityManagerFactory",
+//        transactionManagerRef = "collectCardTransactionManager",
+//        basePackages = ["com.rainist.collectcard.db.collectcard.repository"]
+// )
 class CollectCardDataSourceConfig {
     @Primary
     @Bean(name = ["collectCardProperties"])
@@ -38,20 +35,23 @@ class CollectCardDataSourceConfig {
     @ConfigurationProperties("collectcard.datasource.hikari")
     fun dataSource(@Qualifier("collectCardProperties") collectCardProperties: DataSourceProperties): DataSource {
         return collectCardProperties
-                .initializeDataSourceBuilder()
-                .type(HikariDataSource::class.java)
-                .build()
+            .initializeDataSourceBuilder()
+            .type(HikariDataSource::class.java)
+            .build()
     }
 
     @Primary
     @Bean(name = ["collectCardEntityManagerFactory"])
-    fun entityManagerFactory(builder: EntityManagerFactoryBuilder, @Qualifier("collectCardDataSource") dataSource: DataSource): LocalContainerEntityManagerFactoryBean {
+    fun entityManagerFactory(
+        builder: EntityManagerFactoryBuilder,
+        @Qualifier("collectCardDataSource") dataSource: DataSource
+    ): LocalContainerEntityManagerFactoryBean {
         return builder
-                .dataSource(dataSource)
-                .packages("com.rainist.collectcard.db.collectcard.entity")
-                .persistenceUnit("collectcard")
-                .properties(jpaProperties())
-                .build()
+            .dataSource(dataSource)
+            .packages("com.rainist.collectcard.db.collectcard.entity")
+            .persistenceUnit("collectcard")
+            .properties(jpaProperties())
+            .build()
     }
 
     @Primary
