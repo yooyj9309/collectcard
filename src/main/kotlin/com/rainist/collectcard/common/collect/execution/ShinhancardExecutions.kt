@@ -16,7 +16,6 @@ import com.rainist.collectcard.common.collect.api.ShinhancardApis
 import com.rainist.collectcard.userinfo.dto.UserInfoResponse
 import java.util.function.BiConsumer
 import java.util.function.BinaryOperator
-import kotlin.streams.toList
 
 class ShinhancardExecutions {
 
@@ -207,7 +206,7 @@ class ShinhancardExecutions {
                 )
                 .fetch { listCardBillsResponse ->
                     listCardBillsResponse as ListCardBillsResponse
-                    listCardBillsResponse.dataBody?.cardBills?.stream()?.filter { it != null }?.toList()?.iterator() ?: mutableListOf<CardBill>().iterator()
+                    listCardBillsResponse.dataBody?.cardBills?.iterator() ?: mutableListOf<CardBill>().iterator()
                 }
                 .then(
                     Execution.create()
@@ -236,7 +235,7 @@ class ShinhancardExecutions {
                         )
                         .fetch { listCardBillsResponse ->
                             listCardBillsResponse as ListCardBillsResponse
-                            listCardBillsResponse.dataBody?.cardBills?.stream()?.filter { it != null }?.toList()?.iterator() ?: mutableListOf<CardBill>().iterator()
+                            listCardBillsResponse.dataBody?.cardBills?.iterator() ?: mutableListOf<CardBill>().iterator()
                         }
                         .then(
                             Execution.create()

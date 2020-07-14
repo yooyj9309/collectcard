@@ -2,7 +2,9 @@ package com.rainist.collectcard.cardbills.dto
 
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
 import com.google.protobuf.StringValue
+import com.rainist.common.exception.ValidationException
 import com.rainist.common.util.DateTimeUtil
+import java.math.BigDecimal
 import javax.smartcardio.CardException
 
 data class ListCardBillsResponse(
@@ -25,42 +27,47 @@ data class ListCardBillsResponseDataBody(
 
 fun ListCardBillsResponse.toListCardBillsResponseProto(): CollectcardProto.ListCardBillsResponse {
     // TODO 박두상 쉐도잉을 하면서 하나씩 맞춰봐야 할 것 같습니다. 추후 null 해당부분에서 고려하지않게 미리 제거하여 받는 방법도 구성이 필요할 것 같습니다.
-    return this?.dataBody?.cardBills?.filter { it != null }?.map { it ->
+    return this.dataBody?.cardBills?.map { cardBill ->
         CollectcardProto.CardBill.newBuilder()
-            .setDueDateMs(DateTimeUtil.zoneDateTimeToEpochMilliSecond(safeValue(it.paymentDate))) // 1. 결제 예정 일자, 시간 정리에 대한 협의 필요.
+            .setDueDateMs(DateTimeUtil.zoneDateTimeToEpochMilliSecond(safeValue(cardBill.paymentDate))) // 1. 결제 예정 일자, 시간 정리에 대한 협의 필요.
             .setCurrency("KRW") // TODO 3. iso 4217??  받아오는 값인지 의미잇는
-            .setBillType(StringValue.of(it.billNumber)) // 명세서제목 또는 발급사등 구분
+            .setBillType(cardBill.billNumber?.let { StringValue.of(it) } ?: StringValue.getDefaultInstance())
             .setLinkedAccount(
                 CollectcardProto.BankAccountSummary.newBuilder()
-                    .setNumber(it.paymentAccountNumber) // 계좌 번호
-                    .setBankCode(StringValue.of(it.paymentBankId)) // 은행 번호
+                    .setNumber(cardBill.paymentAccountNumber) // 계좌 번호
+                    .setBankCode(StringValue.of(cardBill.paymentBankId)) // 은행 번호
                     .build()
             ) // 청구 계좌
             .addAllTransactions( // 청구 내역
-                it.transactions?.filter { it -> it != null && !it?.approvalDay?.isEmpty()!! }?.map {
+                cardBill.transactions?.map { cardBillTransaction ->
                     CollectcardProto.CardBillTransaction.newBuilder()
-                        .setAmount2F(it.amount?.toLong() ?: throw Exception())
-                        .setCurrency(it.currencyCode ?: "KRW") // TODO 박두상 공통 상수 관리 부분으로 빼서 사용 필요.
+                        .setAmount2F(cardBillTransaction.amount?.setScale(2)?.multiply(BigDecimal(100L))?.toLong() ?: throw ValidationException("승인금액이 없습니다"))
+                        .setCurrency(cardBillTransaction.currencyCode ?: "KRW") // TODO 박두상 공통 상수 관리 부분으로 빼서 사용 필요.
                         .setIsInstallment(false) // TODO 박두상 향후 해당부분 구현 필요
-                        .setFee2F(safeValue(it.serviceChargeAmount?.toLong()))
+                        .setFee2F(cardBillTransaction.serviceChargeAmount?.setScale(2)?.multiply(BigDecimal(100L))?.toLong() ?: 0L)
                         .setCard(CollectcardProto.CardSummary.newBuilder()
-                            .setNumber(it.cardNumber)
+                            .setNumber(cardBillTransaction.cardNumber)
                             .build())
                         .setStore(CollectcardProto.AffiliatedStoreSummary.newBuilder()
-                            .setName(it.storeName)
+                            .setName(cardBillTransaction.storeName)
                             .build()
                         )
                         .build()
                 }
-                    ?.toMutableList()
-                    ?: mutableListOf()
+                ?.toMutableList()
             )
-            .setTotalAmount2F(it?.transactions?.map { safeValue(it.amount?.toLong()) }!!.sum()) // 2. 총 청구 금액
+            .setTotalAmount2F(cardBill.transactions?.map { it.amount?.setScale(2)?.multiply(BigDecimal(100L))?.toLong() ?: 0L }!!.sum()) // 2. 총 청구 금액
             .build()
-    }.let {
+    }
+    ?.let {
         CollectcardProto.ListCardBillsResponse
             .newBuilder()
-            .addAllCardBills(it ?: mutableListOf())
+            .addAllCardBills(it)
+            .build()
+    }
+    ?: kotlin.run {
+        CollectcardProto.ListCardBillsResponse
+            .newBuilder()
             .build()
     }
 }

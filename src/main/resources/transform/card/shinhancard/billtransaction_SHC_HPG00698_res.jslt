@@ -6,17 +6,19 @@
    },
    "dataBody": {
         "billTransactions": [for (.dataBody.grp001)
-            {
-                "cardNumber": .useCrdC,
-                "approvalDay" : .useD,
-                "storeName": .useMchtNm,
-                "installment": .dvdMnth,
-                "installmentRound": .rcpMnt,
-                "amount": .slsAmt,
-                "serviceChargeAmount": .useFeeInt,
-                "isOverseaUse": if (.frgnY == "Y") true else false,
-                "currencyCode": .crcyUnt
-            }
+            if(.useD != "")(
+                {
+                    "cardNumber": .useCrdC,
+                    "approvalDay" : .useD,
+                    "storeName": .useMchtNm,
+                    "installment": .dvdMnth,
+                    "installmentRound": .rcpMnt,
+                    "amount": .slsAmt,
+                    "serviceChargeAmount": .useFeeInt,
+                    "isOverseaUse": if (.frgnY == "Y") true else false,
+                    "currencyCode": .crcyUnt
+                }
+            )
         ],
         "nextKey" : .dataBody.nxtQyKey
     }
