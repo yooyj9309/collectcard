@@ -16,7 +16,7 @@ data class CardTransaction(
     @field:NotEmpty
     var cardNumber: String? = null, //  3. 카드번호
 
-    var businessNumber: String? = null, //  4. 사업자 번호
+    var businessLicenseNumber: String? = null, //  4. 사업자 번호
 
     @field:NotEmpty
     var storeName: String? = null, //  5. 가맹점이름
