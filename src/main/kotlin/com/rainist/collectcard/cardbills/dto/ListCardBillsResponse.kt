@@ -2,9 +2,7 @@ package com.rainist.collectcard.cardbills.dto
 
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
 import com.google.protobuf.StringValue
-import com.rainist.common.exception.ValidationException
 import com.rainist.common.util.DateTimeUtil
-import java.math.BigDecimal
 import javax.smartcardio.CardException
 
 data class ListCardBillsResponse(
@@ -29,7 +27,7 @@ fun ListCardBillsResponse.toListCardBillsResponseProto(): CollectcardProto.ListC
     // TODO 박두상 쉐도잉을 하면서 하나씩 맞춰봐야 할 것 같습니다. 추후 null 해당부분에서 고려하지않게 미리 제거하여 받는 방법도 구성이 필요할 것 같습니다.
     return this.dataBody?.cardBills?.map { cardBill ->
         CollectcardProto.CardBill.newBuilder()
-            .setDueDateMs(DateTimeUtil.zoneDateTimeToEpochMilliSecond(safeValue(cardBill.paymentDate))) // 1. 결제 예정 일자, 시간 정리에 대한 협의 필요.
+            .setDueDate(DateTimeUtil.zoneDateTimeToString(safeValue(cardBill.paymentDate))) // 1. 결제 예정 일자, 시간 정리에 대한 협의 필요.
             .setCurrency("KRW") // TODO 3. iso 4217??  받아오는 값인지 의미잇는
             .setBillType(cardBill.billNumber?.let { StringValue.of(it) } ?: StringValue.getDefaultInstance())
             .setLinkedAccount(
@@ -41,10 +39,10 @@ fun ListCardBillsResponse.toListCardBillsResponseProto(): CollectcardProto.ListC
             .addAllTransactions( // 청구 내역
                 cardBill.transactions?.map { cardBillTransaction ->
                     CollectcardProto.CardBillTransaction.newBuilder()
-                        .setAmount2F(cardBillTransaction.amount?.setScale(2)?.multiply(BigDecimal(100L))?.toLong() ?: throw ValidationException("승인금액이 없습니다"))
+                        .setAmount(cardBillTransaction.amount?.toDouble() ?: 0.0)
                         .setCurrency(cardBillTransaction.currencyCode ?: "KRW") // TODO 박두상 공통 상수 관리 부분으로 빼서 사용 필요.
-                        .setIsInstallment(false) // TODO 박두상 향후 해당부분 구현 필요
-                        .setFee2F(cardBillTransaction.serviceChargeAmount?.setScale(2)?.multiply(BigDecimal(100L))?.toLong() ?: 0L)
+                        .setInstallment(false) // TODO 박두상 향후 해당부분 구현 필요
+                        .setFee(cardBillTransaction.serviceChargeAmount?.toDouble() ?: 0.0)
                         .setCard(CollectcardProto.CardSummary.newBuilder()
                             .setNumber(cardBillTransaction.cardNumber)
                             .build())
@@ -56,13 +54,13 @@ fun ListCardBillsResponse.toListCardBillsResponseProto(): CollectcardProto.ListC
                 }
                 ?.toMutableList()
             )
-            .setTotalAmount2F(cardBill.transactions?.map { it.amount?.setScale(2)?.multiply(BigDecimal(100L))?.toLong() ?: 0L }!!.sum()) // 2. 총 청구 금액
+            .setTotalAmount(cardBill.transactions?.map { it.amount?.toDouble() ?: 0.0 }!!.sum()) // 2. 총 청구 금액
             .build()
     }
     ?.let {
         CollectcardProto.ListCardBillsResponse
             .newBuilder()
-            .addAllCardBills(it)
+            .addAllData(it)
             .build()
     }
     ?: kotlin.run {

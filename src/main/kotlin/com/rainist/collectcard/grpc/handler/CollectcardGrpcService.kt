@@ -38,7 +38,7 @@ class CollectcardGrpcService(
         }.onSuccess {
             logger.info("[사용자 카드 조회 결과 success]")
 
-            for (card in it.cardsList) {
+            for (card in it.dataList) {
                 logger.info("[사용자 카드 조회 결과 : {}]", card)
             }
 
@@ -59,7 +59,7 @@ class CollectcardGrpcService(
         }
         .onSuccess {
             logger.info("[사용자 카드 내역 조회 결과 success]")
-            for (transaction in it.cardTransactionsList) {
+            for (transaction in it.dataList) {
                 logger.info("[사용자 카드 내역 조회 결과 : {}]", transaction)
             }
 
@@ -94,7 +94,7 @@ class CollectcardGrpcService(
         .onSuccess {
             logger.info("[사용자 대출내역 조회 결과 success]")
             it?.let {
-                for (loan in it.cardLoansList) {
+                for (loan in it.dataList) {
                     logger.info("[사용자 대출내역 조회 결과 : {}]", loan)
                 }
             }

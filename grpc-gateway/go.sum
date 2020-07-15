@@ -41,6 +41,8 @@ github.com/rainist/idl v0.0.0-20200714023855-e703afd63c06 h1:Al5kEp+5kwzcVAXO9Y0
 github.com/rainist/idl v0.0.0-20200714023855-e703afd63c06/go.mod h1:D7T03kjL53YTmPFK5wMyBR19skpXjdsInE8m8caGQwg=
 github.com/rainist/idl v0.0.0-20200714085935-9d8c209d1f36 h1:fM1KUaAx/KtpEIpx42XU6vrwj2HqpwgUoJAS6E4MmbQ=
 github.com/rainist/idl v0.0.0-20200714085935-9d8c209d1f36/go.mod h1:D7T03kjL53YTmPFK5wMyBR19skpXjdsInE8m8caGQwg=
+github.com/rainist/idl v0.0.0-20200714103137-25faeee495de h1:zvPDU9yi0LKHC+OE5nqAQpkS4hkRQWkrpjnvz5NV0Bc=
+github.com/rainist/idl v0.0.0-20200714103137-25faeee495de/go.mod h1:D7T03kjL53YTmPFK5wMyBR19skpXjdsInE8m8caGQwg=
 github.com/rogpeppe/fastuuid v1.2.0/go.mod h1:jVj6XXZzXRy/MSR5jhDC/2q6DgLz+nrA6LYCDYWNEvQ=
 github.com/sirupsen/logrus v1.5.0/go.mod h1:+F7Ogzej0PZc/94MaYx/nvG9jOFMD2osvC3s+Squfpo=
 github.com/sirupsen/logrus v1.6.0 h1:UBcNElsrwanuuMsnGSlYmtmgbb23qDR5dG+6X6Oo89I=

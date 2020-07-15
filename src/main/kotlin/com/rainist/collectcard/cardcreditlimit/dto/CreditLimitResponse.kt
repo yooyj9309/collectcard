@@ -34,7 +34,7 @@ fun CreditLimitResponse.toCreditLimitResponseProto(): CollectcardProto.GetCredit
         ?.let {
             return CollectcardProto.GetCreditLimitResponse
                 .newBuilder()
-                .setCreditLimit(it)
+                .setData(it)
                 .build()
         }
         ?: throw CardsException("DataBody data is null, resultCode : ${dataHeader?.resultCode}, resultMessage : ${dataHeader?.resultMessage}")
@@ -42,8 +42,8 @@ fun CreditLimitResponse.toCreditLimitResponseProto(): CollectcardProto.GetCredit
 
 private fun makeLimitStatusProtoResponse(totalAmount: BigDecimal, remainedAmount: BigDecimal, usedAmount: BigDecimal): CollectcardProto.LimitStatus {
     return CollectcardProto.LimitStatus.newBuilder()
-        .setTotalAmount2F(totalAmount.toLong())
-        .setRemainedAmount2F(remainedAmount.toLong())
-        .setUsedAmount2F(usedAmount.toLong())
+        .setTotalAmount(totalAmount.toDouble())
+        .setRemainedAmount(remainedAmount.toDouble())
+        .setUsedAmount(usedAmount.toDouble())
         .build()
 }

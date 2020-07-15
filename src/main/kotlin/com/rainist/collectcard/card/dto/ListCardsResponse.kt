@@ -2,8 +2,8 @@ package com.rainist.collectcard.card.dto
 
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
 import com.google.protobuf.BoolValue
-import com.google.protobuf.Int64Value
 import com.google.protobuf.StringValue
+import java.time.format.DateTimeFormatter
 
 data class ListCardsResponse(
     var dataHeader: ListCardsResponseDataHeader?,
@@ -26,22 +26,22 @@ fun ListCardsResponse.toListCardsResponseProto(): CollectcardProto.ListCardsResp
             .newBuilder()
             .setName(it.cardName)
             .setNumber(it.cardNumber)
-            .setCardholderName(StringValue.of(it.cardOwnerName))
-            .setIssuedDateMs(
-                it.issuedAt?.let { Int64Value.of(it.toEpochSecond()) } ?: Int64Value.getDefaultInstance()
+            .setUserName(StringValue.of(it.cardOwnerName))
+            .setIssuedDate(
+                it.issuedAt?.format(DateTimeFormatter.ISO_LOCAL_DATE) ?.let { StringValue.of(it) } ?: StringValue.getDefaultInstance()
             )
-            .setExpirationDateMs(
-                it.expiresAt?.let { Int64Value.of(it.toEpochSecond()) } ?: Int64Value.getDefaultInstance()
+            .setExpirationDate(
+                it.expiresAt?.format(DateTimeFormatter.ISO_LOCAL_DATE) ?.let { StringValue.of(it) } ?: StringValue.getDefaultInstance()
             )
             .setType(StringValue.of(it.cardType))
-            .setIsDormant(BoolValue.of(it.cardStatus == CardStatus.DORMANT))
-//            .setIsHybrid(BoolValue.of())
-//            .setIsTransitSupported(BoolValue.of())
+            .setDormant(BoolValue.of(it.cardStatus == CardStatus.DORMANT))
+            .setHybrid(BoolValue.getDefaultInstance())
+            .setTrafficSupported(BoolValue.getDefaultInstance())
             .build()
     }.let {
         CollectcardProto.ListCardsResponse
             .newBuilder()
-            .addAllCards(it)
+            .addAllData(it)
             .build()
     }
 }

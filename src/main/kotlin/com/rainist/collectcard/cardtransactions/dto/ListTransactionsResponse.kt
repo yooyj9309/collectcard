@@ -1,11 +1,11 @@
 package com.rainist.collectcard.cardtransactions.dto
 
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
-import com.google.protobuf.Int64Value
+import com.google.protobuf.DoubleValue
+import com.google.protobuf.Int32Value
 import com.google.protobuf.StringValue
 import com.rainist.common.exception.ValidationException
 import com.rainist.common.util.DateTimeUtil
-import java.math.BigDecimal
 
 data class ListTransactionsResponse(
     var dataHeader: ListTransactionsResponseDataHeader? = null,
@@ -31,45 +31,44 @@ fun ListTransactionsResponse.toListCardsReponseProto(): CollectcardProto.ListCar
 
     return kotlin.runCatching {
         let {
-            this.dataBody?.transactions?.map {
+            this.dataBody?.transactions?.map { transaction ->
 
                 CollectcardProto.CardTransaction
                     .newBuilder()
-                    .setApprovalNumber(it.approvalNumber) // TODO 예상국 무승인 거래 경우 대응하기
-                    .setTransactedAtMs(
-                        DateTimeUtil.stringToLocalDateTime(it.approvalDay!!, "yyyyMMdd", it.approvalTime!!, "HHmmss")
-                            .let { DateTimeUtil.kstLocalDateTimeToEpochMilliSecond(it) }
+                    .setApprovalNumber(transaction.approvalNumber) // TODO 예상국 무승인 거래 경우 대응하기
+                    .setTransactedAt(
+                        DateTimeUtil.stringToLocalDateTime(transaction.approvalDay!!, "yyyyMMdd", transaction.approvalTime!!, "HHmmss")
+                            .let { DateTimeUtil.kstLocalDateTimeToEpochMilliSecond(it) }.toInt()
                     )
                     .setStore(
                         CollectcardProto.AffiliatedStoreSummary
                             .newBuilder()
-                            .setName(it.storeName)
-                            .setType(StringValue.of(it.storeCategory ?: ""))
+                            .setName(transaction.storeName)
+                            .setType(StringValue.of(transaction.storeCategory ?: ""))
                             .build()
                     )
                     .setCard(
                         CollectcardProto.CardSummary
                             .newBuilder()
-                            .setNumber(it.cardNumber)
-                            .setName(StringValue.of(it.cardName ?: ""))
-                            .setCardType(StringValue.of(it.cardType ?: ""))
+                            .setNumber(transaction.cardNumber)
+                            .setName(StringValue.of(transaction.cardName ?: ""))
+                            .setType(StringValue.of(transaction.cardType ?: ""))
                             .build()
                     )
                     .setInstallmentMonth(
-                        it.installment?.let { Int64Value.of(it.toLong()) }
+                        transaction.installment?.let { Int32Value.of(it) }
                     )
-                    .setApprovedAmount2F(
-                        it.amount?.setScale(2)?.multiply(BigDecimal(100L))?.toLong()
-                            ?: throw ValidationException("승인금액이 없습니다")
+                    .setApprovedAmount(
+                        transaction.amount?.toDouble() ?: throw ValidationException("승인금액이 없습니다")
                     )
-                    .setCancelledAmount2F(
-                        it.canceledAmount?.setScale(2)?.multiply(BigDecimal(100L))?.toLong()
-                            ?.let { Int64Value.of(it) }
+                    .setCancelledAmount(
+                        transaction.canceledAmount?.toDouble()
+                            ?.let { DoubleValue.of(it) }
                             ?: throw ValidationException("취소금액이 없습니다")
                     )
-                    .setCurrency(it.currencyCode ?: "KRW")
-                    .setIsOverseas(it.isOverseaUse ?: false)
-                    .setIsInstallment(it.isInstallmentPayment ?: false)
+                    .setCurrency(transaction.currencyCode ?: "KRW")
+                    .setForeign(transaction.isOverseaUse ?: false)
+                    .setInstallment(transaction.isInstallmentPayment ?: false)
                     .build()
             }
             ?. toMutableList()
@@ -78,7 +77,7 @@ fun ListTransactionsResponse.toListCardsReponseProto(): CollectcardProto.ListCar
             .let {
                 CollectcardProto.ListCardTransactionsResponse
                     .newBuilder()
-                    .addAllCardTransactions(it)
+                    .addAllData(it)
                     .build()
             }
     }
