@@ -4,19 +4,33 @@
         "resultMessage": .dataHeader.resultMessage
     },
     "dataBody": {
-        "creditlimitInfo" : {
-           "totalAmount" : .dataBody.rTotAmt,
-           "remainedAmount" : .dataBody.xTotAmt,
-           "usedAmount" : .dataBody.uTotAmt,
-           "singleTotalAmount" : .dataBody.rAllAmt,
-           "singleRemainedAmount" : .dataBody.inLumpRmnAmt,
-           "singleUsedAmount" : .dataBody.inLumpUseAmt,
-           "installmentTotalAmount" : .dataBody.rInsAmt,
-           "installmentRemainedAmount" : .dataBody.installmentRmnAmt,
-           "installmentUsedAmount" : .dataBody.installmentUseAmt,
-           "loanTotalAmount" : .dataBody.rCashAmt,
-           "loanRemainedAmount" : .dataBody.csavRmnAmt,
-           "loanUsedAmount" : .dataBody.csavUseAmt
-       }
+        "creditLimitInfo" : {
+            "loanLimit" : {
+                "totalLimitAmount" : .dataBody.rTotAmt,
+                "remainedAmount" : .dataBody.xTotAmt,
+                "usedAmount" : .dataBody.uTotAmt
+            },
+            "onetimePaymentLimit" : {
+                "totalLimitAmount" : .dataBody.rAllAmt,
+                "remainedAmount" : .dataBody.inLumpRmnAmt,
+                "usedAmount" : .dataBody.inLumpUseAmt
+            },
+            "installmentLimit" : {
+                "totalLimitAmount" : .dataBody.rInsAmt,
+                "remainedAmount" : .dataBody.installmentRmnAmt,
+                "usedAmount" : .dataBody.installmentUseAmt
+            },
+            "cashServiceLimit" : {
+                "totalLimitAmount" : .dataBody.rCashAmt,
+                "remainedAmount" : .dataBody.csavRmnAmt,
+                "usedAmount" : .dataBody.csavUseAmt
+            },
+            // 현재 connectcard proto에는 카드론이라는 명칭으로 해당 값이 내려가고 있으나, 신한카드는 현금서비스 값을 카드론 proto값으로 내리고 있는중
+            "cardLoanLimit" : {
+                "totalLimitAmount" : .dataBody.rCashAmt,
+                "remainedAmount" : .dataBody.csavRmnAmt,
+                "usedAmount" : .dataBody.csavUseAmt
+            }
+        }
     }
 }

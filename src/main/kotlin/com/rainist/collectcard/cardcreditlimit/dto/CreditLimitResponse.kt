@@ -2,7 +2,6 @@ package com.rainist.collectcard.cardcreditlimit.dto
 
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
 import com.rainist.collectcard.card.CardsException
-import java.math.BigDecimal
 
 data class CreditLimitResponse(
     var dataHeader: CreditLimitResponseDataHeader?,
@@ -15,20 +14,20 @@ data class CreditLimitResponseDataHeader(
 )
 
 data class CreditLimitResponseDataBody(
-    var creditlimitInfo: CreditLimit? = null
+    var creditLimitInfo: CreditLimit? = null
 )
 
 fun CreditLimitResponse.toCreditLimitResponseProto(): CollectcardProto.GetCreditLimitResponse {
-    this.dataBody?.creditlimitInfo?.let {
+    this.dataBody?.creditLimitInfo?.let {
         CollectcardProto.CreditLimit.newBuilder()
             .setSinglePaymentLimit(
-                makeLimitStatusProtoResponse(it.singleTotalAmount, it.singleRemainedAmount, it.singleUsedAmount)
+                makeLimitStatusProtoResponse(it.onetimePaymentLimit)
             ).setTotalLimit(
-                makeLimitStatusProtoResponse(it.totalAmount, it.remainedAmount, it.usedAmount)
+                makeLimitStatusProtoResponse(it.loanLimit)
             ).setLoanLimit(
-                makeLimitStatusProtoResponse(it.loanTotalAmount, it.loanRemainedAmount, it.loanUsedAmount)
+                makeLimitStatusProtoResponse(it.cardLoanLimit)
             ).setInstallmentLimit(
-                makeLimitStatusProtoResponse(it.installmentTotalAmount, it.installmentRemainedAmount, it.installmentUsedAmount)
+                makeLimitStatusProtoResponse(it.installmentLimit)
             )
     }
         ?.let {
@@ -40,10 +39,10 @@ fun CreditLimitResponse.toCreditLimitResponseProto(): CollectcardProto.GetCredit
         ?: throw CardsException("DataBody data is null, resultCode : ${dataHeader?.resultCode}, resultMessage : ${dataHeader?.resultMessage}")
 }
 
-private fun makeLimitStatusProtoResponse(totalAmount: BigDecimal, remainedAmount: BigDecimal, usedAmount: BigDecimal): CollectcardProto.LimitStatus {
+private fun makeLimitStatusProtoResponse(limit: Limit?): CollectcardProto.LimitStatus {
     return CollectcardProto.LimitStatus.newBuilder()
-        .setTotalAmount(totalAmount.toDouble())
-        .setRemainedAmount(remainedAmount.toDouble())
-        .setUsedAmount(usedAmount.toDouble())
-        .build()
+    .setTotalAmount(limit?.totalLimitAmount?.toDouble() ?: 0.0)
+    .setRemainedAmount(limit?.remainedAmount?.toDouble() ?: 0.0)
+    .setUsedAmount(limit?.usedAmount?.toDouble() ?: 0.0)
+    .build()
 }

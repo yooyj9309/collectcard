@@ -1,42 +1,43 @@
 package com.rainist.collectcard.cardcreditlimit.dto
 
 import java.math.BigDecimal
+import org.springframework.format.annotation.NumberFormat
 
 data class CreditLimit(
-    // (총한도, 전체) 총 한도액
-    var totalAmount: BigDecimal,
 
-    // (총한도, 전체) 잔여 한도
-    var remainedAmount: BigDecimal,
+    // 대출 한도 여부
+    var loanLimit: Limit? = null,
 
-    // (총한도, 전체) 이용 금액
-    var usedAmount: BigDecimal,
+    // 일회 결제 한도 여부
+    var onetimePaymentLimit: Limit? = null,
 
-    // (1회 결제 한도) 총 한도
-    var singleTotalAmount: BigDecimal,
+    // 카드론 한도 여부
+    var cardLoanLimit: Limit? = null,
 
-    // (1회 결제 한도) 잔여 한도
-    var singleRemainedAmount: BigDecimal,
+    // 신용카드 한도 여부
+    var creditCardLimit: Limit? = null,
 
-    // (1회 결제 한도) 이용 금액
-    var singleUsedAmount: BigDecimal,
+    // 체크카드 한도 여부
+    var debitCardLimit: Limit? = null,
 
-    // (할부) 총 한도
-    var installmentTotalAmount: BigDecimal,
+    // 현금서비스 한도 여부
+    var cashServiceLimit: Limit? = null,
 
-    // (할부) 잔여 한도
-    var installmentRemainedAmount: BigDecimal,
+    // 해외 한도 여부
+    var overseaLimit: Limit? = null,
 
-    // (할부) 이용 금
-    var installmentUsedAmount: BigDecimal,
+    // 할부 한도
+    @Deprecated("신규 Proto에는 없는 내역으로 사라질 예정입니다.")
+    var installmentLimit: Limit? = null
+)
 
-    //  (카드론, 현금서비스) 총 한도
-    var loanTotalAmount: BigDecimal,
+data class Limit(
+    @NumberFormat(style = NumberFormat.Style.NUMBER)
+    var totalLimitAmount: BigDecimal? = null, // 총한도
 
-    // (카드론, 현금서비스) 잔여 한도
-    var loanRemainedAmount: BigDecimal,
+    @NumberFormat(style = NumberFormat.Style.NUMBER)
+    var remainedAmount: BigDecimal? = null, // 남은 한도
 
-    // (카드론, 현금서비스) 이용 금액
-    var loanUsedAmount: BigDecimal
-
+    @NumberFormat(style = NumberFormat.Style.NUMBER)
+    var usedAmount: BigDecimal? = null // 사용금액
 )
