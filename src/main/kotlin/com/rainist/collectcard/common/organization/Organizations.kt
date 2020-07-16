@@ -21,7 +21,7 @@ class Organizations(
     fun init() {
         kotlin.runCatching {
             shinhancardOrganization = CardOrganization().apply {
-                this.name = "신한카드"
+                this.name = "shinhancard"
                 this.code = "SHC"
                 this.clientId = shinhancardClientId
                 this.organizationObjectId = shinhancardOrganizationObjectid
@@ -30,12 +30,10 @@ class Organizations(
             }.also {
                 map[shinhancardOrganizationObjectid] = it
             }
-        }
-        .onFailure {
+        }.onFailure {
             logger.withFieldError("OrganizationsInitError", it.localizedMessage, it)
             throw Exception("OrganizationsInitError")
-        }
-        .getOrThrow()
+        }.getOrThrow()
     }
 
     companion object : Log {
