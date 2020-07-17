@@ -10,6 +10,8 @@ import com.rainist.collectcard.cardtransactions.dto.ListTransactionsRequestDataH
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponse
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponseDataBody
 import com.rainist.collectcard.cardtransactions.dto.toListCardsReponseProto
+import com.rainist.collectcard.cardtransactions.repository.CardTransactionRepository
+import com.rainist.collectcard.cardtransactions.util.CardTransactionUtil
 import com.rainist.collectcard.cardtransactions.validation.ListCardRequestValidator
 import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
@@ -39,6 +41,7 @@ class CardTransactionServiceImpl(
     val listCardRequestValidator: ListCardRequestValidator,
     val validationService: ValidationService,
     val headerService: HeaderService,
+    val cardTransactionRepository: CardTransactionRepository,
     @Qualifier("async-thread") val executor: Executor
 ) : CardTransactionService {
 
@@ -115,13 +118,13 @@ class CardTransactionServiceImpl(
             .getOrThrow()
     }
 
-    override fun listTransactions(
-        header: MutableMap<String, String?>,
+    fun listTransactions(
+        headerInfo: HeaderInfo,
         listTransactionsRequest: ListTransactionsRequest
     ): ListTransactionsResponse {
 
         return kotlin.runCatching {
-            val response = execute(header, listTransactionsRequest)
+            val response = execute(headerService.getHeader(headerInfo), listTransactionsRequest)
 
             val headerValidations = response?.filter {
                 // TODO 예상국 각 금융사별 OK 사인 코드 넣기 ( 제대로 온 내역만 파싱하고 나머지는 로그 알림이 맞지 않나? ) Body Validation 으로 처리 가능 쉐도잉시 정책 적용
@@ -132,7 +135,7 @@ class CardTransactionServiceImpl(
                 it.response.dataBody?.transactions?.toMutableList() ?: mutableListOf()
             }
                 ?.filter {
-                    it.cardNumber?.length ?: 0 > 0
+                    (it.cardNumber?.length ?: 0) > 0
                 }
                 ?.mapNotNull {
                     validationService.validateOrNull(it)
@@ -140,11 +143,29 @@ class CardTransactionServiceImpl(
                 ?.sortedByDescending { cardTransaction -> cardTransaction.approvalDay + cardTransaction.approvalTime }
                 ?.toMutableList()
 
-            ListTransactionsResponse().apply {
+            val listTransactionsResponse: ListTransactionsResponse = ListTransactionsResponse().apply {
                 this.dataBody = ListTransactionsResponseDataBody().apply {
                     this.transactions = bodyValidation
                 }
             }
+
+            listTransactionsResponse.dataBody?.transactions?.forEach { cardTransaction ->
+                var cardTransactionEntity = cardTransactionRepository.findByBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndIssuedDate(
+                    headerInfo.banksaladUserId!!.toLong(),
+                    headerInfo.organizationObjectid,
+                    cardTransaction.cardCompanyCardId,
+                    cardTransaction.approvalNumber,
+                    DateTimeUtil.stringToLocalDateTime(cardTransaction.approvalDay!!, "yyyyMMdd", cardTransaction.approvalTime!!, "HHmmss")
+                )
+
+                if (cardTransactionEntity == null) {
+                    cardTransactionRepository.save(
+                        CardTransactionUtil.makeCardTransactionEntity(headerInfo, cardTransaction)
+                    )
+                }
+            }
+
+            listTransactionsResponse
         }
             .onFailure {
                 logger.withFieldError("ListTransactionsError", it.localizedMessage, it)
@@ -153,7 +174,7 @@ class CardTransactionServiceImpl(
     }
 
     // Asset Gateway req
-    fun listTransactions(request: CollectcardProto.ListCardTransactionsRequest): CollectcardProto.ListCardTransactionsResponse {
+    override fun listTransactions(request: CollectcardProto.ListCardTransactionsRequest): CollectcardProto.ListCardTransactionsResponse {
 
         return kotlin.runCatching {
             takeIf {
@@ -193,9 +214,7 @@ class CardTransactionServiceImpl(
                         this.organizationObjectid = request.companyId.value
                         this.clientId = Organizations.valueOf(request.companyId.value)?.clientId
                     }.let { headerInfo ->
-                        headerService.getHeader(headerInfo)
-                    }.let { header ->
-                        listTransactions(header, listTransactionRequest)
+                        listTransactions(headerInfo, listTransactionRequest)
                     }
                 }
                 ?.toListCardsReponseProto()

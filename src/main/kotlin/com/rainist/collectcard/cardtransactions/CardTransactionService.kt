@@ -1,8 +1,7 @@
 package com.rainist.collectcard.cardtransactions
 
-import com.rainist.collectcard.cardtransactions.dto.ListTransactionsRequest
-import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponse
+import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
 
 interface CardTransactionService {
-    fun listTransactions(header: MutableMap<String, String?>, listTransactionsRequest: ListTransactionsRequest): ListTransactionsResponse
+    fun listTransactions(request: CollectcardProto.ListCardTransactionsRequest): CollectcardProto.ListCardTransactionsResponse
 }

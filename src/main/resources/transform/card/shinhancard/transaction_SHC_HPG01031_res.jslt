@@ -16,9 +16,11 @@ let CardType = {
             {
                 "approvalDay" : if(size(.apvDt) >= 14) .apvDt[ 0 : 8 ] else "",   // 승인일자 yyyyMMdd
                 "approvalTime" : if(size(.apvDt) >= 14) .apvDt[ 8 : 14 ] else "", // 승인시간 HHmmss
+                "cardCompanyCardId" : "",
                 "approvalNumber": .apvN,                                          // 승인번호
                 "amount": .apva,                                                  // 승인금액
                 "cardNumber": .crdN,                                              // 카드번호
+                "cardNumberMask" : .cardno,                                             // 카드넘버마스크
                 "storeName" : .mctNm,                                             // 가맹점명
                 "paymentDay": .stDuD,                                             // 결제예정일자
                 "storeCategory" : .ryCd,                                          // 업종코드명

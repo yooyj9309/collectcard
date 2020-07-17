@@ -16,6 +16,11 @@ data class CardTransaction(
     @field:NotEmpty
     var cardNumber: String? = null, //  3. 카드번호
 
+    @field:NotEmpty
+    var cardNumberMask: String? = null, // 추가, 마스킹된 값
+
+    var cardCompanyCardId: String? = null, // 추가, 카드회사 카드 ID
+
     var businessLicenseNumber: String? = null, //  4. 사업자 번호
 
     @field:NotEmpty
