@@ -25,11 +25,9 @@ mydata:
         validation-timeout: 4000
         max-lifetime: 1800000
 
-
-host:
-  card:
-    shinhancard: https://openapi.shinhancard.com:8443
-
 shinhancard:
+  organizationId: shinhancard
+  objectId: 596d66692c4069c168b57c59
+  host: https://openapi.shinhancard.com:8443
   clientId: ${PRODUCTION_SHINHANCARD_CLIENT_ID}
-  organizationObjectid: 5880ec0575c8e8fbdc00aced
+  

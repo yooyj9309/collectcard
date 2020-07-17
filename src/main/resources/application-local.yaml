@@ -30,11 +30,8 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: trace
     org.springframework.transaction.interceptor: trace
 
-host:
-  card:
-    shinhancard: https://devopenapi.shinhancard.com:8443
-
 shinhancard:
+  organizationId: shinhancard
+  objectId: 596d66692c4069c168b57c59
+  host: https://devopenapi.shinhancard.com:8443
   clientId: ${DEVELOPMENT_SHINHANCARD_CLIENT_ID}
-  organizationObjectid: 596d66692c4069c168b57c59
-

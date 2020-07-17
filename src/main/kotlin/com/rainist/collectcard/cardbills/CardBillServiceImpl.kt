@@ -14,7 +14,7 @@ import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.exception.CollectcardException
-import com.rainist.collectcard.common.organization.Organizations
+import com.rainist.collectcard.common.organization.OrganizationService
 import com.rainist.collectcard.header.HeaderService
 import com.rainist.collectcard.header.dto.HeaderInfo
 import com.rainist.common.log.Log
@@ -24,8 +24,9 @@ import org.springframework.stereotype.Service
 
 @Service
 class CardBillServiceImpl(
-    val collectExecutorService: CollectExecutorService,
-    val headerService: HeaderService
+    val headerService: HeaderService,
+    val organizationService: OrganizationService,
+    val collectExecutorService: CollectExecutorService
 ) : CardBillService {
 
     companion object : Log {
@@ -98,7 +99,8 @@ class CardBillServiceImpl(
                         }
                         ?.let { DateTimeUtil.localDateToString(it, "yyyyMMdd") }
                         ?: kotlin.run {
-                            val cardOrganization = Organizations.valueOf(request.companyId.value)
+                            val cardOrganization =
+                                organizationService.getOrganizationByObjectId(request.companyId.value)
                             DateTimeUtil.kstNowLocalDate().minusMonths(
                                 cardOrganization?.maxMonth
                                     ?: CardBillServiceImpl.DEFAULT_MAX_MONTH
@@ -114,7 +116,8 @@ class CardBillServiceImpl(
                     HeaderInfo().apply {
                         this.banksaladUserId = request.userId
                         this.organizationObjectid = request.companyId.value
-                        this.clientId = Organizations.valueOf(request.companyId.value)?.clientId
+                        this.clientId =
+                            organizationService.getOrganizationByObjectId(request.companyId.value)?.clientId
                     }.let { headerInfo ->
                         headerService.getHeader(headerInfo)
                     }.let { header ->

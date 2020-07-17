@@ -17,7 +17,7 @@ import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
-import com.rainist.collectcard.common.organization.Organizations
+import com.rainist.collectcard.common.organization.OrganizationService
 import com.rainist.collectcard.header.HeaderService
 import com.rainist.collectcard.header.dto.HeaderInfo
 import com.rainist.common.exception.UnknownException
@@ -37,10 +37,11 @@ import org.springframework.stereotype.Service
 @ExperimentalCoroutinesApi
 @Service
 class CardTransactionServiceImpl(
+    val headerService: HeaderService,
+    val organizationService: OrganizationService,
     val collectExecutorService: CollectExecutorService,
     val listCardRequestValidator: ListCardRequestValidator,
     val validationService: ValidationService,
-    val headerService: HeaderService,
     val cardTransactionRepository: CardTransactionRepository,
     @Qualifier("async-thread") val executor: Executor
 ) : CardTransactionService {
@@ -67,7 +68,10 @@ class CardTransactionServiceImpl(
                     Pair(startDate, endDate)
                 }
                 ?.let {
-                    val cardOrganization = Organizations.valueOf(listTransactionsRequest.organizationObjectid)
+                    val cardOrganization =
+                        organizationService.getOrganizationByObjectId(
+                            listTransactionsRequest.organizationObjectid ?: ""
+                        )
                     DateTimeUtil.splitLocalDateRangeByMonth(
                         it.first,
                         it.second,
@@ -150,13 +154,19 @@ class CardTransactionServiceImpl(
             }
 
             listTransactionsResponse.dataBody?.transactions?.forEach { cardTransaction ->
-                var cardTransactionEntity = cardTransactionRepository.findByBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndIssuedDate(
-                    headerInfo.banksaladUserId!!.toLong(),
-                    headerInfo.organizationObjectid,
-                    cardTransaction.cardCompanyCardId,
-                    cardTransaction.approvalNumber,
-                    DateTimeUtil.stringToLocalDateTime(cardTransaction.approvalDay!!, "yyyyMMdd", cardTransaction.approvalTime!!, "HHmmss")
-                )
+                var cardTransactionEntity =
+                    cardTransactionRepository.findByBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndIssuedDate(
+                        headerInfo.banksaladUserId!!.toLong(),
+                        headerInfo.organizationObjectid,
+                        cardTransaction.cardCompanyCardId,
+                        cardTransaction.approvalNumber,
+                        DateTimeUtil.stringToLocalDateTime(
+                            cardTransaction.approvalDay!!,
+                            "yyyyMMdd",
+                            cardTransaction.approvalTime!!,
+                            "HHmmss"
+                        )
+                    )
 
                 if (cardTransactionEntity == null) {
                     cardTransactionRepository.save(
@@ -197,7 +207,8 @@ class CardTransactionServiceImpl(
                                 }
                                 ?.let { DateTimeUtil.localDateToString(it, "yyyyMMdd") }
                                 ?: kotlin.run {
-                                    val cardOrganization = Organizations.valueOf(request.companyId.value)
+                                    val cardOrganization =
+                                        organizationService.getOrganizationByObjectId(request.companyId.value)
                                     DateTimeUtil.kstNowLocalDate()
                                         .minusMonths(cardOrganization?.maxMonth ?: DEFAULT_MAX_MONTH)
                                         .let {
@@ -212,7 +223,8 @@ class CardTransactionServiceImpl(
                     HeaderInfo().apply {
                         this.banksaladUserId = request.userId
                         this.organizationObjectid = request.companyId.value
-                        this.clientId = Organizations.valueOf(request.companyId.value)?.clientId
+                        this.clientId =
+                            organizationService.getOrganizationByObjectId(request.companyId.value)?.clientId
                     }.let { headerInfo ->
                         listTransactions(headerInfo, listTransactionRequest)
                     }

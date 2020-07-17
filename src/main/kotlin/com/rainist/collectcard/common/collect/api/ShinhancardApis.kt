@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class ShinhancardApis {
-    @Value("\${host.card.shinhancard}")
-    lateinit var hostCardShinhancard: String
+    @Value("\${shinhancard.host}")
+    lateinit var shinhancardHost: String
 
     @PostConstruct
     fun init() {
@@ -20,7 +20,7 @@ class ShinhancardApis {
             Api.builder()
                 .name("보유카드조회")
                 .signaturePolicy(signaturePolicyShinhancard)
-                .endpoint("$hostCardShinhancard/v1.0/EXT/mycard/searchavailablecard")
+                .endpoint("$shinhancardHost/v1.0/EXT/mycard/searchavailablecard")
                 .method(Api.HttpMethod.POST)
                 .transform(
                     request(
@@ -38,7 +38,7 @@ class ShinhancardApis {
             Api.builder()
                 .name("신용 국내사용내역 조회-일시불/할부(SHC_HPG00428)")
                 .signaturePolicy(signaturePolicyShinhancard)
-                .endpoint("$hostCardShinhancard/v1.0/EXT/usecreditcard/searchusefordomestic")
+                .endpoint("$shinhancardHost/v1.0/EXT/usecreditcard/searchusefordomestic")
                 .method(Api.HttpMethod.POST)
                 .transform(
                     request(
@@ -56,7 +56,7 @@ class ShinhancardApis {
             Api.builder()
                 .name("신용 해외사용내역조회-일시불조회(SHC_HPG01612)")
                 .signaturePolicy(signaturePolicyShinhancard)
-                .endpoint("$hostCardShinhancard/v1.0/EXT/usecreditcard/searchuseforoverseas")
+                .endpoint("$shinhancardHost/v1.0/EXT/usecreditcard/searchuseforoverseas")
                 .method(Api.HttpMethod.POST)
                 .transform(
                     request(
@@ -74,7 +74,7 @@ class ShinhancardApis {
             Api.builder()
                 .name("체크 국내사용내역(SHC_HPG01030)")
                 .signaturePolicy(signaturePolicyShinhancard)
-                .endpoint("$hostCardShinhancard/v1.0/EXT/usedebitcard/searchusefordomestic")
+                .endpoint("$shinhancardHost/v1.0/EXT/usedebitcard/searchusefordomestic")
                 .method(Api.HttpMethod.POST)
                 .transform(
                     request(
@@ -92,7 +92,7 @@ class ShinhancardApis {
             Api.builder()
                 .name("체크 국내사용내역(SHC_HPG01031)")
                 .signaturePolicy(signaturePolicyShinhancard)
-                .endpoint("$hostCardShinhancard/v1.0/EXT/usedebitcard/searchuseforoverseas")
+                .endpoint("$shinhancardHost/v1.0/EXT/usedebitcard/searchuseforoverseas")
                 .method(Api.HttpMethod.POST)
                 .transform(
                     request(
@@ -110,7 +110,7 @@ class ShinhancardApis {
             Api.builder()
                 .name("카드_[EXT] 결제예정금액 총괄(SHC_HPG01096_EXT)")
                 .signaturePolicy(signaturePolicyShinhancard)
-                .endpoint("$hostCardShinhancard/v1.0/EXT/usecard/searchtotalpayments")
+                .endpoint("$shinhancardHost/v1.0/EXT/usecard/searchtotalpayments")
                 .method(Api.HttpMethod.POST)
                 .transform(
                     request(
@@ -128,7 +128,7 @@ class ShinhancardApis {
             Api.builder()
                 .name("카드_[EXT] 결제예정금액(일시불,현금서비스 상세)(SHC_HPG00237)")
                 .signaturePolicy(signaturePolicyShinhancard)
-                .endpoint("$hostCardShinhancard/v1.0/EXT/usecard/searchpaymentsdetail")
+                .endpoint("$shinhancardHost/v1.0/EXT/usecard/searchpaymentsdetail")
                 .method(Api.HttpMethod.POST)
                 .transform(
                     request(
@@ -146,7 +146,7 @@ class ShinhancardApis {
             Api.builder()
                 .name("카드_[EXT] (할부) 결제예정금액(할부, 론 상세)(SHC_HPG00238)")
                 .signaturePolicy(signaturePolicyShinhancard)
-                .endpoint("$hostCardShinhancard/v1.0/EXT/useinstallment/searchpaymentsdetail")
+                .endpoint("$shinhancardHost/v1.0/EXT/useinstallment/searchpaymentsdetail")
                 .method(Api.HttpMethod.POST)
                 .transform(
                     request(
@@ -164,7 +164,7 @@ class ShinhancardApis {
             Api.builder()
                 .name("체크카드 월별 청구내역(SHC_HPG01226)")
                 .signaturePolicy(signaturePolicyShinhancard)
-                .endpoint("$hostCardShinhancard/v1.0/EXT/usedebitcard/searchmonthlybillingfor6months")
+                .endpoint("$shinhancardHost/v1.0/EXT/usedebitcard/searchmonthlybillingfor6months")
                 .method(Api.HttpMethod.POST)
                 .transform(
                     request(
@@ -182,7 +182,7 @@ class ShinhancardApis {
             Api.builder()
                 .name("신용카드 월별 청구내역(SHC_HPG00719)")
                 .signaturePolicy(signaturePolicyShinhancard)
-                .endpoint("$hostCardShinhancard/v1.0/EXT/usecreditcard/searchmonthlybillingfor6months")
+                .endpoint("$shinhancardHost/v1.0/EXT/usecreditcard/searchmonthlybillingfor6months")
                 .method(Api.HttpMethod.POST)
                 .transform(
                     request(
@@ -200,7 +200,7 @@ class ShinhancardApis {
             Api.builder()
                 .name("체크카드 월별 청구내역 상세(SHC_HPG00537)")
                 .signaturePolicy(signaturePolicyShinhancard)
-                .endpoint("$hostCardShinhancard/v1.0/EXT/usedebitcard/searchmonthlybillingdetail")
+                .endpoint("$shinhancardHost/v1.0/EXT/usedebitcard/searchmonthlybillingdetail")
                 .method(Api.HttpMethod.POST)
                 .transform(
                     request(
@@ -218,7 +218,7 @@ class ShinhancardApis {
             Api.builder()
                 .name("신용카드 월별 청구내역 상세(SHC_HPG00698)")
                 .signaturePolicy(signaturePolicyShinhancard)
-                .endpoint("$hostCardShinhancard/v1.0/EXT/usecreditcard/searchmonthlybillingdetail")
+                .endpoint("$shinhancardHost/v1.0/EXT/usecreditcard/searchmonthlybillingdetail")
                 .method(Api.HttpMethod.POST)
                 .transform(
                     request(
@@ -236,7 +236,7 @@ class ShinhancardApis {
             Api.builder()
                 .name("사용자 거래정보 조회 (SHC_EXT_00001)")
                 .signaturePolicy(signaturePolicyShinhancard)
-                .endpoint("$hostCardShinhancard/v1.0/EXT/myinfo/searchtransinfo")
+                .endpoint("$shinhancardHost/v1.0/EXT/myinfo/searchtransinfo")
                 .method(Api.HttpMethod.POST)
                 .transform(
                     request(
@@ -254,7 +254,7 @@ class ShinhancardApis {
             Api.builder()
                 .name("대출정보 현황 정보 조회 (SHC_HPG00203)")
                 .signaturePolicy(signaturePolicyShinhancard)
-                .endpoint("$hostCardShinhancard/v1.0/EXT/uselongloan/searchproduct")
+                .endpoint("$shinhancardHost/v1.0/EXT/uselongloan/searchproduct")
                 .method(Api.HttpMethod.POST)
                 .transform(
                     request(
@@ -272,7 +272,7 @@ class ShinhancardApis {
             Api.builder()
                 .name("대출 상세 정보 조회 (SHC_HPG00188)")
                 .signaturePolicy(signaturePolicyShinhancard)
-                .endpoint("$hostCardShinhancard/v1.0/EXT/uselongloan/loancondition")
+                .endpoint("$shinhancardHost/v1.0/EXT/uselongloan/loancondition")
                 .method(Api.HttpMethod.POST)
                 .transform(
                     request(
@@ -290,7 +290,7 @@ class ShinhancardApis {
             Api.builder()
                 .name("개인 한도 조회 (SHC_HPG01730)")
                 .signaturePolicy(signaturePolicyShinhancard)
-                .endpoint("$hostCardShinhancard/v1.0/EXT/usecard/searchlimit")
+                .endpoint("$shinhancardHost/v1.0/EXT/usecard/searchlimit")
                 .method(Api.HttpMethod.POST)
                 .transform(
                     request(

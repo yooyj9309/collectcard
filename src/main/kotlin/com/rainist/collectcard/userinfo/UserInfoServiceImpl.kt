@@ -7,7 +7,7 @@ import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
-import com.rainist.collectcard.common.organization.Organizations
+import com.rainist.collectcard.common.organization.OrganizationService
 import com.rainist.collectcard.header.HeaderService
 import com.rainist.collectcard.header.dto.HeaderInfo
 import com.rainist.collectcard.userinfo.dto.UserInfoRequest
@@ -17,8 +17,9 @@ import org.springframework.stereotype.Service
 
 @Service
 class UserInfoServiceImpl(
-    val validationService: ValidationService,
     val headerService: HeaderService,
+    val organizationService: OrganizationService,
+    val validationService: ValidationService,
     val collectExecutorService: CollectExecutorService
 ) : UserInfoService {
 
@@ -32,7 +33,9 @@ class UserInfoServiceImpl(
                     HeaderInfo().apply {
                         this.banksaladUserId = userInfoRequest.banksaladUserId
                         this.organizationObjectid = userInfoRequest.organizationObjectid
-                        this.clientId = Organizations.valueOf(userInfoRequest.organizationObjectid)?.clientId
+                        this.clientId = organizationService.getOrganizationByObjectId(
+                            userInfoRequest.organizationObjectid ?: ""
+                        )?.clientId
                     }
                 }
                 .let { headerInfo ->

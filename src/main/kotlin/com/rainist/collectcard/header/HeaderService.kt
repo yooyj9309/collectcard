@@ -1,6 +1,6 @@
 package com.rainist.collectcard.header
 
-import com.rainist.collectcard.common.organization.Organizations
+import com.rainist.collectcard.common.organization.OrganizationService
 import com.rainist.collectcard.grpc.client.ConnectClient
 import com.rainist.collectcard.header.dto.HeaderInfo
 import com.rainist.common.exception.UnknownException
@@ -10,14 +10,14 @@ import org.springframework.stereotype.Service
 
 @Service
 class HeaderService(
-    val connectClient: ConnectClient
+    val connectClient: ConnectClient,
+    val organizationService: OrganizationService
 ) {
     companion object : Log
 
-    // TODO : refactoring 프로젝트 내에 companyId와 organizationId 가 공존하여 혼동을 유발함
     fun makeHeader(banksaladUserId: String, organizationId: String): MutableMap<String, String?> {
 
-        val cardOrganization = Organizations.valueOfOrganizationId(organizationId)
+        val cardOrganization = organizationService.getOrganizationByOrganizationId(organizationId)
         val accessToken =
             connectClient.getAccessToken(banksaladUserId, cardOrganization.organizationObjectId)?.accessToken
 
