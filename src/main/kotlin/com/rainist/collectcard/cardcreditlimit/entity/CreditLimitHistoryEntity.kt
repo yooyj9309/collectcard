@@ -1,7 +1,6 @@
 package com.rainist.collectcard.cardcreditlimit.entity
 
 import java.math.BigDecimal
-import java.sql.Timestamp
 import java.time.LocalDateTime
 import javax.persistence.Entity
 import javax.persistence.EntityListeners
@@ -35,7 +34,7 @@ data class CreditLimitHistoryEntity(
     var cardCompanyId: String? = null,
 
     // 최종조회일시
-    var lastCheckAt: Timestamp? = null,
+    var lastCheckAt: LocalDateTime? = null,
 
     // 일회결제한도금액
     var onetimePaymentLimitAmount: BigDecimal? = null,
