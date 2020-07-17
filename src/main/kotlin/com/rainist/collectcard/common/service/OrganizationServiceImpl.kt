@@ -18,14 +18,14 @@ class OrganizationServiceImpl : OrganizationService {
     @Value("\${shinhancard.objectId}")
     lateinit var shinhancardObjectId: String
 
-    private val organizationsByOrganizationId = LinkedHashMap<String, Organization>()
-    private val organizationsByOrganizationObjectId = LinkedHashMap<String, Organization>()
+    private val organizationsByOrganizationId = LinkedHashMap<String, CardOrganization>()
+    private val organizationsByOrganizationObjectId = LinkedHashMap<String, CardOrganization>()
 
     companion object : Log
 
     @PostConstruct
     fun init() {
-        val shinhancardOrganization = Organization().apply {
+        val shinhancardOrganization = CardOrganization().apply {
             this.name = shinhancardOrganizationId
             this.code = "SHC"
             this.clientId = shinhancardClientId
@@ -37,12 +37,12 @@ class OrganizationServiceImpl : OrganizationService {
         organizationsByOrganizationObjectId[shinhancardObjectId] = shinhancardOrganization
     }
 
-    override fun getOrganizationByOrganizationId(organizationId: String): Organization {
+    override fun getOrganizationByOrganizationId(organizationId: String): CardOrganization {
         return organizationsByOrganizationId[organizationId]
             ?: throw CollectcardException("Fail to resolve organization. organizationId: $organizationId")
     }
 
-    override fun getOrganizationByObjectId(objectId: String): Organization {
+    override fun getOrganizationByObjectId(objectId: String): CardOrganization {
         return organizationsByOrganizationObjectId[objectId]
             ?: throw CollectcardException("Fail to resolve organization. organizationObjectId: $objectId")
     }

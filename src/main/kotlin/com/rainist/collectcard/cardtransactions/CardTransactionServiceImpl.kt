@@ -210,7 +210,7 @@ class CardTransactionServiceImpl(
                                     val cardOrganization =
                                         organizationService.getOrganizationByObjectId(request.companyId.value)
                                     DateTimeUtil.kstNowLocalDate()
-                                        .minusMonths(cardOrganization?.maxMonth ?: DEFAULT_MAX_MONTH)
+                                        .minusMonths(cardOrganization?.maxMonth.toLong() ?: DEFAULT_MAX_MONTH)
                                         .let {
                                             DateTimeUtil.localDateToString(it, "yyyyMMdd")
                                         }

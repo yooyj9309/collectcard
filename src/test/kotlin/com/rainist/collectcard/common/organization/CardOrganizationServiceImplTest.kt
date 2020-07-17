@@ -13,7 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith(SpringExtension::class)
 @SpringBootTest()
 @DisplayName("Organization")
-internal class OrganizationServiceImplTest {
+internal class CardOrganizationServiceImplTest {
 
     @Autowired
     lateinit var organizationService: OrganizationService

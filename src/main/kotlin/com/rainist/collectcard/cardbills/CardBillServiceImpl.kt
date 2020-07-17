@@ -103,7 +103,7 @@ class CardBillServiceImpl(
                             val cardOrganization =
                                 organizationService.getOrganizationByObjectId(request.companyId.value)
                             DateTimeUtil.kstNowLocalDate().minusMonths(
-                                cardOrganization?.maxMonth
+                                cardOrganization?.maxMonth.toLong()
                                     ?: CardBillServiceImpl.DEFAULT_MAX_MONTH
                             )
                                 .let {
