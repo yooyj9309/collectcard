@@ -2,8 +2,8 @@ package com.rainist.collectcard.cardbills.dto
 
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
 import com.google.protobuf.StringValue
+import com.rainist.collectcard.common.exception.CollectcardException
 import com.rainist.common.util.DateTimeUtil
-import javax.smartcardio.CardException
 
 data class ListCardBillsResponse(
     var dataHeader: ListCardBillsResponseDataHeader? = null,
@@ -71,5 +71,5 @@ fun ListCardBillsResponse.toListCardBillsResponseProto(): CollectcardProto.ListC
 }
 
 fun <T : Any> safeValue(input: T?): T {
-    return input?.let { input } ?: throw CardException("parameter is null") // TODO 임시 코드 NULL CHECK를 하는부분을 공통으로 빼거나 하는 처리로직 필요.
+    return input?.let { input } ?: throw CollectcardException("parameter is null") // TODO 임시 코드 NULL CHECK를 하는부분을 공통으로 빼거나 하는 처리로직 필요.
 }

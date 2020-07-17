@@ -20,6 +20,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 data class CardHistoryEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var cardHistoryId: Long? = null,
+
     var cardId: Long? = null,
 
     var banksaladUserId: Long? = null,

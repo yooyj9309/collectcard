@@ -1,5 +1,7 @@
 package com.rainist.collectcard.common.organization
 
+import com.rainist.collect.common.exception.CollectException
+import com.rainist.collectcard.common.exception.CollectcardException
 import com.rainist.common.log.Log
 import com.rainist.common.service.ValidationService
 import javax.annotation.PostConstruct
@@ -28,23 +30,36 @@ class Organizations(
             }.also {
                 validationService.validateOrThrows(it)
             }.also {
-                map[shinhancardOrganizationObjectid] = it
+                organizationsByObjectId[shinhancardOrganizationObjectid] = it
+                organizationsByOrganizationId["shinhancard"] = it
             }
         }.onFailure {
             logger.withFieldError("OrganizationsInitError", it.localizedMessage, it)
-            throw Exception("OrganizationsInitError")
+            throw CollectException("OrganizationsInitError")
         }.getOrThrow()
     }
 
     companion object : Log {
-        private val map = LinkedHashMap<String, CardOrganization>()
+        private val organizationsByObjectId = LinkedHashMap<String, CardOrganization>()
+        private val organizationsByOrganizationId = LinkedHashMap<String, CardOrganization>()
 
+        @Deprecated("deprecated")
         fun valueOf(organizationObjectid: String?): CardOrganization? {
-            return map[organizationObjectid]
+            return organizationsByObjectId[organizationObjectid]
                 ?: kotlin.run {
                     logger.withFieldError("OrganizationsNotFound", organizationObjectid ?: "null")
                     null
                 }
+        }
+
+        fun valueOfCompanyId(companyId: String): CardOrganization {
+            return organizationsByObjectId[companyId]
+                ?: throw CollectcardException("Fail to resolve organization. companyId: $companyId")
+        }
+
+        fun valueOfOrganizationId(organizationId: String): CardOrganization {
+            return organizationsByOrganizationId[organizationId]
+                ?: throw CollectcardException("Fail to resolve organization. organizationId: $organizationId")
         }
 
         // 신한카드

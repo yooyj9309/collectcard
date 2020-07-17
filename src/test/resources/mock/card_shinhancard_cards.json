@@ -5,34 +5,39 @@
     "successCode": "0",
     "resultMessage": "성공적으로 조회 되었습니다."
   },
-  "clnHgNm": "599780ac2b285a1dc894291556901ad2120b24ef",
   "dataBody": {
     "nxtQyKey": "",
     "resCd": "0004",
+    "clnHgNm": "홍길동",
     "grp001": [
       {
-        "cardno": "b44b19e1f1e8ef09ca6f9d6853ba79cd805931f6",
+        "cardno": "1111222233334444",
+        "enccardno": "b44b19e1f1e8ef09ca6f9d6853ba79cd805931f6",
         "cardname": "그랜드",
         "cardbrand": "0",
         "cardgubun": "1",
         "trafficyn": "N"
       },
       {
-        "cardno": "6b2fc388c9933e93ecf0d1736a1013abe4c7837a",
+        "cardno": "1111222233335555",
+        "enccardno": "6b2fc388c9933e93ecf0d1736a1013abe4c7837a",
+        "clnHgNm": "홍길동",
         "cardname": "네이버페이  체크",
         "cardbrand": "0",
         "cardgubun": "5",
         "trafficyn": "Y"
       },
       {
-        "cardno": "777bb3424c04c501ca900bc61f522ea0f191e6fd",
+        "cardno": "1111222233336666",
+        "enccardno": "777bb3424c04c501ca900bc61f522ea0f191e6fd",
         "cardname": "내일배움 카카오페이  체크KB",
         "cardbrand": "2",
         "cardgubun": "5",
         "trafficyn": "N"
       },
       {
-        "cardno": "f0d9c3b752013b045ce807e9b98cce8c1badb9bc",
+        "cardno": "1111222233337777",
+        "enccardno": "f0d9c3b752013b045ce807e9b98cce8c1badb9bc",
         "cardname": "11번가",
         "cardbrand": "1",
         "cardgubun": "1",

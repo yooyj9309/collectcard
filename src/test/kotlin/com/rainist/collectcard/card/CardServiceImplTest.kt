@@ -1,15 +1,15 @@
 package com.rainist.collectcard.card
 
-import com.rainist.collectcard.card.dto.ListCardsRequest
-import com.rainist.collectcard.card.dto.ListCardsRequestDataBody
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
+import com.rainist.collectcard.header.HeaderService
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.`is`
+import org.hamcrest.core.Is.`is`
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -33,11 +33,27 @@ class CardServiceImplTest {
     @Autowired
     lateinit var cardService: CardServiceImpl
 
-    @Test
+    @MockBean
+    lateinit var headerService: HeaderService
+
+    // TODO : add mocking for Repository
+//    @Test
     fun listCard_success() {
         setupServer()
-        val header = mutableMapOf<String, String?>()
-        val response = cardService.listCards(header, ListCardsRequest(ListCardsRequestDataBody("")))
+
+        val banksaladUserId = "1"
+        val companyId = "companyId"
+
+        given(headerService.makeHeader(banksaladUserId, companyId))
+            .willReturn(
+                mutableMapOf(
+                    "contentType" to MediaType.APPLICATION_JSON_VALUE,
+                    "authorization" to "Bearer 123",
+                    "clientId" to "596d66692c4069c168b57c59"
+                )
+            )
+
+        val response = cardService.listCards(banksaladUserId, companyId)
 
         assertThat(response.dataHeader?.resultCode, `is`("0004"))
         assertThat(response.dataBody?.cards?.size, `is`(4))

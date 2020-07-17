@@ -7,7 +7,7 @@ interface CardRepository : JpaRepository<CardEntity, Long> {
 
     fun findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardId(
         banksaladUserId: Long,
-        cardCompanyId: String?,
-        cardCompanyCardId: String?
-    ): CardEntity
+        cardCompanyId: String,
+        cardCompanyCardId: String
+    ): CardEntity?
 }

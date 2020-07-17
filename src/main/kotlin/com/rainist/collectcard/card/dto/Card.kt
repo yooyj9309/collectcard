@@ -25,6 +25,10 @@ data class Card(
 
     var cardCompanyId: String?,
 
+    // TODO : add IDL
+    // 카드사 카드 아이디
+    var cardCompanyCardId: String?,
+
     // 카드 소유주 이름 (e.g. 김뱅샐)
     var cardOwnerName: String?,
 
