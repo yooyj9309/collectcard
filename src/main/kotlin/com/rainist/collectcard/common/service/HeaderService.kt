@@ -1,6 +1,5 @@
-package com.rainist.collectcard.header
+package com.rainist.collectcard.common.service
 
-import com.rainist.collectcard.common.organization.OrganizationService
 import com.rainist.collectcard.grpc.client.ConnectClient
 import com.rainist.collectcard.header.dto.HeaderInfo
 import com.rainist.common.exception.UnknownException

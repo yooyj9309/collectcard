@@ -7,8 +7,8 @@ import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
-import com.rainist.collectcard.common.organization.OrganizationService
-import com.rainist.collectcard.header.HeaderService
+import com.rainist.collectcard.common.service.HeaderService
+import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.header.dto.HeaderInfo
 import com.rainist.collectcard.userinfo.dto.UserInfoRequest
 import com.rainist.collectcard.userinfo.dto.UserInfoResponse

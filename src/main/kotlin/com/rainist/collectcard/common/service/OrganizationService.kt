@@ -1,4 +1,4 @@
-package com.rainist.collectcard.common.organization
+package com.rainist.collectcard.common.service
 
 interface OrganizationService {
 

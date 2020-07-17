@@ -14,8 +14,8 @@ import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.exception.CollectcardException
-import com.rainist.collectcard.common.organization.OrganizationService
-import com.rainist.collectcard.header.HeaderService
+import com.rainist.collectcard.common.service.HeaderService
+import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.header.dto.HeaderInfo
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
@@ -83,6 +83,7 @@ class CardBillServiceImpl(
         }.getOrThrow().response
     }
 
+    //    fun listUserCardBills(request: CollectcardProto.ListCardBillsRequest): CollectcardProto.ListCardBillsResponse {
     fun listUserCardBills(request: CollectcardProto.ListCardBillsRequest): CollectcardProto.ListCardBillsResponse {
         return kotlin.runCatching {
             ListCardBillsRequest().apply {

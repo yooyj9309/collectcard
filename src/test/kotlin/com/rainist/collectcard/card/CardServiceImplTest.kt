@@ -1,7 +1,7 @@
 package com.rainist.collectcard.card
 
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
-import com.rainist.collectcard.header.HeaderService
+import com.rainist.collectcard.common.service.HeaderService
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.Is.`is`
 import org.junit.jupiter.api.DisplayName

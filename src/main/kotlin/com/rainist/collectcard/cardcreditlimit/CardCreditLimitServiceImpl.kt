@@ -18,7 +18,7 @@ import com.rainist.collectcard.common.db.entity.CreditLimitEntity
 import com.rainist.collectcard.common.db.repository.CreditLimitHistoryRepository
 import com.rainist.collectcard.common.db.repository.CreditLimitRepository
 import com.rainist.collectcard.common.exception.CollectcardException
-import com.rainist.collectcard.header.HeaderService
+import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import org.springframework.stereotype.Service

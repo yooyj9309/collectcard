@@ -12,7 +12,7 @@ import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
-import com.rainist.collectcard.header.HeaderService
+import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.common.log.Log
 import com.rainist.common.service.ValidationService
 import org.springframework.stereotype.Service

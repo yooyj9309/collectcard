@@ -1,4 +1,4 @@
-package com.rainist.collectcard.common.organization
+package com.rainist.collectcard.common.service
 
 import com.rainist.collectcard.common.exception.CollectcardException
 import com.rainist.common.log.Log

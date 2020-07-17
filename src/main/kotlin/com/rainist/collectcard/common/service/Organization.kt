@@ -1,4 +1,4 @@
-package com.rainist.collectcard.common.organization
+package com.rainist.collectcard.common.service
 
 import com.rainist.collectcard.cardtransactions.CardTransactionServiceImpl.Companion.DEFAULT_DIVISION
 import com.rainist.collectcard.cardtransactions.CardTransactionServiceImpl.Companion.DEFAULT_MAX_MONTH

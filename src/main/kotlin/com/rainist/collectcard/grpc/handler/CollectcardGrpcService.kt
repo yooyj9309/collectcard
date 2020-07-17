@@ -10,7 +10,7 @@ import com.rainist.collectcard.cardloans.CardLoanService
 import com.rainist.collectcard.cardloans.dto.toListCardLoansResponseProto
 import com.rainist.collectcard.cardtransactions.CardTransactionServiceImpl
 import com.rainist.collectcard.common.exception.CollectcardException
-import com.rainist.collectcard.common.organization.OrganizationService
+import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.common.interceptor.StatsUnaryServerInterceptor
 import com.rainist.common.log.Log
 import io.grpc.stub.StreamObserver

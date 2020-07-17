@@ -16,7 +16,7 @@ import com.rainist.collectcard.common.db.entity.CardHistoryEntity
 import com.rainist.collectcard.common.db.repository.CardHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardRepository
 import com.rainist.collectcard.common.exception.CollectcardException
-import com.rainist.collectcard.header.HeaderService
+import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import org.springframework.http.HttpStatus
