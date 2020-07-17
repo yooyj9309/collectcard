@@ -58,8 +58,15 @@ class CardServiceImpl(
             throw CollectcardException("Resopnse status is not success")
         }
 
+        val listCardsResponse = executionResponse.response
+
+        /* convert type and format if necessary */
+        listCardsResponse.dataBody?.cards?.forEach { card ->
+            card.cardNumber = card.cardNumber?.replace("-", "")
+        }
+
         /* Save to DB and return */
-        executionResponse.response.dataBody?.cards?.forEach { card ->
+        listCardsResponse.dataBody?.cards?.forEach { card ->
             upsertCardAndCardHistory(banksaladUserId, organizationId, card)
         }
 
