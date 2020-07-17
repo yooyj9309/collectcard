@@ -14,10 +14,12 @@ class HeaderService(
 ) {
     companion object : Log
 
-    fun makeHeader(banksaladUserId: String, organizationObjectid: String): MutableMap<String, String?> {
+    // TODO : refactoring 프로젝트 내에 companyId와 organizationId 가 공존하여 혼동을 유발함
+    fun makeHeader(banksaladUserId: String, organizationId: String): MutableMap<String, String?> {
 
-        val cardOrganization = Organizations.valueOfCompanyId(organizationObjectid)
-        val accessToken = connectClient.getAccessToken(banksaladUserId, organizationObjectid)?.accessToken
+        val cardOrganization = Organizations.valueOfOrganizationId(organizationId)
+        val accessToken =
+            connectClient.getAccessToken(banksaladUserId, cardOrganization.organizationObjectId)?.accessToken
 
         return mutableMapOf(
             "contentType" to MediaType.APPLICATION_JSON_VALUE,
