@@ -2,8 +2,8 @@ package com.rainist.collectcard.cardcreditlimit.util
 
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
 import com.rainist.collectcard.cardcreditlimit.dto.CreditLimit
-import com.rainist.collectcard.cardcreditlimit.entity.CreditLimitEntity
-import com.rainist.collectcard.cardcreditlimit.entity.CreditLimitHistoryEntity
+import com.rainist.collectcard.common.db.entity.CreditLimitEntity
+import com.rainist.collectcard.common.db.entity.CreditLimitHistoryEntity
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -35,7 +35,11 @@ class CreditLimitEntityUtil {
             return false
         }
 
-        fun copyCreditLimitEntity(lastCheckAt: LocalDateTime, sourceCreditLimitEntity: CreditLimitEntity, targetCreditLimitEntity: CreditLimitEntity) {
+        fun copyCreditLimitEntity(
+            lastCheckAt: LocalDateTime,
+            sourceCreditLimitEntity: CreditLimitEntity,
+            targetCreditLimitEntity: CreditLimitEntity
+        ) {
             targetCreditLimitEntity.apply {
                 this.banksaladUserId = sourceCreditLimitEntity.banksaladUserId
                 this.cardCompanyId = sourceCreditLimitEntity.cardCompanyId
@@ -63,7 +67,11 @@ class CreditLimitEntityUtil {
             }
         }
 
-        fun makeCreditLimitEntity(lastCheckAt: LocalDateTime, request: CollectcardProto.GetCreditLimitRequest, creditLimit: CreditLimit): CreditLimitEntity {
+        fun makeCreditLimitEntity(
+            lastCheckAt: LocalDateTime,
+            request: CollectcardProto.GetCreditLimitRequest,
+            creditLimit: CreditLimit
+        ): CreditLimitEntity {
             // TODO 각 카드사별로 없는 값이 있을 경우 어떤 값을 추가할지에 대한 논의 필요 -> 우선 -1 값 적용
             return CreditLimitEntity().apply {
                 this.banksaladUserId = request.userId.toLong()

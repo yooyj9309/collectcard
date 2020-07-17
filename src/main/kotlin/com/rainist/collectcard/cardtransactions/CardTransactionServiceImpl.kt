@@ -10,13 +10,13 @@ import com.rainist.collectcard.cardtransactions.dto.ListTransactionsRequestDataH
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponse
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponseDataBody
 import com.rainist.collectcard.cardtransactions.dto.toListCardsReponseProto
-import com.rainist.collectcard.cardtransactions.repository.CardTransactionRepository
 import com.rainist.collectcard.cardtransactions.util.CardTransactionUtil
 import com.rainist.collectcard.cardtransactions.validation.ListCardRequestValidator
 import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
+import com.rainist.collectcard.common.db.repository.CardTransactionRepository
 import com.rainist.collectcard.common.organization.OrganizationService
 import com.rainist.collectcard.header.HeaderService
 import com.rainist.collectcard.header.dto.HeaderInfo

@@ -9,6 +9,8 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
         default_batch_fetch_size: 100
     open-in-view: false
+    hibernate:
+      ddl-auto: validate
   datasource:
     url: jdbc:mysql://dev-barista-cluster.cluster-cejbmksulyv2.ap-northeast-2.rds.amazonaws.com:3306/collectcard?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver

@@ -1,4 +1,4 @@
-package com.rainist.collectcard.cardcreditlimit.entity
+package com.rainist.collectcard.common.db.entity
 
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -12,35 +12,43 @@ import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 
+/**
+ * 카드 한도 이력
+ */
 @EntityListeners(AuditingEntityListener::class)
 @Entity
-@Table(name = "card_limit")
-data class CreditLimitEntity(
+@Table(name = "card_limit_history")
+data class CreditLimitHistoryEntity(
 
-    // 카드 한도 테이블 ID
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var cardLimitHistoryId: Long? = null,
+
+    // 카드한도 ID
     var cardLimitId: Long? = null,
 
-    // 뱅샐 유저 아이디
+    // 뱅크샐러드 사용자 ID
     var banksaladUserId: Long? = null,
 
     // 카드 회사 ID
     var cardCompanyId: String? = null,
 
+    // 최종조회일시
+    var lastCheckAt: LocalDateTime? = null,
+
     // 일회결제한도금액
     var onetimePaymentLimitAmount: BigDecimal? = null,
 
-    // 신용카드 총 한도금액
+    // 신용카드 총한도금액
     var creditCardLimitTotalAmount: BigDecimal? = null,
 
-    // 신용카드 사용한도금
+    // 신용카드 사용한도금액
     var creditCardLimitUsedAmount: BigDecimal? = null,
 
     // 신용카드 잔여한도금액
     var creditCardLimitRemainingAmount: BigDecimal? = null,
 
-    // 현금서비스 총 한도 금액
+    // 현금서비스 총한도금액
     var cashAdvanceLimitTotalAmount: BigDecimal? = null,
 
     // 현금서비스 사용한도금액
@@ -84,9 +92,6 @@ data class CreditLimitEntity(
 
     // 직불카드 잔여금액
     var debitCardRemainingAmount: BigDecimal? = null,
-
-    // 최종조회일시
-    var lastCheckAt: LocalDateTime? = null,
 
     // 생성일시
     @CreatedDate

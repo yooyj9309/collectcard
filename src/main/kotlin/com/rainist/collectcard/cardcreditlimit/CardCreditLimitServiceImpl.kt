@@ -9,14 +9,14 @@ import com.rainist.collectcard.cardcreditlimit.dto.CardCreditLimitRequestDataHea
 import com.rainist.collectcard.cardcreditlimit.dto.CreditLimitRequest
 import com.rainist.collectcard.cardcreditlimit.dto.CreditLimitResponse
 import com.rainist.collectcard.cardcreditlimit.dto.toCreditLimitResponseProto
-import com.rainist.collectcard.cardcreditlimit.entity.CreditLimitEntity
-import com.rainist.collectcard.cardcreditlimit.repository.CreditLimitHistoryRepository
-import com.rainist.collectcard.cardcreditlimit.repository.CreditLimitRepository
 import com.rainist.collectcard.cardcreditlimit.util.CreditLimitEntityUtil
 import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
+import com.rainist.collectcard.common.db.entity.CreditLimitEntity
+import com.rainist.collectcard.common.db.repository.CreditLimitHistoryRepository
+import com.rainist.collectcard.common.db.repository.CreditLimitRepository
 import com.rainist.collectcard.common.exception.CollectcardException
 import com.rainist.collectcard.header.HeaderService
 import com.rainist.common.log.Log
@@ -52,7 +52,10 @@ class CardCreditLimitServiceImpl(
                     .build()
             )
         }.mapCatching { executionResponse ->
-            var creditLimitEntity = creditLimitRepository.findCreditLimitEntitiesByBanksaladUserIdAndCardCompanyId(request.userId.toLong(), request.companyId.value) ?: CreditLimitEntity()
+            var creditLimitEntity = creditLimitRepository.findCreditLimitEntitiesByBanksaladUserIdAndCardCompanyId(
+                request.userId.toLong(),
+                request.companyId.value
+            ) ?: CreditLimitEntity()
 
             if (executionResponse.response.dataBody == null || executionResponse.response.dataBody?.creditLimitInfo == null)
                 throw CollectcardException("DataBody is null")

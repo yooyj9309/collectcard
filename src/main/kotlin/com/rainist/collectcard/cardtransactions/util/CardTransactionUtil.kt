@@ -1,7 +1,7 @@
 package com.rainist.collectcard.cardtransactions.util
 
 import com.rainist.collectcard.cardtransactions.dto.CardTransaction
-import com.rainist.collectcard.cardtransactions.entity.CardTransactionEntity
+import com.rainist.collectcard.common.db.entity.CardTransactionEntity
 import com.rainist.collectcard.header.dto.HeaderInfo
 import com.rainist.common.util.DateTimeUtil
 
@@ -15,7 +15,12 @@ class CardTransactionUtil {
                 this.cardCompanyId = headerInfo.organizationObjectid
                 this.cardCompanyCardId = cardTransaction.cardCompanyCardId ?: ""
                 this.approvalNumber = cardTransaction.approvalNumber
-                this.issuedDate = DateTimeUtil.stringToLocalDateTime(cardTransaction.approvalDay!!, "yyyyMMdd", cardTransaction.approvalTime!!, "HHmmss")
+                this.issuedDate = DateTimeUtil.stringToLocalDateTime(
+                    cardTransaction.approvalDay!!,
+                    "yyyyMMdd",
+                    cardTransaction.approvalTime!!,
+                    "HHmmss"
+                )
                 this.cardName = cardTransaction.cardName
                 this.cardNumber = cardTransaction.cardNumber
                 this.cardNumberMask = cardTransaction.cardNumberMask

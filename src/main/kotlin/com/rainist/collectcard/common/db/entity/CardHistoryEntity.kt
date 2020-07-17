@@ -62,7 +62,7 @@ data class CardHistoryEntity(
 
     var paymentAccountNumber: String? = null,
 
-    @Column(nullable = false, columnDefinition = "TINYINT(1)")
+    @Column(columnDefinition = "BIT", length = 1)
     var isBusinessCard: Boolean? = false,
 
     @CreatedDate

@@ -1,4 +1,4 @@
-package com.rainist.collectcard.cardloans.entity
+package com.rainist.collectcard.common.db.entity
 
 import java.math.BigDecimal
 import java.time.LocalDate

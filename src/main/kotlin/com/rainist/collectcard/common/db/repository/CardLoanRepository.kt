@@ -1,6 +1,6 @@
-package com.rainist.collectcard.cardloans.repository
+package com.rainist.collectcard.common.db.repository
 
-import com.rainist.collectcard.cardloans.entity.CardLoanEntity
+import com.rainist.collectcard.common.db.entity.CardLoanEntity
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface CardLoanRepository : JpaRepository<CardLoanEntity, Long> {

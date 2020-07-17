@@ -1,4 +1,4 @@
-package com.rainist.collectcard.cardtransactions.entity
+package com.rainist.collectcard.common.db.entity
 
 import java.time.LocalDateTime
 import javax.persistence.Column
@@ -49,7 +49,7 @@ data class CardTransactionEntity(
 
     var currency: String? = null,
 
-    @Column(nullable = false, columnDefinition = "TINYINT(1)")
+    @Column(columnDefinition = "BIT", length = 1)
     var isInstallmentPayment: Boolean? = false,
 
     @CreatedDate

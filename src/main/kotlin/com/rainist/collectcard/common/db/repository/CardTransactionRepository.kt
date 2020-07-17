@@ -1,6 +1,6 @@
-package com.rainist.collectcard.cardtransactions.repository
+package com.rainist.collectcard.common.db.repository
 
-import com.rainist.collectcard.cardtransactions.entity.CardTransactionEntity
+import com.rainist.collectcard.common.db.entity.CardTransactionEntity
 import java.time.LocalDateTime
 import org.springframework.data.jpa.repository.JpaRepository
 
