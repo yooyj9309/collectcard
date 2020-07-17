@@ -7,6 +7,7 @@ import com.rainist.collectcard.card.dto.toListCardsResponseProto
 import com.rainist.collectcard.cardbills.CardBillServiceImpl
 import com.rainist.collectcard.cardcreditlimit.CardCreditLimitService
 import com.rainist.collectcard.cardloans.CardLoanService
+import com.rainist.collectcard.cardloans.dto.toListCardLoansResponseProto
 import com.rainist.collectcard.cardtransactions.CardTransactionServiceImpl
 import com.rainist.collectcard.common.exception.CollectcardException
 import com.rainist.collectcard.common.organization.Organizations
@@ -95,12 +96,16 @@ class CollectcardGrpcService(
     override fun listCardLoans(request: CollectcardProto.ListCardLoansRequest, responseObserver: StreamObserver<CollectcardProto.ListCardLoansResponse>) {
         logger.debug("[사용자 대출 내역 조회 시작 : {}]", request)
 
+        val banksaladUserId = request.userId
+        val organizationId: String = Organizations.valueOfCompanyId(request.companyId.value).name
+            ?: throw CollectcardException("Fail to resolve cardCompanyId: ${request.companyId.value}")
+
         kotlin.runCatching {
-            cardLoanService.listCardLoans(request)
+            cardLoanService.listCardLoans(banksaladUserId, organizationId).toListCardLoansResponseProto()
         }
         .onSuccess {
             logger.info("[사용자 대출내역 조회 결과 success]")
-            it?.let {
+            it.let {
                 for (loan in it.dataList) {
                     logger.info("[사용자 대출내역 조회 결과 : {}]", loan)
                 }
