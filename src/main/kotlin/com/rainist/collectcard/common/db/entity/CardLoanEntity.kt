@@ -26,7 +26,7 @@ data class CardLoanEntity(
 
     var cardCompanyId: String? = null,
 
-    var cardCompanyLoanId: Long? = null,
+    var cardCompanyLoanId: String? = null,
 
     var loanName: String? = null,
 

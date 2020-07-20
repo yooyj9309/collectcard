@@ -1,130 +1,130 @@
 package com.rainist.collectcard.cardbills
 
-import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
 import com.rainist.collect.common.execution.ExecutionRequest
 import com.rainist.collect.common.execution.ExecutionResponse
 import com.rainist.collect.executor.CollectExecutorService
+import com.rainist.collectcard.cardbills.dto.CardBill
+import com.rainist.collectcard.cardbills.dto.CardBillTransaction
 import com.rainist.collectcard.cardbills.dto.ListCardBillsRequest
 import com.rainist.collectcard.cardbills.dto.ListCardBillsRequestDataBody
-import com.rainist.collectcard.cardbills.dto.ListCardBillsRequestDataHeader
 import com.rainist.collectcard.cardbills.dto.ListCardBillsResponse
-import com.rainist.collectcard.cardbills.dto.toListCardBillsResponseProto
 import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
+import com.rainist.collectcard.common.db.entity.CardBillEntity
+import com.rainist.collectcard.common.db.repository.CardBillRepository
 import com.rainist.collectcard.common.exception.CollectcardException
+import com.rainist.collectcard.common.service.CardOrganization
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.OrganizationService
-import com.rainist.collectcard.header.dto.HeaderInfo
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
-import java.time.LocalDate
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CardBillServiceImpl(
+    val collectExecutorService: CollectExecutorService,
     val headerService: HeaderService,
-    val organizationService: OrganizationService,
-    val collectExecutorService: CollectExecutorService
+    val cardBillRepository: CardBillRepository,
+    val organizationService: OrganizationService
 ) : CardBillService {
 
-    companion object : Log {
-        const val DEFAULT_MAX_MONTH = 6L
-    }
+    companion object : Log
 
-    override fun listUserCardBills(
-        header: MutableMap<String, String?>,
-        listCardBillsRequest: ListCardBillsRequest
-    ): ListCardBillsResponse {
-        val cardBillsResponse = this.listCardBills(header, listCardBillsRequest)
-        val cardExpectedBillsResponse = this.listCardBills(header, listCardBillsRequest)
+    @Transactional
+    override fun listUserCardBills(banksaladUerId: String, organizationId: String, startAt: Long?): ListCardBillsResponse {
+        val header = headerService.makeHeader(banksaladUerId, organizationId)
 
-        cardBillsResponse.dataBody?.cardBills?.addAll(cardExpectedBillsResponse.dataBody?.cardBills ?: mutableListOf())
+        val organization = organizationService.getOrganizationByObjectId(organizationId)
 
-        return cardBillsResponse
-    }
-
-    fun listUserCardBillsExpected(
-        header: MutableMap<String, String?>,
-        listCardBillsRequest: ListCardBillsRequest
-    ): ListCardBillsResponse {
-
-        return runCatching<ExecutionResponse<ListCardBillsResponse>> {
-            collectExecutorService.execute(
-                Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.billTransactionExpected),
-                ExecutionRequest.builder<ListCardBillsRequest>()
-                    .headers(header)
-                    .request(listCardBillsRequest)
-                    .build()
-            )
-        }.onFailure {
-            logger.error("Failed to retrieve bills expected list: ${it.message}")
-            throw CollectcardException("exception", it)
-        }.getOrThrow().response
-    }
-
-    fun listCardBills(
-        header: MutableMap<String, String?>,
-        listCardBillsRequest: ListCardBillsRequest
-    ): ListCardBillsResponse {
-
-        return runCatching<ExecutionResponse<ListCardBillsResponse>> {
-            collectExecutorService.execute(
-                Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.cardbills),
-                ExecutionRequest.builder<ListCardBillsRequest>()
-                    .headers(header)
-                    .request(listCardBillsRequest)
-                    .build()
-            )
-        }.onFailure {
-            logger.error("Failed to retrieve bills list: ${it.message}")
-            throw CollectcardException("exception", it)
-        }.getOrThrow().response
-    }
-
-    //    fun listUserCardBills(request: CollectcardProto.ListCardBillsRequest): CollectcardProto.ListCardBillsResponse {
-    fun listUserCardBills(request: CollectcardProto.ListCardBillsRequest): CollectcardProto.ListCardBillsResponse {
-        return kotlin.runCatching {
-            ListCardBillsRequest().apply {
-                this.dataHeader = ListCardBillsRequestDataHeader()
-                this.dataBody = ListCardBillsRequestDataBody().apply {
-                    this.startAt = takeIf { request.hasFromMs() }
-                        ?.let { DateTimeUtil.epochMilliSecondToKSTLocalDateTime(request.fromMs.value) }
-                        ?.let { localDateTime ->
-                            LocalDate.of(
-                                localDateTime.year,
-                                localDateTime.month,
-                                localDateTime.dayOfMonth
-                            )
-                        }
-                        ?.let { DateTimeUtil.localDateToString(it, "yyyyMMdd") }
-                        ?: kotlin.run {
-                            val cardOrganization =
-                                organizationService.getOrganizationByObjectId(request.companyId.value)
-                            DateTimeUtil.kstNowLocalDate().minusMonths(
-                                cardOrganization?.maxMonth.toLong()
-                                    ?: CardBillServiceImpl.DEFAULT_MAX_MONTH
-                            )
-                                .let {
-                                    DateTimeUtil.localDateToString(it, "yyyyMMdd")
-                                }
-                        }
-                }
+        val request = ListCardBillsRequest().apply {
+            dataBody = ListCardBillsRequestDataBody().apply {
+                this.startAt = startAt?.let {
+                    DateTimeUtil.epochMilliSecondToKSTLocalDateTime(startAt)
+                }?.let {
+                    DateTimeUtil.localDatetimeToString(it, "yyyyMMdd")
+                } ?: DateTimeUtil.kstNowLocalDate()
+                    .minusMonths(organization.maxMonth.toLong())
+                    .let { DateTimeUtil.localDateToString(it, "yyyyMMdd") }
             }
-                .let { listCardBillsRequest ->
+        }
 
-                    HeaderInfo().apply {
-                        this.banksaladUserId = request.userId
-                        this.organizationObjectid = request.companyId.value
-                        this.clientId =
-                            organizationService.getOrganizationByObjectId(request.companyId.value)?.clientId
-                    }.let { headerInfo ->
-                        headerService.getHeader(headerInfo)
-                    }.let { header ->
-                        listCardBills(header, listCardBillsRequest)
-                    }
-                }.toListCardBillsResponseProto()
-        }.getOrThrow()
+        val executionResponse: ExecutionResponse<ListCardBillsResponse> = collectExecutorService.execute(
+            Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.billTransactionExpected),
+            ExecutionRequest.builder<ListCardBillsRequest>()
+                .headers(header)
+                .request(request)
+                .build()
+        )
+
+        // TODO : error handling
+        if (!HttpStatus.valueOf(executionResponse.httpStatusCode).is2xxSuccessful) {
+            throw CollectcardException("Resopnse status is not success")
+        }
+
+        val cardBillResponse = executionResponse.response
+
+        cardBillResponse.dataBody?.cardBills?.forEach { cardBill ->
+            upsertCardBill(banksaladUerId, organization, cardBill)
+            cardBill.transactions?.map { billTransaction ->
+                upsertCardBillTransaction(banksaladUerId, organization, billTransaction)
+            }
+        }
+
+        return cardBillResponse
+    }
+
+    private fun upsertCardBill(banksaladUserId: String, organization: CardOrganization, cardBill: CardBill) {
+        val cardBillEntity = cardBillRepository.findByBanksaladUserIdAndCardCompanyIdAndBillNumber(
+            banksaladUserId.toLong(),
+            organization.name ?: "",
+            cardBill.billNumber ?: ""
+        ) ?: CardBillEntity()
+
+        if (isCardBillUpdated(cardBill, cardBillEntity)) {
+            return
+        }
+
+        cardBillEntity.apply {
+            this.banksaladUserId = banksaladUserId.toLong()
+            this.cardCompanyId = organization.name
+            this.billNumber = cardBill.billNumber
+            this.userName = cardBill.userName
+            this.userGrade = cardBill.userGrade
+            this.paymentDate = cardBill.paymentDate?.toLocalDateTime()
+            this.billedYearMonth = cardBill.billedYearMonth?.let { DateTimeUtil.zoneDateTimeToString(it) }
+            this.nextPaymentDate = cardBill.nextPaymentDate?.toLocalDateTime()
+            this.billingAmount = cardBill.billingAmount
+            this.prepayedAmount = cardBill.prepayedAmount
+            this.paymentBankId = cardBill.paymentBankId
+            this.paymentAccountNumber = cardBill.paymentAccountNumber
+            this.totalPoint = cardBill.totalPoints?.toBigDecimal()
+            this.expiringPoints = cardBill.expiringPoints?.toBigDecimal()
+            this.lastCheckAt = DateTimeUtil.getLocalDateTime()
+        }.let { cardBillRepository.save(it) }
+    }
+
+    private fun upsertCardBillTransaction(banksaladUserId: String, organization: CardOrganization, cardBillTransaction: CardBillTransaction) {
+        TODO()
+    }
+
+    private fun isCardBillUpdated(cardBill: CardBill, cardBillEntity: CardBillEntity): Boolean {
+        cardBillEntity.also {
+            if (cardBillEntity.userName != cardBill.userName) return true
+            if (cardBillEntity.userGrade != cardBill.userGrade) return true
+            if (cardBillEntity.paymentDate != cardBill.paymentDate?.toLocalDateTime()) return true
+            if (cardBillEntity.billedYearMonth != cardBill.billedYearMonth?.let { DateTimeUtil.zoneDateTimeToString(it) }) return true
+            if (cardBillEntity.nextPaymentDate != cardBill.nextPaymentDate?.toLocalDateTime()) return true
+            if (cardBillEntity.billingAmount != cardBill.billingAmount) return true
+            if (cardBillEntity.prepayedAmount != cardBill.prepayedAmount) return true
+            if (cardBillEntity.paymentBankId != cardBill.paymentBankId) return true
+            if (cardBillEntity.paymentAccountNumber != cardBill.paymentAccountNumber) return true
+            if (cardBillEntity.totalPoint != cardBill.totalPoints?.toBigDecimal()) return true
+            if (cardBillEntity.expiringPoints != cardBill.expiringPoints?.toBigDecimal()) return true
+        }
+        return false
     }
 }

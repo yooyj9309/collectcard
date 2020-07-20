@@ -25,7 +25,7 @@ data class CardLoanHistoryEntity(
 
     var cardCompanyId: String? = null,
 
-    var cardCompanyLoanId: Long? = null,
+    var cardCompanyLoanId: String? = null,
 
     var lastCheckAt: LocalDateTime? = null,
 

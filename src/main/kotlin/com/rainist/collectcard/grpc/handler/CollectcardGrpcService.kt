@@ -4,7 +4,8 @@ import com.github.rainist.idl.apis.v1.collectcard.CollectcardGrpc
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
 import com.rainist.collectcard.card.CardService
 import com.rainist.collectcard.card.dto.toListCardsResponseProto
-import com.rainist.collectcard.cardbills.CardBillServiceImpl
+import com.rainist.collectcard.cardbills.CardBillService
+import com.rainist.collectcard.cardbills.dto.toListCardBillsResponseProto
 import com.rainist.collectcard.cardcreditlimit.CardCreditLimitService
 import com.rainist.collectcard.cardloans.CardLoanService
 import com.rainist.collectcard.cardloans.dto.toListCardLoansResponseProto
@@ -23,7 +24,7 @@ class CollectcardGrpcService(
     val cardService: CardService,
     val cardTransactionService: CardTransactionServiceImpl,
     val cardLoanService: CardLoanService,
-    val cardBillService: CardBillServiceImpl,
+    val cardBillService: CardBillService,
     val cardCreditLimitService: CardCreditLimitService
 ) : CollectcardGrpc.CollectcardImplBase() {
 
@@ -95,13 +96,25 @@ class CollectcardGrpcService(
         request: CollectcardProto.ListCardBillsRequest,
         responseObserver: StreamObserver<CollectcardProto.ListCardBillsResponse>
     ) {
+        logger.debug("[사용자 청구서 조회 시작 : {}]", request)
+
+        val banksaladUserId = request.userId
+        val organizationId: String = organizationService.getOrganizationByObjectId(request.companyId.value).name
+            ?: throw CollectcardException("Fail to resolve cardCompanyId: ${request.companyId.value}")
+
         kotlin.runCatching {
-            cardBillService.listUserCardBills(request)
+            cardBillService.listUserCardBills(banksaladUserId, organizationId, request.takeIf { request.hasFromMs() }?.fromMs?.value).toListCardBillsResponseProto()
         }.onSuccess {
+            logger.info("[사용자 청구서 조회 결과 success]")
+
+            for (card in it.dataList) {
+                logger.info("[사용자 청구서 조회 결과 : {}]", card)
+            }
+
             responseObserver.onNext(it)
             responseObserver.onCompleted()
         }.onFailure {
-            logger.error("[청구서 조회 에러 : {}]", it.localizedMessage, it)
+            logger.error("[사용자 청구서 조회 에러 : {}]", it.localizedMessage, it)
             responseObserver.onError(it)
         }
     }
