@@ -5,6 +5,7 @@ import com.rainist.collectcard.common.db.repository.UserSyncStatusRepository
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZoneOffset
 import org.springframework.stereotype.Service
 
 @Service
@@ -14,6 +15,20 @@ class UserSyncStatusServiceImpl(
 
     companion object {
         val ZONE_ID_UTC = "UTC"
+    }
+
+    override fun getUserSyncStatusLastCheckAt(
+        banksaladUserId: Long,
+        organizationId: String,
+        transactionId: String
+    ): Long {
+        val userSyncStatusEntity = userSyncStatusRepository.findByBanksaladUserIdAndOrganizationIdAndTransactionId(
+            banksaladUserId,
+            organizationId,
+            transactionId
+        )
+
+        return userSyncStatusEntity?.lastCheckAt?.toInstant(ZoneOffset.UTC)?.toEpochMilli() ?: 0
     }
 
     override fun updateUserSyncStatus(

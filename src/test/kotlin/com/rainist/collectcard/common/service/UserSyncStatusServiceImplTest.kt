@@ -42,7 +42,7 @@ internal class UserSyncStatusServiceImplTest {
 
     @Test
     fun updateUserSyncStatus_update_transaction() {
-        val banksaladUserId = 1.toLong()
+        val banksaladUserId = 2.toLong()
         val organizationId = "shinhancard"
         val transactionId = "cards"
 
@@ -67,5 +67,23 @@ internal class UserSyncStatusServiceImplTest {
         )
 
         Assert.assertEquals(lastCheckAt2, userSyncStatusEntity?.lastCheckAt?.toInstant(ZoneOffset.UTC)?.toEpochMilli())
+    }
+
+    @Test
+    fun getLastUserSyncStatus() {
+        val banksaladUserId = 3.toLong()
+        val organizationId = "shinhancard"
+        val transactionId = "cards"
+
+        var lastCheckAtFromDB =
+            userSyncStatusService.getUserSyncStatusLastCheckAt(banksaladUserId, organizationId, transactionId)
+        Assert.assertEquals(0, lastCheckAtFromDB)
+
+        var lastCheckAt = System.currentTimeMillis()
+        userSyncStatusService.updateUserSyncStatus(banksaladUserId, organizationId, transactionId, lastCheckAt)
+
+        lastCheckAtFromDB =
+            userSyncStatusService.getUserSyncStatusLastCheckAt(banksaladUserId, organizationId, transactionId)
+        Assert.assertEquals(lastCheckAt, lastCheckAtFromDB)
     }
 }
