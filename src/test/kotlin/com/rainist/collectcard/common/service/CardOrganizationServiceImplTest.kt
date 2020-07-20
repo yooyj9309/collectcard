@@ -1,6 +1,5 @@
-package com.rainist.collectcard.common.organization
+package com.rainist.collectcard.common.service
 
-import com.rainist.collectcard.common.service.OrganizationService
 import org.hamcrest.MatcherAssert
 import org.hamcrest.core.Is
 import org.junit.jupiter.api.DisplayName
