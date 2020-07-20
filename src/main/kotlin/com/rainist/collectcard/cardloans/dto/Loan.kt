@@ -6,6 +6,8 @@ import org.springframework.format.annotation.NumberFormat
 
 data class Loan(
 
+    var loanId: String? = null, // 대출 id
+
     var loanNumber: String? = null, // 대출번호
 
     var loanName: String? = null, // 상품명

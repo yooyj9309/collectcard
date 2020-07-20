@@ -17,9 +17,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 @Entity
 @Table(name = "card_loan_history")
 data class CardLoanHistoryEntity(
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var cardLoanHistoryId: Long? = null,
+
+    var cardLoanId: Long? = null,
 
     var banksaladUserId: Long? = null,
 

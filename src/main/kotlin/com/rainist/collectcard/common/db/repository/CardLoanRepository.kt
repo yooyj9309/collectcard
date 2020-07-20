@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface CardLoanRepository : JpaRepository<CardLoanEntity, Long> {
     fun findByBanksaladUserIdAndCardCompanyIdAndCardCompanyLoanId(
         banksaladUserId: Long,
-        cardCompanyId: String,
-        cardCompanyLoanId: Long
-    ): CardLoanEntity
+        cardCompanyId: String?,
+        cardCompanyLoanId: String?
+    ): CardLoanEntity?
 }

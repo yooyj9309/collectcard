@@ -60,6 +60,8 @@ data class CardLoanEntity(
 
     var loanNumber: String? = null,
 
+    var loanAmount: BigDecimal? = null,
+
     var loanRemainingAmount: BigDecimal? = null,
 
     // 생성일시

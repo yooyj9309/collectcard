@@ -24,6 +24,7 @@ class ShinhancardExecutions {
         // 대출 상세
         val mergeLoansDetail =
             BiConsumer { master: Loan, detail: Loan ->
+                master.loanId = detail.loanId
                 master.loanNumber = detail.loanNumber
                 master.loanAmount = detail.loanAmount
                 master.issuedDate = detail.issuedDate
@@ -31,6 +32,7 @@ class ShinhancardExecutions {
                 master.interestRate = detail.interestRate
                 master.repaymentMethod = detail.repaymentMethod
                 master.remainingAmount = detail.remainingAmount
+                master.loanCategory = master.loanName
             }
 
         // 대출 정보
@@ -282,7 +284,7 @@ class ShinhancardExecutions {
                 .then(
                     Execution.create()
                         .exchange(ShinhancardApis.card_shinhancard_loan_detail)
-                        .to(ListLoansResponse::class.java)
+                        .to(Loan::class.java)
                         .build()
                 )
                 .merge(mergeLoansDetail)

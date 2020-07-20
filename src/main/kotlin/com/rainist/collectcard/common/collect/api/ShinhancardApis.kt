@@ -281,7 +281,7 @@ class ShinhancardApis {
                     ),
                     response(
                         "transform/card/shinhancard/header_res.jslt",
-                        "transform/card/shinhancard/loan_SHC_HPG00188_req.jslt"
+                        "transform/card/shinhancard/loan_SHC_HPG00188_res.jslt"
                     )
                 ).build()
 
