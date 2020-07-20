@@ -12,6 +12,7 @@ import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
+import com.rainist.collectcard.common.service.CardOrganization
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.common.log.Log
 import com.rainist.common.service.ValidationService
@@ -27,9 +28,9 @@ class CardLoanServiceImpl(
 
     companion object : Log
 
-    override fun listCardLoans(banksaladUserId: String, organizationId: String): ListLoansResponse {
+    override fun listCardLoans(banksaladUserId: String, organization: CardOrganization): ListLoansResponse {
         /* request header */
-        val header = headerService.makeHeader(banksaladUserId, organizationId)
+        val header = headerService.makeHeader(banksaladUserId, organization)
 
         /* request body */
         val listLoansRequest = ListLoansRequest().apply {

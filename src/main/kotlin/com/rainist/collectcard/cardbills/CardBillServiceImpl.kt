@@ -35,10 +35,8 @@ class CardBillServiceImpl(
     companion object : Log
 
     @Transactional
-    override fun listUserCardBills(banksaladUerId: String, organizationId: String, startAt: Long?): ListCardBillsResponse {
-        val header = headerService.makeHeader(banksaladUerId, organizationId)
-
-        val organization = organizationService.getOrganizationByObjectId(organizationId)
+    override fun listUserCardBills(banksaladUerId: String, organization: CardOrganization, startAt: Long?): ListCardBillsResponse {
+        val header = headerService.makeHeader(banksaladUerId, organization)
 
         val request = ListCardBillsRequest().apply {
             dataBody = ListCardBillsRequestDataBody().apply {
@@ -68,19 +66,19 @@ class CardBillServiceImpl(
         val cardBillResponse = executionResponse.response
 
         cardBillResponse.dataBody?.cardBills?.forEach { cardBill ->
-            upsertCardBill(banksaladUerId, organization, cardBill)
+            upsertCardBill(banksaladUerId, organization.organizationId, cardBill)
             cardBill.transactions?.map { billTransaction ->
-                upsertCardBillTransaction(banksaladUerId, organization, billTransaction)
+                upsertCardBillTransaction(banksaladUerId, organization.organizationId, billTransaction)
             }
         }
 
         return cardBillResponse
     }
 
-    private fun upsertCardBill(banksaladUserId: String, organization: CardOrganization, cardBill: CardBill) {
+    private fun upsertCardBill(banksaladUserId: String, organizationId: String?, cardBill: CardBill) {
         val cardBillEntity = cardBillRepository.findByBanksaladUserIdAndCardCompanyIdAndBillNumber(
             banksaladUserId.toLong(),
-            organization.name ?: "",
+            organizationId ?: "",
             cardBill.billNumber ?: ""
         ) ?: CardBillEntity()
 
@@ -90,7 +88,7 @@ class CardBillServiceImpl(
 
         cardBillEntity.apply {
             this.banksaladUserId = banksaladUserId.toLong()
-            this.cardCompanyId = organization.name
+            this.cardCompanyId = organizationId
             this.billNumber = cardBill.billNumber
             this.userName = cardBill.userName
             this.userGrade = cardBill.userGrade
@@ -107,7 +105,7 @@ class CardBillServiceImpl(
         }.let { cardBillRepository.save(it) }
     }
 
-    private fun upsertCardBillTransaction(banksaladUserId: String, organization: CardOrganization, cardBillTransaction: CardBillTransaction) {
+    private fun upsertCardBillTransaction(banksaladUserId: String, organizationId: String?, cardBillTransaction: CardBillTransaction) {
         TODO()
     }
 

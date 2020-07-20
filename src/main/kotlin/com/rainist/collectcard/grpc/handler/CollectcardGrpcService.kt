@@ -10,7 +10,6 @@ import com.rainist.collectcard.cardcreditlimit.CardCreditLimitService
 import com.rainist.collectcard.cardloans.CardLoanService
 import com.rainist.collectcard.cardloans.dto.toListCardLoansResponseProto
 import com.rainist.collectcard.cardtransactions.CardTransactionServiceImpl
-import com.rainist.collectcard.common.exception.CollectcardException
 import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.common.interceptor.StatsUnaryServerInterceptor
 import com.rainist.common.log.Log
@@ -46,11 +45,10 @@ class CollectcardGrpcService(
         logger.debug("[사용자 카드 조회 시작 : {}]", request)
 
         val banksaladUserId = request.userId
-        val organizationId: String = organizationService.getOrganizationByObjectId(request.companyId.value)?.name
-            ?: throw CollectcardException("Fail to resolve cardCompanyId: ${request.companyId.value}")
+        val organization = organizationService.getOrganizationByObjectId(request.companyId.value)
 
         kotlin.runCatching {
-            cardService.listCards(banksaladUserId, organizationId).toListCardsResponseProto()
+            cardService.listCards(banksaladUserId, organization).toListCardsResponseProto()
         }.onSuccess {
             logger.info("[사용자 카드 조회 결과 success]")
 
@@ -99,11 +97,10 @@ class CollectcardGrpcService(
         logger.debug("[사용자 청구서 조회 시작 : {}]", request)
 
         val banksaladUserId = request.userId
-        val organizationId: String = organizationService.getOrganizationByObjectId(request.companyId.value).name
-            ?: throw CollectcardException("Fail to resolve cardCompanyId: ${request.companyId.value}")
+        val organization = organizationService.getOrganizationByObjectId(request.companyId.value)
 
         kotlin.runCatching {
-            cardBillService.listUserCardBills(banksaladUserId, organizationId, request.takeIf { request.hasFromMs() }?.fromMs?.value).toListCardBillsResponseProto()
+            cardBillService.listUserCardBills(banksaladUserId, organization, request.takeIf { request.hasFromMs() }?.fromMs?.value).toListCardBillsResponseProto()
         }.onSuccess {
             logger.info("[사용자 청구서 조회 결과 success]")
 
@@ -126,11 +123,10 @@ class CollectcardGrpcService(
         logger.debug("[사용자 대출 내역 조회 시작 : {}]", request)
 
         val banksaladUserId = request.userId
-        val organizationId: String = organizationService.getOrganizationByObjectId(request.companyId.value).name
-            ?: throw CollectcardException("Fail to resolve cardCompanyId: ${request.companyId.value}")
+        val organization = organizationService.getOrganizationByObjectId(request.companyId.value)
 
         kotlin.runCatching {
-            cardLoanService.listCardLoans(banksaladUserId, organizationId).toListCardLoansResponseProto()
+            cardLoanService.listCardLoans(banksaladUserId, organization).toListCardLoansResponseProto()
         }
             .onSuccess {
                 logger.info("[사용자 대출내역 조회 결과 success]")

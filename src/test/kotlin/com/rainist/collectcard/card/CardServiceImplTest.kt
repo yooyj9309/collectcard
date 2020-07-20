@@ -1,6 +1,7 @@
 package com.rainist.collectcard.card
 
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
+import com.rainist.collectcard.common.service.CardOrganization
 import com.rainist.collectcard.common.service.HeaderService
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.Is.`is`
@@ -42,9 +43,11 @@ class CardServiceImplTest {
         setupServer()
 
         val banksaladUserId = "1"
-        val companyId = "companyId"
+        val organization = CardOrganization().apply {
+            organizationId = "organizationId"
+        }
 
-        given(headerService.makeHeader(banksaladUserId, companyId))
+        given(headerService.makeHeader(banksaladUserId, organization))
             .willReturn(
                 mutableMapOf(
                     "contentType" to MediaType.APPLICATION_JSON_VALUE,
@@ -53,7 +56,7 @@ class CardServiceImplTest {
                 )
             )
 
-        val response = cardService.listCards(banksaladUserId, companyId)
+        val response = cardService.listCards(banksaladUserId, organization)
 
         assertThat(response.dataHeader?.resultCode, `is`("0004"))
         assertThat(response.dataBody?.cards?.size, `is`(4))

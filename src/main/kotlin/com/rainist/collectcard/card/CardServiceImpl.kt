@@ -16,6 +16,7 @@ import com.rainist.collectcard.common.db.entity.CardHistoryEntity
 import com.rainist.collectcard.common.db.repository.CardHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardRepository
 import com.rainist.collectcard.common.exception.CollectcardException
+import com.rainist.collectcard.common.service.CardOrganization
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
@@ -34,9 +35,9 @@ class CardServiceImpl(
     companion object : Log
 
     @Transactional
-    override fun listCards(banksaladUserId: String, organizationId: String): ListCardsResponse {
+    override fun listCards(banksaladUserId: String, organization: CardOrganization): ListCardsResponse {
         /* header */
-        val header = headerService.makeHeader(banksaladUserId, organizationId)
+        val header = headerService.makeHeader(banksaladUserId, organization)
 
         /* request body */
         val listCardsRequest = ListCardsRequest().apply {
@@ -67,7 +68,7 @@ class CardServiceImpl(
 
         /* Save to DB and return */
         listCardsResponse.dataBody?.cards?.forEach { card ->
-            upsertCardAndCardHistory(banksaladUserId, organizationId, card)
+            upsertCardAndCardHistory(banksaladUserId, organization.organizationId ?: "", card)
         }
 
         return executionResponse.response

@@ -14,9 +14,8 @@ class HeaderService(
 ) {
     companion object : Log
 
-    fun makeHeader(banksaladUserId: String, organizationId: String): MutableMap<String, String?> {
+    fun makeHeader(banksaladUserId: String, cardOrganization: CardOrganization): MutableMap<String, String?> {
 
-        val cardOrganization = organizationService.getOrganizationByOrganizationId(organizationId)
         val accessToken =
             connectClient.getAccessToken(banksaladUserId, cardOrganization.organizationObjectId)?.accessToken
 
