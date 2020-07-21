@@ -6,6 +6,7 @@ import com.rainist.collectcard.common.service.HeaderService
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.Is.`is`
 import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
@@ -38,7 +39,7 @@ class CardServiceImplTest {
     lateinit var headerService: HeaderService
 
     // TODO : add mocking for Repository
-//    @Test
+    @Test
     fun listCard_success() {
         setupServer()
 

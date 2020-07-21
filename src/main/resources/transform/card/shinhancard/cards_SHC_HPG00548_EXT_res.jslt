@@ -41,10 +41,12 @@ let cardholder_name = .dataBody.clnHgNm
                 "cardCompanyCardId": .enccardno,
                 "cardOwnerName": $cardholder_name,
                 "cardOwnerType": get-key($CardOwnerType, .cardgubun, "SELF"),
+                "cardOwnerTypeOrigin": .cardgubun,
                 "cardName": .cardname,
                 "cardNumberMask": .cardno,
                 "cardNumber": .cardno,
                 "cardType": get-key($CardType, .cardgubun, "CARD_TYPE_CREDIT"),
+                "cardTypeOrigin": .cardgubun,
                 "internationalBrandName": get-key($brands, .cardbrand, "CARD_INTERNATIONAL_BRAND_UNKNOWN")
             }
         ],

@@ -25,11 +25,11 @@ class ShinhancardApis {
                 .transform(
                     request(
                         "transform/card/shinhancard/header_req.jslt",
-                        "transform/card/shinhancard/cards_req.jslt"
+                        "transform/card/shinhancard/cards_SHC_HPG00548_EXT_req.jslt"
                     ),
                     response(
                         "transform/card/shinhancard/header_res.jslt",
-                        "transform/card/shinhancard/cards_res.jslt"
+                        "transform/card/shinhancard/cards_SHC_HPG00548_EXT_res.jslt"
                     )
                 ).build()
 

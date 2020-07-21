@@ -36,4 +36,4 @@ server:
   port: 9999
 
 grpc:
-  port: 18081
+  port: 0

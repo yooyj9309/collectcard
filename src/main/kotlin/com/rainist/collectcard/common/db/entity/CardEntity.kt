@@ -21,51 +21,33 @@ data class CardEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var cardId: Long? = null,
-
     var banksaladUserId: Long? = null,
-
     var cardCompanyId: String? = null,
-
     var cardCompanyCardId: String? = null,
-
+    var lastCheckAt: LocalDateTime? = null,
     var cardOwnerName: String? = null,
-
     var cardOwnerType: String? = null,
-
+    var cardOwnerTypeOrigin: String? = null,
     var cardName: String? = null,
-
     var cardBrandName: String? = null,
-
     var internationalBrandName: String? = null,
-
     var cardNumber: String? = null,
-
     var cardNumberMask: String? = null,
-
     var cardType: String? = null,
-
-    var issuedDate: LocalDateTime? = null,
-
-    var expirationDate: LocalDateTime? = null,
-
+    var cardTypeOrigin: String? = null,
+    var issuedDate: String? = null,
+    var expirationDate: String? = null,
     var cardStatus: String? = null,
-
-    var lastUseDate: LocalDateTime? = null,
-
+    var cardStatusOrigin: String? = null,
+    var lastUseDate: String? = null,
+    var lastUseTime: String? = null,
     var annualFee: BigDecimal? = null,
-
     var paymentBankId: String? = null,
-
     var paymentAccountNumber: String? = null,
-
     @Column(columnDefinition = "BIT", length = 1)
     var isBusinessCard: Boolean? = false,
-
-    var lastCheckAt: LocalDateTime? = null,
-
     @CreatedDate
     var createdAt: LocalDateTime = DateTimeUtil.utcNowLocalDateTime(),
-
     @LastModifiedDate
     var updatedAt: LocalDateTime? = null
 )
