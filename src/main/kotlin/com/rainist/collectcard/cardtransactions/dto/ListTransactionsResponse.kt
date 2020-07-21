@@ -27,7 +27,7 @@ data class ListTransactionsResponseDataBody(
  * ListTransactionResponse to Proto ListCardTransactionsResponse
  * https://github.com/Rainist/idl/blob/2e22832f1b77911a9c9952dfba0b8f99fcd8717c/protos/apis/v1/collectcard/collectcard.proto#L123
  */
-fun ListTransactionsResponse.toListCardsReponseProto(): CollectcardProto.ListCardTransactionsResponse {
+fun ListTransactionsResponse.toListCardsTransactionResponseProto(): CollectcardProto.ListCardTransactionsResponse {
 
     return kotlin.runCatching {
         let {

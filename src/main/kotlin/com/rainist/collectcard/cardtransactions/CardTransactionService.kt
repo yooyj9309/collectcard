@@ -1,7 +1,8 @@
 package com.rainist.collectcard.cardtransactions
 
-import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
+import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponse
+import com.rainist.collectcard.common.service.CardOrganization
 
 interface CardTransactionService {
-    fun listTransactions(request: CollectcardProto.ListCardTransactionsRequest): CollectcardProto.ListCardTransactionsResponse
+    fun listTransactions(banksaladUserId: String, organization: CardOrganization, fromMs: Long?): ListTransactionsResponse
 }

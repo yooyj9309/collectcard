@@ -9,7 +9,8 @@ import com.rainist.collectcard.cardbills.dto.toListCardBillsResponseProto
 import com.rainist.collectcard.cardcreditlimit.CardCreditLimitService
 import com.rainist.collectcard.cardloans.CardLoanService
 import com.rainist.collectcard.cardloans.dto.toListCardLoansResponseProto
-import com.rainist.collectcard.cardtransactions.CardTransactionServiceImpl
+import com.rainist.collectcard.cardtransactions.CardTransactionService
+import com.rainist.collectcard.cardtransactions.dto.toListCardsTransactionResponseProto
 import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.common.interceptor.StatsUnaryServerInterceptor
 import com.rainist.common.log.Log
@@ -21,7 +22,7 @@ import org.lognet.springboot.grpc.GRpcService
 class CollectcardGrpcService(
     val organizationService: OrganizationService,
     val cardService: CardService,
-    val cardTransactionService: CardTransactionServiceImpl,
+    val cardTransactionService: CardTransactionService,
     val cardLoanService: CardLoanService,
     val cardBillService: CardBillService,
     val cardCreditLimitService: CardCreditLimitService
@@ -71,23 +72,25 @@ class CollectcardGrpcService(
     ) {
         logger.debug("[사용자 카드 내역 조회 시작 : {}]", request)
 
-        kotlin.runCatching {
-            cardTransactionService.listTransactions(request)
-        }
-            .onSuccess {
-                logger.info("[사용자 카드 내역 조회 결과 success]")
-                for (transaction in it.dataList) {
-                    logger.info("[사용자 카드 내역 조회 결과 : {}]", transaction)
-                }
+        val banksaladUserId = request.userId
+        val organization = organizationService.getOrganizationByObjectId(request.companyId.value)
 
-                responseObserver.onNext(it)
-                responseObserver.onCompleted()
+        kotlin.runCatching {
+            cardTransactionService.listTransactions(banksaladUserId, organization, request.takeIf { request.hasFromMs() }?.fromMs?.value).toListCardsTransactionResponseProto()
+            // cardTransactionService.listTransactions(request)
+        }.onSuccess {
+            logger.info("[사용자 카드 내역 조회 결과 success]")
+            for (transaction in it.dataList) {
+                logger.info("[사용자 카드 내역 조회 결과 : {}]", transaction)
             }
-            .onFailure {
-                logger.error("[사용자 카드 내역 조회 에러 : {}]", it.localizedMessage, it)
-                // TODO 예상국 exception  처리 코드 추가 하기
-                responseObserver.onError(it)
-            }
+
+            responseObserver.onNext(it)
+            responseObserver.onCompleted()
+        }.onFailure {
+            logger.error("[사용자 카드 내역 조회 에러 : {}]", it.localizedMessage, it)
+            // TODO 예상국 exception  처리 코드 추가 하기
+            responseObserver.onError(it)
+        }
     }
 
     override fun listCardBills(
