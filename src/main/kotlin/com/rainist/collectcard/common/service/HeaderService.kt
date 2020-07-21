@@ -14,15 +14,32 @@ class HeaderService(
 ) {
     companion object : Log
 
+    val CONTENT_TYPE = "contentType"
+    val AUTHORIZATION = "authorization"
+    val CALIENT_ID = "clientId"
+
+    fun makeHeader(banksaladUserId: String, organizationId: String): MutableMap<String, String?> {
+        val organization = organizationService.getOrganizationByOrganizationId(organizationId)
+        val accessToken =
+            connectClient.getAccessToken(banksaladUserId, organization.organizationObjectId)?.accessToken
+
+        return mutableMapOf(
+            CONTENT_TYPE to MediaType.APPLICATION_JSON_VALUE,
+            AUTHORIZATION to "Bearer $accessToken",
+            CALIENT_ID to organization.clientId
+        )
+    }
+
+    @Deprecated("deprecated")
     fun makeHeader(banksaladUserId: String, cardOrganization: CardOrganization): MutableMap<String, String?> {
 
         val accessToken =
             connectClient.getAccessToken(banksaladUserId, cardOrganization.organizationObjectId)?.accessToken
 
         return mutableMapOf(
-            "contentType" to MediaType.APPLICATION_JSON_VALUE,
-            "authorization" to "Bearer $accessToken",
-            "clientId" to cardOrganization.clientId
+            CONTENT_TYPE to MediaType.APPLICATION_JSON_VALUE,
+            AUTHORIZATION to "Bearer $accessToken",
+            CALIENT_ID to cardOrganization.clientId
         )
     }
 

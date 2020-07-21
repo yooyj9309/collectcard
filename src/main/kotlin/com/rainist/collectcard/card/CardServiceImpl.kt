@@ -15,9 +15,10 @@ import com.rainist.collectcard.common.db.entity.CardEntity
 import com.rainist.collectcard.common.db.entity.CardHistoryEntity
 import com.rainist.collectcard.common.db.repository.CardHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardRepository
+import com.rainist.collectcard.common.dto.SyncRequest
 import com.rainist.collectcard.common.exception.CollectcardException
-import com.rainist.collectcard.common.service.CardOrganization
 import com.rainist.collectcard.common.service.HeaderService
+import com.rainist.collectcard.common.util.SyncStatus
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import org.springframework.http.HttpStatus
@@ -35,9 +36,10 @@ class CardServiceImpl(
     companion object : Log
 
     @Transactional
-    override fun listCards(banksaladUserId: String, organization: CardOrganization): ListCardsResponse {
+    @SyncStatus(transactionId = "cards")
+    override fun listCards(syncRequest: SyncRequest): ListCardsResponse {
         /* header */
-        val header = headerService.makeHeader(banksaladUserId, organization)
+        val header = headerService.makeHeader(syncRequest.banksaladUserId, syncRequest.organizationId)
 
         /* request body */
         val listCardsRequest = ListCardsRequest().apply {
@@ -68,7 +70,7 @@ class CardServiceImpl(
 
         /* Save to DB and return */
         listCardsResponse.dataBody?.cards?.forEach { card ->
-            upsertCardAndCardHistory(banksaladUserId, organization.organizationId ?: "", card)
+            upsertCardAndCardHistory(syncRequest.banksaladUserId, syncRequest.organizationId ?: "", card)
         }
 
         return executionResponse.response

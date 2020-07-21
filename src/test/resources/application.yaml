@@ -11,12 +11,13 @@ spring:
     username: sa
     password:
   jpa:
-    show-sql: false
+    show-sql: true
     hibernate:
       ddl-auto: create-drop
 
 logging:
   config: classpath:logback/logback.xml
+  level.org.hibernate.type: trace
 
 host:
   card:

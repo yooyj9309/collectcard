@@ -1,7 +1,7 @@
 package com.rainist.collectcard.card
 
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
-import com.rainist.collectcard.common.service.CardOrganization
+import com.rainist.collectcard.common.dto.SyncRequest
 import com.rainist.collectcard.common.service.HeaderService
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.Is.`is`
@@ -38,17 +38,13 @@ class CardServiceImplTest {
     @MockBean
     lateinit var headerService: HeaderService
 
-    // TODO : add mocking for Repository
     @Test
     fun listCard_success() {
         setupServer()
 
-        val banksaladUserId = "1"
-        val organization = CardOrganization().apply {
-            organizationId = "organizationId"
-        }
+        val syncRequest = SyncRequest("1", "organizationId")
 
-        given(headerService.makeHeader(banksaladUserId, organization))
+        given(headerService.makeHeader(syncRequest.banksaladUserId, syncRequest.organizationId))
             .willReturn(
                 mutableMapOf(
                     "contentType" to MediaType.APPLICATION_JSON_VALUE,
@@ -57,7 +53,7 @@ class CardServiceImplTest {
                 )
             )
 
-        val response = cardService.listCards(banksaladUserId, organization)
+        val response = cardService.listCards(syncRequest)
 
         assertThat(response.dataHeader?.resultCode, `is`("0004"))
         assertThat(response.dataBody?.cards?.size, `is`(4))
