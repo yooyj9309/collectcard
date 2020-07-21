@@ -1,6 +1,5 @@
 package com.rainist.collectcard.cardcreditlimit
 
-import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
 import com.rainist.collect.common.execution.ExecutionRequest
 import com.rainist.collect.common.execution.ExecutionResponse
 import com.rainist.collect.executor.CollectExecutorService
@@ -8,7 +7,6 @@ import com.rainist.collectcard.cardcreditlimit.dto.CardCreditLimitRequestDataBod
 import com.rainist.collectcard.cardcreditlimit.dto.CardCreditLimitRequestDataHeader
 import com.rainist.collectcard.cardcreditlimit.dto.CreditLimitRequest
 import com.rainist.collectcard.cardcreditlimit.dto.CreditLimitResponse
-import com.rainist.collectcard.cardcreditlimit.dto.toCreditLimitResponseProto
 import com.rainist.collectcard.cardcreditlimit.util.CreditLimitEntityUtil
 import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
@@ -18,6 +16,7 @@ import com.rainist.collectcard.common.db.entity.CreditLimitEntity
 import com.rainist.collectcard.common.db.repository.CreditLimitHistoryRepository
 import com.rainist.collectcard.common.db.repository.CreditLimitRepository
 import com.rainist.collectcard.common.exception.CollectcardException
+import com.rainist.collectcard.common.service.CardOrganization
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
@@ -35,54 +34,52 @@ class CardCreditLimitServiceImpl(
     companion object : Log
 
     @Transactional
-    override fun cardCreditLimit(request: CollectcardProto.GetCreditLimitRequest): CollectcardProto.GetCreditLimitResponse {
-        val lastCheckAt = DateTimeUtil.kstNowLocalDateTime()
-        val header = headerService.getHeader(request.userId, request.companyId.value)
+    override fun cardCreditLimit(banksaladUserId: String, organization: CardOrganization): CreditLimitResponse {
+        val lastCheckAt = DateTimeUtil.utcNowLocalDateTime()
+        val header = headerService.makeHeader(banksaladUserId, organization)
+        val creditLimitRequest = CreditLimitRequest().apply {
+            this.dataHeader = CardCreditLimitRequestDataHeader()
+            this.dataBody = CardCreditLimitRequestDataBody()
+        }
 
-        return runCatching<ExecutionResponse<CreditLimitResponse>> {
-            collectExecutorService.execute(
-                Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.creditLimit),
-                ExecutionRequest.builder<CreditLimitRequest>()
-                    .headers(header)
-                    .request(
-                        CreditLimitRequest().apply {
-                            this.dataHeader = CardCreditLimitRequestDataHeader()
-                            this.dataBody = CardCreditLimitRequestDataBody()
-                        })
-                    .build()
+        // get api call result
+        val executionResponse: ExecutionResponse<CreditLimitResponse> = collectExecutorService.execute(
+            Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.creditLimit),
+            ExecutionRequest.builder<CreditLimitRequest>()
+                .headers(header)
+                .request(creditLimitRequest)
+                .build()
+        )
+
+        // validate
+        if (executionResponse.response.dataBody == null || executionResponse.response.dataBody?.creditLimitInfo == null)
+            throw CollectcardException("DataBody is null")
+
+        // db insert
+        var creditLimitEntity = creditLimitRepository.findCreditLimitEntitiesByBanksaladUserIdAndCardCompanyId(
+            banksaladUserId.toLong(),
+            organization.organizationId.toString()
+        ) ?: CreditLimitEntity()
+
+        val resEntity = CreditLimitEntityUtil.makeCreditLimitEntity(
+            lastCheckAt,
+            banksaladUserId.toLong(),
+            organization.organizationId,
+            executionResponse.response.dataBody?.creditLimitInfo!!
+        )
+
+        if (CreditLimitEntityUtil.isUpdated(creditLimitEntity, resEntity)) {
+            // update
+            CreditLimitEntityUtil.copyCreditLimitEntity(lastCheckAt, resEntity, creditLimitEntity)
+            creditLimitEntity = creditLimitRepository.save(creditLimitEntity)
+            creditLimitHistoryRepository.save(
+                CreditLimitEntityUtil.makeCreditLimitHistoryEntity(creditLimitEntity)
             )
-        }.mapCatching { executionResponse ->
-            var creditLimitEntity = creditLimitRepository.findCreditLimitEntitiesByBanksaladUserIdAndCardCompanyId(
-                request.userId.toLong(),
-                request.companyId.value
-            ) ?: CreditLimitEntity()
+        } else {
+            creditLimitEntity.lastCheckAt = lastCheckAt
+        }
 
-            if (executionResponse.response.dataBody == null || executionResponse.response.dataBody?.creditLimitInfo == null)
-                throw CollectcardException("DataBody is null")
-
-            val resEntity = CreditLimitEntityUtil.makeCreditLimitEntity(
-                lastCheckAt,
-                request,
-                executionResponse.response.dataBody?.creditLimitInfo!!
-            )
-
-            if (CreditLimitEntityUtil.diffCheck(creditLimitEntity, resEntity)) {
-                // update
-                CreditLimitEntityUtil.copyCreditLimitEntity(lastCheckAt, resEntity, creditLimitEntity)
-                creditLimitEntity = creditLimitRepository.save(creditLimitEntity)
-                creditLimitHistoryRepository.save(
-                    CreditLimitEntityUtil.makeCreditLimitHistoryEntity(creditLimitEntity)
-                )
-            } else {
-                creditLimitEntity.lastCheckAt = lastCheckAt
-            }
-
-            executionResponse.response.toCreditLimitResponseProto()
-        }.onSuccess { creditLimitResponse ->
-            logger.debug("응답 리턴 성공 : {}", creditLimitResponse)
-            creditLimitResponse
-        }.onFailure {
-            throw CollectcardException(it.localizedMessage, it)
-        }.getOrThrow()
+        // return
+        return executionResponse.response
     }
 }

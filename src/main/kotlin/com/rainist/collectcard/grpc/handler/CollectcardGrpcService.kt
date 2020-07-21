@@ -7,6 +7,7 @@ import com.rainist.collectcard.card.dto.toListCardsResponseProto
 import com.rainist.collectcard.cardbills.CardBillService
 import com.rainist.collectcard.cardbills.dto.toListCardBillsResponseProto
 import com.rainist.collectcard.cardcreditlimit.CardCreditLimitService
+import com.rainist.collectcard.cardcreditlimit.dto.toCreditLimitResponseProto
 import com.rainist.collectcard.cardloans.CardLoanService
 import com.rainist.collectcard.cardloans.dto.toListCardLoansResponseProto
 import com.rainist.collectcard.cardtransactions.CardTransactionService
@@ -152,10 +153,13 @@ class CollectcardGrpcService(
         request: CollectcardProto.GetCreditLimitRequest,
         responseObserver: StreamObserver<CollectcardProto.GetCreditLimitResponse>
     ) {
+        val banksaladUserId = request.userId
+        val organization = organizationService.getOrganizationByObjectId(request.companyId.value)
+
         logger.debug("[사용자 개인 한도 조회 시작 : {}]", request)
 
         kotlin.runCatching {
-            cardCreditLimitService.cardCreditLimit(request)
+            cardCreditLimitService.cardCreditLimit(banksaladUserId, organization).toCreditLimitResponseProto()
         }.onSuccess {
             responseObserver.onNext(it)
             responseObserver.onCompleted()

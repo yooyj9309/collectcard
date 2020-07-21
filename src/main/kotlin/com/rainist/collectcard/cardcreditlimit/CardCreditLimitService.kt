@@ -1,7 +1,8 @@
 package com.rainist.collectcard.cardcreditlimit
 
-import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
+import com.rainist.collectcard.cardcreditlimit.dto.CreditLimitResponse
+import com.rainist.collectcard.common.service.CardOrganization
 
 interface CardCreditLimitService {
-    fun cardCreditLimit(request: CollectcardProto.GetCreditLimitRequest): CollectcardProto.GetCreditLimitResponse
+    fun cardCreditLimit(banksaladUserId: String, organization: CardOrganization): CreditLimitResponse
 }

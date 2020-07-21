@@ -82,7 +82,7 @@ class CardLoanServiceImpl(
                 }
                 // update
                 else {
-                    if (CardLoanUtil.diffCheck(cardLoanEntity, bodyEntity)) {
+                    if (CardLoanUtil.isUpdated(cardLoanEntity, bodyEntity)) {
                         // update
                         CardLoanUtil.copyCardLoanEntity(bodyEntity, cardLoanEntity)
                         cardLoanRepository.save(cardLoanEntity)

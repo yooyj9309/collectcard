@@ -1,6 +1,5 @@
 package com.rainist.collectcard.cardcreditlimit.util
 
-import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
 import com.rainist.collectcard.cardcreditlimit.dto.CreditLimit
 import com.rainist.collectcard.common.db.entity.CreditLimitEntity
 import com.rainist.collectcard.common.db.entity.CreditLimitHistoryEntity
@@ -10,7 +9,7 @@ import java.time.LocalDateTime
 class CreditLimitEntityUtil {
     companion object {
 
-        fun diffCheck(from: CreditLimitEntity, to: CreditLimitEntity): Boolean {
+        fun isUpdated(from: CreditLimitEntity, to: CreditLimitEntity): Boolean {
             if (from.onetimePaymentLimitAmount?.compareTo(to.onetimePaymentLimitAmount) != 0) return true
             if (from.onetimePaymentLimitAmount?.compareTo(to.onetimePaymentLimitAmount) != 0) return true
             if (from.creditCardLimitTotalAmount?.compareTo(to.creditCardLimitTotalAmount) != 0) return true
@@ -69,32 +68,33 @@ class CreditLimitEntityUtil {
 
         fun makeCreditLimitEntity(
             lastCheckAt: LocalDateTime,
-            request: CollectcardProto.GetCreditLimitRequest,
+            banksaladUserId: Long?,
+            cardCompanyId: String?,
             creditLimit: CreditLimit
         ): CreditLimitEntity {
             // TODO 각 카드사별로 없는 값이 있을 경우 어떤 값을 추가할지에 대한 논의 필요 -> 우선 -1 값 적용
             return CreditLimitEntity().apply {
-                this.banksaladUserId = request.userId.toLong()
-                this.cardCompanyId = request.companyId.value
-                this.onetimePaymentLimitAmount = creditLimit.onetimePaymentLimit?.totalLimitAmount ?: BigDecimal(-1)
-                this.creditCardLimitTotalAmount = creditLimit.creditCardLimit?.totalLimitAmount ?: BigDecimal(-1)
-                this.creditCardLimitUsedAmount = creditLimit.creditCardLimit?.usedAmount ?: BigDecimal(-1)
-                this.creditCardLimitRemainingAmount = creditLimit.creditCardLimit?.remainedAmount ?: BigDecimal(-1)
-                this.cashAdvanceLimitTotalAmount = creditLimit.cashServiceLimit?.totalLimitAmount ?: BigDecimal(-1)
-                this.cashAdvanceLimitUsedAmount = creditLimit.cashServiceLimit?.usedAmount ?: BigDecimal(-1)
-                this.cashAdvanceLimitRemainingAmount = creditLimit.cashServiceLimit?.remainedAmount ?: BigDecimal(-1)
-                this.overseaLimitTotalAmount = creditLimit.overseaLimit?.totalLimitAmount ?: BigDecimal(-1)
-                this.overseaLimitUsedAmount = creditLimit.overseaLimit?.usedAmount ?: BigDecimal(-1)
-                this.overseaLimitRemainingAmount = creditLimit.overseaLimit?.remainedAmount ?: BigDecimal(-1)
-                this.loanLimitTotalAmount = creditLimit.loanLimit?.totalLimitAmount ?: BigDecimal(-1)
-                this.loanLimitRemainingAmount = creditLimit.loanLimit?.usedAmount ?: BigDecimal(-1)
-                this.loanLimitUsedAmount = creditLimit.loanLimit?.remainedAmount ?: BigDecimal(-1)
-                this.cardLoanLimitTotalAmount = creditLimit.cardLoanLimit?.totalLimitAmount ?: BigDecimal(-1)
-                this.cardLoanLimitUsedAmount = creditLimit.cardLoanLimit?.usedAmount ?: BigDecimal(-1)
-                this.cardLoanLimitRemainingAmount = creditLimit.cardLoanLimit?.remainedAmount ?: BigDecimal(-1)
-                this.debitCardTotalAmount = creditLimit.debitCardLimit?.totalLimitAmount ?: BigDecimal(-1)
-                this.debitCardUsedAmount = creditLimit.debitCardLimit?.usedAmount ?: BigDecimal(-1)
-                this.debitCardRemainingAmount = creditLimit.debitCardLimit?.remainedAmount ?: BigDecimal(-1)
+                this.banksaladUserId = banksaladUserId
+                this.cardCompanyId = cardCompanyId
+                this.onetimePaymentLimitAmount = creditLimit.onetimePaymentLimit?.totalLimitAmount ?: BigDecimal(0)
+                this.creditCardLimitTotalAmount = creditLimit.creditCardLimit?.totalLimitAmount ?: BigDecimal(0)
+                this.creditCardLimitUsedAmount = creditLimit.creditCardLimit?.usedAmount ?: BigDecimal(0)
+                this.creditCardLimitRemainingAmount = creditLimit.creditCardLimit?.remainedAmount ?: BigDecimal(0)
+                this.cashAdvanceLimitTotalAmount = creditLimit.cashServiceLimit?.totalLimitAmount ?: BigDecimal(0)
+                this.cashAdvanceLimitUsedAmount = creditLimit.cashServiceLimit?.usedAmount ?: BigDecimal(0)
+                this.cashAdvanceLimitRemainingAmount = creditLimit.cashServiceLimit?.remainedAmount ?: BigDecimal(0)
+                this.overseaLimitTotalAmount = creditLimit.overseaLimit?.totalLimitAmount ?: BigDecimal(0)
+                this.overseaLimitUsedAmount = creditLimit.overseaLimit?.usedAmount ?: BigDecimal(0)
+                this.overseaLimitRemainingAmount = creditLimit.overseaLimit?.remainedAmount ?: BigDecimal(0)
+                this.loanLimitTotalAmount = creditLimit.loanLimit?.totalLimitAmount ?: BigDecimal(0)
+                this.loanLimitRemainingAmount = creditLimit.loanLimit?.usedAmount ?: BigDecimal(0)
+                this.loanLimitUsedAmount = creditLimit.loanLimit?.remainedAmount ?: BigDecimal(0)
+                this.cardLoanLimitTotalAmount = creditLimit.cardLoanLimit?.totalLimitAmount ?: BigDecimal(0)
+                this.cardLoanLimitUsedAmount = creditLimit.cardLoanLimit?.usedAmount ?: BigDecimal(0)
+                this.cardLoanLimitRemainingAmount = creditLimit.cardLoanLimit?.remainedAmount ?: BigDecimal(0)
+                this.debitCardTotalAmount = creditLimit.debitCardLimit?.totalLimitAmount ?: BigDecimal(0)
+                this.debitCardUsedAmount = creditLimit.debitCardLimit?.usedAmount ?: BigDecimal(0)
+                this.debitCardRemainingAmount = creditLimit.debitCardLimit?.remainedAmount ?: BigDecimal(0)
                 this.lastCheckAt = lastCheckAt
             }
         }

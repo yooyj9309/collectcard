@@ -64,7 +64,7 @@ class CardLoanUtil {
             }
         }
 
-        fun diffCheck(from: CardLoanEntity, to: CardLoanEntity): Boolean {
+        fun isUpdated(from: CardLoanEntity, to: CardLoanEntity): Boolean {
             if (!from.expirationDate?.isEqual(to.expirationDate)!!) return true
             if (from.loanStatus != to.loanStatus) return true
             if (from.repaymentMethod != to.repaymentMethod) return true

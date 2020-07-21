@@ -29,6 +29,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @ExperimentalCoroutinesApi
 @Service
@@ -108,6 +109,7 @@ class CardTransactionServiceImpl(
         }.sortedByDescending { cardTransaction -> cardTransaction.approvalDay + cardTransaction.approvalTime }.toMutableList()
     }
 
+    @Transactional
     override fun listTransactions(banksaladUserId: String, organization: CardOrganization, fromMs: Long?): ListTransactionsResponse {
         val header = headerService.makeHeader(banksaladUserId, organization)
 
