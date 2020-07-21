@@ -53,10 +53,16 @@ data class CardBillTransactionEntity(
     var cardType: String,
 
     @Nullable
+    var cardTypeOrigin: String,
+
+    @Nullable
     var cardTransactionType: String,
 
     @Nullable
-    var currency: String,
+    var cardTransactionTypeOrigin: String,
+
+    @Nullable
+    var currencyCode: String,
 
     var isInstallmentPayment: Boolean,
 
@@ -87,17 +93,22 @@ data class CardBillTransactionEntity(
 
     var approvalNumber: String,
 
-    var approvedAt: LocalDateTime,
+    var approvalDate: String,
+
+    var approvalTime: String,
 
     @Nullable
     var pointsToEarn: BigDecimal,
 
     var isOverseaUse: Boolean,
 
-    var paymentDate: LocalDateTime,
+    var paymentDate: String,
 
     @Nullable
     var storeCategory: String,
+
+    @Nullable
+    var storeCategoryOrigin: String,
 
     @Nullable
     var transactionCountry: String,

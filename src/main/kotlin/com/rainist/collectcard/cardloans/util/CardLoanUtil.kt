@@ -3,7 +3,6 @@ package com.rainist.collectcard.cardloans.util
 import com.rainist.collectcard.cardloans.dto.Loan
 import com.rainist.collectcard.common.db.entity.CardLoanEntity
 import com.rainist.collectcard.common.db.entity.CardLoanHistoryEntity
-import com.rainist.common.util.DateTimeUtil
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -17,16 +16,16 @@ class CardLoanUtil {
                 this.cardCompanyLoanId = loan.loanId
                 this.loanName = loan.loanName
                 this.paymentBankId = loan.paymentBankId
-                this.expirationDate = loan.expirationDate?.let { DateTimeUtil.stringToLocalDateTime(it + "000000") } // TODO 이후 시간데이터는 String으로 들어갈 예정
+                this.expirationDate = loan.expirationDate // TODO 이후 시간데이터는 String으로 들어갈 예정
                 this.loanStatus = loan.loanStatus.description
                 this.paymentAccountNumber = loan.paymentAccountNumber
                 this.repaymentMethod = loan.repaymentMethod
                 this.withdrawalDay = loan.withdrawalDay
                 this.interestRate = loan.interestRate ?: BigDecimal(0) // default 0
                 this.loanCategory = loan.loanCategory
-                this.currency = "KRW" // todo 해당부분이 loan에 없음 확인필요
+                this.currencyCode = "KRW" // todo 해당부분이 loan에 없음 확인필요
                 this.additionalLoanAmount = loan.additionalLoanAmount ?: BigDecimal(0) // default 0
-                this.fullyPaidDate = loan.fullyPaidDate?.let { DateTimeUtil.stringToLocalDate(it) }
+                this.fullyPaidDate = loan.fullyPaidDate
                 this.cardNumber = loan.cardNumber
                 this.principalAmount = loan.principalAmount ?: BigDecimal(0) // default 0
                 this.interestAmount = loan.interestAmount ?: BigDecimal(0) // default 0
@@ -52,7 +51,7 @@ class CardLoanUtil {
                 this.withdrawalDay = cardLoanEntity.withdrawalDay
                 this.interestRate = cardLoanEntity.interestRate
                 this.loanCategory = cardLoanEntity.loanCategory
-                this.currency = cardLoanEntity.currency
+                this.currencyCode = cardLoanEntity.currencyCode
                 this.additionalLoanAmount = cardLoanEntity.additionalLoanAmount
                 this.fullyPaidDate = cardLoanEntity.fullyPaidDate
                 this.cardNumber = cardLoanEntity.cardNumber
@@ -65,14 +64,14 @@ class CardLoanUtil {
         }
 
         fun isUpdated(from: CardLoanEntity, to: CardLoanEntity): Boolean {
-            if (!from.expirationDate?.isEqual(to.expirationDate)!!) return true
+            if (from.expirationDate != to.expirationDate) return true
             if (from.loanStatus != to.loanStatus) return true
             if (from.repaymentMethod != to.repaymentMethod) return true
             if (from.withdrawalDay != to.withdrawalDay) return true
             if (from.loanCategory != to.loanCategory) return true
             if (from.cardNumber != to.cardNumber) return true
             if (from.loanNumber != to.loanNumber) return true
-            if ((from.fullyPaidDate != null || to.fullyPaidDate != null) && !from.fullyPaidDate!!.isEqual(to.fullyPaidDate)) return true
+            if (from.fullyPaidDate != to.fullyPaidDate) return true
             if (from.additionalLoanAmount?.compareTo(to.additionalLoanAmount) != 0) return true
             if (from.interestRate?.compareTo(to.interestRate) != 0) return true
             if (from.principalAmount?.compareTo(to.principalAmount) != 0) return true

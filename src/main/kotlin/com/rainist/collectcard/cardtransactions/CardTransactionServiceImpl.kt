@@ -142,15 +142,13 @@ class CardTransactionServiceImpl(
 
         // db insert
         response.forEach { cardTransaction ->
-            var cardTransactionEntity = cardTransactionRepository.findByBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndIssuedDate(
+            var cardTransactionEntity = cardTransactionRepository.findByBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDateAndApprovalTime(
                 banksaladUserId.toLong(),
                 organization.organizationId,
                 cardTransaction.cardCompanyCardId,
                 cardTransaction.approvalNumber,
-                DateTimeUtil.stringToLocalDateTime(
-                    cardTransaction.approvalDay!!, "yyyyMMdd",
-                    cardTransaction.approvalTime!!, "HHmmss"
-                )
+                cardTransaction.approvalDay,
+                cardTransaction.approvalTime
             )
 
             if (cardTransactionEntity == null) {

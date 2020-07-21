@@ -1,7 +1,6 @@
 package com.rainist.collectcard.common.db.entity
 
 import java.math.BigDecimal
-import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.persistence.Entity
 import javax.persistence.EntityListeners
@@ -28,17 +27,23 @@ data class CardLoanEntity(
 
     var cardCompanyLoanId: String? = null,
 
+    var lastCheckAt: LocalDateTime? = null,
+
     var loanName: String? = null,
 
     var paymentBankId: String? = null,
 
-    var expirationDate: LocalDateTime? = null,
+    var paymentAccountNumber: String? = null,
+
+    var expirationDate: String? = null,
 
     var loanStatus: String? = null,
 
-    var paymentAccountNumber: String? = null,
+    var loanStatusOrigin: String? = null,
 
     var repaymentMethod: String? = null,
+
+    var repaymentMethodOrigin: String? = null,
 
     var withdrawalDay: String? = null,
 
@@ -46,11 +51,11 @@ data class CardLoanEntity(
 
     var loanCategory: String? = null,
 
-    var currency: String? = null,
+    var currencyCode: String? = null,
 
     var additionalLoanAmount: BigDecimal? = null,
 
-    var fullyPaidDate: LocalDate? = null,
+    var fullyPaidDate: String? = null,
 
     var cardNumber: String? = null,
 

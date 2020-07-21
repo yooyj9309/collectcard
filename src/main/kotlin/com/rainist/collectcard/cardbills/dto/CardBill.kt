@@ -16,10 +16,10 @@ data class CardBill(
     var billNumber: String?,
 
     // 결제예정일 또는 결제일
-    var paymentDate: ZonedDateTime?,
+    var paymentDate: String?,
 
     // 다음 결제 예정일
-    var nextPaymentDate: ZonedDateTime?,
+    var nextPaymentDate: String?,
 
     // 청구금액
     var billingAmount: BigDecimal?,

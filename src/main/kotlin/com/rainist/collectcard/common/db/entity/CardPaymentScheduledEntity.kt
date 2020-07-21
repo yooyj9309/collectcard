@@ -9,6 +9,8 @@ import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.Table
+import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 
 @Entity
@@ -49,10 +51,14 @@ data class CardPaymentScheduledEntity(
     @Nullable
     var cardType: String,
 
+    var cardTypeOrigin: String,
+
     @Nullable
     var cardTransactionType: String,
 
-    var currency: String,
+    var cardTransactionTypeOrigin: String,
+
+    var currencyCode: String,
 
     var isInstallmentPayment: Boolean,
 
@@ -76,15 +82,19 @@ data class CardPaymentScheduledEntity(
 
     var approvalNumber: String,
 
-    var approvedAt: LocalDateTime,
+    var approvalDate: String,
+
+    var approvalTime: String,
 
     var pointsToEarn: BigDecimal,
 
     var isOverseaUse: Boolean,
 
-    var paymentDate: LocalDateTime,
+    var paymentDate: String,
 
     var storeCategory: String,
+
+    var storeCategoryOrigin: String,
 
     var transactionCountry: String,
 
@@ -106,7 +116,9 @@ data class CardPaymentScheduledEntity(
 
     var lastCheckAt: LocalDateTime,
 
+    @CreatedDate
     var createdAt: LocalDateTime,
 
+    @LastModifiedDate
     var updatedAt: LocalDateTime
 )

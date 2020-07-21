@@ -3,7 +3,7 @@ package com.rainist.collectcard.cardbills.dto
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
 import com.google.protobuf.StringValue
 import com.rainist.collectcard.common.exception.CollectcardException
-import com.rainist.common.util.DateTimeUtil
+import java.text.SimpleDateFormat
 
 data class ListCardBillsResponse(
     var dataHeader: ListCardBillsResponseDataHeader? = null,
@@ -27,7 +27,7 @@ fun ListCardBillsResponse.toListCardBillsResponseProto(): CollectcardProto.ListC
     // TODO 박두상 쉐도잉을 하면서 하나씩 맞춰봐야 할 것 같습니다. 추후 null 해당부분에서 고려하지않게 미리 제거하여 받는 방법도 구성이 필요할 것 같습니다.
     return this.dataBody?.cardBills?.map { cardBill ->
         CollectcardProto.CardBill.newBuilder()
-            .setDueDate(DateTimeUtil.zoneDateTimeToString(safeValue(cardBill.paymentDate), "yyyy-MM-dd")) // 1. 결제 예정 일자, 시간 정리에 대한 협의 필요.
+            .setDueDate(SimpleDateFormat("yyyy-MM-dd").format(SimpleDateFormat("yyyyMMdd").parse(cardBill.paymentDate)))
             .setCurrency("KRW") // TODO 3. iso 4217??  받아오는 값인지 의미잇는
             .setBillType(cardBill.billNumber?.let { StringValue.of(it) } ?: StringValue.getDefaultInstance())
             .setLinkedAccount(

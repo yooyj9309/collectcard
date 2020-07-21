@@ -27,17 +27,22 @@ data class CardBillEntity(
 
     var billNumber: String? = null,
 
+    var lastCheckAt: LocalDateTime? = null,
+
     @Nullable
     var userName: String? = null,
 
     @Nullable
     var userGrade: String? = null,
 
-    var paymentDate: LocalDateTime? = null,
+    @Nullable
+    var userGradeOrigin: String? = null,
+
+    var paymentDate: String? = null,
 
     var billedYearMonth: String? = null,
 
-    var nextPaymentDate: LocalDateTime? = null,
+    var nextPaymentDate: String? = null,
 
     var billingAmount: BigDecimal? = null,
 
@@ -54,8 +59,6 @@ data class CardBillEntity(
 
     @Nullable
     var expiringPoints: BigDecimal? = null,
-
-    var lastCheckAt: LocalDateTime? = null,
 
     @CreatedDate
     var createdAt: LocalDateTime? = null,

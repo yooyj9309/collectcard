@@ -29,7 +29,9 @@ data class CardTransactionEntity(
 
     var approvalNumber: String? = null,
 
-    var issuedDate: LocalDateTime? = null,
+    var approvalDate: String? = null,
+
+    var approvalTime: String? = null,
 
     var cardName: String? = null,
 
@@ -45,9 +47,13 @@ data class CardTransactionEntity(
 
     var cardType: String? = null,
 
+    var cardTypeOrigin: String? = null,
+
     var cardTransactionType: String? = null,
 
-    var currency: String? = null,
+    var cardTransactionTypeOrigin: String? = null,
+
+    var currencyCode: String? = null,
 
     @Column(columnDefinition = "BIT", length = 1)
     var isInstallmentPayment: Boolean? = false,

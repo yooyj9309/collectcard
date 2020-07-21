@@ -92,9 +92,9 @@ class CardBillServiceImpl(
             this.billNumber = cardBill.billNumber
             this.userName = cardBill.userName
             this.userGrade = cardBill.userGrade
-            this.paymentDate = cardBill.paymentDate?.toLocalDateTime()
+            this.paymentDate = cardBill.paymentDate
             this.billedYearMonth = cardBill.billedYearMonth?.let { DateTimeUtil.zoneDateTimeToString(it) }
-            this.nextPaymentDate = cardBill.nextPaymentDate?.toLocalDateTime()
+            this.nextPaymentDate = cardBill.nextPaymentDate
             this.billingAmount = cardBill.billingAmount
             this.prepayedAmount = cardBill.prepayedAmount
             this.paymentBankId = cardBill.paymentBankId
@@ -113,9 +113,9 @@ class CardBillServiceImpl(
         cardBillEntity.also {
             if (cardBillEntity.userName != cardBill.userName) return true
             if (cardBillEntity.userGrade != cardBill.userGrade) return true
-            if (cardBillEntity.paymentDate != cardBill.paymentDate?.toLocalDateTime()) return true
+            if (cardBillEntity.paymentDate != cardBill.paymentDate) return true
             if (cardBillEntity.billedYearMonth != cardBill.billedYearMonth?.let { DateTimeUtil.zoneDateTimeToString(it) }) return true
-            if (cardBillEntity.nextPaymentDate != cardBill.nextPaymentDate?.toLocalDateTime()) return true
+            if (cardBillEntity.nextPaymentDate != cardBill.nextPaymentDate) return true
             if (cardBillEntity.billingAmount != cardBill.billingAmount) return true
             if (cardBillEntity.prepayedAmount != cardBill.prepayedAmount) return true
             if (cardBillEntity.paymentBankId != cardBill.paymentBankId) return true

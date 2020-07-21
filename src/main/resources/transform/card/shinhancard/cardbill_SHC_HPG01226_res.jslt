@@ -12,7 +12,7 @@
                     "userName": "",
                     "userGrade": "",
                     "billNumber": .setlTypeNo,
-                    "paymentDate": parse-time(.setlDay+" +0900" , "yyyyMMdd Z"),
+                    "paymentDate": .setlDay,
                     "nextPaymentDate": "",
                     "billingAmount": .bllAmt,
                     "prepayedAmount": "",
