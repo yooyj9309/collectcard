@@ -168,7 +168,7 @@ class ShinhancardExecutions {
                 }.then(
                     Execution.create()
                         .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_lump_sum)
-                        .to(ListCardBillsResponse::class.java)
+                        .to(ListBillTransactionsResponse::class.java)
                         .build()
                 ).merge(mergeBillTransaction)
                 .with(
@@ -188,7 +188,7 @@ class ShinhancardExecutions {
                         }.then(
                             Execution.create()
                                 .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_installment)
-                                .to(ListCardBillsResponse::class.java)
+                                .to(ListBillTransactionsResponse::class.java)
                                 .build()
                         ).merge(mergeBillTransaction)
                         .build()
