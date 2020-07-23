@@ -13,7 +13,7 @@ class CardTransactionUtil {
                 this.cardCompanyId = organizationObjectId
                 this.cardCompanyCardId = cardTransaction.cardCompanyCardId ?: ""
                 this.approvalNumber = cardTransaction.approvalNumber
-                this.approvalDate = cardTransaction.approvalDay
+                this.approvalDay = cardTransaction.approvalDay
                 this.approvalTime = cardTransaction.approvalTime
                 this.cardName = cardTransaction.cardName
                 this.cardNumber = cardTransaction.cardNumber

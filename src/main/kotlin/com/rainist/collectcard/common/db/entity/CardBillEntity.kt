@@ -38,15 +38,15 @@ data class CardBillEntity(
     @Nullable
     var userGradeOrigin: String? = null,
 
-    var paymentDate: String? = null,
+    var paymentDay: String? = null,
 
     var billedYearMonth: String? = null,
 
-    var nextPaymentDate: String? = null,
+    var nextPaymentDay: String? = null,
 
     var billingAmount: BigDecimal? = null,
 
-    var prepayedAmount: BigDecimal? = null,
+    var prepaidAmount: BigDecimal? = null,
 
     @Nullable
     var paymentBankId: String? = null,

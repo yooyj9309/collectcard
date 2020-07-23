@@ -28,11 +28,11 @@ fun ListCardsResponse.toListCardsResponseProto(): CollectcardProto.ListCardsResp
             .setNumber(it.cardNumber)
             .setUserName(StringValue.of(it.cardOwnerName))
             .setIssuedDate(
-                it.issuedDate?.format(DateTimeFormatter.ISO_LOCAL_DATE)?.let { StringValue.of(it) }
+                it.issuedDay?.format(DateTimeFormatter.ISO_LOCAL_DATE)?.let { StringValue.of(it) }
                     ?: StringValue.getDefaultInstance()
             )
             .setExpirationDate(
-                it.expiresDate?.format(DateTimeFormatter.ISO_LOCAL_DATE)?.let { StringValue.of(it) }
+                it.expiresDay?.format(DateTimeFormatter.ISO_LOCAL_DATE)?.let { StringValue.of(it) }
                     ?: StringValue.getDefaultInstance()
             )
             .setType(StringValue.of(it.cardType))

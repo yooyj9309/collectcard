@@ -29,7 +29,7 @@ data class CardTransactionEntity(
 
     var approvalNumber: String? = null,
 
-    var approvalDate: String? = null,
+    var approvalDay: String? = null,
 
     var approvalTime: String? = null,
 

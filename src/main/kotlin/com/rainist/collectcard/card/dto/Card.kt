@@ -47,15 +47,15 @@ data class Card(
     // 카드 타입 원본 (e.g. 신용카드, 체크카드)
     var cardTypeOrigin: String?,
     // 카드 발급일자
-    var issuedDate: String?,
+    var issuedDay: String?,
     // 카드 만료일자
-    var expiresDate: String?,
+    var expiresDay: String?,
     // 카드 상태 (e.g. 등록, 해지, 휴면, 거래정지)
     var cardStatus: CardStatus?,
     // 카드 상태 원본 (e.g. 등록, 해지, 휴면, 거래정지)
     var cardStatusOrigin: String?,
     // 마지막 이용일자
-    var lastUseDate: String?,
+    var lastUseDay: String?,
     // 마지막 이용일시
     var lastUseTime: String?,
     // 연회비

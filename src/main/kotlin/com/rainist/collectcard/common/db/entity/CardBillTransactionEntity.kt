@@ -80,7 +80,7 @@ data class CardBillTransactionEntity(
     var taxAmount: BigDecimal,
 
     @Nullable
-    var payedPoints: BigDecimal,
+    var paidPoints: BigDecimal,
 
     @Nullable
     var isPointPay: Boolean,
@@ -93,7 +93,7 @@ data class CardBillTransactionEntity(
 
     var approvalNumber: String,
 
-    var approvalDate: String,
+    var approvalDay: String,
 
     var approvalTime: String,
 
@@ -102,7 +102,7 @@ data class CardBillTransactionEntity(
 
     var isOverseaUse: Boolean,
 
-    var paymentDate: String,
+    var paymentDay: String,
 
     @Nullable
     var storeCategory: String,

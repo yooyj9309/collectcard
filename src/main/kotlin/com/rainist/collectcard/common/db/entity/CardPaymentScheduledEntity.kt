@@ -72,7 +72,7 @@ data class CardPaymentScheduledEntity(
 
     var taxAmount: BigDecimal,
 
-    var payedPoints: BigDecimal,
+    var paidPoints: BigDecimal,
 
     var isPointPay: Boolean,
 
@@ -82,7 +82,7 @@ data class CardPaymentScheduledEntity(
 
     var approvalNumber: String,
 
-    var approvalDate: String,
+    var approvalDay: String,
 
     var approvalTime: String,
 
@@ -90,7 +90,7 @@ data class CardPaymentScheduledEntity(
 
     var isOverseaUse: Boolean,
 
-    var paymentDate: String,
+    var paymentDay: String,
 
     var storeCategory: String,
 

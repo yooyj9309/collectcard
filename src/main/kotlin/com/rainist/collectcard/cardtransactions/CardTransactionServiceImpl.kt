@@ -47,7 +47,47 @@ class CardTransactionServiceImpl(
         const val DEFAULT_DIVISION = 3
     }
 
-    fun execute(
+    @Transactional
+    override fun listTransactions(banksaladUserId: String, organization: CardOrganization, fromMs: Long?): ListTransactionsResponse {
+        val header = headerService.makeHeader(banksaladUserId, organization)
+
+        val request = ListTransactionsRequest().apply {
+            this.organizationObjectid = organization.organizationObjectId
+            this.dataHeader = ListTransactionsRequestDataHeader()
+            this.dataBody = ListTransactionsRequestDataBody().apply {
+                this.startAt = createStartAt(fromMs, organization.maxMonth.toLong())
+            }
+        }
+
+        val transactions = getlistTransactionsByDivision(header, request, organization.division)
+
+        // db insert
+        transactions.forEach { cardTransaction ->
+            var cardTransactionEntity = cardTransactionRepository.findByBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
+                banksaladUserId.toLong(),
+                organization.organizationId,
+                cardTransaction.cardCompanyCardId,
+                cardTransaction.approvalNumber,
+                cardTransaction.approvalDay,
+                cardTransaction.approvalTime
+            )
+
+            if (cardTransactionEntity == null) {
+                cardTransactionRepository.save(
+                    CardTransactionUtil.makeCardTransactionEntity(banksaladUserId.toLong(), organization.organizationId.toString(), cardTransaction)
+                )
+            }
+        }
+
+        // return
+        return ListTransactionsResponse().apply {
+            this.dataBody = ListTransactionsResponseDataBody().apply {
+                this.transactions = transactions
+            }
+        }
+    }
+
+    private fun getlistTransactionsByDivision(
         header: MutableMap<String, String?>,
         request: ListTransactionsRequest,
         division: Int
@@ -109,60 +149,22 @@ class CardTransactionServiceImpl(
         }.sortedByDescending { cardTransaction -> cardTransaction.approvalDay + cardTransaction.approvalTime }.toMutableList()
     }
 
-    @Transactional
-    override fun listTransactions(banksaladUserId: String, organization: CardOrganization, fromMs: Long?): ListTransactionsResponse {
-        val header = headerService.makeHeader(banksaladUserId, organization)
-
-        val request = ListTransactionsRequest().apply {
-            this.organizationObjectid = organization.organizationObjectId
-            this.dataHeader = ListTransactionsRequestDataHeader()
-            this.dataBody = ListTransactionsRequestDataBody().apply {
-                this.startAt = let {
-                    if (fromMs != null) {
-                        val localdateTime = DateTimeUtil.epochMilliSecondToKSTLocalDateTime(fromMs)
-                        DateTimeUtil.localDateToString(
-                            LocalDate.of(
-                                localdateTime.year,
-                                localdateTime.month,
-                                localdateTime.dayOfMonth
-                            ),
-                            "yyyyMMdd"
-                        )
-                    } else {
-                        DateTimeUtil.localDateToString(
-                            DateTimeUtil.kstNowLocalDate().minusMonths(organization.maxMonth.toLong()),
-                            "yyyyMMdd"
-                        )
-                    }
-                }
-            }
-        }
-
-        val response = execute(header, request, organization.division)
-
-        // db insert
-        response.forEach { cardTransaction ->
-            var cardTransactionEntity = cardTransactionRepository.findByBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDateAndApprovalTime(
-                banksaladUserId.toLong(),
-                organization.organizationId,
-                cardTransaction.cardCompanyCardId,
-                cardTransaction.approvalNumber,
-                cardTransaction.approvalDay,
-                cardTransaction.approvalTime
+    private fun createStartAt(startAt: Long?, maxMonth: Long): String {
+        return if (startAt != null) {
+            val localdateTime = DateTimeUtil.epochMilliSecondToKSTLocalDateTime(startAt)
+            DateTimeUtil.localDateToString(
+                LocalDate.of(
+                    localdateTime.year,
+                    localdateTime.month,
+                    localdateTime.dayOfMonth
+                ),
+                "yyyyMMdd"
             )
-
-            if (cardTransactionEntity == null) {
-                cardTransactionRepository.save(
-                    CardTransactionUtil.makeCardTransactionEntity(banksaladUserId.toLong(), organization.organizationId.toString(), cardTransaction)
-                )
-            }
-        }
-
-        // return
-        return ListTransactionsResponse().apply {
-            this.dataBody = ListTransactionsResponseDataBody().apply {
-                this.transactions = response
-            }
+        } else {
+            DateTimeUtil.localDateToString(
+                DateTimeUtil.kstNowLocalDate().minusMonths(maxMonth),
+                "yyyyMMdd"
+            )
         }
     }
 }
