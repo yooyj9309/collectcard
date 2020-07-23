@@ -27,8 +27,8 @@ class ShinhancardExecutions {
                 master.loanId = detail.loanId
                 master.loanNumber = detail.loanNumber
                 master.loanAmount = detail.loanAmount
-                master.issuedDate = detail.issuedDate
-                master.expirationDate = detail.expirationDate
+                master.issuedDay = detail.issuedDay
+                master.expirationDay = detail.expirationDay
                 master.interestRate = detail.interestRate
                 master.repaymentMethod = detail.repaymentMethod
                 master.remainingAmount = detail.remainingAmount

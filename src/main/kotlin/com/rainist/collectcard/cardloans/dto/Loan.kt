@@ -1,5 +1,7 @@
 package com.rainist.collectcard.cardloans.dto
 
+import com.rainist.collectcard.common.enums.CardLoanRepaymentMethod
+import com.rainist.collectcard.common.enums.CardLoanStatus
 import com.rainist.common.annotation.validation.StringDateFormat
 import java.math.BigDecimal
 import org.springframework.format.annotation.NumberFormat
@@ -23,14 +25,18 @@ data class Loan(
     var paymentAccountNumber: String? = null, // 결제계좌번호
 
     @field:StringDateFormat("yyyyMMdd")
-    var issuedDate: String? = null, // 신규일 (개설일)
+    var issuedDay: String? = null, // 신규일 (개설일)
 
     @field:StringDateFormat("yyyyMMdd")
-    var expirationDate: String? = null, // 만기일
+    var expirationDay: String? = null, // 만기일
 
-    var loanStatus: LoanStatus = LoanStatus.LOAN_STATUS_UNKNOWN, // 상태 (미납, 완납)
+    var loanStatus: CardLoanStatus = CardLoanStatus.CardLOAN_STATUS_UNKNOWN, // 상태 (미납, 완납)
 
-    var repaymentMethod: String? = null, // 상환방식
+    var loanStatusOrigin: String? = null,
+
+    var repaymentMethod: CardLoanRepaymentMethod = CardLoanRepaymentMethod.UNKNOWN, // 상환방식
+
+    var repaymentMethodOrigin: String? = null,
 
     var withdrawalDay: String? = null, // 출금일자
 
@@ -43,7 +49,7 @@ data class Loan(
     var additionalLoanAmount: BigDecimal? = null, // 추가대출 가능액
 
     @field:StringDateFormat("yyyyMMdd")
-    var fullyPaidDate: String? = null, // 대출 완납일
+    var fullyPaidDay: String? = null, // 대출 완납일
 
     var cardNumber: String? = null, // 카드번호
 

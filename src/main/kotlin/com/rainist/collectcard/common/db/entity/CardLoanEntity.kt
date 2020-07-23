@@ -35,7 +35,7 @@ data class CardLoanEntity(
 
     var paymentAccountNumber: String? = null,
 
-    var expirationDate: String? = null,
+    var expirationDay: String? = null,
 
     var loanStatus: String? = null,
 
@@ -55,7 +55,7 @@ data class CardLoanEntity(
 
     var additionalLoanAmount: BigDecimal? = null,
 
-    var fullyPaidDate: String? = null,
+    var fullyPaidDay: String? = null,
 
     var cardNumber: String? = null,
 
