@@ -9,8 +9,10 @@ import com.rainist.collect.executor.CollectExecutorServiceImpl
 import com.rainist.collect.executor.IApiLogger
 import com.rainist.collect.executor.IIdGenerator
 import com.rainist.collect.executor.ITransferClient
+import java.util.concurrent.Executor
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 
 @Configuration
 class CollectConfig(
@@ -30,9 +32,20 @@ class CollectConfig(
     }
 
     @Bean
-    fun executorService() = CollectExecutorServiceImpl(transferClient, idGenerator, apiLogger, collectObjectMapper())
+    fun threadPoolTaskExecutor(): Executor {
+        val executor = ThreadPoolTaskExecutor()
+        executor.setThreadNamePrefix("TaskExecutor-")
+        executor.corePoolSize = 5
+        executor.maxPoolSize = 10
+        executor.setQueueCapacity(10)
+        executor.initialize()
+        return executor
+    }
+
+    @Bean
+    fun executorService() = CollectExecutorServiceImpl(transferClient, idGenerator, apiLogger, threadPoolTaskExecutor(), collectObjectMapper())
 
     @Bean
     fun collectExecutorService() =
-        CollectExecutorServiceImpl(transferClient, idGenerator, apiLogger, collectObjectMapper())
+            CollectExecutorServiceImpl(transferClient, idGenerator, apiLogger, threadPoolTaskExecutor(), collectObjectMapper())
 }
