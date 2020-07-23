@@ -16,7 +16,7 @@ let CardType = {
             {
                 "approvalDay" : if(size(.apvDt) >= 14) .apvDt[ 0 : 8 ] else "",   // 승인일자 yyyyMMdd
                 "approvalTime" : if(size(.apvDt) >= 14) .apvDt[ 8 : 14 ] else "", // 승인시간 HHmmss
-                "cardCompanyCardId" : "",
+                "cardCompanyCardId" : ".crdN",
                 "approvalNumber": .apvN,                                          // 승인번호
                 "amount": .apva,                                                  // 승인금액
                 "cardNumber": .crdN,                                              // 카드번호
@@ -25,7 +25,9 @@ let CardType = {
                 "paymentDay": .stDuD,                                             // 결제예정일자
                 "storeCategory" : .ryCd,                                          // 업종코드명
                 "transactionCountry" : .ntn,                                      // 사용국가
-                "cardType" : get-key($CardType, .ccd, "CARD_TYPE_UNKNOWN"),       // 거래구분 TODO 예상국 이게 여기서 왜 필요한지 내부 처리 로직 확인 ccd? cusccd?
+                //"cardType" : get-key($CardType, .ccd, "CARD_TYPE_UNKNOWN"),       // 거래구분 TODO 예상국 이게 여기서 왜 필요한지 내부 처리 로직 확인 ccd? cusccd?
+                "cardType" : "DEBIT",                                             //TODO 박두상. 현재 카드타입을 이용하는 값이 connectCard에서도 null이기에 해당부분 수정, 확인은 별도로 필요
+                "cardTransactionType" : if (.apva > 0) "APPROVAL" else "APPROVAL_CANCEL" // 해외의 경우 승인 취소가 맞는지 확인필요.
             }
         ],
         "nextKey" : .dataBody.nxtQyKey  // 다음 조회 키

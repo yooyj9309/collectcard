@@ -1,10 +1,11 @@
 package com.rainist.collectcard.cardtransactions.dto
 
+import com.rainist.collectcard.common.enums.CardTransactionType
+import com.rainist.collectcard.common.enums.CardType
 import com.rainist.common.annotation.validation.StringDateFormat
 import com.rainist.common.annotation.validation.StringTimeFormat
 import java.math.BigDecimal
 import javax.validation.constraints.NotEmpty
-import javax.validation.constraints.NotNull
 import org.springframework.format.annotation.NumberFormat
 
 data class CardTransaction(
@@ -28,12 +29,13 @@ data class CardTransaction(
 
     var storeNumber: String? = null, //  6. 가맹점 번호
 
-    var cardType: String? = null, //  7. 카드타입 (신용카드, 체크카드)
+    var cardType: CardType = CardType.UNKNOWN, //  7. 카드타입 (신용카드, 체크카드)
 
-    // TODO 예상국 카드 거래 타입에 대한 명세 추가 ( 신용, 체크 )
+    var cardTypeOrigin: String? = null,
 
-    @field:NotNull(message = "cardTransactionType는 필수 값입니다")
-    var cardTransactionType: CardTransactionType? = null, //  8. 내역타입 ( 승인, 전체 취소, 부분취소, 거절 )월
+    var cardTransactionType: CardTransactionType = CardTransactionType.CARD_TRANSACTION_TYPE_UNKNOWN, //  8. 내역타입 ( 승인, 전체 취소, 부분취소, 거절 )월
+
+    var cardTransactionTypeOrigin: String? = null,
 
     var currencyCode: String? = null, //  9. 통화코드
 

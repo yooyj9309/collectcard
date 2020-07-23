@@ -1,6 +1,6 @@
 package com.rainist.collectcard.cardbills.dto
 
-import com.rainist.collectcard.cardtransactions.dto.CardTransactionType
+import com.rainist.collectcard.common.enums.CardTransactionType
 import com.rainist.common.annotation.validation.StringDateFormat
 import com.rainist.common.annotation.validation.StringTimeFormat
 import java.math.BigDecimal

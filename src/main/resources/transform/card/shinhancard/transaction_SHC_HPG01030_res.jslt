@@ -35,8 +35,10 @@ let CardType = {
                 "storeNumber": .retlno,                                                 // 가맹점번호
                 "canceledAmount": .subCla,                                              // 부분취소 금액
                 "storeCategory" : .ryCd,                                                // 업종코드명
-                "cardType" : get-key($CardType, .settlgubun, "CARD_TYPE_UNKNOWN"),      // 거래구분 TODO 예상국 이게 여기서 왜 필요한지 내부 처리 로직 확인
-                "cardTransactionType": get-key($CardTransactionType, .status, "CARD_TRANSACTION_TYPE_UNKNOWN")  // 상태
+                "cardType" : "DEBIT",
+                //"cardType" : get-key($CardType, .settlgubun, "CARD_TYPE_UNKNOWN"),      // 거래구분 TODO 예상국 이게 여기서 왜 필요한지 내부 처리 로직 확인
+                "cardTransactionType": get-key($CardTransactionType, .status, "CARD_TRANSACTION_TYPE_UNKNOWN"),  // 상태
+                "cardTransactionTypeOrigin" : .status
             }
         ],
         "nextKey" : .dataBody.nxtQyKey  // 다음 조회 키

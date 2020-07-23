@@ -21,8 +21,10 @@ class CardTransactionUtil {
                 this.businessLicenseNumber = cardTransaction.businessLicenseNumber
                 this.storeName = cardTransaction.storeName
                 this.storeNumber = cardTransaction.storeNumber
-                this.cardType = cardTransaction.cardType
-                this.cardTransactionType = cardTransaction.cardTransactionType?.name
+                this.cardType = cardTransaction.cardType.name
+                this.cardTypeOrigin = cardTransaction.cardTypeOrigin
+                this.cardTransactionType = cardTransaction.cardTransactionType.name
+                this.cardTransactionTypeOrigin = cardTransaction.cardTransactionTypeOrigin
                 this.currencyCode = cardTransaction.currencyCode ?: "KRW"
                 this.isInstallmentPayment = cardTransaction.isInstallmentPayment ?: false
             }

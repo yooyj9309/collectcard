@@ -27,7 +27,9 @@ let CardTransactionType = {
                 "storeCategory" : .ryCd,                                                // 업종코드명
                 "currencyCode" : .engcrcycd,                                            // 통화코드
                 "transactionCountry" : .nation,                                         // 사용국가
-                "cardTransactionType": get-key($CardTransactionType, .trantype, "CARD_TRANSACTION_TYPE_UNKNOWN")  // 상태
+                "cardType" : "CREDIT",
+                "cardTransactionType": get-key($CardTransactionType, .trantype, "CARD_TRANSACTION_TYPE_UNKNOWN"),  // 상태
+                "cardTransactionTypeOrigin" : .trantype
             }
         ],
         "nextKey" : .dataBody.nxtQyKey  // 다음 조회 키

@@ -52,7 +52,7 @@ fun ListTransactionsResponse.toListCardsTransactionResponseProto(): CollectcardP
                             .newBuilder()
                             .setNumber(transaction.cardNumber)
                             .setName(StringValue.of(transaction.cardName ?: ""))
-                            .setType(StringValue.of(transaction.cardType ?: ""))
+                            .setType(StringValue.of(transaction.cardType.name))
                             .build()
                     )
                     .setInstallmentMonth(

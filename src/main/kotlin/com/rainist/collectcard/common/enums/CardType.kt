@@ -1,4 +1,4 @@
-package com.rainist.collectcard.cardtransactions.dto
+package com.rainist.collectcard.common.enums
 
 enum class CardType(
     var index: Int,

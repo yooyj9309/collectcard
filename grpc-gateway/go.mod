@@ -4,7 +4,8 @@ go 1.14
 
 require (
 	github.com/grpc-ecosystem/grpc-gateway v1.14.6
-	github.com/rainist/idl v0.0.0-20200714103137-25faeee495de
+	github.com/rainist/idl v0.0.0-20200721080835-97b09e57ce2f
 	github.com/sirupsen/logrus v1.6.0
 	google.golang.org/grpc v1.29.1
+	google.golang.org/protobuf v1.25.0 // indirect
 )
