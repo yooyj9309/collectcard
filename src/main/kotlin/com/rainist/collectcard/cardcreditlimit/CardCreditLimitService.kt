@@ -1,8 +1,8 @@
 package com.rainist.collectcard.cardcreditlimit
 
 import com.rainist.collectcard.cardcreditlimit.dto.CreditLimitResponse
-import com.rainist.collectcard.common.service.CardOrganization
+import com.rainist.collectcard.common.dto.SyncRequest
 
 interface CardCreditLimitService {
-    fun cardCreditLimit(banksaladUserId: String, organization: CardOrganization): CreditLimitResponse
+    fun cardCreditLimit(syncRequest: SyncRequest): CreditLimitResponse
 }

@@ -15,12 +15,14 @@ import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.db.repository.CardLoanHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardLoanRepository
-import com.rainist.collectcard.common.service.CardOrganization
+import com.rainist.collectcard.common.dto.SyncRequest
 import com.rainist.collectcard.common.service.HeaderService
+import com.rainist.collectcard.common.util.SyncStatus
 import com.rainist.common.log.Log
 import com.rainist.common.service.ValidationService
 import com.rainist.common.util.DateTimeUtil
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CardLoanServiceImpl(
@@ -34,10 +36,12 @@ class CardLoanServiceImpl(
 
     companion object : Log
 
-    override fun listCardLoans(banksaladUserId: String, organization: CardOrganization): ListLoansResponse {
+    @Transactional
+    @SyncStatus(transactionId = "cardLoans")
+    override fun listCardLoans(syncRequest: SyncRequest): ListLoansResponse {
         /* request header */
         val lastCheckAt = DateTimeUtil.getLocalDateTime()
-        val header = headerService.makeHeader(banksaladUserId, organization)
+        val header = headerService.makeHeader(syncRequest.banksaladUserId, syncRequest.organizationId)
 
         /* request body */
         val listLoansRequest = ListLoansRequest().apply {
@@ -63,14 +67,14 @@ class CardLoanServiceImpl(
         res.response.dataBody?.loans?.forEach { loan ->
             if (loan.loanId != null) {
                 val cardLoanEntity = cardLoanRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyLoanId(
-                    banksaladUserId.toLong(),
-                    organization.organizationId,
+                    syncRequest.banksaladUserId.toLong(),
+                    syncRequest.organizationId,
                     loan.loanId
                 )
 
                 var bodyEntity = CardLoanUtil.makeCardLoanEntity(
-                    banksaladUserId,
-                    organization.organizationId,
+                    syncRequest.banksaladUserId,
+                    syncRequest.organizationId,
                     loan
                 )
 

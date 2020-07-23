@@ -15,9 +15,10 @@ import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.db.entity.CreditLimitEntity
 import com.rainist.collectcard.common.db.repository.CreditLimitHistoryRepository
 import com.rainist.collectcard.common.db.repository.CreditLimitRepository
+import com.rainist.collectcard.common.dto.SyncRequest
 import com.rainist.collectcard.common.exception.CollectcardException
-import com.rainist.collectcard.common.service.CardOrganization
 import com.rainist.collectcard.common.service.HeaderService
+import com.rainist.collectcard.common.util.SyncStatus
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import org.springframework.stereotype.Service
@@ -34,9 +35,11 @@ class CardCreditLimitServiceImpl(
     companion object : Log
 
     @Transactional
-    override fun cardCreditLimit(banksaladUserId: String, organization: CardOrganization): CreditLimitResponse {
+    @SyncStatus(transactionId = "cardCreditLimit")
+    override fun cardCreditLimit(syncRequest: SyncRequest): CreditLimitResponse {
+
         val lastCheckAt = DateTimeUtil.utcNowLocalDateTime()
-        val header = headerService.makeHeader(banksaladUserId, organization)
+        val header = headerService.makeHeader(syncRequest.banksaladUserId, syncRequest.organizationId)
         val creditLimitRequest = CreditLimitRequest().apply {
             this.dataHeader = CardCreditLimitRequestDataHeader()
             this.dataBody = CardCreditLimitRequestDataBody()
@@ -57,14 +60,14 @@ class CardCreditLimitServiceImpl(
 
         // db insert
         var creditLimitEntity = creditLimitRepository.findCreditLimitEntitiesByBanksaladUserIdAndCardCompanyId(
-            banksaladUserId.toLong(),
-            organization.organizationId.toString()
+            syncRequest.banksaladUserId.toLong(),
+            syncRequest.organizationId
         ) ?: CreditLimitEntity()
 
         val resEntity = CreditLimitEntityUtil.makeCreditLimitEntity(
             lastCheckAt,
-            banksaladUserId.toLong(),
-            organization.organizationId,
+            syncRequest.banksaladUserId.toLong(),
+            syncRequest.organizationId,
             executionResponse.response.dataBody?.creditLimitInfo!!
         )
 

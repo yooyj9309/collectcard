@@ -76,13 +76,13 @@ class CollectcardGrpcService(
     ) {
         logger.debug("[사용자 카드 내역 조회 시작 : {}]", request)
 
-        val banksaladUserId = request.userId
-        val organization = organizationService.getOrganizationByObjectId(request.companyId.value)
-
+        val syncRequest = SyncRequest(
+            request.userId,
+            organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: ""
+        )
         kotlin.runCatching {
             cardTransactionService.listTransactions(
-                banksaladUserId,
-                organization,
+                syncRequest,
                 request.takeIf { request.hasFromMs() }?.fromMs?.value
             ).toListCardsTransactionResponseProto()
             // cardTransactionService.listTransactions(request)
@@ -137,11 +137,13 @@ class CollectcardGrpcService(
     ) {
         logger.debug("[사용자 대출 내역 조회 시작 : {}]", request)
 
-        val banksaladUserId = request.userId
-        val organization = organizationService.getOrganizationByObjectId(request.companyId.value)
+        val syncRequest = SyncRequest(
+            request.userId,
+            organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: ""
+        )
 
         kotlin.runCatching {
-            cardLoanService.listCardLoans(banksaladUserId, organization).toListCardLoansResponseProto()
+            cardLoanService.listCardLoans(syncRequest).toListCardLoansResponseProto()
         }
             .onSuccess {
                 logger.info("[사용자 대출내역 조회 결과 success]")
@@ -164,13 +166,15 @@ class CollectcardGrpcService(
         request: CollectcardProto.GetCreditLimitRequest,
         responseObserver: StreamObserver<CollectcardProto.GetCreditLimitResponse>
     ) {
-        val banksaladUserId = request.userId
-        val organization = organizationService.getOrganizationByObjectId(request.companyId.value)
+        val syncRequest = SyncRequest(
+            request.userId,
+            organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: ""
+        )
 
         logger.debug("[사용자 개인 한도 조회 시작 : {}]", request)
 
         kotlin.runCatching {
-            cardCreditLimitService.cardCreditLimit(banksaladUserId, organization).toCreditLimitResponseProto()
+            cardCreditLimitService.cardCreditLimit(syncRequest).toCreditLimitResponseProto()
         }.onSuccess {
             responseObserver.onNext(it)
             responseObserver.onCompleted()

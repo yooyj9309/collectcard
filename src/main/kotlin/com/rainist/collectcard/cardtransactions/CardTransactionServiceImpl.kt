@@ -16,8 +16,9 @@ import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.db.repository.CardTransactionRepository
-import com.rainist.collectcard.common.service.CardOrganization
+import com.rainist.collectcard.common.dto.SyncRequest
 import com.rainist.collectcard.common.service.HeaderService
+import com.rainist.collectcard.common.util.SyncStatus
 import com.rainist.common.log.Log
 import com.rainist.common.service.ValidationService
 import com.rainist.common.util.DateTimeUtil
@@ -44,28 +45,28 @@ class CardTransactionServiceImpl(
 
     companion object : Log {
         const val DEFAULT_MAX_MONTH = 12L
-        const val DEFAULT_DIVISION = 3
+        const val DEFAULT_DIVISION_MONTH = 3
     }
 
     @Transactional
-    override fun listTransactions(banksaladUserId: String, organization: CardOrganization, fromMs: Long?): ListTransactionsResponse {
-        val header = headerService.makeHeader(banksaladUserId, organization)
+    @SyncStatus(transactionId = "cardTransactions")
+    override fun listTransactions(syncRequest: SyncRequest, fromMs: Long?): ListTransactionsResponse {
+        val header = headerService.makeHeader(syncRequest.banksaladUserId, syncRequest.organizationId)
 
         val request = ListTransactionsRequest().apply {
-            this.organizationObjectid = organization.organizationObjectId
             this.dataHeader = ListTransactionsRequestDataHeader()
             this.dataBody = ListTransactionsRequestDataBody().apply {
-                this.startAt = createStartAt(fromMs, organization.maxMonth.toLong())
+                this.startAt = createStartAt(fromMs)
             }
         }
 
-        val transactions = getlistTransactionsByDivision(header, request, organization.division)
+        val transactions = getlistTransactionsByDivision(header, request)
 
         // db insert
         transactions.forEach { cardTransaction ->
             var cardTransactionEntity = cardTransactionRepository.findByBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
-                banksaladUserId.toLong(),
-                organization.organizationId,
+                syncRequest.banksaladUserId.toLong(),
+                syncRequest.organizationId,
                 cardTransaction.cardCompanyCardId,
                 cardTransaction.approvalNumber,
                 cardTransaction.approvalDay,
@@ -74,7 +75,7 @@ class CardTransactionServiceImpl(
 
             if (cardTransactionEntity == null) {
                 cardTransactionRepository.save(
-                    CardTransactionUtil.makeCardTransactionEntity(banksaladUserId.toLong(), organization.organizationId.toString(), cardTransaction)
+                    CardTransactionUtil.makeCardTransactionEntity(syncRequest.banksaladUserId.toLong(), syncRequest.organizationId, cardTransaction)
                 )
             }
         }
@@ -89,8 +90,7 @@ class CardTransactionServiceImpl(
 
     private fun getlistTransactionsByDivision(
         header: MutableMap<String, String?>,
-        request: ListTransactionsRequest,
-        division: Int
+        request: ListTransactionsRequest
     ): MutableList<CardTransaction> {
 
         val searchDateList = let {
@@ -99,7 +99,7 @@ class CardTransactionServiceImpl(
             val startDate = DateTimeUtil.stringToLocalDate(dataBody.startAt, "yyyyMMdd")
             val endDate = DateTimeUtil.stringToLocalDate(dataBody.endAt, "yyyyMMdd")
             DateTimeUtil.splitLocalDateRangeByMonth(
-                startDate, endDate, division
+                startDate, endDate, DEFAULT_DIVISION_MONTH
             )
         }?.toMutableList() ?: mutableListOf()
 
@@ -149,7 +149,7 @@ class CardTransactionServiceImpl(
         }.sortedByDescending { cardTransaction -> cardTransaction.approvalDay + cardTransaction.approvalTime }.toMutableList()
     }
 
-    private fun createStartAt(startAt: Long?, maxMonth: Long): String {
+    private fun createStartAt(startAt: Long?): String {
         return if (startAt != null) {
             val localdateTime = DateTimeUtil.epochMilliSecondToKSTLocalDateTime(startAt)
             DateTimeUtil.localDateToString(
@@ -162,7 +162,7 @@ class CardTransactionServiceImpl(
             )
         } else {
             DateTimeUtil.localDateToString(
-                DateTimeUtil.kstNowLocalDate().minusMonths(maxMonth),
+                DateTimeUtil.kstNowLocalDate().minusMonths(DEFAULT_MAX_MONTH),
                 "yyyyMMdd"
             )
         }
