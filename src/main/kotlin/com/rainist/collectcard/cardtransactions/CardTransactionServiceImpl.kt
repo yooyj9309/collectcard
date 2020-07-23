@@ -2,6 +2,7 @@ package com.rainist.collectcard.cardtransactions
 
 import com.rainist.collect.common.execution.ExecutionRequest
 import com.rainist.collect.common.execution.ExecutionResponse
+import com.rainist.collect.executor.ApiLog
 import com.rainist.collect.executor.CollectExecutorService
 import com.rainist.collectcard.cardtransactions.dto.CardTransaction
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsRequest
@@ -10,13 +11,13 @@ import com.rainist.collectcard.cardtransactions.dto.ListTransactionsRequestDataH
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponse
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponseDataBody
 import com.rainist.collectcard.cardtransactions.util.CardTransactionUtil
-import com.rainist.collectcard.cardtransactions.validation.ListCardRequestValidator
 import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.db.repository.CardTransactionRepository
 import com.rainist.collectcard.common.dto.SyncRequest
+import com.rainist.collectcard.common.service.ApiLogService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.util.SyncStatus
 import com.rainist.common.log.Log
@@ -35,9 +36,9 @@ import org.springframework.transaction.annotation.Transactional
 @ExperimentalCoroutinesApi
 @Service
 class CardTransactionServiceImpl(
+    val apiLogService: ApiLogService,
     val headerService: HeaderService,
     val collectExecutorService: CollectExecutorService,
-    val listCardRequestValidator: ListCardRequestValidator,
     val validationService: ValidationService,
     val cardTransactionRepository: CardTransactionRepository,
     @Qualifier("async-thread") val executor: Executor
@@ -60,22 +61,27 @@ class CardTransactionServiceImpl(
             }
         }
 
-        val transactions = getlistTransactionsByDivision(header, request)
+        val transactions = getlistTransactionsByDivision(syncRequest, header, request)
 
         // db insert
         transactions.forEach { cardTransaction ->
-            var cardTransactionEntity = cardTransactionRepository.findByBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
-                syncRequest.banksaladUserId.toLong(),
-                syncRequest.organizationId,
-                cardTransaction.cardCompanyCardId,
-                cardTransaction.approvalNumber,
-                cardTransaction.approvalDay,
-                cardTransaction.approvalTime
-            )
+            var cardTransactionEntity =
+                cardTransactionRepository.findByBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
+                    syncRequest.banksaladUserId.toLong(),
+                    syncRequest.organizationId,
+                    cardTransaction.cardCompanyCardId,
+                    cardTransaction.approvalNumber,
+                    cardTransaction.approvalDay,
+                    cardTransaction.approvalTime
+                )
 
             if (cardTransactionEntity == null) {
                 cardTransactionRepository.save(
-                    CardTransactionUtil.makeCardTransactionEntity(syncRequest.banksaladUserId.toLong(), syncRequest.organizationId, cardTransaction)
+                    CardTransactionUtil.makeCardTransactionEntity(
+                        syncRequest.banksaladUserId.toLong(),
+                        syncRequest.organizationId,
+                        cardTransaction
+                    )
                 )
             }
         }
@@ -89,6 +95,7 @@ class CardTransactionServiceImpl(
     }
 
     private fun getlistTransactionsByDivision(
+        syncRequest: SyncRequest,
         header: MutableMap<String, String?>,
         request: ListTransactionsRequest
     ): MutableList<CardTransaction> {
@@ -115,24 +122,38 @@ class CardTransactionServiceImpl(
                     }
                 }
             }
-            .map {
-                println("time is :${it.dataBody?.startAt} ~ ${it.dataBody?.endAt}")
-                async {
-                    val res: ExecutionResponse<ListTransactionsResponse> =
-                        collectExecutorService.execute(
-                            Executions.valueOf(
-                                BusinessType.card,
-                                Organization.shinhancard,
-                                Transaction.cardTransaction
-                            ),
-                            ExecutionRequest.builder<ListTransactionsRequest>()
-                                .headers(header)
-                                .request(it)
-                                .build()
-                        )
-                    res
+                .map {
+                    println("time is :${it.dataBody?.startAt} ~ ${it.dataBody?.endAt}")
+                    async {
+                        val res: ExecutionResponse<ListTransactionsResponse> =
+                            collectExecutorService.execute(
+                                Executions.valueOf(
+                                    BusinessType.card,
+                                    Organization.shinhancard,
+                                    Transaction.cardTransaction
+                                ),
+                                ExecutionRequest.builder<ListTransactionsRequest>()
+                                    .headers(header)
+                                    .request(it)
+                                    .build(),
+                                { apiLog: ApiLog ->
+                                    apiLogService.logRequest(
+                                        syncRequest.organizationId,
+                                        syncRequest.banksaladUserId.toLong(),
+                                        apiLog
+                                    )
+                                },
+                                { apiLog: ApiLog ->
+                                    apiLogService.logResponse(
+                                        syncRequest.organizationId,
+                                        syncRequest.banksaladUserId.toLong(),
+                                        apiLog
+                                    )
+                                }
+                            )
+                        res
+                    }
                 }
-            }
         }.let {
             it.map { deferred ->
                 deferred.getCompleted()
@@ -146,7 +167,8 @@ class CardTransactionServiceImpl(
             it.cardNumber?.length ?: 0 > 0
         }.mapNotNull {
             validationService.validateOrNull(it)
-        }.sortedByDescending { cardTransaction -> cardTransaction.approvalDay + cardTransaction.approvalTime }.toMutableList()
+        }.sortedByDescending { cardTransaction -> cardTransaction.approvalDay + cardTransaction.approvalTime }
+            .toMutableList()
     }
 
     private fun createStartAt(startAt: Long?): String {

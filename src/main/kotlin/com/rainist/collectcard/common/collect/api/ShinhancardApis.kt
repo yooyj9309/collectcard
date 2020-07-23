@@ -18,7 +18,8 @@ class ShinhancardApis {
         // 유효카드 정보조회 SHC_HPG00548
         card_shinhancard_cards =
             Api.builder()
-                .name("보유카드조회")
+                .id("card_shinhancard_cards")
+                .name("유효카드 정보조회 SHC_HPG00548")
                 .signaturePolicy(signaturePolicyShinhancard)
                 .endpoint("$shinhancardHost/v1.0/EXT/mycard/searchavailablecard")
                 .method(Api.HttpMethod.POST)
@@ -36,6 +37,7 @@ class ShinhancardApis {
         // 신용 국내사용내역조회-일시불/할부 SHC_HPG00428
         card_shinhancard_credit_domestic_transactions =
             Api.builder()
+                .id("card_shinhancard_credit_domestic_transactions")
                 .name("신용 국내사용내역 조회-일시불/할부(SHC_HPG00428)")
                 .signaturePolicy(signaturePolicyShinhancard)
                 .endpoint("$shinhancardHost/v1.0/EXT/usecreditcard/searchusefordomestic")
@@ -54,6 +56,7 @@ class ShinhancardApis {
         // 신용 해외사용내역조회-일시불조회 SHC_HPG01612
         card_shinhancard_credit_oversea_transactions =
             Api.builder()
+                .id("card_shinhancard_credit_oversea_transactions")
                 .name("신용 해외사용내역조회-일시불조회(SHC_HPG01612)")
                 .signaturePolicy(signaturePolicyShinhancard)
                 .endpoint("$shinhancardHost/v1.0/EXT/usecreditcard/searchuseforoverseas")
@@ -72,6 +75,7 @@ class ShinhancardApis {
         // 체크 국내사용내역 조회 SHC_HPG01030
         card_shinhancard_check_domestic_transactions =
             Api.builder()
+                .id("card_shinhancard_check_domestic_transactions")
                 .name("체크 국내사용내역(SHC_HPG01030)")
                 .signaturePolicy(signaturePolicyShinhancard)
                 .endpoint("$shinhancardHost/v1.0/EXT/usedebitcard/searchusefordomestic")
@@ -90,6 +94,7 @@ class ShinhancardApis {
         // 체크 해외사용내역 조회 SHC_HPG01031
         card_shinhancard_check_oversea_transactions =
             Api.builder()
+                .id("card_shinhancard_check_oversea_transactions")
                 .name("체크 국내사용내역(SHC_HPG01031)")
                 .signaturePolicy(signaturePolicyShinhancard)
                 .endpoint("$shinhancardHost/v1.0/EXT/usedebitcard/searchuseforoverseas")
@@ -108,6 +113,7 @@ class ShinhancardApis {
         // 카드_[EXT] 결제예정금액 총괄 SHC_HPG01096_EXT
         card_shinhancard_list_user_card_bills_expected =
             Api.builder()
+                .id("card_shinhancard_list_user_card_bills_expected")
                 .name("카드_[EXT] 결제예정금액 총괄(SHC_HPG01096_EXT)")
                 .signaturePolicy(signaturePolicyShinhancard)
                 .endpoint("$shinhancardHost/v1.0/EXT/usecard/searchtotalpayments")
@@ -126,6 +132,7 @@ class ShinhancardApis {
         // 결제예정금액(일시불,현금서비스 상세) (SHC_HPG00237)
         card_shinhancard_list_user_card_bills_expected_detail_lump_sum =
             Api.builder()
+                .id("card_shinhancard_list_user_card_bills_expected_detail_lump_sum")
                 .name("카드_[EXT] 결제예정금액(일시불,현금서비스 상세)(SHC_HPG00237)")
                 .signaturePolicy(signaturePolicyShinhancard)
                 .endpoint("$shinhancardHost/v1.0/EXT/usecard/searchpaymentsdetail")
@@ -144,6 +151,7 @@ class ShinhancardApis {
         // (할부) 결제예정금액(할부, 론 상세) (SHC_HPG00238)
         card_shinhancard_list_user_card_bills_expected_detail_installment =
             Api.builder()
+                .id("card_shinhancard_list_user_card_bills_expected_detail_installment")
                 .name("카드_[EXT] (할부) 결제예정금액(할부, 론 상세)(SHC_HPG00238)")
                 .signaturePolicy(signaturePolicyShinhancard)
                 .endpoint("$shinhancardHost/v1.0/EXT/useinstallment/searchpaymentsdetail")
@@ -162,6 +170,7 @@ class ShinhancardApis {
         // 체크카드 월별 청구내역 최근 6개월 이력 조회 (SHC_HPG01226)
         card_shinhancard_check_bills =
             Api.builder()
+                .id("card_shinhancard_check_bills")
                 .name("체크카드 월별 청구내역(SHC_HPG01226)")
                 .signaturePolicy(signaturePolicyShinhancard)
                 .endpoint("$shinhancardHost/v1.0/EXT/usedebitcard/searchmonthlybillingfor6months")
@@ -180,6 +189,7 @@ class ShinhancardApis {
         // 신용카드 월별 청구내역(SHC_HPG00719)
         card_shinhancard_credit_bills =
             Api.builder()
+                .id("card_shinhancard_credit_bills")
                 .name("신용카드 월별 청구내역(SHC_HPG00719)")
                 .signaturePolicy(signaturePolicyShinhancard)
                 .endpoint("$shinhancardHost/v1.0/EXT/usecreditcard/searchmonthlybillingfor6months")
@@ -198,6 +208,7 @@ class ShinhancardApis {
         // 체크카드 월별 청구내역(SHC_HPG00537)
         card_shinhancard_check_bill_transactions =
             Api.builder()
+                .id("card_shinhancard_check_bill_transactions")
                 .name("체크카드 월별 청구내역 상세(SHC_HPG00537)")
                 .signaturePolicy(signaturePolicyShinhancard)
                 .endpoint("$shinhancardHost/v1.0/EXT/usedebitcard/searchmonthlybillingdetail")
@@ -216,6 +227,7 @@ class ShinhancardApis {
         // 체크카드 월별 청구내역(SHC_HPG00698)
         card_shinhancard_credit_bill_transactions =
             Api.builder()
+                .id("card_shinhancard_credit_bill_transactions")
                 .name("신용카드 월별 청구내역 상세(SHC_HPG00698)")
                 .signaturePolicy(signaturePolicyShinhancard)
                 .endpoint("$shinhancardHost/v1.0/EXT/usecreditcard/searchmonthlybillingdetail")
@@ -234,6 +246,7 @@ class ShinhancardApis {
         // 사용자 거래정보 조회 (SHC_EXT_00001)
         card_shinhancard_user_info =
             Api.builder()
+                .id("card_shinhancard_user_info")
                 .name("사용자 거래정보 조회 (SHC_EXT_00001)")
                 .signaturePolicy(signaturePolicyShinhancard)
                 .endpoint("$shinhancardHost/v1.0/EXT/myinfo/searchtransinfo")
@@ -252,6 +265,7 @@ class ShinhancardApis {
         // 대출정보 현황 정보 조회 (SHC_HPG00203)
         card_shinhancard_loan_info =
             Api.builder()
+                .id("card_shinhancard_loan_info")
                 .name("대출정보 현황 정보 조회 (SHC_HPG00203)")
                 .signaturePolicy(signaturePolicyShinhancard)
                 .endpoint("$shinhancardHost/v1.0/EXT/uselongloan/searchproduct")
@@ -270,6 +284,7 @@ class ShinhancardApis {
         // 대출 상세 정보 조회 (SHC_HPG00188)
         card_shinhancard_loan_detail =
             Api.builder()
+                .id("card_shinhancard_loan_detail")
                 .name("대출 상세 정보 조회 (SHC_HPG00188)")
                 .signaturePolicy(signaturePolicyShinhancard)
                 .endpoint("$shinhancardHost/v1.0/EXT/uselongloan/loancondition")
@@ -288,6 +303,7 @@ class ShinhancardApis {
         // 개인 한도 조회 (SHC_HPG01730)
         card_shinhancard_credit_limit =
             Api.builder()
+                .id("card_shinhancard_credit_limit")
                 .name("개인 한도 조회 (SHC_HPG01730)")
                 .signaturePolicy(signaturePolicyShinhancard)
                 .endpoint("$shinhancardHost/v1.0/EXT/usecard/searchlimit")

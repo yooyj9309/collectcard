@@ -2,13 +2,13 @@ package com.rainist.collectcard.cardloans
 
 import com.rainist.collect.common.execution.ExecutionRequest
 import com.rainist.collect.common.execution.ExecutionResponse
+import com.rainist.collect.executor.ApiLog
 import com.rainist.collect.executor.CollectExecutorService
 import com.rainist.collectcard.cardloans.dto.ListLoansRequest
 import com.rainist.collectcard.cardloans.dto.ListLoansRequestDataBody
 import com.rainist.collectcard.cardloans.dto.ListLoansRequestDataHeader
 import com.rainist.collectcard.cardloans.dto.ListLoansResponse
 import com.rainist.collectcard.cardloans.util.CardLoanUtil
-import com.rainist.collectcard.cardloans.validation.ListCardLoansRequestValidator
 import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
@@ -16,19 +16,18 @@ import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.db.repository.CardLoanHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardLoanRepository
 import com.rainist.collectcard.common.dto.SyncRequest
+import com.rainist.collectcard.common.service.ApiLogService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.util.SyncStatus
 import com.rainist.common.log.Log
-import com.rainist.common.service.ValidationService
 import com.rainist.common.util.DateTimeUtil
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CardLoanServiceImpl(
-    val listCardLoansRequestValidator: ListCardLoansRequestValidator,
+    val apiLogService: ApiLogService,
     val headerService: HeaderService,
-    val validationService: ValidationService,
     val collectExecutorService: CollectExecutorService,
     val cardLoanRepository: CardLoanRepository,
     val cardLoanHistoryRepository: CardLoanHistoryRepository
@@ -55,7 +54,13 @@ class CardLoanServiceImpl(
             ExecutionRequest.builder<ListLoansRequest>()
                 .headers(header)
                 .request(listLoansRequest)
-                .build()
+                .build(),
+            { apiLog: ApiLog ->
+                apiLogService.logRequest(syncRequest.organizationId, syncRequest.banksaladUserId.toLong(), apiLog)
+            },
+            { apiLog: ApiLog ->
+                apiLogService.logResponse(syncRequest.organizationId, syncRequest.banksaladUserId.toLong(), apiLog)
+            }
         )
 
         /* validate logic */
@@ -81,8 +86,11 @@ class CardLoanServiceImpl(
                 // only save(insert)
                 if (cardLoanEntity == null) {
                     bodyEntity = cardLoanRepository.save(bodyEntity)
-                    cardLoanHistoryRepository.save(CardLoanUtil.makeCardLoanHistoryEntity(
-                        lastCheckAt, bodyEntity))
+                    cardLoanHistoryRepository.save(
+                        CardLoanUtil.makeCardLoanHistoryEntity(
+                            lastCheckAt, bodyEntity
+                        )
+                    )
                 }
                 // update
                 else {
@@ -90,7 +98,12 @@ class CardLoanServiceImpl(
                         // update
                         CardLoanUtil.copyCardLoanEntity(bodyEntity, cardLoanEntity)
                         cardLoanRepository.save(cardLoanEntity)
-                        cardLoanHistoryRepository.save(CardLoanUtil.makeCardLoanHistoryEntity(lastCheckAt, cardLoanEntity))
+                        cardLoanHistoryRepository.save(
+                            CardLoanUtil.makeCardLoanHistoryEntity(
+                                lastCheckAt,
+                                cardLoanEntity
+                            )
+                        )
                     }
                 }
             }

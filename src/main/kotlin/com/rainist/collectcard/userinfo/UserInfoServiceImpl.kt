@@ -42,12 +42,13 @@ class UserInfoServiceImpl(
                     headerService.getHeader(headerInfo)
                 }
                 .let { header ->
+                    // TODO : add api logging
                     val res: ExecutionResponse<UserInfoResponse> = collectExecutorService.execute(
                         Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.userInfo),
                         ExecutionRequest.builder<UserInfoRequest>()
                             .headers(header)
                             .request(userInfoRequest)
-                            .build()
+                            .build(), null, null
                     )
                     res
                 }

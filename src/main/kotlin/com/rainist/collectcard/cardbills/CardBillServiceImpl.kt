@@ -2,6 +2,7 @@ package com.rainist.collectcard.cardbills
 
 import com.rainist.collect.common.execution.ExecutionRequest
 import com.rainist.collect.common.execution.ExecutionResponse
+import com.rainist.collect.executor.ApiLog
 import com.rainist.collect.executor.CollectExecutorService
 import com.rainist.collectcard.cardbills.dto.CardBill
 import com.rainist.collectcard.cardbills.dto.CardBillTransaction
@@ -15,6 +16,7 @@ import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.db.entity.CardBillEntity
 import com.rainist.collectcard.common.db.repository.CardBillRepository
 import com.rainist.collectcard.common.exception.CollectcardException
+import com.rainist.collectcard.common.service.ApiLogService
 import com.rainist.collectcard.common.service.CardOrganization
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.OrganizationService
@@ -26,8 +28,9 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CardBillServiceImpl(
-    val collectExecutorService: CollectExecutorService,
+    val apiLogService: ApiLogService,
     val headerService: HeaderService,
+    val collectExecutorService: CollectExecutorService,
     val cardBillRepository: CardBillRepository,
     val organizationService: OrganizationService
 ) : CardBillService {
@@ -35,8 +38,12 @@ class CardBillServiceImpl(
     companion object : Log
 
     @Transactional
-    override fun listUserCardBills(banksaladUerId: String, organization: CardOrganization, startAt: Long?): ListCardBillsResponse {
-        val header = headerService.makeHeader(banksaladUerId, organization)
+    override fun listUserCardBills(
+        banksaladUserId: String,
+        organization: CardOrganization,
+        startAt: Long?
+    ): ListCardBillsResponse {
+        val header = headerService.makeHeader(banksaladUserId, organization)
 
         val request = ListCardBillsRequest().apply {
             dataBody = ListCardBillsRequestDataBody().apply {
@@ -55,7 +62,13 @@ class CardBillServiceImpl(
             ExecutionRequest.builder<ListCardBillsRequest>()
                 .headers(header)
                 .request(request)
-                .build()
+                .build(),
+            { apiLog: ApiLog ->
+                apiLogService.logRequest(organization.organizationId ?: "", banksaladUserId.toLong(), apiLog)
+            },
+            { apiLog: ApiLog ->
+                apiLogService.logResponse(organization.organizationId ?: "", banksaladUserId.toLong(), apiLog)
+            }
         )
 
         // TODO : error handling
@@ -66,9 +79,9 @@ class CardBillServiceImpl(
         val cardBillResponse = executionResponse.response
 
         cardBillResponse.dataBody?.cardBills?.forEach { cardBill ->
-            upsertCardBill(banksaladUerId, organization.organizationId, cardBill)
+            upsertCardBill(banksaladUserId, organization.organizationId, cardBill)
             cardBill.transactions?.map { billTransaction ->
-                upsertCardBillTransaction(banksaladUerId, organization.organizationId, billTransaction)
+                upsertCardBillTransaction(banksaladUserId, organization.organizationId, billTransaction)
             }
         }
 
@@ -105,7 +118,11 @@ class CardBillServiceImpl(
         }.let { cardBillRepository.save(it) }
     }
 
-    private fun upsertCardBillTransaction(banksaladUserId: String, organizationId: String?, cardBillTransaction: CardBillTransaction) {
+    private fun upsertCardBillTransaction(
+        banksaladUserId: String,
+        organizationId: String?,
+        cardBillTransaction: CardBillTransaction
+    ) {
         TODO()
     }
 

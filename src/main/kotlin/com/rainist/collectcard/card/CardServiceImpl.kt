@@ -2,6 +2,7 @@ package com.rainist.collectcard.card
 
 import com.rainist.collect.common.execution.ExecutionRequest
 import com.rainist.collect.common.execution.ExecutionResponse
+import com.rainist.collect.executor.ApiLog
 import com.rainist.collect.executor.CollectExecutorService
 import com.rainist.collectcard.card.dto.Card
 import com.rainist.collectcard.card.dto.ListCardsRequest
@@ -17,6 +18,7 @@ import com.rainist.collectcard.common.db.repository.CardHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardRepository
 import com.rainist.collectcard.common.dto.SyncRequest
 import com.rainist.collectcard.common.exception.CollectcardException
+import com.rainist.collectcard.common.service.ApiLogService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.util.SyncStatus
 import com.rainist.common.log.Log
@@ -27,10 +29,11 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CardServiceImpl(
+    val apiLogService: ApiLogService,
     val collectExecutorService: CollectExecutorService,
+    val headerService: HeaderService,
     val cardRepository: CardRepository,
-    val cardHistoryRepository: CardHistoryRepository,
-    val headerService: HeaderService
+    val cardHistoryRepository: CardHistoryRepository
 ) : CardService {
 
     companion object : Log
@@ -47,13 +50,20 @@ class CardServiceImpl(
         }
 
         /* Call API */
-        val executionResponse: ExecutionResponse<ListCardsResponse> = collectExecutorService.execute(
-            Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.cards),
-            ExecutionRequest.builder<ListCardsRequest>()
-                .headers(header)
-                .request(listCardsRequest)
-                .build()
-        )
+        val executionResponse: ExecutionResponse<ListCardsResponse> =
+            collectExecutorService.execute(
+                Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.cards),
+                ExecutionRequest.builder<ListCardsRequest>()
+                    .headers(header)
+                    .request(listCardsRequest)
+                    .build(),
+                { apiLog: ApiLog ->
+                    apiLogService.logRequest(syncRequest.organizationId, syncRequest.banksaladUserId.toLong(), apiLog)
+                },
+                { apiLog: ApiLog ->
+                    apiLogService.logResponse(syncRequest.organizationId, syncRequest.banksaladUserId.toLong(), apiLog)
+                }
+            )
 
         /* response error handling */
         // TODO : error handling

@@ -2,6 +2,7 @@ package com.rainist.collectcard.cardcreditlimit
 
 import com.rainist.collect.common.execution.ExecutionRequest
 import com.rainist.collect.common.execution.ExecutionResponse
+import com.rainist.collect.executor.ApiLog
 import com.rainist.collect.executor.CollectExecutorService
 import com.rainist.collectcard.cardcreditlimit.dto.CardCreditLimitRequestDataBody
 import com.rainist.collectcard.cardcreditlimit.dto.CardCreditLimitRequestDataHeader
@@ -17,6 +18,7 @@ import com.rainist.collectcard.common.db.repository.CreditLimitHistoryRepository
 import com.rainist.collectcard.common.db.repository.CreditLimitRepository
 import com.rainist.collectcard.common.dto.SyncRequest
 import com.rainist.collectcard.common.exception.CollectcardException
+import com.rainist.collectcard.common.service.ApiLogService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.util.SyncStatus
 import com.rainist.common.log.Log
@@ -26,8 +28,9 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CardCreditLimitServiceImpl(
-    val collectExecutorService: CollectExecutorService,
+    val apiLogService: ApiLogService,
     val headerService: HeaderService,
+    val collectExecutorService: CollectExecutorService,
     val creditLimitRepository: CreditLimitRepository,
     val creditLimitHistoryRepository: CreditLimitHistoryRepository
 ) : CardCreditLimitService {
@@ -51,7 +54,13 @@ class CardCreditLimitServiceImpl(
             ExecutionRequest.builder<CreditLimitRequest>()
                 .headers(header)
                 .request(creditLimitRequest)
-                .build()
+                .build(),
+            { apiLog: ApiLog ->
+                apiLogService.logRequest(syncRequest.organizationId, syncRequest.banksaladUserId.toLong(), apiLog)
+            },
+            { apiLog: ApiLog ->
+                apiLogService.logResponse(syncRequest.organizationId, syncRequest.banksaladUserId.toLong(), apiLog)
+            }
         )
 
         // validate
