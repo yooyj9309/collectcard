@@ -4,5 +4,5 @@ import com.rainist.collectcard.cardbills.dto.ListCardBillsResponse
 import com.rainist.collectcard.common.service.CardOrganization
 
 interface CardBillService {
-    fun listUserCardBills(banksaladUerId: String, organization: CardOrganization, startAt: Long?): ListCardBillsResponse
+    fun listUserCardBills(banksaladUserId: String, organization: CardOrganization, startAt: Long?): ListCardBillsResponse
 }

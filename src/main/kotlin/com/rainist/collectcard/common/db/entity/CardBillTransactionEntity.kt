@@ -19,129 +19,129 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 data class CardBillTransactionEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var cardBillTransactionId: Long,
+    var cardBillTransactionId: Long? = null,
 
-    var banksaladUserId: Long,
+    var banksaladUserId: Long? = null,
 
-    var cardCompanyId: String,
+    var cardCompanyId: String? = null,
 
-    var billNumber: String,
+    var billNumber: String? = null,
 
-    var cardBillTransactionNo: Int,
+    var cardBillTransactionNo: Int? = null,
 
-    var cardCompanyCardId: String,
-
-    @Nullable
-    var cardName: String,
+    var cardCompanyCardId: String? = null,
 
     @Nullable
-    var cardNumber: String,
+    var cardName: String? = null,
 
     @Nullable
-    var cardNumberMask: String,
+    var cardNumber: String? = null,
 
     @Nullable
-    var businessLicenseNumber: String,
+    var cardNumberMask: String? = null,
 
     @Nullable
-    var storeName: String,
+    var businessLicenseNumber: String? = null,
 
     @Nullable
-    var storeNumber: String,
+    var storeName: String? = null,
 
     @Nullable
-    var cardType: String,
+    var storeNumber: String? = null,
 
     @Nullable
-    var cardTypeOrigin: String,
+    var cardType: String? = null,
 
     @Nullable
-    var cardTransactionType: String,
+    var cardTypeOrigin: String? = null,
 
     @Nullable
-    var cardTransactionTypeOrigin: String,
+    var cardTransactionType: String? = null,
 
     @Nullable
-    var currencyCode: String,
-
-    var isInstallmentPayment: Boolean,
-
-    var installment: Int,
+    var cardTransactionTypeOrigin: String? = null,
 
     @Nullable
-    var installmentRound: Int,
+    var currencyCode: String? = null,
 
-    var netSalesAmount: BigDecimal,
+    var isInstallmentPayment: Boolean? = null,
 
-    @Nullable
-    var serviceChargeAmount: BigDecimal,
-
-    @Nullable
-    var taxAmount: BigDecimal,
+    var installment: Int? = null,
 
     @Nullable
-    var paidPoints: BigDecimal,
+    var installmentRound: Int? = null,
+
+    var netSalesAmount: BigDecimal? = null,
 
     @Nullable
-    var isPointPay: Boolean,
+    var serviceChargeAmount: BigDecimal? = null,
 
     @Nullable
-    var discountAmount: BigDecimal,
+    var taxAmount: BigDecimal? = null,
 
     @Nullable
-    var canceledAmount: BigDecimal,
-
-    var approvalNumber: String,
-
-    var approvalDay: String,
-
-    var approvalTime: String,
+    var paidPoints: BigDecimal? = null,
 
     @Nullable
-    var pointsToEarn: BigDecimal,
-
-    var isOverseaUse: Boolean,
-
-    var paymentDay: String,
+    var isPointPay: Boolean? = null,
 
     @Nullable
-    var storeCategory: String,
+    var discountAmount: BigDecimal? = null,
 
     @Nullable
-    var storeCategoryOrigin: String,
+    var canceledAmount: BigDecimal? = null,
+
+    var approvalNumber: String? = null,
+
+    var approvalDay: String? = null,
+
+    var approvalTime: String? = null,
 
     @Nullable
-    var transactionCountry: String,
+    var pointsToEarn: BigDecimal? = null,
+
+    var isOverseaUse: Boolean? = null,
+
+    var paymentDay: String? = null,
 
     @Nullable
-    var billingRound: Int,
+    var storeCategory: String? = null,
 
     @Nullable
-    var paidAmount: BigDecimal,
+    var storeCategoryOrigin: String? = null,
 
     @Nullable
-    var billedAmount: BigDecimal,
+    var transactionCountry: String? = null,
 
     @Nullable
-    var billedFee: BigDecimal,
+    var billingRound: Int? = null,
 
     @Nullable
-    var remainingAmount: BigDecimal,
+    var paidAmount: BigDecimal? = null,
 
     @Nullable
-    var isPaidFull: Boolean,
+    var billedAmount: BigDecimal? = null,
 
     @Nullable
-    var cashbackAmount: BigDecimal,
+    var billedFee: BigDecimal? = null,
 
     @Nullable
-    var pointsRate: BigDecimal,
+    var remainingAmount: BigDecimal? = null,
 
-    var lastCheckAt: LocalDateTime,
+    @Nullable
+    var isPaidFull: Boolean? = null,
+
+    @Nullable
+    var cashbackAmount: BigDecimal? = null,
+
+    @Nullable
+    var pointsRate: BigDecimal? = null,
+
+    var lastCheckAt: LocalDateTime? = null,
 
     @CreatedDate
-    var createdAt: LocalDateTime,
+    var createdAt: LocalDateTime? = null,
 
     @LastModifiedDate
-    var updatedAt: LocalDateTime
+    var updatedAt: LocalDateTime? = null
 )

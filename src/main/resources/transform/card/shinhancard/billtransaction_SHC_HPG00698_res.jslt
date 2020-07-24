@@ -9,6 +9,7 @@
             if(.useD != "")(
                 {
                     "cardNumber": .useCrdC,
+                    "cardNumberMasked": .useCrdC,
                     "approvalDay" : .useD,
                     "storeName": .useMchtNm,
                     "installment": .dvdMnth,

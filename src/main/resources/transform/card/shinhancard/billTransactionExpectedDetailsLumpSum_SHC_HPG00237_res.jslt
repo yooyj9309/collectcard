@@ -11,8 +11,9 @@
             {
                 "approvalDay" : .date,                  // 이용일자
                 "amount": .prnTxn,                      // 이용원금금액
-                "storeName": .mchtNm,                  // 가맹점명
+                "storeName": .mchtNm,                   // 가맹점명
                 "cardNumber": .crdN,                    // 마스킹 카드번호
+                "cardNumberMasked": .crdN,              // 마스킹 카드번호
                 "thisMonthBilledAmount": .prnBll,       // 원금금액
                 "thisMonthBilledFee": .feeBll,          // 수수료금액
                 "isPaidFull": .fullPaymentFlag,         // 완납여부

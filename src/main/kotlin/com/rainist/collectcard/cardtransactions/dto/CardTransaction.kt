@@ -51,7 +51,7 @@ data class CardTransaction(
 
     var tax: BigDecimal? = null, //  15. 부가세
 
-    var payedPoints: BigDecimal? = null, //  16. 포인트결제금액
+    var paidPoints: BigDecimal? = null, //  16. 포인트결제금액
 
     var isPointPay: Boolean? = null, //  17. 포인트결제여부
 

@@ -15,7 +15,7 @@
                     "paymentDate": .setlDay,
                     "nextPaymentDate": "",
                     "billingAmount": .bllAmt,
-                    "prepayedAmount": "",
+                    "prepaidAmount": "",
                     "paymentBankId": .bankno,
                     "paymentAccountNumber": "",
                     "billedYearMonth": "",

@@ -25,7 +25,7 @@ data class CardBill(
     var billingAmount: BigDecimal?,
 
     // 선결제 된 금액
-    var prepayedAmount: BigDecimal?,
+    var prepaidAmount: BigDecimal?,
 
     // 결제기관
     var paymentBankId: String?,

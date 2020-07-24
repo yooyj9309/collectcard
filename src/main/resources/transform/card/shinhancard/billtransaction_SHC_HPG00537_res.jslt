@@ -12,6 +12,7 @@
                     "amount": .capital,
                     "serviceChargeAmount": .commission,
                     "cardNumber": .class,
+                    "cardNumberMasked": .class,
                     "storeName": .joinnm,
                     "discountAmount": .dcntamt
                 }

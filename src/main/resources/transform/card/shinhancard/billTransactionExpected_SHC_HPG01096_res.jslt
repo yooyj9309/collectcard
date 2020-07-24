@@ -15,7 +15,7 @@
                 "paymentDate": .aowDuD,
                 "nextPaymentDate": "",
                 "billingAmount": .bllAmt,
-                "prepayedAmount": "",
+                "prepaidAmount": "",
                 "paymentBankId": .bankno,
                 "paymentAccountNumber": .accountNo,
                 "billedYearMonth": "",
