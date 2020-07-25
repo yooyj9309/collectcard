@@ -14,11 +14,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 
 @Entity
 @EntityListeners(AuditingEntityListener::class)
-@Table(name = "api_access_log")
+@Table(name = "api_log")
 data class ApiLogEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var apiAccessLogId: Long? = null,
+    var apiLogId: Long? = null,
 
     var requestId: String? = null,
 
@@ -40,6 +40,12 @@ data class ApiLogEntity(
     @Column(columnDefinition = "json")
     var requestBodyJson: String? = null,
 
+    @Column(columnDefinition = "json")
+    var transformedRequestHeaderJson: String? = null,
+
+    @Column(columnDefinition = "json")
+    var transformedRequestBodyJson: String? = null,
+
     var resultCode: String? = null,
 
     var responseCode: String? = null,
@@ -49,6 +55,12 @@ data class ApiLogEntity(
 
     @Column(columnDefinition = "json")
     var responseBodyJson: String? = null,
+
+    @Column(columnDefinition = "json")
+    var transformedResponseHeaderJson: String? = null,
+
+    @Column(columnDefinition = "json")
+    var transformedResponseBodyJson: String? = null,
 
     var requestDatetime: LocalDateTime? = null,
 

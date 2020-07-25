@@ -19,12 +19,18 @@ class ApiLogServiceImpl(private val apiLogRepository: ApiLogRepository) : ApiLog
                 this.requestId = apiLog.id
                 this.organizationId = organizationId
                 this.banksaladUserId = banksaladUserId
+
                 this.apiId = apiLog.api.id
                 this.requestUrl = apiLog.api.endpoint
                 this.httpMethod = apiLog.api.method.name
                 this.organizationApiId = apiLog.api.name
-                this.requestHeaderJson = apiLog.request.transformedHeader
-                this.requestBodyJson = apiLog.request.transformedBody
+
+                this.requestHeaderJson = apiLog.request.header
+                this.requestBodyJson = apiLog.request.body
+
+                this.transformedRequestHeaderJson = apiLog.request.transformedHeader
+                this.transformedRequestBodyJson = apiLog.request.transformedBody
+
                 this.requestDatetime = LocalDateTime.now(ZoneId.of(ZONE_ID_UTC))
             }
         )
@@ -43,8 +49,13 @@ class ApiLogServiceImpl(private val apiLogRepository: ApiLogRepository) : ApiLog
 
         apiLogEntity.apply {
             this.responseCode = apiLog.response.responseCode
+
+            this.responseHeaderJson = apiLog.response.header
+            this.responseBodyJson = apiLog.response.body
+
             this.responseHeaderJson = apiLog.response.transformedHeader
             this.responseBodyJson = apiLog.response.transformedBody
+
             this.responseDatetime = LocalDateTime.now(ZoneId.of(ZONE_ID_UTC))
         }
 
