@@ -41,6 +41,8 @@ class CardServiceImpl(
     @Transactional
     @SyncStatus(transactionId = "cards")
     override fun listCards(syncRequest: SyncRequest): ListCardsResponse {
+        logger.info("CardService.listCards start: syncRequest: {}", syncRequest)
+
         /* header */
         val header = headerService.makeHeader(syncRequest.banksaladUserId, syncRequest.organizationId)
 
@@ -82,6 +84,8 @@ class CardServiceImpl(
         listCardsResponse.dataBody?.cards?.forEach { card ->
             upsertCardAndCardHistory(syncRequest.banksaladUserId, syncRequest.organizationId ?: "", card)
         }
+
+        logger.info("CardService.listCards end: syncRequest: {}", syncRequest)
 
         return executionResponse.response
     }
