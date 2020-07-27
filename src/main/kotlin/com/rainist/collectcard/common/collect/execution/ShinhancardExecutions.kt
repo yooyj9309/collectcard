@@ -33,7 +33,6 @@ class ShinhancardExecutions {
                 master.interestRate = detail.interestRate
                 master.repaymentMethod = detail.repaymentMethod
                 master.remainingAmount = detail.remainingAmount
-                master.loanCategory = master.loanName
             }
 
         // 대출 정보

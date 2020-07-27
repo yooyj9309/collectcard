@@ -1,0 +1,24 @@
+{
+  "dataBody": {
+    "dfmRt": "01490",
+    "feeRt": "00000",
+    "resCd": "0005",
+    "loanDt": "20200225",
+    "loanNo": "0005",
+    "delayRt": "01790",
+    "loanAmt": "0000003000000",
+    "loanBal": "0000003000000",
+    "loanTrm": "06",
+    "dfmMsCnt": "03",
+    "expireDt": "20200728",
+    "definiteDt": "20200225",
+    "interestRt": "01490",
+    "repaymentMthd": "05",
+    "settleDtQyDtCurrTa": "00000000"
+  },
+  "dataHeader": {
+    "resultCode": "0004",
+    "successCode": "0",
+    "resultMessage": "성공적으로 조회 되었습니다."
+  }
+}

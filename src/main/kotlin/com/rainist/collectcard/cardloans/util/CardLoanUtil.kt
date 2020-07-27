@@ -24,7 +24,7 @@ class CardLoanUtil {
                 this.repaymentMethodOrigin = loan.repaymentMethodOrigin
                 this.withdrawalDay = loan.withdrawalDay
                 this.interestRate = loan.interestRate ?: BigDecimal(0) // default 0
-                this.loanCategory = loan.loanCategory
+                this.loanCategory = loan.loanCategory ?: ""
                 this.currencyCode = "KRW" // todo 해당부분이 loan에 없음 확인필요
                 this.additionalLoanAmount = loan.additionalLoanAmount ?: BigDecimal(0) // default 0
                 this.fullyPaidDay = loan.fullyPaidDay
