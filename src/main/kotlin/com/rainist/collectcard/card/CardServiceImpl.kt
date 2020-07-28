@@ -14,6 +14,8 @@ import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.db.entity.CardEntity
 import com.rainist.collectcard.common.db.entity.CardHistoryEntity
+import com.rainist.collectcard.common.db.entity.makeCardEntity
+import com.rainist.collectcard.common.db.entity.makeCardHistoryEntity
 import com.rainist.collectcard.common.db.repository.CardHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardRepository
 import com.rainist.collectcard.common.dto.SyncRequest
@@ -92,72 +94,32 @@ class CardServiceImpl(
 
     private fun upsertCardAndCardHistory(banksaladUserId: String, cardCompanyId: String, card: Card) {
         /* 카드 조회 */
-        var cardEntity = cardRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardId(
-            banksaladUserId.toLong(),
-            cardCompanyId,
-            card.cardCompanyCardId ?: ""
-        ) ?: CardEntity()
+        cardRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardId(banksaladUserId.toLong(), cardCompanyId, card.cardCompanyCardId ?: "")
+            ?.let { cardEntity ->
+                /* 기존 카드 */
 
-        /* update 여부 체크 */
-        if (!isCardUpdated(card, cardEntity)) return
+                val prevUpdatedAt = cardEntity.updatedAt
+                val bodyEntity = cardEntity.makeCardEntity(banksaladUserId.toLong(), cardCompanyId, card)
 
-        /* update card */
-        cardEntity.apply {
-            this.banksaladUserId = banksaladUserId.toLong()
-            this.cardCompanyId = cardCompanyId
-            this.cardCompanyCardId = card.cardCompanyCardId
-            this.lastCheckAt = DateTimeUtil.getLocalDateTime()
-            this.cardOwnerName = card.cardOwnerName
-            this.cardOwnerType = card.cardOwnerType?.name
-            this.cardOwnerTypeOrigin = card.cardOwnerTypeOrigin
-            this.cardName = card.cardName
-            this.cardBrandName = card.cardBrandName
-            this.internationalBrandName = card.internationalBrandName
-            this.cardNumber = card.cardNumber
-            this.cardNumberMask = card.cardNumberMask
-            this.cardType = card.cardType
-            this.cardTypeOrigin = card.cardTypeOrigin
-            this.issuedDay = card.issuedDay
-            this.expirationDay = card.expiresDay
-            this.cardStatus = card.cardStatus?.name
-            this.cardStatusOrigin = card.cardStatusOrigin
-            this.lastUseDay = card.lastUseDay
-            this.lastUseTime = card.lastUseTime
-            this.annualFee = card.annualFee
-            this.paymentBankId = card.paymentBankId
-            this.paymentAccountNumber = card.paymentAccountNumber
-            this.isBusinessCard = card.isBusinessCard
-        }
+                val saveEntity = cardRepository.saveAndFlush(bodyEntity)
 
-        cardEntity = cardRepository.save(cardEntity)
+                if (true == saveEntity.updatedAt?.isAfter(prevUpdatedAt)) {
+                    /* insert card_history */
+                    cardHistoryRepository.save(CardHistoryEntity().makeCardHistoryEntity(cardEntity))
+                }
 
-        /* insert card_history */
-        cardHistoryRepository.save(CardHistoryEntity(cardEntity))
-    }
+                saveEntity.lastCheckAt = DateTimeUtil.utcNowLocalDateTime()
+                cardRepository.save(saveEntity)
+            }
+            ?: kotlin.run {
+                /*  신규 카드 */
 
-    private fun isCardUpdated(card: Card, cardEntity: CardEntity): Boolean {
-        cardEntity.let {
-            if (cardEntity.cardOwnerName != card.cardOwnerName) return true
-            if (cardEntity.cardOwnerType != card.cardOwnerType?.name) return true
-            if (cardEntity.cardOwnerTypeOrigin != card.cardOwnerTypeOrigin) return true
-            if (cardEntity.cardName != card.cardName) return true
-            if (cardEntity.cardBrandName != card.cardBrandName) return true
-            if (cardEntity.internationalBrandName != card.internationalBrandName) return true
-            if (cardEntity.cardNumber != card.cardNumber) return true
-            if (cardEntity.cardNumberMask != card.cardNumberMask) return true
-            if (cardEntity.cardType != card.cardType) return true
-            if (cardEntity.cardTypeOrigin != card.cardTypeOrigin) return true
-            if (cardEntity.issuedDay != card.issuedDay) return true
-            if (cardEntity.expirationDay != card.expiresDay) return true
-            if (cardEntity.cardStatus != card.cardStatus?.name) return true
-            if (cardEntity.cardStatusOrigin != card.cardStatusOrigin) return true
-            if (cardEntity.lastUseDay != card.lastUseDay) return true
-            if (cardEntity.lastUseTime != card.lastUseTime) return true
-            if (cardEntity.annualFee != card.annualFee) return true
-            if (cardEntity.paymentBankId != card.paymentBankId) return true
-            if (cardEntity.paymentAccountNumber != card.paymentAccountNumber) return true
-            if (cardEntity.isBusinessCard != card.isBusinessCard) return true
-        }
-        return false
+                /* insert new card */
+                val cardEntity = CardEntity().makeCardEntity(banksaladUserId.toLong(), cardCompanyId, card)
+                cardRepository.save(cardEntity)
+
+                /* insert card_history */
+                cardHistoryRepository.save(CardHistoryEntity().makeCardHistoryEntity(cardEntity))
+            }
     }
 }

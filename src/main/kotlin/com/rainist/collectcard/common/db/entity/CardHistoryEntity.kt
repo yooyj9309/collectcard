@@ -51,32 +51,33 @@ data class CardHistoryEntity(
     var createdAt: LocalDateTime = DateTimeUtil.utcNowLocalDateTime(),
     @LastModifiedDate
     var updatedAt: LocalDateTime? = null
-) {
-    constructor(cardEntity: CardEntity) : this() {
-        cardId = cardEntity.cardId
-        banksaladUserId = cardEntity.banksaladUserId
-        cardCompanyId = cardEntity.cardCompanyId
-        cardCompanyCardId = cardEntity.cardCompanyCardId
-        lastCheckAt = cardEntity.lastCheckAt
-        cardOwnerName = cardEntity.cardOwnerName
-        cardOwnerType = cardEntity.cardOwnerType
-        cardOwnerTypeOrigin = cardEntity.cardOwnerTypeOrigin
-        cardName = cardEntity.cardName
-        cardBrandName = cardEntity.cardBrandName
-        internationalBrandName = cardEntity.internationalBrandName
-        cardNumber = cardEntity.cardNumber
-        cardNumberMask = cardEntity.cardNumberMask
-        cardType = cardEntity.cardType
-        cardTypeOrigin = cardEntity.cardTypeOrigin
-        issuedDay = cardEntity.issuedDay
-        expirationDay = cardEntity.expirationDay
-        cardStatus = cardEntity.cardStatus
-        cardStatusOrigin = cardEntity.cardStatusOrigin
-        lastUseDay = cardEntity.lastUseDay
-        lastUseTime = cardEntity.lastUseTime
-        annualFee = cardEntity.annualFee
-        paymentBankId = cardEntity.paymentBankId
-        paymentAccountNumber = cardEntity.paymentAccountNumber
-        isBusinessCard = cardEntity.isBusinessCard
-    }
+)
+
+fun CardHistoryEntity.makeCardHistoryEntity(cardEntity: CardEntity): CardHistoryEntity {
+    this.cardId = cardEntity.cardId
+    this.banksaladUserId = cardEntity.banksaladUserId
+    this.cardCompanyId = cardEntity.cardCompanyId
+    this.cardCompanyCardId = cardEntity.cardCompanyCardId
+    this.lastCheckAt = cardEntity.lastCheckAt
+    this.cardOwnerName = cardEntity.cardOwnerName
+    this.cardOwnerType = cardEntity.cardOwnerType
+    this.cardOwnerTypeOrigin = cardEntity.cardOwnerTypeOrigin
+    this.cardName = cardEntity.cardName
+    this.cardBrandName = cardEntity.cardBrandName
+    this.internationalBrandName = cardEntity.internationalBrandName
+    this.cardNumber = cardEntity.cardNumber
+    this.cardNumberMask = cardEntity.cardNumberMask
+    this.cardType = cardEntity.cardType
+    this.cardTypeOrigin = cardEntity.cardTypeOrigin
+    this.issuedDay = cardEntity.issuedDay
+    this.expirationDay = cardEntity.expirationDay
+    this.cardStatus = cardEntity.cardStatus
+    this.cardStatusOrigin = cardEntity.cardStatusOrigin
+    this.lastUseDay = cardEntity.lastUseDay
+    this.lastUseTime = cardEntity.lastUseTime
+    this.annualFee = cardEntity.annualFee
+    this.paymentBankId = cardEntity.paymentBankId
+    this.paymentAccountNumber = cardEntity.paymentAccountNumber
+    this.isBusinessCard = cardEntity.isBusinessCard
+    return this
 }
