@@ -1,5 +1,6 @@
 package com.rainist.collectcard.common.db.entity
 
+import com.rainist.collectcard.cardloans.dto.Loan
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import javax.persistence.Entity
@@ -78,3 +79,30 @@ data class CardLoanEntity(
     var updatedAt: LocalDateTime? = null
 
 )
+
+fun CardLoanEntity.makeCardLoanEntity(banksaladUserId: String, organizationId: String?, loan: Loan): CardLoanEntity {
+    this.banksaladUserId = banksaladUserId.toLong()
+    this.cardCompanyId = organizationId
+    this.cardCompanyLoanId = loan.loanId
+    this.loanName = loan.loanName
+    this.paymentBankId = loan.paymentBankId
+    this.expirationDay = loan.expirationDay
+    this.loanStatus = loan.loanStatus.name
+    this.loanStatusOrigin = loan.loanStatusOrigin
+    this.paymentAccountNumber = loan.paymentAccountNumber
+    this.repaymentMethod = loan.repaymentMethod.name
+    this.repaymentMethodOrigin = loan.repaymentMethodOrigin
+    this.withdrawalDay = loan.withdrawalDay
+    this.interestRate = loan.interestRate ?: BigDecimal(0) // default 0
+    this.loanCategory = loan.loanCategory
+    this.currencyCode = "KRW" // todo 해당부분이 loan에 없음 확인필요
+    this.additionalLoanAmount = loan.additionalLoanAmount ?: BigDecimal(0) // default 0
+    this.fullyPaidDay = loan.fullyPaidDay
+    this.cardNumber = loan.cardNumber
+    this.principalAmount = loan.principalAmount ?: BigDecimal(0) // default 0
+    this.interestAmount = loan.interestAmount ?: BigDecimal(0) // default 0
+    this.loanNumber = loan.loanNumber
+    this.loanAmount = loan.loanAmount ?: BigDecimal(0) // default 0
+    this.loanRemainingAmount = loan.remainingAmount ?: BigDecimal(0) // default 0
+    return this
+}

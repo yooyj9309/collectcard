@@ -1,3 +1,4 @@
+/*
 package com.rainist.collectcard.cardloans.util
 
 import com.rainist.collectcard.cardloans.dto.Loan
@@ -6,6 +7,7 @@ import com.rainist.collectcard.common.db.entity.CardLoanHistoryEntity
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
+@Deprecated("삭제 예정")
 class CardLoanUtil {
 
     companion object {
@@ -106,3 +108,4 @@ class CardLoanUtil {
         }
     }
 }
+*/

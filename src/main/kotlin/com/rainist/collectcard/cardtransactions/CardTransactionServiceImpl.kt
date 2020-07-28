@@ -122,38 +122,38 @@ class CardTransactionServiceImpl(
                     }
                 }
             }
-                .map {
-                    println("time is :${it.dataBody?.startAt} ~ ${it.dataBody?.endAt}")
-                    async {
-                        val res: ExecutionResponse<ListTransactionsResponse> =
-                            collectExecutorService.execute(
-                                Executions.valueOf(
-                                    BusinessType.card,
-                                    Organization.shinhancard,
-                                    Transaction.cardTransaction
-                                ),
-                                ExecutionRequest.builder<ListTransactionsRequest>()
-                                    .headers(header)
-                                    .request(it)
-                                    .build(),
-                                { apiLog: ApiLog ->
-                                    apiLogService.logRequest(
-                                        syncRequest.organizationId,
-                                        syncRequest.banksaladUserId.toLong(),
-                                        apiLog
-                                    )
-                                },
-                                { apiLog: ApiLog ->
-                                    apiLogService.logResponse(
-                                        syncRequest.organizationId,
-                                        syncRequest.banksaladUserId.toLong(),
-                                        apiLog
-                                    )
-                                }
-                            )
-                        res
-                    }
+            .map {
+                println("time is :${it.dataBody?.startAt} ~ ${it.dataBody?.endAt}")
+                async {
+                    val res: ExecutionResponse<ListTransactionsResponse> =
+                        collectExecutorService.execute(
+                            Executions.valueOf(
+                                BusinessType.card,
+                                Organization.shinhancard,
+                                Transaction.cardTransaction
+                            ),
+                            ExecutionRequest.builder<ListTransactionsRequest>()
+                                .headers(header)
+                                .request(it)
+                                .build(),
+                            { apiLog: ApiLog ->
+                                apiLogService.logRequest(
+                                    syncRequest.organizationId,
+                                    syncRequest.banksaladUserId.toLong(),
+                                    apiLog
+                                )
+                            },
+                            { apiLog: ApiLog ->
+                                apiLogService.logResponse(
+                                    syncRequest.organizationId,
+                                    syncRequest.banksaladUserId.toLong(),
+                                    apiLog
+                                )
+                            }
+                        )
+                    res
                 }
+            }
         }.let {
             it.map { deferred ->
                 deferred.getCompleted()

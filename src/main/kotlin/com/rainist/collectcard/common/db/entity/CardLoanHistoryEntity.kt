@@ -79,3 +79,33 @@ data class CardLoanHistoryEntity(
     @LastModifiedDate
     var updatedAt: LocalDateTime? = null
 )
+
+fun CardLoanHistoryEntity.makeCardLoanHistoryEntity(lastCheckAt: LocalDateTime, cardLoanEntity: CardLoanEntity): CardLoanHistoryEntity {
+    this.cardLoanId = cardLoanEntity.cardLoanId
+    this.banksaladUserId = cardLoanEntity.banksaladUserId
+    this.cardCompanyId = cardLoanEntity.cardCompanyId
+    this.cardCompanyLoanId = cardLoanEntity.cardCompanyLoanId
+    this.lastCheckAt = lastCheckAt
+    this.loanName = cardLoanEntity.loanName
+    this.paymentBankId = cardLoanEntity.paymentBankId
+    this.expirationDay = cardLoanEntity.expirationDay
+    this.loanStatus = cardLoanEntity.loanStatus
+    this.loanStatusOrigin = cardLoanEntity.loanStatusOrigin
+    this.paymentAccountNumber = cardLoanEntity.paymentAccountNumber
+    this.repaymentMethod = cardLoanEntity.repaymentMethod
+    this.repaymentMethodOrigin = cardLoanEntity.repaymentMethodOrigin
+    this.withdrawalDay = cardLoanEntity.withdrawalDay
+    this.interestRate = cardLoanEntity.interestRate
+    this.loanCategory = cardLoanEntity.loanCategory
+    this.currencyCode = cardLoanEntity.currencyCode
+    this.additionalLoanAmount = cardLoanEntity.additionalLoanAmount
+    this.fullyPaidDay = cardLoanEntity.fullyPaidDay
+    this.cardNumber = cardLoanEntity.cardNumber
+    this.principalAmount = cardLoanEntity.principalAmount
+    this.interestAmount = cardLoanEntity.interestAmount
+    this.loanNumber = cardLoanEntity.loanNumber
+    this.loanAmount = cardLoanEntity.loanAmount
+    this.loanRemainingAmount = cardLoanEntity.loanRemainingAmount
+
+    return this
+}

@@ -8,11 +8,14 @@ import com.rainist.collectcard.cardloans.dto.ListLoansRequest
 import com.rainist.collectcard.cardloans.dto.ListLoansRequestDataBody
 import com.rainist.collectcard.cardloans.dto.ListLoansRequestDataHeader
 import com.rainist.collectcard.cardloans.dto.ListLoansResponse
-import com.rainist.collectcard.cardloans.util.CardLoanUtil
 import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
+import com.rainist.collectcard.common.db.entity.CardLoanEntity
+import com.rainist.collectcard.common.db.entity.CardLoanHistoryEntity
+import com.rainist.collectcard.common.db.entity.makeCardLoanEntity
+import com.rainist.collectcard.common.db.entity.makeCardLoanHistoryEntity
 import com.rainist.collectcard.common.db.repository.CardLoanHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardLoanRepository
 import com.rainist.collectcard.common.dto.SyncRequest
@@ -70,41 +73,33 @@ class CardLoanServiceImpl(
 
         /* db insert */
         res.response.dataBody?.loans?.forEach { loan ->
-            if (loan.loanId != null) {
-                val cardLoanEntity = cardLoanRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyLoanId(
-                    syncRequest.banksaladUserId.toLong(),
-                    syncRequest.organizationId,
-                    loan.loanId
-                )
 
-                var bodyEntity = CardLoanUtil.makeCardLoanEntity(
-                    syncRequest.banksaladUserId,
-                    syncRequest.organizationId,
-                    loan
-                )
-
-                // only save(insert)
-                if (cardLoanEntity == null) {
-                    bodyEntity = cardLoanRepository.save(bodyEntity)
-                    cardLoanHistoryRepository.save(
-                        CardLoanUtil.makeCardLoanHistoryEntity(
-                            lastCheckAt, bodyEntity
-                        )
-                    )
-                }
+            loan.loanId?.let {
+                cardLoanRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyLoanId(syncRequest.banksaladUserId.toLong(), syncRequest.organizationId, loan.loanId)
+            }
+            ?.let { cardLoanEntity ->
                 // update
-                else {
-                    if (CardLoanUtil.isUpdated(cardLoanEntity, bodyEntity)) {
-                        // update
-                        CardLoanUtil.copyCardLoanEntity(bodyEntity, cardLoanEntity)
-                        cardLoanRepository.save(cardLoanEntity)
-                        cardLoanHistoryRepository.save(
-                            CardLoanUtil.makeCardLoanHistoryEntity(
-                                lastCheckAt,
-                                cardLoanEntity
-                            )
-                        )
-                    }
+
+                val prevUpdatedAt = cardLoanEntity.updatedAt
+                val bodyEntity = cardLoanEntity.makeCardLoanEntity(syncRequest.banksaladUserId, syncRequest.organizationId, loan)
+
+                val saveEntity = cardLoanRepository.saveAndFlush(bodyEntity)
+
+                // history insert
+                if (true == saveEntity.updatedAt?.isAfter(prevUpdatedAt)) {
+                    cardLoanHistoryRepository.save(CardLoanHistoryEntity().makeCardLoanHistoryEntity(lastCheckAt, saveEntity))
+                }
+
+                saveEntity.lastCheckAt = DateTimeUtil.utcNowLocalDateTime()
+                cardLoanRepository.save(saveEntity)
+            }
+            ?: kotlin.run {
+                // only insert
+                val loanEntity = CardLoanEntity().makeCardLoanEntity(syncRequest.banksaladUserId, syncRequest.organizationId, loan)
+
+                cardLoanRepository.save(loanEntity).let { cardLoanEntity ->
+                    val history = CardLoanHistoryEntity().makeCardLoanHistoryEntity(lastCheckAt, cardLoanEntity)
+                    cardLoanHistoryRepository.save(history)
                 }
             }
         }
