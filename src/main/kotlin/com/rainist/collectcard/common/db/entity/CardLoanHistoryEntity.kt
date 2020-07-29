@@ -2,6 +2,7 @@ package com.rainist.collectcard.common.db.entity
 
 import java.math.BigDecimal
 import java.time.LocalDateTime
+import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.EntityListeners
 import javax.persistence.GeneratedValue
@@ -21,24 +22,32 @@ data class CardLoanHistoryEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var cardLoanHistoryId: Long? = null,
 
+    @Column(nullable = false)
     var cardLoanId: Long? = null,
 
+    @Column(nullable = false)
     var banksaladUserId: Long? = null,
 
+    @Column(nullable = false)
     var cardCompanyId: String? = null,
 
+    @Column(nullable = false)
     var cardCompanyLoanId: String? = null,
 
+    @Column(nullable = false)
     var lastCheckAt: LocalDateTime? = null,
 
+    @Column(nullable = false)
     var loanName: String? = null,
 
     var paymentBankId: String? = null,
 
     var paymentAccountNumber: String? = null,
 
+    @Column(nullable = false)
     var expirationDay: String? = null,
 
+    @Column(nullable = false)
     var loanStatus: String? = null,
 
     var loanStatusOrigin: String? = null,
@@ -51,6 +60,7 @@ data class CardLoanHistoryEntity(
 
     var interestRate: BigDecimal? = null,
 
+    @Column(nullable = false)
     var loanCategory: String? = null,
 
     var currencyCode: String? = null,
@@ -65,6 +75,7 @@ data class CardLoanHistoryEntity(
 
     var interestAmount: BigDecimal? = null,
 
+    @Column(nullable = false)
     var loanNumber: String? = null,
 
     var loanAmount: BigDecimal? = null,
@@ -80,12 +91,12 @@ data class CardLoanHistoryEntity(
     var updatedAt: LocalDateTime? = null
 )
 
-fun CardLoanHistoryEntity.makeCardLoanHistoryEntity(lastCheckAt: LocalDateTime, cardLoanEntity: CardLoanEntity): CardLoanHistoryEntity {
+fun CardLoanHistoryEntity.makeCardLoanHistoryEntity(cardLoanEntity: CardLoanEntity): CardLoanHistoryEntity {
     this.cardLoanId = cardLoanEntity.cardLoanId
     this.banksaladUserId = cardLoanEntity.banksaladUserId
     this.cardCompanyId = cardLoanEntity.cardCompanyId
     this.cardCompanyLoanId = cardLoanEntity.cardCompanyLoanId
-    this.lastCheckAt = lastCheckAt
+    this.lastCheckAt = cardLoanEntity.lastCheckAt
     this.loanName = cardLoanEntity.loanName
     this.paymentBankId = cardLoanEntity.paymentBankId
     this.expirationDay = cardLoanEntity.expirationDay

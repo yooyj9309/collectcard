@@ -1,0 +1,22 @@
+{
+  "dataBody": {
+    "resCd": "0004",
+    "grp001": [
+      {
+        "scd": "스피드론대출",
+        "seq": "02",
+        "loanno": "0006",
+        "rgugun": "17",
+        "loanamt": "0000006000000",
+        "lonegubun": "1"
+      }
+    ],
+    "nxtQyKey": ""
+  },
+  "dataHeader": {
+    "reqKey": null,
+    "resultCode": "0004",
+    "successCode": "0",
+    "resultMessage": "성공적으로 조회 되었습니다."
+  }
+}

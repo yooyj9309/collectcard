@@ -79,15 +79,15 @@ class CardLoanServiceImpl(
             }
             ?.let { cardLoanEntity ->
                 // update
-
+                val prevLastCheckAt = cardLoanEntity.lastCheckAt
                 val prevUpdatedAt = cardLoanEntity.updatedAt
-                val bodyEntity = cardLoanEntity.makeCardLoanEntity(syncRequest.banksaladUserId, syncRequest.organizationId, loan)
 
+                val bodyEntity = cardLoanEntity.makeCardLoanEntity(prevLastCheckAt, syncRequest.banksaladUserId, syncRequest.organizationId, loan)
                 val saveEntity = cardLoanRepository.saveAndFlush(bodyEntity)
 
                 // history insert
                 if (true == saveEntity.updatedAt?.isAfter(prevUpdatedAt)) {
-                    cardLoanHistoryRepository.save(CardLoanHistoryEntity().makeCardLoanHistoryEntity(lastCheckAt, saveEntity))
+                    cardLoanHistoryRepository.save(CardLoanHistoryEntity().makeCardLoanHistoryEntity(saveEntity))
                 }
 
                 saveEntity.lastCheckAt = DateTimeUtil.utcNowLocalDateTime()
@@ -95,10 +95,10 @@ class CardLoanServiceImpl(
             }
             ?: kotlin.run {
                 // only insert
-                val loanEntity = CardLoanEntity().makeCardLoanEntity(syncRequest.banksaladUserId, syncRequest.organizationId, loan)
+                val loanEntity = CardLoanEntity().makeCardLoanEntity(lastCheckAt, syncRequest.banksaladUserId, syncRequest.organizationId, loan)
 
                 cardLoanRepository.save(loanEntity).let { cardLoanEntity ->
-                    val history = CardLoanHistoryEntity().makeCardLoanHistoryEntity(lastCheckAt, cardLoanEntity)
+                    val history = CardLoanHistoryEntity().makeCardLoanHistoryEntity(cardLoanEntity)
                     cardLoanHistoryRepository.save(history)
                 }
             }

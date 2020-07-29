@@ -1,0 +1,30 @@
+{
+  "dataBody": {
+    "resCd": "0004",
+    "grp001": [
+      {
+        "scd": "스피드론플러스",
+        "seq": "01",
+        "loanno": "0005",
+        "rgugun": "34",
+        "loanamt": "0000009000000",
+        "lonegubun": "1"
+      },
+      {
+        "scd": "스피드론이지",
+        "seq": "02",
+        "loanno": "0004",
+        "rgugun": "17",
+        "loanamt": "0000003000000",
+        "lonegubun": "1"
+      }
+    ],
+    "nxtQyKey": "1"
+  },
+  "dataHeader": {
+    "reqKey": null,
+    "resultCode": "0004",
+    "successCode": "0",
+    "resultMessage": "성공적으로 조회 되었습니다."
+  }
+}
