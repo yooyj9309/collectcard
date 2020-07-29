@@ -1,0 +1,26 @@
+{
+  "dataBody": {
+    "resCd": "0004",
+    "rAllAmt": "000007100000",
+    "rInsAmt": "000007100000",
+    "rTotAmt": "000007100000",
+    "uTotAmt": "000000344320",
+    "xTotAmt": "000006755680",
+    "rCashAmt": "000000000000",
+    "csavRmnAmt": "000000000000",
+    "csavUseAmt": "000000000000",
+    "pbfRestAmt": "000006755680",
+    "pbfUsedAmt": "000000053220",
+    "pbfTotalAmt": "000007100000",
+    "inLumpRmnAmt": "000006755680",
+    "inLumpUseAmt": "000000344320",
+    "installmentRmnAmt": "000006755680",
+    "installmentUseAmt": "000000000000"
+  },
+  "dataHeader": {
+    "reqKey": null,
+    "resultCode": "0004",
+    "successCode": "0",
+    "resultMessage": "조회완료 되었습니다.처리완료"
+  }
+}

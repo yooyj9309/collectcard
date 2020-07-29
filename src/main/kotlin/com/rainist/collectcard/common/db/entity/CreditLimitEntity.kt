@@ -2,6 +2,7 @@ package com.rainist.collectcard.common.db.entity
 
 import java.math.BigDecimal
 import java.time.LocalDateTime
+import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.EntityListeners
 import javax.persistence.GeneratedValue
@@ -23,24 +24,33 @@ data class CreditLimitEntity(
     var cardLimitId: Long? = null,
 
     // 뱅샐 유저 아이디
+    @Column(nullable = false)
     var banksaladUserId: Long? = null,
 
     // 카드 회사 ID
+    @Column(nullable = false)
     var cardCompanyId: String? = null,
 
+    // 최종조회일시
+    @Column(nullable = false)
+    var lastCheckAt: LocalDateTime? = null,
+
     // 일회결제한도금액
+    @Column(nullable = false)
     var onetimePaymentLimitAmount: BigDecimal? = null,
 
     // 신용카드 총 한도금액
+    @Column(nullable = false)
     var creditCardLimitTotalAmount: BigDecimal? = null,
 
-    // 신용카드 사용한도금
+    // 신용카드 사용한도금액
     var creditCardLimitUsedAmount: BigDecimal? = null,
 
     // 신용카드 잔여한도금액
     var creditCardLimitRemainingAmount: BigDecimal? = null,
 
     // 현금서비스 총 한도 금액
+    @Column(nullable = false)
     var cashAdvanceLimitTotalAmount: BigDecimal? = null,
 
     // 현금서비스 사용한도금액
@@ -59,6 +69,7 @@ data class CreditLimitEntity(
     var overseaLimitRemainingAmount: BigDecimal? = null,
 
     // 대출 총한도금액
+    @Column(nullable = false)
     var loanLimitTotalAmount: BigDecimal? = null,
 
     // 대출 잔여한도금액
@@ -68,6 +79,7 @@ data class CreditLimitEntity(
     var loanLimitUsedAmount: BigDecimal? = null,
 
     // 카드론 총한도금액
+    @Column(nullable = false)
     var cardLoanLimitTotalAmount: BigDecimal? = null,
 
     // 카드론 사용한도금액
@@ -77,6 +89,7 @@ data class CreditLimitEntity(
     var cardLoanLimitRemainingAmount: BigDecimal? = null,
 
     // 직불카드 총금액
+    @Column(nullable = false)
     var debitCardTotalAmount: BigDecimal? = null,
 
     // 직불카드 사용금액
@@ -84,9 +97,6 @@ data class CreditLimitEntity(
 
     // 직불카드 잔여금액
     var debitCardRemainingAmount: BigDecimal? = null,
-
-    // 최종조회일시
-    var lastCheckAt: LocalDateTime? = null,
 
     // 생성일시
     @CreatedDate

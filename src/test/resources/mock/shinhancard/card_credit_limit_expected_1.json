@@ -1,0 +1,25 @@
+{
+  "dataHeader": {
+    "successCode": "0",
+    "resultCode": "0004",
+    "resultMessage": "조회완료 되었습니다.처리완료"
+  },
+  "dataBody": {
+    "csavRmnAmt": "000003000000",
+    "installmentRmnAmt": "000009966500",
+    "pbfTotalAmt": "000010000000",
+    "inLumpUseAmt": "000000033500",
+    "uTotAmt": "000000033500",
+    "rAllAmt": "000010000000",
+    "xTotAmt": "000009966500",
+    "rCashAmt": "000003000000",
+    "pbfRestAmt": "000009966500",
+    "inLumpRmnAmt": "000009966500",
+    "rInsAmt": "000010000000",
+    "installmentUseAmt": "000000000000",
+    "resCd": "0004",
+    "rTotAmt": "000010000000",
+    "pbfUsedAmt": "000000000000",
+    "csavUseAmt": "000000000000"
+  }
+}
