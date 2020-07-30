@@ -21,12 +21,16 @@ data class CardTransactionEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var cardTransactionId: Long? = null,
 
+    @Column(nullable = false)
     var banksaladUserId: Long? = null,
 
+    @Column(nullable = false)
     var cardCompanyId: String? = null,
 
+    @Column(nullable = false)
     var cardCompanyCardId: String? = null,
 
+    @Column(nullable = false)
     var approvalNumber: String? = null,
 
     var approvalDay: String? = null,
@@ -35,6 +39,7 @@ data class CardTransactionEntity(
 
     var cardName: String? = null,
 
+    @Column(nullable = false)
     var cardNumber: String? = null,
 
     var cardNumberMask: String? = null,
@@ -49,13 +54,14 @@ data class CardTransactionEntity(
 
     var cardTypeOrigin: String? = null,
 
+    @Column(nullable = false)
     var cardTransactionType: String? = null,
 
     var cardTransactionTypeOrigin: String? = null,
 
     var currencyCode: String? = null,
 
-    @Column(columnDefinition = "BIT", length = 1)
+    @Column(nullable = false, columnDefinition = "BIT", length = 1)
     var isInstallmentPayment: Boolean? = false,
 
     @CreatedDate

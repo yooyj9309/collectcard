@@ -3,6 +3,7 @@ package com.rainist.collectcard.common.db.entity
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import javax.annotation.Nullable
+import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.EntityListeners
 import javax.persistence.GeneratedValue
@@ -21,23 +22,25 @@ data class CardBillTransactionEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var cardBillTransactionId: Long? = null,
 
+    @Column(nullable = false)
     var banksaladUserId: Long? = null,
 
+    @Column(nullable = false)
     var cardCompanyId: String? = null,
 
+    @Column(nullable = false)
     var billNumber: String? = null,
 
+    @Column(nullable = false)
     var cardBillTransactionNo: Int? = null,
 
+    @Column(nullable = false)
     var cardCompanyCardId: String? = null,
 
-    @Nullable
     var cardName: String? = null,
 
-    @Nullable
     var cardNumber: String? = null,
 
-    @Nullable
     var cardNumberMask: String? = null,
 
     @Nullable
@@ -64,79 +67,69 @@ data class CardBillTransactionEntity(
     @Nullable
     var currencyCode: String? = null,
 
+    @Column(nullable = false)
     var isInstallmentPayment: Boolean? = null,
 
+    @Column(nullable = false)
     var installment: Int? = null,
 
-    @Nullable
     var installmentRound: Int? = null,
 
+    @Column(nullable = false)
     var netSalesAmount: BigDecimal? = null,
 
-    @Nullable
     var serviceChargeAmount: BigDecimal? = null,
 
-    @Nullable
     var taxAmount: BigDecimal? = null,
 
-    @Nullable
     var paidPoints: BigDecimal? = null,
 
-    @Nullable
     var isPointPay: Boolean? = null,
 
-    @Nullable
     var discountAmount: BigDecimal? = null,
 
-    @Nullable
     var canceledAmount: BigDecimal? = null,
 
+    @Column(nullable = false)
     var approvalNumber: String? = null,
 
+    @Column(nullable = false)
     var approvalDay: String? = null,
 
+    @Column(nullable = false)
     var approvalTime: String? = null,
 
-    @Nullable
     var pointsToEarn: BigDecimal? = null,
 
+    @Column(nullable = false)
     var isOverseaUse: Boolean? = null,
 
+    @Column(nullable = false)
     var paymentDay: String? = null,
 
-    @Nullable
     var storeCategory: String? = null,
 
-    @Nullable
     var storeCategoryOrigin: String? = null,
 
-    @Nullable
     var transactionCountry: String? = null,
 
-    @Nullable
     var billingRound: Int? = null,
 
-    @Nullable
     var paidAmount: BigDecimal? = null,
 
-    @Nullable
     var billedAmount: BigDecimal? = null,
 
-    @Nullable
     var billedFee: BigDecimal? = null,
 
-    @Nullable
     var remainingAmount: BigDecimal? = null,
 
-    @Nullable
     var isPaidFull: Boolean? = null,
 
-    @Nullable
     var cashbackAmount: BigDecimal? = null,
 
-    @Nullable
     var pointsRate: BigDecimal? = null,
 
+    @Column(nullable = false)
     var lastCheckAt: LocalDateTime? = null,
 
     @CreatedDate

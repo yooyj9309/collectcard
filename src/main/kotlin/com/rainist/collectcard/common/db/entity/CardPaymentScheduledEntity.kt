@@ -2,7 +2,7 @@ package com.rainist.collectcard.common.db.entity
 
 import java.math.BigDecimal
 import java.time.LocalDateTime
-import javax.annotation.Nullable
+import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.EntityListeners
 import javax.persistence.GeneratedValue
@@ -21,51 +21,49 @@ data class CardPaymentScheduledEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var cardPaymentScheduledId: Long,
 
+    @Column(nullable = false)
     var banksaladUserId: Long,
 
+    @Column(nullable = false)
     var cardCompanyId: String,
 
+    @Column(nullable = false)
     var paymentScheduledTransactionNo: Int,
 
-    @Nullable
+    @Column(nullable = false)
     var cardCompanyCardId: String,
 
-    @Nullable
     var cardName: String,
 
-    @Nullable
     var cardNumber: String,
 
-    @Nullable
     var cardNumberMask: String,
 
-    @Nullable
     var businessLicenseNumber: String,
 
-    @Nullable
     var storeName: String,
 
-    @Nullable
     var storeNumber: String,
 
-    @Nullable
     var cardType: String,
 
     var cardTypeOrigin: String,
 
-    @Nullable
     var cardTransactionType: String,
 
     var cardTransactionTypeOrigin: String,
 
     var currencyCode: String,
 
+    @Column(nullable = false)
     var isInstallmentPayment: Boolean,
 
+    @Column(nullable = false)
     var installment: Int,
 
     var installmentRound: Int,
 
+    @Column(nullable = false)
     var netSalesAmount: BigDecimal,
 
     var serviceChargeAmount: BigDecimal,

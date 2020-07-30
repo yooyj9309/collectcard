@@ -20,30 +20,37 @@ data class ApiLogEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var apiLogId: Long? = null,
 
+    @Column(nullable = false)
     var requestId: String? = null,
 
+    @Column(nullable = false)
     var organizationId: String? = null,
 
+    @Column(nullable = false)
     var banksaladUserId: Long? = null,
 
+    @Column(nullable = false)
     var apiId: String? = null,
 
+    @Column(nullable = false)
     var organizationApiId: String? = null,
 
+    @Column(nullable = false)
     var requestUrl: String? = null,
 
+    @Column(nullable = false)
     var httpMethod: String? = null,
 
-    @Column(columnDefinition = "json")
+    @Column(nullable = false, columnDefinition = "json")
     var requestHeaderJson: String? = null,
 
-    @Column(columnDefinition = "json")
+    @Column(nullable = false, columnDefinition = "json")
     var requestBodyJson: String? = null,
 
-    @Column(columnDefinition = "json")
+    @Column(nullable = false, columnDefinition = "json")
     var transformedRequestHeaderJson: String? = null,
 
-    @Column(columnDefinition = "json")
+    @Column(nullable = false, columnDefinition = "json")
     var transformedRequestBodyJson: String? = null,
 
     var resultCode: String? = null,
@@ -62,6 +69,7 @@ data class ApiLogEntity(
     @Column(columnDefinition = "json")
     var transformedResponseBodyJson: String? = null,
 
+    @Column(nullable = false)
     var requestDatetime: LocalDateTime? = null,
 
     var responseDatetime: LocalDateTime? = null,
