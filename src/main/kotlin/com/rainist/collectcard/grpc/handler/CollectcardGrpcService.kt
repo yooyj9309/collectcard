@@ -13,7 +13,9 @@ import com.rainist.collectcard.cardloans.dto.toListCardLoansResponseProto
 import com.rainist.collectcard.cardtransactions.CardTransactionService
 import com.rainist.collectcard.cardtransactions.dto.toListCardsTransactionResponseProto
 import com.rainist.collectcard.common.dto.SyncRequest
+import com.rainist.collectcard.common.exception.HealthCheckException
 import com.rainist.collectcard.common.service.OrganizationService
+import com.rainist.collectcard.config.onException
 import com.rainist.common.interceptor.StatsUnaryServerInterceptor
 import com.rainist.common.log.Log
 import io.grpc.stub.StreamObserver
@@ -36,9 +38,17 @@ class CollectcardGrpcService(
         request: CollectcardProto.HealthCheckRequest,
         responseObserver: StreamObserver<CollectcardProto.HealthCheckResponse>
     ) {
-        val resp = CollectcardProto.HealthCheckResponse.newBuilder().build()
-        responseObserver.onNext(resp)
-        responseObserver.onCompleted()
+        kotlin.runCatching {
+            CollectcardProto.HealthCheckResponse.newBuilder().build()
+        }
+        .onSuccess {
+            responseObserver.onNext(it)
+            responseObserver.onCompleted()
+        }
+        .onFailure {
+            val ex = HealthCheckException()
+            responseObserver.onException(ex) // TODO it 으로 바꾸기
+        }
     }
 
     override fun listCards(
