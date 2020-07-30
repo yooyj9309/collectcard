@@ -79,12 +79,16 @@ class CardServiceImpl(
 
         /* convert type and format if necessary */
         listCardsResponse.dataBody?.cards?.forEach { card ->
-            card.cardNumber = card.cardNumber?.replace("-", "")
+            card.apply {
+                cardNumber = cardNumber?.replace("-", "")
+                cardNumberMask = cardNumberMask?.replace("-", "")
+                cardCompanyId = syncRequest.organizationId
+            }
         }
 
         /* Save to DB and return */
         listCardsResponse.dataBody?.cards?.forEach { card ->
-            upsertCardAndCardHistory(syncRequest.banksaladUserId, syncRequest.organizationId ?: "", card)
+            upsertCardAndCardHistory(syncRequest.banksaladUserId, card)
         }
 
         logger.info("CardService.listCards end: syncRequest: {}", syncRequest)
@@ -92,14 +96,14 @@ class CardServiceImpl(
         return executionResponse.response
     }
 
-    private fun upsertCardAndCardHistory(banksaladUserId: String, cardCompanyId: String, card: Card) {
+    private fun upsertCardAndCardHistory(banksaladUserId: String, card: Card) {
         /* 카드 조회 */
-        cardRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardId(banksaladUserId.toLong(), cardCompanyId, card.cardCompanyCardId ?: "")
+        cardRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardId(banksaladUserId.toLong(), card.cardCompanyId ?: "", card.cardCompanyCardId ?: "")
             ?.let { cardEntity ->
                 /* 기존 카드 */
 
                 val prevUpdatedAt = cardEntity.updatedAt
-                val bodyEntity = cardEntity.makeCardEntity(banksaladUserId.toLong(), cardCompanyId, card)
+                val bodyEntity = cardEntity.makeCardEntity(banksaladUserId.toLong(), card)
 
                 val saveEntity = cardRepository.saveAndFlush(bodyEntity)
 
@@ -115,7 +119,7 @@ class CardServiceImpl(
                 /*  신규 카드 */
 
                 /* insert new card */
-                val cardEntity = CardEntity().makeCardEntity(banksaladUserId.toLong(), cardCompanyId, card)
+                val cardEntity = CardEntity().makeCardEntity(banksaladUserId.toLong(), card)
                 cardRepository.save(cardEntity)
 
                 /* insert card_history */

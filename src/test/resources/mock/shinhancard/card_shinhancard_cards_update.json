@@ -1,0 +1,23 @@
+{
+  "dataHeader": {
+    "reqKey": null,
+    "resultCode": "0004",
+    "successCode": "0",
+    "resultMessage": "성공적으로 조회 되었습니다."
+  },
+  "dataBody": {
+    "resCd": "0004",
+    "clnHgNm": "홍길동",
+    "nxtQyKey": "",
+    "grp001": [
+      {
+        "cardno": "9523-****-*****-8721",
+        "cardname": "Deep Store[딥 스토어] test",
+        "cardbrand": "2",
+        "cardgubun": "5",
+        "enccardno": "602640e6acb211fb19f5d580170bbeac78410dad",
+        "trafficyn": "Y"
+      }
+    ]
+  }
+}

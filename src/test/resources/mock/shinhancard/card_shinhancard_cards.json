@@ -1,0 +1,47 @@
+{
+  "dataHeader": {
+    "reqKey": null,
+    "resultCode": "0004",
+    "successCode": "0",
+    "resultMessage": "다음자료가 존재합니다."
+  },
+  "dataBody": {
+    "resCd": "0004",
+    "clnHgNm": "홍길동",
+    "nxtQyKey": "",
+    "grp001": [
+      {
+        "cardno": "9523-****-*****-8721",
+        "cardname": "Deep Store[딥 스토어]",
+        "cardbrand": "1",
+        "cardgubun": "1",
+        "enccardno": "602640e6acb211fb19f5d580170bbeac78410dad",
+        "trafficyn": "Y"
+      },
+      {
+        "cardno": "5774-****-*****-1742",
+        "cardname": "하이패스(체크)신한은행",
+        "cardbrand": "0",
+        "cardgubun": "5",
+        "enccardno": "c4e22131495b48fee7e413393a1b173da744497a",
+        "trafficyn": "N"
+      },
+      {
+        "cardno": "2339-****-*****-8647",
+        "cardname": "Always On(올웨이즈온)",
+        "cardbrand": "1",
+        "cardgubun": "1",
+        "enccardno": "635caa1b701b83474c85e7e2aaf25f050e849509",
+        "trafficyn": "Y"
+      },
+      {
+        "cardno": "3780-****-*****-9882",
+        "cardname": "신한금융투자 CMA R+ LOVE(체크)(후발급용)",
+        "cardbrand": "2",
+        "cardgubun": "5",
+        "enccardno": "9679ce74d0c2e52b47fe8ac9d2a50a7b53ba0c94",
+        "trafficyn": "Y"
+      }
+    ]
+  }
+}

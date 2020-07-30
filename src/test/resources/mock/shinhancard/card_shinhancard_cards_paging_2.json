@@ -1,0 +1,47 @@
+{
+  "dataHeader": {
+    "reqKey": null,
+    "resultCode": "0004",
+    "successCode": "0",
+    "resultMessage": "성공적으로 조회 되었습니다."
+  },
+  "dataBody": {
+    "resCd": "0004",
+    "clnHgNm": "홍길동",
+    "nxtQyKey": "",
+    "grp001": [
+      {
+        "cardno": "6152-****-*****-2234",
+        "cardname": "11번가",
+        "cardbrand": "1",
+        "cardgubun": "1",
+        "enccardno": "adef60140af3364e3fb43a4e7bdc3b0b0976aa1c",
+        "trafficyn": "Y"
+      },
+      {
+        "cardno": "8397-****-*****-4033",
+        "cardname": "CJ ONE (체크)신한은행",
+        "cardbrand": "1",
+        "cardgubun": "5",
+        "enccardno": "d43cea7a94dd10e2172c9c97b25e78df09de28b2",
+        "trafficyn": "Y"
+      },
+      {
+        "cardno": "6623-****-*****-9536",
+        "cardname": "Hey Young(헤이영)",
+        "cardbrand": "2",
+        "cardgubun": "5",
+        "enccardno": "b91a6919e3428b946b218caf94bce8fa863c374b",
+        "trafficyn": "Y"
+      },
+      {
+        "cardno": "4972-****-*****-8553",
+        "cardname": "네이버페이 라인프렌즈 신한카드",
+        "cardbrand": "2",
+        "cardgubun": "1",
+        "enccardno": "f02f66fa0f5beb8eec6ef7be39a31b23215f93d5",
+        "trafficyn": "Y"
+      }
+    ]
+  }
+}

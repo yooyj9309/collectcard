@@ -1,0 +1,135 @@
+{
+  "dataHeader": {
+    "reqKey": null,
+    "resultCode": "0010",
+    "successCode": "0",
+    "resultMessage": "다음자료가 존재합니다."
+  },
+  "dataBody": {
+    "resCd": "0010",
+    "clnHgNm": "홍길동",
+    "nxtQyKey": "N542879667639580520200304",
+    "grp001": [
+      {
+        "cardno": "9523-****-*****-8721",
+        "cardname": "Deep Store[딥 스토어]",
+        "cardbrand": "1",
+        "cardgubun": "1",
+        "enccardno": "602640e6acb211fb19f5d580170bbeac78410dad",
+        "trafficyn": "Y"
+      },
+      {
+        "cardno": "5774-****-*****-1742",
+        "cardname": "하이패스(체크)신한은행",
+        "cardbrand": "0",
+        "cardgubun": "5",
+        "enccardno": "c4e22131495b48fee7e413393a1b173da744497a",
+        "trafficyn": "N"
+      },
+      {
+        "cardno": "2339-****-*****-8647",
+        "cardname": "Always On(올웨이즈온)",
+        "cardbrand": "1",
+        "cardgubun": "1",
+        "enccardno": "635caa1b701b83474c85e7e2aaf25f050e849509",
+        "trafficyn": "Y"
+      },
+      {
+        "cardno": "3780-****-*****-9882",
+        "cardname": "신한금융투자 CMA R+ LOVE(체크)(후발급용)",
+        "cardbrand": "2",
+        "cardgubun": "5",
+        "enccardno": "9679ce74d0c2e52b47fe8ac9d2a50a7b53ba0c94",
+        "trafficyn": "Y"
+      },
+      {
+        "cardno": "9179-****-*****-2008",
+        "cardname": "Change-Up  체크(체인지업)",
+        "cardbrand": "1",
+        "cardgubun": "5",
+        "enccardno": "f5452eff9b1e8263cf5a34d9ede76c7ee0625fbc",
+        "trafficyn": "Y"
+      },
+      {
+        "cardno": "8622-****-*****-1446",
+        "cardname": "SOL Deep Dream(체크)[쏠 딥 드림] 신한은행",
+        "cardbrand": "2",
+        "cardgubun": "5",
+        "enccardno": "5478b67f9893300a33290ac3c67099e960127e0c",
+        "trafficyn": "Y"
+      },
+      {
+        "cardno": "6535-****-*****-8859",
+        "cardname": "Smart Global  체크신한은행_스마트 글로벌",
+        "cardbrand": "1",
+        "cardgubun": "5",
+        "enccardno": "2cc9e441d3b65433125b63c244d7349a13da0d20",
+        "trafficyn": "Y"
+      },
+      {
+        "cardno": "6973-****-*****-6480",
+        "cardname": "RPM Platinum#",
+        "cardbrand": "6",
+        "cardgubun": "1",
+        "enccardno": "1406a23138309320598a4ed64b0b5c234e45d7cd",
+        "trafficyn": "Y"
+      },
+      {
+        "cardno": "8780-****-*****-7439",
+        "cardname": "네이버페이  체크",
+        "cardbrand": "2",
+        "cardgubun": "5",
+        "enccardno": "b3fca5ff4079208f5ee92957c382259fe8a5c46a",
+        "trafficyn": "Y"
+      },
+      {
+        "cardno": "7115-****-*****-1493",
+        "cardname": "미니언즈 Deep Dream(체크)신한은행",
+        "cardbrand": "2",
+        "cardgubun": "5",
+        "enccardno": "b91f4f11062d40c088f7799f932b3bbbe93bfecd",
+        "trafficyn": "Y"
+      },
+      {
+        "cardno": "3860-****-*****-2302",
+        "cardname": "Deep On (체크)[딥 온] 신한은행",
+        "cardbrand": "1",
+        "cardgubun": "5",
+        "enccardno": "24f196c782504d099f034528c2134ab334067399",
+        "trafficyn": "Y"
+      },
+      {
+        "cardno": "4765-****-*****-6926",
+        "cardname": "마이펫[맥스] S-Line 체크신한은행",
+        "cardbrand": "2",
+        "cardgubun": "5",
+        "enccardno": "599f50b06ccf6659f7fbe165ce5fff51e6389701",
+        "trafficyn": "Y"
+      },
+      {
+        "cardno": "8801-****-*****-6519",
+        "cardname": "몰테일(체크)신한은행",
+        "cardbrand": "1",
+        "cardgubun": "5",
+        "enccardno": "664f63002fda3311971bd63dd2b30e126fffcc2f",
+        "trafficyn": "Y"
+      },
+      {
+        "cardno": "8784-****-*****-6958",
+        "cardname": "라이프 글로벌패스",
+        "cardbrand": "0",
+        "cardgubun": "5",
+        "enccardno": "441d662fd2483b9975d61f82339b0031046c2390",
+        "trafficyn": "N"
+      },
+      {
+        "cardno": "8306-****-*****-9998",
+        "cardname": "카카오페이 신한  체크카드_캐릭터형(신한은행)",
+        "cardbrand": "1",
+        "cardgubun": "5",
+        "enccardno": "9ce0e42ec889d9dce3ddc49ef63816f8af861901",
+        "trafficyn": "Y"
+      }
+    ]
+  }
+}

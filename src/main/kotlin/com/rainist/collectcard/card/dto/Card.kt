@@ -20,50 +20,50 @@ enum class CardOwnerType {
 }
 
 data class Card(
-    var cardId: String?,
+    var cardId: String? = null,
 
-    var cardCompanyId: String?,
+    var cardCompanyId: String? = null,
     // TODO : add IDL
     // 카드사 카드 아이디
-    var cardCompanyCardId: String?,
+    var cardCompanyCardId: String? = null,
     // 카드 소유주 이름 (e.g. 김뱅샐)
-    var cardOwnerName: String?,
+    var cardOwnerName: String? = null,
     // 카드 소유자 구분
-    var cardOwnerType: CardOwnerType?,
+    var cardOwnerType: CardOwnerType? = null,
     // 카드 소유자 구분 원본
-    var cardOwnerTypeOrigin: String?,
+    var cardOwnerTypeOrigin: String? = null,
     // 카드 이름 (e.g. 나라사랑카드)
-    var cardName: String?,
+    var cardName: String? = null,
     // 카드 브랜드 (e.g. KB, Woori, etc.)
-    var cardBrandName: String?,
+    var cardBrandName: String? = null,
     // 국제 브랜드 (e.g. VISA, MasterCard, AMEX, etc)
-    var internationalBrandName: String?,
+    var internationalBrandName: String? = null,
     // 카드 번호 마스크 (e.g. 1111-1100-0000-1111, 1:유효숫자 부분, 0:마스크된 부분)
-    var cardNumber: String?,
+    var cardNumber: String? = null,
     // 카드 번호 (e.g. 9430-20**-****-2399)
-    var cardNumberMask: String?,
+    var cardNumberMask: String? = null,
     // 카드 타입 (e.g. 신용카드, 체크카드)
-    var cardType: String?,
+    var cardType: String? = null,
     // 카드 타입 원본 (e.g. 신용카드, 체크카드)
-    var cardTypeOrigin: String?,
+    var cardTypeOrigin: String? = null,
     // 카드 발급일자
-    var issuedDay: String?,
+    var issuedDay: String? = null,
     // 카드 만료일자
-    var expiresDay: String?,
+    var expiresDay: String? = null,
     // 카드 상태 (e.g. 등록, 해지, 휴면, 거래정지)
-    var cardStatus: CardStatus?,
+    var cardStatus: CardStatus? = null,
     // 카드 상태 원본 (e.g. 등록, 해지, 휴면, 거래정지)
-    var cardStatusOrigin: String?,
+    var cardStatusOrigin: String? = null,
     // 마지막 이용일자
-    var lastUseDay: String?,
+    var lastUseDay: String? = null,
     // 마지막 이용일시
-    var lastUseTime: String?,
+    var lastUseTime: String? = null,
     // 연회비
-    var annualFee: BigDecimal?,
+    var annualFee: BigDecimal? = null,
     // 결제기관
-    var paymentBankId: String?,
+    var paymentBankId: String? = null,
     // 결제계좌번호
-    var paymentAccountNumber: String?,
+    var paymentAccountNumber: String? = null,
     // 법인카드 여부
     var isBusinessCard: Boolean = false
 )

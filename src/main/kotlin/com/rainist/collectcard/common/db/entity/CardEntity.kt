@@ -79,15 +79,15 @@ data class CardEntity(
     var isBusinessCard: Boolean? = false,
 
     @CreatedDate
-    var createdAt: LocalDateTime = DateTimeUtil.utcNowLocalDateTime(),
+    var createdAt: LocalDateTime? = DateTimeUtil.utcNowLocalDateTime(),
 
     @LastModifiedDate
     var updatedAt: LocalDateTime? = null
 )
 
-fun CardEntity.makeCardEntity(banksaladUserId: Long?, cardCompanyId: String?, card: Card): CardEntity {
+fun CardEntity.makeCardEntity(banksaladUserId: Long?, card: Card): CardEntity {
     this.banksaladUserId = banksaladUserId
-    this.cardCompanyId = cardCompanyId
+    this.cardCompanyId = card.cardCompanyId
     this.cardCompanyCardId = card.cardCompanyCardId
     this.lastCheckAt = DateTimeUtil.getLocalDateTime()
     this.cardOwnerName = card.cardOwnerName
