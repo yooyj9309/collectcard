@@ -30,6 +30,7 @@ import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -43,6 +44,9 @@ class CardTransactionServiceImpl(
     val cardTransactionRepository: CardTransactionRepository,
     @Qualifier("async-thread") val executor: Executor
 ) : CardTransactionService {
+
+    @Value("\${shinhancard.organizationId}")
+    lateinit var shinhancardOrganizationId: String
 
     companion object : Log {
         const val DEFAULT_MAX_MONTH = 12L
@@ -65,6 +69,11 @@ class CardTransactionServiceImpl(
 
         // db insert
         transactions.forEach { cardTransaction ->
+
+            if (shinhancardOrganizationId == syncRequest.organizationId) {
+                cardTransaction.currencyCode = CardTransactionUtil.getCurrencyCode(cardTransaction.currencyCode)
+            }
+
             val cardTransactionEntity =
                 cardTransactionRepository.findByBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
                     syncRequest.banksaladUserId.toLong(),
