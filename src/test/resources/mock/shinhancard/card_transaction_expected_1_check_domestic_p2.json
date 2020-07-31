@@ -1,0 +1,30 @@
+{
+  "dataBody":{
+    "resCd":"0004",
+    "grp001":[
+      {
+        "ueC":"",
+        "aprvno":"20016886",
+        "retlno":"0100398668",
+        "status":"1",
+        "aprvamt":"000000005200",
+        "aprvtime":"20190920210508",
+        "brandtag":"2",
+        "retlname":"(주)TS푸드앤시스",
+        "settlday":"20191010",
+        "membertag":"2",
+        "usecardno":"654",
+        "settlgubun":"1"
+      }
+    ],
+    "bctgubun":"0",
+    "nxtQyKey":""
+  },
+  "dataHeader":{
+    "reqKey":null,
+    "resultCode":"0010",
+    "successCode":"0",
+    "resultMessage":"조회완료 되었습니다.처리완료"
+  }
+}
+

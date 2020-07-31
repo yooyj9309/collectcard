@@ -1,0 +1,30 @@
+{
+  "dataBody":{
+    "resCd":"0004",
+    "grp001":[
+      {
+        "ueC":"",
+        "aprvno":"43462070",
+        "retlno":"0046036042",
+        "status":"1",
+        "aprvamt":"000000006000",
+        "aprvtime":"20190923122825",
+        "brandtag":"2",
+        "retlname":"본까즈",
+        "settlday":"20191010",
+        "membertag":"2",
+        "usecardno":"654",
+        "settlgubun":"1"
+      }
+    ],
+    "bctgubun":"0",
+    "nxtQyKey":"1"
+  },
+  "dataHeader":{
+    "reqKey":null,
+    "resultCode":"0010",
+    "successCode":"0",
+    "resultMessage":"다음 조회건이 있습니다.다음 조회건이 있음"
+  }
+}
+

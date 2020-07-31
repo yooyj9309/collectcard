@@ -1,0 +1,30 @@
+{
+  "dataBody":{
+    "bccF":"1",
+    "resCd":"0004",
+    "grp001":[
+      {
+        "ccd":"1",
+        "cty":"g.co/helppay#",
+        "ntn":"미국",
+        "apvN":"455685",
+        "apva":"129.00",
+        "crdN":"236",
+        "ryCd":"유선TV",
+        "apvDt":"20200104004801",
+        "mctNm":"GOOGLE *YouTubePremium",
+        "stDuD":"20200210",
+        "brdCcd":"V",
+        "cusCcd":"1",
+        "loaTel":"인도루피"
+      }
+    ],
+    "nxtQyKey":"1"
+  },
+  "dataHeader":{
+    "reqKey":null,
+    "resultCode":"0010",
+    "successCode":"0",
+    "resultMessage":"다음 조회건이 있습니다.조회하신 결과의 다음데이타가 존재합니다"
+  }
+}

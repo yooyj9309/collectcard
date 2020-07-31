@@ -1,0 +1,30 @@
+{
+  "dataBody":{
+    "bctag":"0",
+    "resCd":"0013",
+    "grp001":[
+      {
+        "ueC":"",
+        "aprvno":"",
+        "cardno":"da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "insmon":"00",
+        "retlno":"",
+        "status":"",
+        "subCla":"000000000000",
+        "aprvamt":"000000000000",
+        "stldate":"",
+        "aprvtime":"",
+        "brandtag":"",
+        "retlname":"",
+        "membertag":""
+      }
+    ],
+    "nxtQyKey":""
+  },
+  "dataHeader":{
+    "reqKey":null,
+    "resultCode":"0013",
+    "successCode":"0",
+    "resultMessage":"조회하신 거래내역이 존재하지 않습니다."
+  }
+}

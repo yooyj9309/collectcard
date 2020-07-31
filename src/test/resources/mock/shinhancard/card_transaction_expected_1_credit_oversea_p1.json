@@ -1,0 +1,27 @@
+{
+  "dataHeader": {
+    "successCode": "0",
+    "resultCode": "0010",
+    "reqKey": null,
+    "resultMessage": "다음 조회건이 있습니다.조회하신 결과의 다음데이타가 존재합니다."
+  },
+  "dataBody": {
+    "nxtQyKey": "1",
+    "grp001": [
+      {
+        "ryCd": "광고",
+        "retlname": "FACEBK *4US5YLNYT2",
+        "aprvamt": "35.00",
+        "aprvno": "283905",
+        "trantype": "1",
+        "aprvtime": "20190614192400000471",
+        "cardno": "4518-****-****-2435",
+        "engcrcycd": "USD",
+        "nation": "UNITED KINGDOM",
+        "currency": "미국달러",
+        "stldate": "20190715"
+      }
+    ],
+    "resCd": "0004"
+  }
+}

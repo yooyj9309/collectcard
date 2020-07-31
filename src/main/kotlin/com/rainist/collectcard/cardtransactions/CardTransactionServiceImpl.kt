@@ -61,11 +61,11 @@ class CardTransactionServiceImpl(
             }
         }
 
-        val transactions = getlistTransactionsByDivision(syncRequest, header, request)
+        val transactions = getListTransactionsByDivision(syncRequest, header, request)
 
         // db insert
         transactions.forEach { cardTransaction ->
-            var cardTransactionEntity =
+            val cardTransactionEntity =
                 cardTransactionRepository.findByBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
                     syncRequest.banksaladUserId.toLong(),
                     syncRequest.organizationId,
@@ -94,7 +94,7 @@ class CardTransactionServiceImpl(
         }
     }
 
-    private fun getlistTransactionsByDivision(
+    private fun getListTransactionsByDivision(
         syncRequest: SyncRequest,
         header: MutableMap<String, String?>,
         request: ListTransactionsRequest
@@ -110,7 +110,7 @@ class CardTransactionServiceImpl(
             )
         }?.toMutableList() ?: mutableListOf()
 
-        var resultBody = runBlocking(executor.asCoroutineDispatcher()) {
+        val resultBody = runBlocking(executor.asCoroutineDispatcher()) {
             // 조회 시간 분할
             searchDateList.map {
                 ListTransactionsRequest().apply {
@@ -123,7 +123,6 @@ class CardTransactionServiceImpl(
                 }
             }
             .map {
-                println("time is :${it.dataBody?.startAt} ~ ${it.dataBody?.endAt}")
                 async {
                     val res: ExecutionResponse<ListTransactionsResponse> =
                         collectExecutorService.execute(

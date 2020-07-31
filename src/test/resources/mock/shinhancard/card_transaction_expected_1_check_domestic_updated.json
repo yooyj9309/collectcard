@@ -1,0 +1,13 @@
+{
+  "dataBody":{
+    "resCd":"0013",
+    "grp001":[],
+    "bctgubun":"0",
+    "nxtQyKey":""
+  },
+  "dataHeader":{
+    "resultCode":"0013",
+    "successCode":"0",
+    "resultMessage":"조회결과없습니다."
+  }
+}

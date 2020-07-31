@@ -29,7 +29,7 @@ let CardType = {
                 "approvalNumber": .aprvno,                                              // 승인번호
                 "amount": .aprvamt,                                                     // 승인금액
                 "cardNumber": .usecardno,                                               // 카드번호
-                "cardNumberMask" : .cardno,                                             // 카드넘버마스크
+                "cardNumberMask" : .usecardno,                                          // 카드넘버마스크
                 "storeName" : .retlname,                                                // 가맹점명
                 "paymentDay": .settlday,                                                // 결제일자
                 "storeNumber": .retlno,                                                 // 가맹점번호

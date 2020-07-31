@@ -1,0 +1,14 @@
+{
+  "dataBody":{
+    "bccF":"1",
+    "resCd":"0013",
+    "grp001":[],
+    "nxtQyKey":""
+  },
+  "dataHeader":{
+    "reqKey":null,
+    "resultCode":"0013",
+    "successCode":"0",
+    "resultMessage":"해당내역 없습니다."
+  }
+}

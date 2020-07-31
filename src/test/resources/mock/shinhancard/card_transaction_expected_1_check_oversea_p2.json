@@ -1,0 +1,29 @@
+{
+  "dataBody":{
+    "bccF":"1",
+    "resCd":"0004",
+    "grp001":[
+      {
+        "ccd":"1",
+        "cty":"AMZN.COM/BILL",
+        "ntn":"미국",
+        "apvN":"513916",
+        "apva":"0.00",
+        "crdN":"236",
+        "ryCd":"서적",
+        "apvDt":"20200226232527",
+        "mctNm":"AMAZON.COM",
+        "stDuD":"",
+        "brdCcd":"M",
+        "cusCcd":"2",
+        "loaTel":"미국달러"
+      }
+    ],
+    "nxtQyKey":""
+  },
+  "dataHeader":{
+    "resultCode":"0004",
+    "successCode":"0",
+    "resultMessage":"조회완료 되었습니다."
+  }
+}
