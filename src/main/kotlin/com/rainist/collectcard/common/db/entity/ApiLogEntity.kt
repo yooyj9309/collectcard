@@ -41,28 +41,32 @@ data class ApiLogEntity(
     @Column(nullable = false)
     var httpMethod: String? = null,
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     var requestHeaderText: String? = null,
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     var requestBodyText: String? = null,
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     var transformedRequestHeaderText: String? = null,
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     var transformedRequestBodyText: String? = null,
 
     var resultCode: String? = null,
 
     var responseCode: String? = null,
 
+    @Column(columnDefinition = "TEXT")
     var responseHeaderText: String? = null,
 
+    @Column(columnDefinition = "TEXT")
     var responseBodyText: String? = null,
 
+    @Column(columnDefinition = "TEXT")
     var transformedResponseHeaderText: String? = null,
 
+    @Column(columnDefinition = "TEXT")
     var transformedResponseBodyText: String? = null,
 
     @Column(nullable = false)
