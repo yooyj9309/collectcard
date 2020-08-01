@@ -41,33 +41,29 @@ data class ApiLogEntity(
     @Column(nullable = false)
     var httpMethod: String? = null,
 
-    @Column(nullable = false, columnDefinition = "json")
-    var requestHeaderJson: String? = null,
+    @Column(nullable = false)
+    var requestHeaderText: String? = null,
 
-    @Column(nullable = false, columnDefinition = "json")
-    var requestBodyJson: String? = null,
+    @Column(nullable = false)
+    var requestBodyText: String? = null,
 
-    @Column(nullable = false, columnDefinition = "json")
-    var transformedRequestHeaderJson: String? = null,
+    @Column(nullable = false)
+    var transformedRequestHeaderText: String? = null,
 
-    @Column(nullable = false, columnDefinition = "json")
-    var transformedRequestBodyJson: String? = null,
+    @Column(nullable = false)
+    var transformedRequestBodyText: String? = null,
 
     var resultCode: String? = null,
 
     var responseCode: String? = null,
 
-    @Column(columnDefinition = "json")
-    var responseHeaderJson: String? = null,
+    var responseHeaderText: String? = null,
 
-    @Column(columnDefinition = "json")
-    var responseBodyJson: String? = null,
+    var responseBodyText: String? = null,
 
-    @Column(columnDefinition = "json")
-    var transformedResponseHeaderJson: String? = null,
+    var transformedResponseHeaderText: String? = null,
 
-    @Column(columnDefinition = "json")
-    var transformedResponseBodyJson: String? = null,
+    var transformedResponseBodyText: String? = null,
 
     @Column(nullable = false)
     var requestDatetime: LocalDateTime? = null,
