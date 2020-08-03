@@ -15,8 +15,10 @@ import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.db.entity.CardBillEntity
 import com.rainist.collectcard.common.db.entity.CardBillTransactionEntity
+import com.rainist.collectcard.common.db.entity.CardPaymentScheduledEntity
 import com.rainist.collectcard.common.db.repository.CardBillRepository
 import com.rainist.collectcard.common.db.repository.CardBillTransactionRepository
+import com.rainist.collectcard.common.db.repository.CardPaymentScheduledRepository
 import com.rainist.collectcard.common.exception.CollectcardException
 import com.rainist.collectcard.common.service.ApiLogService
 import com.rainist.collectcard.common.service.CardOrganization
@@ -33,7 +35,8 @@ class CardBillServiceImpl(
     val headerService: HeaderService,
     val collectExecutorService: CollectExecutorService,
     val cardBillRepository: CardBillRepository,
-    val cardBillTransactionRepository: CardBillTransactionRepository
+    val cardBillTransactionRepository: CardBillTransactionRepository,
+    val cardPaymentScheduledRepository: CardPaymentScheduledRepository
 ) : CardBillService {
 
     companion object : Log
@@ -58,7 +61,34 @@ class CardBillServiceImpl(
             }
         }
 
-        val executionResponse: ExecutionResponse<ListCardBillsResponse> = collectExecutorService.execute(
+        // 청구서 execution
+        val cardBillsExecutionResponse: ExecutionResponse<ListCardBillsResponse> = collectExecutorService.execute(
+            Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.cardbills),
+            ExecutionRequest.builder<ListCardBillsRequest>()
+                .headers(header)
+                .request(request)
+                .build(),
+            { apiLog: ApiLog ->
+                apiLogService.logRequest(organization.organizationId ?: "", banksaladUserId.toLong(), apiLog)
+            },
+            { apiLog: ApiLog ->
+                apiLogService.logResponse(organization.organizationId ?: "", banksaladUserId.toLong(), apiLog)
+            }
+        )
+        // TODO : error handling
+        if (!HttpStatus.valueOf(cardBillsExecutionResponse.httpStatusCode).is2xxSuccessful) {
+            throw CollectcardException("Resopnse status is not success")
+        }
+
+        val cardBillsResponse = cardBillsExecutionResponse.response
+
+        // 청구서 IO
+        cardBillsResponse.dataBody?.cardBills?.forEach { cardBill ->
+            upsertCardBillAndTransactions(banksaladUserId, organization.organizationId, cardBill)
+        }
+
+        // 결제 예정 내역 execution
+        val cardBillExpectedExecutionResponse: ExecutionResponse<ListCardBillsResponse> = collectExecutorService.execute(
             Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.billTransactionExpected),
             ExecutionRequest.builder<ListCardBillsRequest>()
                 .headers(header)
@@ -73,17 +103,25 @@ class CardBillServiceImpl(
         )
 
         // TODO : error handling
-        if (!HttpStatus.valueOf(executionResponse.httpStatusCode).is2xxSuccessful) {
+        if (!HttpStatus.valueOf(cardBillExpectedExecutionResponse.httpStatusCode).is2xxSuccessful) {
             throw CollectcardException("Resopnse status is not success")
         }
 
-        val cardBillResponse = executionResponse.response
+        val cardBillExpectedResponse = cardBillExpectedExecutionResponse.response
 
-        cardBillResponse.dataBody?.cardBills?.forEach { cardBill ->
-            upsertCardBillAndTransactions(banksaladUserId, organization.organizationId, cardBill)
+        // 결제 예정 내역 DB IO
+        cardBillExpectedResponse.dataBody?.cardBills?.flatMap {
+            it.transactions ?: mutableListOf()
+        }?.let {
+            deleteAndInsertCardBillExpectedTransactions(banksaladUserId, organization.organizationId, it)
         }
 
-        return cardBillResponse
+        // merge 청구서, 결제 예정 내역
+        cardBillsResponse.dataBody?.cardBills?.addAll(
+            cardBillExpectedResponse.dataBody?.cardBills ?: mutableListOf()
+        )
+
+        return cardBillsResponse
     }
 
     private fun upsertCardBillAndTransactions(banksaladUserId: String, organizationId: String?, cardBill: CardBill) {
@@ -194,5 +232,65 @@ class CardBillServiceImpl(
             if (cardBillEntity.expiringPoints != cardBill.expiringPoints?.toBigDecimal()) return true
         }
         return false
+    }
+
+    private fun deleteAndInsertCardBillExpectedTransactions(banksaladUserId: String, organizationId: String?, cardBillTransactionExpected: List<CardBillTransaction>) {
+        cardPaymentScheduledRepository.deleteAllByBanksaladUserIdAndCardCompanyId(banksaladUserId.toLong(), organizationId)
+
+        cardBillTransactionExpected.forEachIndexed { index, cardBillTransaction ->
+            insertCardBillExpectedTransaction(banksaladUserId, organizationId, index, cardBillTransaction)
+        }
+    }
+
+    private fun insertCardBillExpectedTransaction(banksaladUserId: String, organizationId: String?, paymentScheduledTransactionNo: Int?, cardBillTransaction: CardBillTransaction) {
+
+        CardPaymentScheduledEntity().apply {
+            this.banksaladUserId = banksaladUserId.toLong()
+            this.cardCompanyId = organizationId
+            this.paymentScheduledTransactionNo = paymentScheduledTransactionNo
+//            this.cardCompanyCardId =
+            this.cardName = cardBillTransaction.cardName
+            this.cardNumber = cardBillTransaction.cardNumber
+            this.cardNumberMask = cardBillTransaction.cardNumberMasked
+            this.businessLicenseNumber = cardBillTransaction.businessLicenseNumber
+            this.storeName = cardBillTransaction.storeName
+            this.storeNumber = cardBillTransaction.storeNumber
+            this.cardType = cardBillTransaction.cardType
+            this.cardTypeOrigin = cardBillTransaction.cardTypeOrigin
+            this.cardTransactionType = cardBillTransaction.cardTransactionType?.name
+            this.cardTransactionTypeOrigin = cardBillTransaction.cardTransactionTypeOrigin
+            this.currencyCode = cardBillTransaction.currencyCode
+            this.isInstallmentPayment = cardBillTransaction.isInstallmentPayment
+            this.installment = cardBillTransaction.installment
+            this.installmentRound = cardBillTransaction.installmentRound
+            this.netSalesAmount = cardBillTransaction.netSalesAmount
+            this.serviceChargeAmount = cardBillTransaction.serviceChargeAmount
+            this.taxAmount = cardBillTransaction.tax
+            this.paidPoints = cardBillTransaction.paidPoints
+            this.isPointPay = cardBillTransaction.isPointPay
+            this.discountAmount = cardBillTransaction.discountAmount
+            this.canceledAmount = cardBillTransaction.canceledAmount
+            this.approvalNumber = cardBillTransaction.approvalNumber
+            this.approvalDay = cardBillTransaction.approvalDay
+            this.approvalTime = cardBillTransaction.approvalTime
+            this.pointsToEarn = cardBillTransaction.pointsToEarn
+            this.isOverseaUse = cardBillTransaction.isOverseaUse
+            this.paymentDay = cardBillTransaction.paymentDay
+            this.storeCategory = cardBillTransaction.storeCategory
+            this.storeCategoryOrigin = cardBillTransaction.storeCategoryOrigin
+            this.transactionCountry = cardBillTransaction.transactionCountry
+            this.billingRound = cardBillTransaction.billingRound
+            this.paidAmount = cardBillTransaction.paidAmount
+            this.billedAmount = cardBillTransaction.billedAmount
+            this.billedFee = cardBillTransaction.billedFee
+            this.remainingAmount = cardBillTransaction.remainingAmount
+            this.isPaidFull = cardBillTransaction.isPaidFull
+            this.cashbackAmount = cardBillTransaction.cashback
+            this.pointsRate = cardBillTransaction.pointsRate
+            this.lastCheckAt = DateTimeUtil.getLocalDateTime()
+            this.lastCheckAt = DateTimeUtil.getLocalDateTime()
+        }.let {
+            cardPaymentScheduledRepository.save(it)
+        }
     }
 }

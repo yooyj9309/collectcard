@@ -11,7 +11,7 @@ enum class Organization {
 }
 
 enum class Transaction {
-    userInfo, cards, cardbills, cardTransaction, billTransactions, billTransactionExpected, loan, creditLimit
+    userInfo, cards, cardbills, cardTransaction, billTransactionExpected, loan, creditLimit
 }
 
 class Apis {

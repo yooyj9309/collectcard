@@ -19,104 +19,104 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 data class CardPaymentScheduledEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var cardPaymentScheduledId: Long,
+    var cardPaymentScheduledId: Long? = null,
 
     @Column(nullable = false)
-    var banksaladUserId: Long,
+    var banksaladUserId: Long? = null,
 
     @Column(nullable = false)
-    var cardCompanyId: String,
+    var cardCompanyId: String? = null,
 
     @Column(nullable = false)
-    var paymentScheduledTransactionNo: Int,
+    var paymentScheduledTransactionNo: Int? = null,
 
     @Column(nullable = false)
-    var cardCompanyCardId: String,
+    var cardCompanyCardId: String? = null,
 
-    var cardName: String,
+    var cardName: String? = null,
 
-    var cardNumber: String,
+    var cardNumber: String? = null,
 
-    var cardNumberMask: String,
+    var cardNumberMask: String? = null,
 
-    var businessLicenseNumber: String,
+    var businessLicenseNumber: String? = null,
 
-    var storeName: String,
+    var storeName: String? = null,
 
-    var storeNumber: String,
+    var storeNumber: String? = null,
 
-    var cardType: String,
+    var cardType: String? = null,
 
-    var cardTypeOrigin: String,
+    var cardTypeOrigin: String? = null,
 
-    var cardTransactionType: String,
+    var cardTransactionType: String? = null,
 
-    var cardTransactionTypeOrigin: String,
+    var cardTransactionTypeOrigin: String? = null,
 
-    var currencyCode: String,
-
-    @Column(nullable = false)
-    var isInstallmentPayment: Boolean,
+    var currencyCode: String? = null,
 
     @Column(nullable = false)
-    var installment: Int,
-
-    var installmentRound: Int,
+    var isInstallmentPayment: Boolean? = null,
 
     @Column(nullable = false)
-    var netSalesAmount: BigDecimal,
+    var installment: Int? = null,
 
-    var serviceChargeAmount: BigDecimal,
+    var installmentRound: Int? = null,
 
-    var taxAmount: BigDecimal,
+    @Column(nullable = false)
+    var netSalesAmount: BigDecimal? = null,
 
-    var paidPoints: BigDecimal,
+    var serviceChargeAmount: BigDecimal? = null,
 
-    var isPointPay: Boolean,
+    var taxAmount: BigDecimal? = null,
 
-    var discountAmount: BigDecimal,
+    var paidPoints: BigDecimal? = null,
 
-    var canceledAmount: BigDecimal,
+    var isPointPay: Boolean? = null,
 
-    var approvalNumber: String,
+    var discountAmount: BigDecimal? = null,
 
-    var approvalDay: String,
+    var canceledAmount: BigDecimal? = null,
 
-    var approvalTime: String,
+    var approvalNumber: String? = null,
 
-    var pointsToEarn: BigDecimal,
+    var approvalDay: String? = null,
 
-    var isOverseaUse: Boolean,
+    var approvalTime: String? = null,
 
-    var paymentDay: String,
+    var pointsToEarn: BigDecimal? = null,
 
-    var storeCategory: String,
+    var isOverseaUse: Boolean? = null,
 
-    var storeCategoryOrigin: String,
+    var paymentDay: String? = null,
 
-    var transactionCountry: String,
+    var storeCategory: String? = null,
 
-    var billingRound: Int,
+    var storeCategoryOrigin: String? = null,
 
-    var paidAmount: BigDecimal,
+    var transactionCountry: String? = null,
 
-    var billedAmount: BigDecimal,
+    var billingRound: Int? = null,
 
-    var billedFee: BigDecimal,
+    var paidAmount: BigDecimal? = null,
 
-    var remainingAmount: BigDecimal,
+    var billedAmount: BigDecimal? = null,
 
-    var isPaidFull: Boolean,
+    var billedFee: BigDecimal? = null,
 
-    var cashbackAmount: BigDecimal,
+    var remainingAmount: BigDecimal? = null,
 
-    var pointsRate: BigDecimal,
+    var isPaidFull: Boolean? = null,
 
-    var lastCheckAt: LocalDateTime,
+    var cashbackAmount: BigDecimal? = null,
+
+    var pointsRate: BigDecimal? = null,
+
+    var lastCheckAt: LocalDateTime? = null,
 
     @CreatedDate
-    var createdAt: LocalDateTime,
+    var createdAt: LocalDateTime? = null,
 
     @LastModifiedDate
-    var updatedAt: LocalDateTime
+    var updatedAt: LocalDateTime? = null
 )
