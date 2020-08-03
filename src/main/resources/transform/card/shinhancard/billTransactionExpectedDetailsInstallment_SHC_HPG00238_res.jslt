@@ -9,14 +9,14 @@
    "dataBody": {
         "billTransactions": [for (.dataBody.grp001)
             {
-                "cardNumber": .crdN,                    // 마스킹 카드번호
-                "cardNumberMaked": .crdN,               // 마스킹 카드번호
+                "cardNumber": .crdN,                    // 카드번호
+                "cardNumberMasked": .crdN,              // 마스킹 카드번호
                 "approvalDay" : .useDate,               // 이용일자
                 "amount": .amount,                      // 이용원금금액
                 "storeName": .merchant,                 // 가맹점명
                 "billingRound": .monthCount,            // 청구회차
-                "thisMonthBilledAmount": .monthAmt,     // 원금금액
-                "thisMonthBilledFee": .monthFee,        // 수수료금액
+                "billedAmount": .monthAmt,              // 청구금액
+                "billedFee": .monthFee,                 // 수수료금액
                 "installment": .useMonth,               // 할부개월수
                 "remainingAmount": .dueReamin,          // 미도래금액
                 "pointsRate": .point                    // 적립예정포인트율
