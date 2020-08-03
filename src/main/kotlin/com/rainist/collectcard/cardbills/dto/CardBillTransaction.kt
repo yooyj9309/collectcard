@@ -11,6 +11,8 @@ data class CardBillTransaction(
 
     var cardTransactionId: String? = null, // 카드 트렌젝션 Id
 
+    var cardCompanyCardId: String? = null, // 카드 id
+
     var cardName: String? = null, // 카드이름
 
     @field:NotEmpty

@@ -23,8 +23,8 @@ import com.rainist.collectcard.common.exception.CollectcardException
 import com.rainist.collectcard.common.service.ApiLogService
 import com.rainist.collectcard.common.service.CardOrganization
 import com.rainist.collectcard.common.service.HeaderService
-import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
+import java.math.BigDecimal
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -39,7 +39,7 @@ class CardBillServiceImpl(
     val cardPaymentScheduledRepository: CardPaymentScheduledRepository
 ) : CardBillService {
 
-    companion object : Log
+    companion object Log
 
     @Transactional
     override fun listUserCardBills(
@@ -139,18 +139,19 @@ class CardBillServiceImpl(
             this.banksaladUserId = banksaladUserId.toLong()
             this.cardCompanyId = organizationId
             this.billNumber = cardBill.billNumber
+            this.lastCheckAt = DateTimeUtil.getLocalDateTime()
             this.userName = cardBill.userName
             this.userGrade = cardBill.userGrade
-            this.paymentDay = cardBill.paymentDate
-            this.billedYearMonth = cardBill.billedYearMonth?.let { DateTimeUtil.zoneDateTimeToString(it) }
-            this.nextPaymentDay = cardBill.nextPaymentDate
-            this.billingAmount = cardBill.billingAmount
-            this.prepaidAmount = cardBill.prepaidAmount
+            this.userGradeOrigin = cardBill.userGradeOrigin
+            this.paymentDay = cardBill.paymentDay ?: ""
+            this.billedYearMonth = cardBill.billedYearMonth?.let { DateTimeUtil.zoneDateTimeToString(it) } ?: ""
+            this.nextPaymentDay = cardBill.nextPaymentDay
+            this.billingAmount = cardBill.billingAmount ?: BigDecimal("0.0000")
+            this.prepaidAmount = cardBill.prepaidAmount ?: BigDecimal("0.0000")
             this.paymentBankId = cardBill.paymentBankId
             this.paymentAccountNumber = cardBill.paymentAccountNumber
             this.totalPoint = cardBill.totalPoints?.toBigDecimal()
             this.expiringPoints = cardBill.expiringPoints?.toBigDecimal()
-            this.lastCheckAt = DateTimeUtil.getLocalDateTime()
         }.let { cardBillRepository.save(it) }
 
         cardBillTransactionRepository.deleteAllByBanksaladUserIdAndCardCompanyCardIdAndBillNumber(
@@ -172,7 +173,7 @@ class CardBillServiceImpl(
             this.cardCompanyId = organizationId
             this.billNumber = cardBillTransaction.billNumber
             this.cardBillTransactionNo = cardBillTransactionNo
-//            this.cardCompanyCardId = cardBillTransaction.
+            this.cardCompanyCardId = cardBillTransaction.cardCompanyCardId ?: ""
             this.cardName = cardBillTransaction.cardName
             this.cardNumber = cardBillTransaction.cardNumber
             this.cardNumberMask = cardBillTransaction.cardNumberMasked
@@ -184,22 +185,22 @@ class CardBillServiceImpl(
             this.cardTransactionType = cardBillTransaction.cardTransactionType?.name
             this.cardTransactionTypeOrigin = cardBillTransaction.cardTransactionTypeOrigin
             this.currencyCode = cardBillTransaction.currencyCode
-            this.isInstallmentPayment = cardBillTransaction.isInstallmentPayment
-            this.installment = cardBillTransaction.installment
+            this.isInstallmentPayment = cardBillTransaction.isInstallmentPayment ?: false
+            this.installment = cardBillTransaction.installment ?: 0
             this.installmentRound = cardBillTransaction.installmentRound
-            this.netSalesAmount = cardBillTransaction.netSalesAmount
+            this.netSalesAmount = cardBillTransaction.netSalesAmount ?: BigDecimal("0.0000")
             this.serviceChargeAmount = cardBillTransaction.serviceChargeAmount
             this.taxAmount = cardBillTransaction.tax
             this.paidPoints = cardBillTransaction.paidPoints
             this.isPointPay = cardBillTransaction.isPointPay
             this.discountAmount = cardBillTransaction.discountAmount
             this.canceledAmount = cardBillTransaction.canceledAmount
-            this.approvalNumber = cardBillTransaction.approvalNumber
-            this.approvalDay = cardBillTransaction.approvalDay
-            this.approvalTime = cardBillTransaction.approvalTime
+            this.approvalNumber = cardBillTransaction.approvalNumber ?: ""
+            this.approvalDay = cardBillTransaction.approvalDay ?: ""
+            this.approvalTime = cardBillTransaction.approvalTime ?: ""
             this.pointsToEarn = cardBillTransaction.pointsToEarn
-            this.isOverseaUse = cardBillTransaction.isOverseaUse
-            this.paymentDay = cardBillTransaction.paymentDay
+            this.isOverseaUse = cardBillTransaction.isOverseaUse ?: false
+            this.paymentDay = cardBillTransaction.paymentDay ?: ""
             this.storeCategory = cardBillTransaction.storeCategory
             this.storeCategoryOrigin = cardBillTransaction.storeCategoryOrigin
             this.transactionCountry = cardBillTransaction.transactionCountry
@@ -221,9 +222,9 @@ class CardBillServiceImpl(
         cardBillEntity.also {
             if (cardBillEntity.userName != cardBill.userName) return true
             if (cardBillEntity.userGrade != cardBill.userGrade) return true
-            if (cardBillEntity.paymentDay != cardBill.paymentDate) return true
+            if (cardBillEntity.paymentDay != cardBill.paymentDay) return true
             if (cardBillEntity.billedYearMonth != cardBill.billedYearMonth?.let { DateTimeUtil.zoneDateTimeToString(it) }) return true
-            if (cardBillEntity.nextPaymentDay != cardBill.nextPaymentDate) return true
+            if (cardBillEntity.nextPaymentDay != cardBill.nextPaymentDay) return true
             if (cardBillEntity.billingAmount != cardBill.billingAmount) return true
             if (cardBillEntity.prepaidAmount != cardBill.prepaidAmount) return true
             if (cardBillEntity.paymentBankId != cardBill.paymentBankId) return true
@@ -248,7 +249,7 @@ class CardBillServiceImpl(
             this.banksaladUserId = banksaladUserId.toLong()
             this.cardCompanyId = organizationId
             this.paymentScheduledTransactionNo = paymentScheduledTransactionNo
-//            this.cardCompanyCardId =
+            this.cardCompanyCardId = cardBillTransaction.cardCompanyCardId ?: ""
             this.cardName = cardBillTransaction.cardName
             this.cardNumber = cardBillTransaction.cardNumber
             this.cardNumberMask = cardBillTransaction.cardNumberMasked
@@ -260,21 +261,21 @@ class CardBillServiceImpl(
             this.cardTransactionType = cardBillTransaction.cardTransactionType?.name
             this.cardTransactionTypeOrigin = cardBillTransaction.cardTransactionTypeOrigin
             this.currencyCode = cardBillTransaction.currencyCode
-            this.isInstallmentPayment = cardBillTransaction.isInstallmentPayment
-            this.installment = cardBillTransaction.installment
+            this.isInstallmentPayment = cardBillTransaction.isInstallmentPayment ?: false
+            this.installment = cardBillTransaction.installment ?: 0
             this.installmentRound = cardBillTransaction.installmentRound
-            this.netSalesAmount = cardBillTransaction.netSalesAmount
+            this.netSalesAmount = cardBillTransaction.netSalesAmount ?: BigDecimal("0.0000")
             this.serviceChargeAmount = cardBillTransaction.serviceChargeAmount
             this.taxAmount = cardBillTransaction.tax
             this.paidPoints = cardBillTransaction.paidPoints
             this.isPointPay = cardBillTransaction.isPointPay
             this.discountAmount = cardBillTransaction.discountAmount
             this.canceledAmount = cardBillTransaction.canceledAmount
-            this.approvalNumber = cardBillTransaction.approvalNumber
-            this.approvalDay = cardBillTransaction.approvalDay
-            this.approvalTime = cardBillTransaction.approvalTime
+            this.approvalNumber = cardBillTransaction.approvalNumber ?: ""
+            this.approvalDay = cardBillTransaction.approvalDay ?: ""
+            this.approvalTime = cardBillTransaction.approvalTime ?: ""
             this.pointsToEarn = cardBillTransaction.pointsToEarn
-            this.isOverseaUse = cardBillTransaction.isOverseaUse
+            this.isOverseaUse = cardBillTransaction.isOverseaUse ?: false
             this.paymentDay = cardBillTransaction.paymentDay
             this.storeCategory = cardBillTransaction.storeCategory
             this.storeCategoryOrigin = cardBillTransaction.storeCategoryOrigin
