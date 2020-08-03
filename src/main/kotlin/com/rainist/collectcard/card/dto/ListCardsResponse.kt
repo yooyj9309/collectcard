@@ -3,7 +3,8 @@ package com.rainist.collectcard.card.dto
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
 import com.google.protobuf.BoolValue
 import com.google.protobuf.StringValue
-import java.time.format.DateTimeFormatter
+import com.rainist.collectcard.common.enums.CardStatus
+import com.rainist.collectcard.common.enums.CardType
 
 data class ListCardsResponse(
     var dataHeader: ListCardsResponseDataHeader?,
@@ -21,24 +22,25 @@ data class ListCardsResponseDataBody(
 )
 
 fun ListCardsResponse.toListCardsResponseProto(): CollectcardProto.ListCardsResponse {
-    return this.dataBody?.cards?.map {
+    // TODO 박두상 : 현재 connectCard diff 작업을 위하여 IssuedDate, ExpirationDate, Hybrid 주석처리, cardType String 소문자 처리
+    return this.dataBody?.cards?.map { card ->
         CollectcardProto.Card
             .newBuilder()
-            .setName(it.cardName)
-            .setNumber(it.cardNumber)
-            .setUserName(StringValue.of(it.cardOwnerName))
-            .setIssuedDate(
-                it.issuedDay?.format(DateTimeFormatter.ISO_LOCAL_DATE)?.let { StringValue.of(it) }
-                    ?: StringValue.getDefaultInstance()
-            )
-            .setExpirationDate(
-                it.expiresDay?.format(DateTimeFormatter.ISO_LOCAL_DATE)?.let { StringValue.of(it) }
-                    ?: StringValue.getDefaultInstance()
-            )
-            .setType(StringValue.of(it.cardType))
-            .setDormant(BoolValue.of(it.cardStatus == CardStatus.DORMANT))
-            .setHybrid(BoolValue.getDefaultInstance())
-            .setTrafficSupported(BoolValue.getDefaultInstance())
+            .setName(card.cardName)
+            .setNumber(card.cardNumber)
+            .setUserName(StringValue.of(card.cardOwnerName))
+            .setType(if (card.cardType == CardType.DEBIT) StringValue.of(CardType.CHECK.name.toLowerCase()) else StringValue.of(card.cardType.name.toLowerCase()))
+            .setDormant(BoolValue.of(card.cardStatus == CardStatus.DORMANT))
+//            .setHybrid(BoolValue.getDefaultInstance())
+//            .setIssuedDate(
+//                card.issuedDay?.format(DateTimeFormatter.ISO_LOCAL_DATE)?.let { StringValue.of(it) }
+//                    ?: StringValue.getDefaultInstance()
+//            )
+//            .setExpirationDate(
+//                card.expiresDay?.format(DateTimeFormatter.ISO_LOCAL_DATE)?.let { StringValue.of(it) }
+//                    ?: StringValue.getDefaultInstance()
+//            )
+            .setTrafficSupported(BoolValue.of(card.trafficSupported))
             .build()
     }.let {
         CollectcardProto.ListCardsResponse

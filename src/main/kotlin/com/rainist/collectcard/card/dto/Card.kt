@@ -1,22 +1,12 @@
 package com.rainist.collectcard.card.dto
 
+import com.rainist.collectcard.common.enums.CardOwnerType
+import com.rainist.collectcard.common.enums.CardStatus
+import com.rainist.collectcard.common.enums.CardType
 import java.math.BigDecimal
 
 enum class Brand {
     ShinhanCard
-}
-
-enum class CardStatus {
-    REGISTERED,
-    TERMINATED,
-    DORMANT,
-    SUSPENDED
-}
-
-enum class CardOwnerType {
-    SELF,
-    FAMILY,
-    BUSINESS
 }
 
 data class Card(
@@ -43,7 +33,7 @@ data class Card(
     // 카드 번호 (e.g. 9430-20**-****-2399)
     var cardNumberMask: String? = null,
     // 카드 타입 (e.g. 신용카드, 체크카드)
-    var cardType: String? = null,
+    var cardType: CardType = CardType.UNKNOWN,
     // 카드 타입 원본 (e.g. 신용카드, 체크카드)
     var cardTypeOrigin: String? = null,
     // 카드 발급일자
@@ -65,5 +55,7 @@ data class Card(
     // 결제계좌번호
     var paymentAccountNumber: String? = null,
     // 법인카드 여부
-    var isBusinessCard: Boolean = false
+    var isBusinessCard: Boolean = false,
+    // 교통카드 지원여부 ( db에는 없으나, 현재 신한카드 응답값으로 내리는중)
+    var trafficSupported: Boolean = false
 )

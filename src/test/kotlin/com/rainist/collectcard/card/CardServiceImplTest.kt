@@ -1,11 +1,12 @@
 package com.rainist.collectcard.card
 
 import com.rainist.collectcard.card.dto.Card
-import com.rainist.collectcard.card.dto.CardOwnerType
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
 import com.rainist.collectcard.common.db.entity.CardEntity
 import com.rainist.collectcard.common.db.repository.CardRepository
 import com.rainist.collectcard.common.dto.SyncRequest
+import com.rainist.collectcard.common.enums.CardOwnerType
+import com.rainist.collectcard.common.enums.CardType
 import com.rainist.collectcard.common.service.HeaderService
 import java.time.LocalDateTime
 import org.hamcrest.MatcherAssert.assertThat
@@ -78,9 +79,10 @@ class CardServiceImplTest {
             internationalBrandName = "CARD_INTERNATIONAL_BRAND_MASTERCARD"
             cardNumber = "9523*********8721"
             cardNumberMask = "9523*********8721"
-            cardType = "CARD_TYPE_CREDIT"
+            cardType = CardType.CREDIT
             cardTypeOrigin = "1"
             isBusinessCard = false
+            trafficSupported = true
         }
         ))
 
@@ -108,7 +110,7 @@ class CardServiceImplTest {
             internationalBrandName = "CARD_INTERNATIONAL_BRAND_MASTERCARD",
             cardNumber = "9523*********8721",
             cardNumberMask = "9523*********8721",
-            cardType = "CARD_TYPE_CREDIT",
+            cardType = CardType.CREDIT.name,
             cardTypeOrigin = "1",
             isBusinessCard = false,
             createdAt = now,
@@ -145,9 +147,10 @@ class CardServiceImplTest {
             internationalBrandName = "CARD_INTERNATIONAL_BRAND_MASTERCARD"
             cardNumber = "9523*********8721"
             cardNumberMask = "9523*********8721"
-            cardType = "CARD_TYPE_CREDIT"
+            cardType = CardType.CREDIT
             cardTypeOrigin = "1"
             isBusinessCard = false
+            trafficSupported = true
         }
         ))
 
@@ -175,7 +178,7 @@ class CardServiceImplTest {
             internationalBrandName = "CARD_INTERNATIONAL_BRAND_MASTERCARD",
             cardNumber = "9523*********8721",
             cardNumberMask = "9523*********8721",
-            cardType = "CARD_TYPE_CREDIT",
+            cardType = "CREDIT",
             cardTypeOrigin = "1",
             isBusinessCard = false,
             createdAt = now,
@@ -235,9 +238,10 @@ class CardServiceImplTest {
             internationalBrandName = "CARD_INTERNATIONAL_BRAND_VISA"
             cardNumber = "9523*********8721"
             cardNumberMask = "9523*********8721"
-            cardType = "CARD_TYPE_DEBIT"
+            cardType = CardType.DEBIT
             cardTypeOrigin = "5"
             isBusinessCard = false
+            trafficSupported = true
         }
         ))
 
@@ -264,7 +268,7 @@ class CardServiceImplTest {
             internationalBrandName = "CARD_INTERNATIONAL_BRAND_VISA",
             cardNumber = "9523*********8721",
             cardNumberMask = "9523*********8721",
-            cardType = "CARD_TYPE_DEBIT",
+            cardType = "DEBIT",
             cardTypeOrigin = "5",
             isBusinessCard = false,
             createdAt = now,

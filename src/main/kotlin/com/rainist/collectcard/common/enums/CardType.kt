@@ -5,9 +5,10 @@ enum class CardType(
     var description: String
 ) {
 
-    UNKNOWN(0, "알수없음"),
+    CHECK(0, "(Diff용,구)체크카드"),
     DEBIT(1, "체크카드"),
     CREDIT(2, "신용카드"),
-    MICROPAYMENT(3, "하이브리드카드")
+    MICROPAYMENT(3, "하이브리드카드"),
+    UNKNOWN(99, "알수없음"),
     ;
 }

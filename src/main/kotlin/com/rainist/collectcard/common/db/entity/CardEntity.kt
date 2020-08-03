@@ -98,7 +98,7 @@ fun CardEntity.makeCardEntity(banksaladUserId: Long?, card: Card): CardEntity {
     this.internationalBrandName = card.internationalBrandName
     this.cardNumber = card.cardNumber
     this.cardNumberMask = card.cardNumberMask
-    this.cardType = card.cardType
+    this.cardType = card.cardType.name
     this.cardTypeOrigin = card.cardTypeOrigin
     this.issuedDay = card.issuedDay
     this.expirationDay = card.expiresDay

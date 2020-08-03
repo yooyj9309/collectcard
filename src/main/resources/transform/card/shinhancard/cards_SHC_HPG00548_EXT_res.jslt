@@ -4,10 +4,12 @@ let CardOwnerType = {
 }
 
 let CardType = {
-    "": "CARD_TYPE_UNKNOWN",
-    "1": "CARD_TYPE_CREDIT",
-    "5": "CARD_TYPE_DEBIT",
-    "3": "CARD_TYPE_MICROPAYMENT"
+    "1": "CREDIT",
+    "2": "CREDIT",
+    "3": "CREDIT",
+    "4": "CREDIT",
+    "5": "DEBIT",
+    "99": "UNKNOWN"
 }
 
 let brands = {
@@ -45,9 +47,10 @@ let cardholder_name = .dataBody.clnHgNm
                 "cardName": .cardname,
                 "cardNumberMask": .cardno,
                 "cardNumber": .cardno,
-                "cardType": get-key($CardType, .cardgubun, "CARD_TYPE_CREDIT"),
+                "cardType": get-key($CardType, .cardgubun, "UNKNOWN"),
                 "cardTypeOrigin": .cardgubun,
-                "internationalBrandName": get-key($brands, .cardbrand, "CARD_INTERNATIONAL_BRAND_UNKNOWN")
+                "internationalBrandName": get-key($brands, .cardbrand, "CARD_INTERNATIONAL_BRAND_UNKNOWN"),
+                "trafficSupported" : if( .trafficyn == "Y") true else false
             }
         ],
         "nextKey" : .dataBody.nxtQyKey

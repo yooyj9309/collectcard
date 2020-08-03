@@ -153,19 +153,6 @@ class CardTransactionServiceTest {
         settingOnceMockServiceServer(server, checkOverseaAPI, "classpath:mock/shinhancard/card_transaction_expected_1_check_oversea_p2.json")
     }
 
-    private fun setupServer_test3() {
-        val creditDomesticAPI = ShinhancardApis.card_shinhancard_credit_domestic_transactions
-        val creditOverseaAPI = ShinhancardApis.card_shinhancard_credit_oversea_transactions
-        val checkDomesticAPI = ShinhancardApis.card_shinhancard_check_domestic_transactions
-        val checkOverseaAPI = ShinhancardApis.card_shinhancard_check_oversea_transactions
-        val server = MockRestServiceServer.bindTo(commonRestTemplate).ignoreExpectOrder(true).build()
-
-        settingOnceMockServiceServer(server, creditDomesticAPI, "classpath:mock/shinhancard/card_transaction_expected_1_credit_domestic_updated.json")
-        settingOnceMockServiceServer(server, creditOverseaAPI, "classpath:mock/shinhancard/card_transaction_expected_1_credit_oversea_updated.json")
-        settingOnceMockServiceServer(server, checkDomesticAPI, "classpath:mock/shinhancard/card_transaction_expected_1_check_domestic_updated.json")
-        settingOnceMockServiceServer(server, checkOverseaAPI, "classpath:mock/shinhancard/card_transaction_expected_1_check_oversea_updated.json")
-    }
-
     private fun setupServer_updated() {
         val creditDomesticAPI = ShinhancardApis.card_shinhancard_credit_domestic_transactions
         val creditOverseaAPI = ShinhancardApis.card_shinhancard_credit_oversea_transactions
