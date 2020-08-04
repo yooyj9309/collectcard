@@ -25,11 +25,11 @@ class ApiLogServiceImpl(private val apiLogRepository: ApiLogRepository) : ApiLog
                 this.httpMethod = apiLog.api.method.name
                 this.organizationApiId = apiLog.api.name
 
-                this.requestHeaderText = apiLog.request.header
-                this.requestBodyText = apiLog.request.body
+                this.requestHeaderText = apiLog.request?.header ?: ""
+                this.requestBodyText = apiLog.request?.body ?: ""
 
-                this.transformedRequestHeaderText = apiLog.request.transformedHeader
-                this.transformedRequestBodyText = apiLog.request.transformedBody
+                this.transformedRequestHeaderText = apiLog.request?.transformedHeader ?: ""
+                this.transformedRequestBodyText = apiLog.request?.transformedBody ?: ""
 
                 this.requestDatetime = LocalDateTime.now(ZoneId.of(ZONE_ID_UTC))
             }
@@ -48,15 +48,15 @@ class ApiLogServiceImpl(private val apiLogRepository: ApiLogRepository) : ApiLog
             }
 
         apiLogEntity.apply {
-            this.responseCode = apiLog.response.responseCode
+            this.responseCode = apiLog.response?.responseCode
             // TODO jayden-lee resultCode java-banksalad Response 객체 프로퍼티에 추가해야함
             this.resultCode = ""
 
-            this.responseHeaderText = apiLog.response.header
-            this.responseBodyText = apiLog.response.body
+            this.responseHeaderText = apiLog.response?.header
+            this.responseBodyText = apiLog.response?.body
 
-            this.transformedResponseHeaderText = apiLog.response.transformedHeader
-            this.transformedResponseBodyText = apiLog.response.transformedBody
+            this.transformedResponseHeaderText = apiLog.response?.transformedHeader
+            this.transformedResponseBodyText = apiLog.response?.transformedBody
 
             this.responseDatetime = LocalDateTime.now(ZoneId.of(ZONE_ID_UTC))
         }
