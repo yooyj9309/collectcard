@@ -7,6 +7,7 @@ plugins {
     kotlin("jvm") version "1.3.72"
     kotlin("plugin.spring") version "1.3.72"
     kotlin("plugin.jpa") version "1.3.72"
+    kotlin("kapt") version "1.3.72"
     jacoco
 }
 
@@ -88,6 +89,13 @@ dependencies {
 
     // coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
+
+    // model mapper
+    implementation("org.modelmapper:modelmapper:2.3.8")
+
+    // apache common
+    implementation("org.apache.commons:commons-lang3:3.10")
+
 }
 
 tasks.withType<Test> {

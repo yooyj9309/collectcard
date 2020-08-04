@@ -1,6 +1,5 @@
 package com.rainist.collectcard.common.db.entity
 
-import com.rainist.collectcard.card.dto.Card
 import com.rainist.common.util.DateTimeUtil
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -84,31 +83,3 @@ data class CardEntity(
     @LastModifiedDate
     var updatedAt: LocalDateTime? = null
 )
-
-fun CardEntity.makeCardEntity(banksaladUserId: Long?, card: Card): CardEntity {
-    this.banksaladUserId = banksaladUserId
-    this.cardCompanyId = card.cardCompanyId
-    this.cardCompanyCardId = card.cardCompanyCardId
-    this.lastCheckAt = DateTimeUtil.getLocalDateTime()
-    this.cardOwnerName = card.cardOwnerName
-    this.cardOwnerType = card.cardOwnerType?.name
-    this.cardOwnerTypeOrigin = card.cardOwnerTypeOrigin
-    this.cardName = card.cardName
-    this.cardBrandName = card.cardBrandName
-    this.internationalBrandName = card.internationalBrandName
-    this.cardNumber = card.cardNumber
-    this.cardNumberMask = card.cardNumberMask
-    this.cardType = card.cardType.name
-    this.cardTypeOrigin = card.cardTypeOrigin
-    this.issuedDay = card.issuedDay
-    this.expirationDay = card.expiresDay
-    this.cardStatus = card.cardStatus?.name
-    this.cardStatusOrigin = card.cardStatusOrigin
-    this.lastUseDay = card.lastUseDay
-    this.lastUseTime = card.lastUseTime
-    this.annualFee = card.annualFee
-    this.paymentBankId = card.paymentBankId
-    this.paymentAccountNumber = card.paymentAccountNumber
-    this.isBusinessCard = card.isBusinessCard
-    return this
-}

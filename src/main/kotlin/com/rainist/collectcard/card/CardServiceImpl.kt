@@ -14,8 +14,6 @@ import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.db.entity.CardEntity
 import com.rainist.collectcard.common.db.entity.CardHistoryEntity
-import com.rainist.collectcard.common.db.entity.makeCardEntity
-import com.rainist.collectcard.common.db.entity.makeCardHistoryEntity
 import com.rainist.collectcard.common.db.repository.CardHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardRepository
 import com.rainist.collectcard.common.dto.SyncRequest
@@ -25,6 +23,7 @@ import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.util.SyncStatus
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
+import org.modelmapper.ModelMapper
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -35,7 +34,8 @@ class CardServiceImpl(
     val collectExecutorService: CollectExecutorService,
     val headerService: HeaderService,
     val cardRepository: CardRepository,
-    val cardHistoryRepository: CardHistoryRepository
+    val cardHistoryRepository: CardHistoryRepository,
+    val modelMapper: ModelMapper
 ) : CardService {
 
     companion object : Log
@@ -100,30 +100,39 @@ class CardServiceImpl(
         /* 카드 조회 */
         cardRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardId(banksaladUserId.toLong(), card.cardCompanyId ?: "", card.cardCompanyCardId ?: "")
             ?.let { cardEntity ->
-                /* 기존 카드 */
-
-                val prevUpdatedAt = cardEntity.updatedAt
-                val bodyEntity = cardEntity.makeCardEntity(banksaladUserId.toLong(), card)
-
-                val saveEntity = cardRepository.saveAndFlush(bodyEntity)
-
-                if (true == saveEntity.updatedAt?.isAfter(prevUpdatedAt)) {
-                    /* insert card_history */
-                    cardHistoryRepository.save(CardHistoryEntity().makeCardHistoryEntity(cardEntity))
-                }
-
-                saveEntity.lastCheckAt = DateTimeUtil.utcNowLocalDateTime()
-                cardRepository.save(saveEntity)
+                updateCardEntity(cardEntity, card)
             }
             ?: kotlin.run {
-                /*  신규 카드 */
-
-                /* insert new card */
-                val cardEntity = CardEntity().makeCardEntity(banksaladUserId.toLong(), card)
-                cardRepository.save(cardEntity)
-
-                /* insert card_history */
-                cardHistoryRepository.save(CardHistoryEntity().makeCardHistoryEntity(cardEntity))
+                insertCardEntity(card, banksaladUserId.toLong())
             }
+    }
+
+    /* 기존 카드 */
+    private fun updateCardEntity(cardEntity: CardEntity, card: Card) {
+        val entityDto = modelMapper.map(cardEntity, Card::class.java)
+
+        if (entityDto.unequals(card)) {
+            /* update field */
+            modelMapper.map(card, cardEntity)
+            cardEntity.lastCheckAt = DateTimeUtil.utcNowLocalDateTime()
+
+            val cardHistoryEntity = modelMapper.map(cardEntity, CardHistoryEntity::class.java)
+            cardHistoryRepository.save(cardHistoryEntity)
+        }
+
+        cardRepository.save(cardEntity)
+    }
+
+    /* 신규 카드 */
+    private fun insertCardEntity(card: Card, banksaladUserId: Long) {
+
+        val cardEntity = modelMapper.map(card, CardEntity::class.java).apply {
+            this.banksaladUserId = banksaladUserId
+            this.lastCheckAt = DateTimeUtil.utcNowLocalDateTime()
+        }
+        cardRepository.save(cardEntity)
+
+        val cardHistoryEntity = modelMapper.map(cardEntity, CardHistoryEntity::class.java)
+        cardHistoryRepository.save(cardHistoryEntity)
     }
 }

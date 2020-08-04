@@ -85,32 +85,3 @@ data class CardHistoryEntity(
     @LastModifiedDate
     var updatedAt: LocalDateTime? = null
 )
-
-fun CardHistoryEntity.makeCardHistoryEntity(cardEntity: CardEntity): CardHistoryEntity {
-    this.cardId = cardEntity.cardId
-    this.banksaladUserId = cardEntity.banksaladUserId
-    this.cardCompanyId = cardEntity.cardCompanyId
-    this.cardCompanyCardId = cardEntity.cardCompanyCardId
-    this.lastCheckAt = cardEntity.lastCheckAt
-    this.cardOwnerName = cardEntity.cardOwnerName
-    this.cardOwnerType = cardEntity.cardOwnerType
-    this.cardOwnerTypeOrigin = cardEntity.cardOwnerTypeOrigin
-    this.cardName = cardEntity.cardName
-    this.cardBrandName = cardEntity.cardBrandName
-    this.internationalBrandName = cardEntity.internationalBrandName
-    this.cardNumber = cardEntity.cardNumber
-    this.cardNumberMask = cardEntity.cardNumberMask
-    this.cardType = cardEntity.cardType
-    this.cardTypeOrigin = cardEntity.cardTypeOrigin
-    this.issuedDay = cardEntity.issuedDay
-    this.expirationDay = cardEntity.expirationDay
-    this.cardStatus = cardEntity.cardStatus
-    this.cardStatusOrigin = cardEntity.cardStatusOrigin
-    this.lastUseDay = cardEntity.lastUseDay
-    this.lastUseTime = cardEntity.lastUseTime
-    this.annualFee = cardEntity.annualFee
-    this.paymentBankId = cardEntity.paymentBankId
-    this.paymentAccountNumber = cardEntity.paymentAccountNumber
-    this.isBusinessCard = cardEntity.isBusinessCard
-    return this
-}

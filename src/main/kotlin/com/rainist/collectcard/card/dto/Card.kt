@@ -1,9 +1,11 @@
 package com.rainist.collectcard.card.dto
 
+import com.rainist.collectcard.common.db.entity.CardEntity
 import com.rainist.collectcard.common.enums.CardOwnerType
 import com.rainist.collectcard.common.enums.CardStatus
 import com.rainist.collectcard.common.enums.CardType
 import java.math.BigDecimal
+import org.apache.commons.lang3.builder.EqualsBuilder
 
 enum class Brand {
     ShinhanCard
@@ -56,6 +58,18 @@ data class Card(
     var paymentAccountNumber: String? = null,
     // 법인카드 여부
     var isBusinessCard: Boolean = false,
+
     // 교통카드 지원여부 ( db에는 없으나, 현재 신한카드 응답값으로 내리는중)
     var trafficSupported: Boolean = false
-)
+) {
+
+    companion object {
+        val EXCLUDE_EQUALS_FIELD = mutableListOf(
+            CardEntity::cardId.name
+        )
+    }
+
+    fun unequals(other: Any?): Boolean {
+        return !EqualsBuilder.reflectionEquals(this, other, EXCLUDE_EQUALS_FIELD)
+    }
+}
