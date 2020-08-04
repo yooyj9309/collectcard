@@ -9,8 +9,16 @@ class CardTransactionUtil {
 
         fun makeCardTransactionEntity(banksaladUserId: Long, organizationObjectId: String, cardTransaction: CardTransaction): CardTransactionEntity {
             // TODO
+
+            val approvalYearMonth = try {
+                cardTransaction.approvalDay?.substring(0, 6) ?: ""
+            } catch (e: ArrayIndexOutOfBoundsException) {
+                ""
+            }
+
             return CardTransactionEntity().apply {
                 this.banksaladUserId = banksaladUserId
+                this.approvalYearMonth = approvalYearMonth
                 this.cardCompanyId = organizationObjectId
                 this.cardCompanyCardId = cardTransaction.cardCompanyCardId ?: ""
                 this.approvalNumber = cardTransaction.approvalNumber

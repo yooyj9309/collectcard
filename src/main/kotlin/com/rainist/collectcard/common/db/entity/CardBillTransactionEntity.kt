@@ -23,6 +23,9 @@ data class CardBillTransactionEntity(
     var cardBillTransactionId: Long? = null,
 
     @Column(nullable = false)
+    var billedYearMonth: String? = null,
+
+    @Column(nullable = false)
     var banksaladUserId: Long? = null,
 
     @Column(nullable = false)

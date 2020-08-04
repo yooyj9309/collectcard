@@ -4,7 +4,8 @@ import com.rainist.collectcard.common.db.entity.CardBillTransactionEntity
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface CardBillTransactionRepository : JpaRepository<CardBillTransactionEntity, Long> {
-    fun deleteAllByBanksaladUserIdAndCardCompanyCardIdAndBillNumber(
+    fun deleteAllByBilledYearMonthAndBanksaladUserIdAndCardCompanyCardIdAndBillNumber(
+        billedYearMonth: String,
         banksaladUserId: Long?,
         cardCompanyId: String?,
         billNumber: String?

@@ -45,6 +45,15 @@ class ApiLogServiceImpl(private val apiLogRepository: ApiLogRepository) : ApiLog
                 this.requestUrl = apiLog.api.endpoint
                 this.httpMethod = apiLog.api.method.name
                 this.organizationApiId = apiLog.api.name
+
+                this.requestId = ""
+                this.requestHeaderText = ""
+                this.requestBodyText = ""
+
+                this.transformedRequestHeaderText = ""
+                this.transformedRequestBodyText = ""
+
+                this.requestDatetime = LocalDateTime.now(ZoneId.of(ZONE_ID_UTC))
             }
 
         apiLogEntity.apply {

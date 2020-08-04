@@ -103,8 +103,15 @@ class CardTransactionServiceTest {
             cardTransaction
         )
 
+        val approvalYearMonth = try {
+            cardTransaction.approvalDay?.substring(0, 6) ?: ""
+        } catch (e: ArrayIndexOutOfBoundsException) {
+            ""
+        }
+
         val targetEntity =
-            cardTransactionRepository.findByBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
+            cardTransactionRepository.findByApprovalYearMonthAndBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
+                approvalYearMonth,
                 syncRequest.banksaladUserId.toLong(),
                 syncRequest.organizationId,
                 cardTransaction.cardCompanyCardId,

@@ -157,27 +157,34 @@ class CardBillServiceImpl(
             this.expiringPoints = cardBill.expiringPoints?.toBigDecimal()
         }.let { cardBillRepository.save(it) }
 
-        cardBillTransactionRepository.deleteAllByBanksaladUserIdAndCardCompanyCardIdAndBillNumber(
-            banksaladUserId.toLong(),
+        cardBillTransactionRepository.deleteAllByBilledYearMonthAndBanksaladUserIdAndCardCompanyCardIdAndBillNumber(
+            cardBillEntity.billedYearMonth ?: "",
+            banksaladUserId,
             organizationId,
             cardBill.billNumber
         )
 
         cardBill.transactions?.forEachIndexed { index, cardBillTransaction ->
             insertCardBillTransaction(
-                banksaladUserId, organizationId, index, cardBillTransaction
+                banksaladUserId,
+                cardBillEntity.billedYearMonth,
+                organizationId,
+                index,
+                cardBillTransaction
             )
         }
     }
 
     private fun insertCardBillTransaction(
         banksaladUserId: Long,
+        billedYearMonth: String?,
         organizationId: String?,
         cardBillTransactionNo: Int?,
         cardBillTransaction: CardBillTransaction
     ) {
         CardBillTransactionEntity().apply {
-            this.banksaladUserId = banksaladUserId.toLong()
+            this.banksaladUserId = banksaladUserId
+            this.billedYearMonth = billedYearMonth ?: ""
             this.cardCompanyId = organizationId
             this.billNumber = cardBillTransaction.billNumber
             this.cardBillTransactionNo = cardBillTransactionNo

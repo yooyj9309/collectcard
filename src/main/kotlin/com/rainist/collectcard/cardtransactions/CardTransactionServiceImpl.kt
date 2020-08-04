@@ -83,9 +83,16 @@ class CardTransactionServiceImpl(
                 cardTransaction.currencyCode = CardTransactionUtil.getCurrencyCode(cardTransaction.currencyCode)
             }
 
+            val approvalYearMonth = try {
+                cardTransaction.approvalDay?.substring(0, 6) ?: ""
+            } catch (e: ArrayIndexOutOfBoundsException) {
+                ""
+            }
+
             val cardTransactionEntity =
-                cardTransactionRepository.findByBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
-                    syncRequest.banksaladUserId.toLong(),
+                cardTransactionRepository.findByApprovalYearMonthAndBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
+                    approvalYearMonth,
+                    syncRequest.banksaladUserId,
                     syncRequest.organizationId,
                     cardTransaction.cardCompanyCardId,
                     cardTransaction.approvalNumber,

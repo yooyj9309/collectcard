@@ -9,12 +9,12 @@ import org.springframework.stereotype.Component
 @Component
 class ApiLogger(private val apiLogService: ApiLogService) : IApiLogger {
 
-    override fun onResponse(context: ExecutionContext, apiLog: ApiLog) {
+    override fun onRequest(context: ExecutionContext, apiLog: ApiLog) {
         val userId: Long = context.userId.toLong()
         apiLogService.logRequest(context.organizationId, userId, apiLog)
     }
 
-    override fun onRequest(context: ExecutionContext, apiLog: ApiLog) {
+    override fun onResponse(context: ExecutionContext, apiLog: ApiLog) {
         val userId: Long = context.userId.toLong()
         apiLogService.logResponse(context.organizationId, userId, apiLog)
     }

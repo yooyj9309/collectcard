@@ -4,7 +4,8 @@ import com.rainist.collectcard.common.db.entity.CardTransactionEntity
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface CardTransactionRepository : JpaRepository<CardTransactionEntity, Long> {
-    fun findByBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
+    fun findByApprovalYearMonthAndBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
+        approvalYearMonth: String,
         banksaladUserId: Long,
         cardCompanyId: String?,
         cardCompanyCardId: String?,
