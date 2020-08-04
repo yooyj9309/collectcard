@@ -41,16 +41,16 @@ class CardCreditLimitServiceTest {
     @Autowired
     lateinit var cardCreditLimitHistoryRepository: CreditLimitHistoryRepository
 
-        @MockBean
+    @MockBean
     lateinit var headerService: HeaderService
 
     @Test
     fun cardCreditLimitTest() {
         setupServer()
 
-        val syncRequest = SyncRequest("1", "organizationId")
+        val syncRequest = SyncRequest(1L, "organizationId")
 
-        given(headerService.makeHeader(syncRequest.banksaladUserId, syncRequest.organizationId))
+        given(headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId))
             .willReturn(
                 mutableMapOf(
                     "contentType" to MediaType.APPLICATION_JSON_VALUE,
@@ -60,7 +60,10 @@ class CardCreditLimitServiceTest {
             )
 
         val creditLimit = cardCreditLimitService.cardCreditLimit(syncRequest)
-        Assert.assertEquals(creditLimit.dataBody?.creditLimitInfo?.onetimePaymentLimit?.totalLimitAmount, BigDecimal(10000000))
+        Assert.assertEquals(
+            creditLimit.dataBody?.creditLimitInfo?.onetimePaymentLimit?.totalLimitAmount,
+            BigDecimal(10000000)
+        )
         Assert.assertEquals(creditLimit.dataBody?.creditLimitInfo?.cardLoanLimit?.totalLimitAmount, BigDecimal(3000000))
 
         var listCreditLimitEntity = cardCreditLimitRepository.findAll()
@@ -70,7 +73,10 @@ class CardCreditLimitServiceTest {
         Assert.assertEquals(listCreditLimitEntity[0].onetimePaymentLimitAmount, BigDecimal("10000000.00"))
 
         val creditLimit2 = cardCreditLimitService.cardCreditLimit(syncRequest)
-        Assert.assertEquals(creditLimit2.dataBody?.creditLimitInfo?.onetimePaymentLimit?.totalLimitAmount, BigDecimal(7100000))
+        Assert.assertEquals(
+            creditLimit2.dataBody?.creditLimitInfo?.onetimePaymentLimit?.totalLimitAmount,
+            BigDecimal(7100000)
+        )
         Assert.assertEquals(creditLimit2.dataBody?.creditLimitInfo?.cardLoanLimit?.totalLimitAmount, BigDecimal(0))
 
         listCreditLimitEntity = cardCreditLimitRepository.findAll()

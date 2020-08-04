@@ -1,7 +1,7 @@
 package com.rainist.collectcard.common.dto
 
 data class SyncRequest(
-    var banksaladUserId: String,
+    var banksaladUserId: Long,
     var organizationId: String
 ) {
     override fun toString(): String {

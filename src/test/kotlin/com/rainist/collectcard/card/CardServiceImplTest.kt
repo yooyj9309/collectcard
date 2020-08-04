@@ -49,13 +49,13 @@ class CardServiceImplTest {
     @MockBean
     lateinit var headerService: HeaderService
 
-    val syncRequest = SyncRequest("1", "organizationId")
+    val syncRequest = SyncRequest(1L, "organizationId")
 
     @Test
     fun listCard_success() {
         setupServer(listOf("mock/shinhancard/card_shinhancard_cards.json"))
 
-        given(headerService.makeHeader(syncRequest.banksaladUserId, syncRequest.organizationId))
+        given(headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId))
             .willReturn(
                 mutableMapOf(
                     "contentType" to MediaType.APPLICATION_JSON_VALUE,
@@ -70,21 +70,21 @@ class CardServiceImplTest {
         assertThat(response.dataBody?.cards?.size, `is`(4))
         assertThat(
             response.dataBody?.cards?.first(), `is`(Card().apply {
-            cardCompanyId = "organizationId"
-            cardCompanyCardId = "602640e6acb211fb19f5d580170bbeac78410dad"
-            cardOwnerName = "홍길동"
-            cardOwnerType = CardOwnerType.SELF
-            cardOwnerTypeOrigin = "1"
-            cardName = "Deep Store[딥 스토어]"
-            internationalBrandName = "CARD_INTERNATIONAL_BRAND_MASTERCARD"
-            cardNumber = "9523*********8721"
-            cardNumberMask = "9523*********8721"
-            cardType = CardType.CREDIT
-            cardTypeOrigin = "1"
-            isBusinessCard = false
-            trafficSupported = true
-        }
-        ))
+                cardCompanyId = "organizationId"
+                cardCompanyCardId = "602640e6acb211fb19f5d580170bbeac78410dad"
+                cardOwnerName = "홍길동"
+                cardOwnerType = CardOwnerType.SELF
+                cardOwnerTypeOrigin = "1"
+                cardName = "Deep Store[딥 스토어]"
+                internationalBrandName = "CARD_INTERNATIONAL_BRAND_MASTERCARD"
+                cardNumber = "9523*********8721"
+                cardNumberMask = "9523*********8721"
+                cardType = CardType.CREDIT
+                cardTypeOrigin = "1"
+                isBusinessCard = false
+                trafficSupported = true
+            }
+            ))
 
         val cardEntities = cardRepository.findAll()
         assertThat(cardEntities.size, `is`(4))
@@ -97,32 +97,41 @@ class CardServiceImplTest {
             createdAt = now
             updatedAt = now
         }
-        assertThat(firstEntity, `is`(CardEntity(
-            cardId = 1,
-            banksaladUserId = 1,
-            cardCompanyId = "organizationId",
-            cardCompanyCardId = "602640e6acb211fb19f5d580170bbeac78410dad",
-            lastCheckAt = now,
-            cardOwnerName = "홍길동",
-            cardOwnerType = "SELF",
-            cardOwnerTypeOrigin = "1",
-            cardName = "Deep Store[딥 스토어]",
-            internationalBrandName = "CARD_INTERNATIONAL_BRAND_MASTERCARD",
-            cardNumber = "9523*********8721",
-            cardNumberMask = "9523*********8721",
-            cardType = CardType.CREDIT.name,
-            cardTypeOrigin = "1",
-            isBusinessCard = false,
-            createdAt = now,
-            updatedAt = now
-        )))
+        assertThat(
+            firstEntity, `is`(
+                CardEntity(
+                    cardId = 1,
+                    banksaladUserId = 1,
+                    cardCompanyId = "organizationId",
+                    cardCompanyCardId = "602640e6acb211fb19f5d580170bbeac78410dad",
+                    lastCheckAt = now,
+                    cardOwnerName = "홍길동",
+                    cardOwnerType = "SELF",
+                    cardOwnerTypeOrigin = "1",
+                    cardName = "Deep Store[딥 스토어]",
+                    internationalBrandName = "CARD_INTERNATIONAL_BRAND_MASTERCARD",
+                    cardNumber = "9523*********8721",
+                    cardNumberMask = "9523*********8721",
+                    cardType = CardType.CREDIT.name,
+                    cardTypeOrigin = "1",
+                    isBusinessCard = false,
+                    createdAt = now,
+                    updatedAt = now
+                )
+            )
+        )
     }
 
     @Test
     fun listCard_pagination() {
-        setupServer(listOf("mock/shinhancard/card_shinhancard_cards_paging_1.json", "mock/shinhancard/card_shinhancard_cards_paging_2.json"))
+        setupServer(
+            listOf(
+                "mock/shinhancard/card_shinhancard_cards_paging_1.json",
+                "mock/shinhancard/card_shinhancard_cards_paging_2.json"
+            )
+        )
 
-        given(headerService.makeHeader(syncRequest.banksaladUserId, syncRequest.organizationId))
+        given(headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId))
             .willReturn(
                 mutableMapOf(
                     "contentType" to MediaType.APPLICATION_JSON_VALUE,
@@ -138,21 +147,21 @@ class CardServiceImplTest {
 
         assertThat(
             response.dataBody?.cards?.first(), `is`(Card().apply {
-            cardCompanyId = "organizationId"
-            cardCompanyCardId = "602640e6acb211fb19f5d580170bbeac78410dad"
-            cardOwnerName = "홍길동"
-            cardOwnerType = CardOwnerType.SELF
-            cardOwnerTypeOrigin = "1"
-            cardName = "Deep Store[딥 스토어]"
-            internationalBrandName = "CARD_INTERNATIONAL_BRAND_MASTERCARD"
-            cardNumber = "9523*********8721"
-            cardNumberMask = "9523*********8721"
-            cardType = CardType.CREDIT
-            cardTypeOrigin = "1"
-            isBusinessCard = false
-            trafficSupported = true
-        }
-        ))
+                cardCompanyId = "organizationId"
+                cardCompanyCardId = "602640e6acb211fb19f5d580170bbeac78410dad"
+                cardOwnerName = "홍길동"
+                cardOwnerType = CardOwnerType.SELF
+                cardOwnerTypeOrigin = "1"
+                cardName = "Deep Store[딥 스토어]"
+                internationalBrandName = "CARD_INTERNATIONAL_BRAND_MASTERCARD"
+                cardNumber = "9523*********8721"
+                cardNumberMask = "9523*********8721"
+                cardType = CardType.CREDIT
+                cardTypeOrigin = "1"
+                isBusinessCard = false
+                trafficSupported = true
+            }
+            ))
 
         val cardEntities = cardRepository.findAll()
         assertThat(cardEntities.size, `is`(19))
@@ -165,32 +174,36 @@ class CardServiceImplTest {
             createdAt = now
             updatedAt = now
         }
-        assertThat(firstEntity, `is`(CardEntity(
-            cardId = 1,
-            banksaladUserId = 1,
-            cardCompanyId = "organizationId",
-            cardCompanyCardId = "602640e6acb211fb19f5d580170bbeac78410dad",
-            lastCheckAt = now,
-            cardOwnerName = "홍길동",
-            cardOwnerType = "SELF",
-            cardOwnerTypeOrigin = "1",
-            cardName = "Deep Store[딥 스토어]",
-            internationalBrandName = "CARD_INTERNATIONAL_BRAND_MASTERCARD",
-            cardNumber = "9523*********8721",
-            cardNumberMask = "9523*********8721",
-            cardType = "CREDIT",
-            cardTypeOrigin = "1",
-            isBusinessCard = false,
-            createdAt = now,
-            updatedAt = now
-        )))
+        assertThat(
+            firstEntity, `is`(
+                CardEntity(
+                    cardId = 1,
+                    banksaladUserId = 1,
+                    cardCompanyId = "organizationId",
+                    cardCompanyCardId = "602640e6acb211fb19f5d580170bbeac78410dad",
+                    lastCheckAt = now,
+                    cardOwnerName = "홍길동",
+                    cardOwnerType = "SELF",
+                    cardOwnerTypeOrigin = "1",
+                    cardName = "Deep Store[딥 스토어]",
+                    internationalBrandName = "CARD_INTERNATIONAL_BRAND_MASTERCARD",
+                    cardNumber = "9523*********8721",
+                    cardNumberMask = "9523*********8721",
+                    cardType = "CREDIT",
+                    cardTypeOrigin = "1",
+                    isBusinessCard = false,
+                    createdAt = now,
+                    updatedAt = now
+                )
+            )
+        )
     }
 
     @Test
     fun listCard_updated() {
         setupServer(listOf("mock/shinhancard/card_shinhancard_cards_update.json"))
 
-        given(headerService.makeHeader(syncRequest.banksaladUserId, syncRequest.organizationId))
+        given(headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId))
             .willReturn(
                 mutableMapOf(
                     "contentType" to MediaType.APPLICATION_JSON_VALUE,
@@ -229,21 +242,21 @@ class CardServiceImplTest {
 
         assertThat(
             response.dataBody?.cards?.first(), `is`(Card().apply {
-            cardCompanyId = "organizationId"
-            cardCompanyCardId = "602640e6acb211fb19f5d580170bbeac78410dad"
-            cardOwnerName = "홍길동"
-            cardOwnerType = CardOwnerType.SELF
-            cardOwnerTypeOrigin = "5"
-            cardName = "Deep Store[딥 스토어] test"
-            internationalBrandName = "CARD_INTERNATIONAL_BRAND_VISA"
-            cardNumber = "9523*********8721"
-            cardNumberMask = "9523*********8721"
-            cardType = CardType.DEBIT
-            cardTypeOrigin = "5"
-            isBusinessCard = false
-            trafficSupported = true
-        }
-        ))
+                cardCompanyId = "organizationId"
+                cardCompanyCardId = "602640e6acb211fb19f5d580170bbeac78410dad"
+                cardOwnerName = "홍길동"
+                cardOwnerType = CardOwnerType.SELF
+                cardOwnerTypeOrigin = "5"
+                cardName = "Deep Store[딥 스토어] test"
+                internationalBrandName = "CARD_INTERNATIONAL_BRAND_VISA"
+                cardNumber = "9523*********8721"
+                cardNumberMask = "9523*********8721"
+                cardType = CardType.DEBIT
+                cardTypeOrigin = "5"
+                isBusinessCard = false
+                trafficSupported = true
+            }
+            ))
 
         val cardEntities = cardRepository.findAll()
         assertThat(cardEntities.size, `is`(1))
@@ -255,25 +268,29 @@ class CardServiceImplTest {
             createdAt = now
             updatedAt = now
         }
-        assertThat(firstEntity, `is`(CardEntity(
-            cardId = 1,
-            banksaladUserId = 1,
-            cardCompanyId = "organizationId",
-            cardCompanyCardId = "602640e6acb211fb19f5d580170bbeac78410dad",
-            lastCheckAt = now,
-            cardOwnerName = "홍길동",
-            cardOwnerType = "SELF",
-            cardOwnerTypeOrigin = "5",
-            cardName = "Deep Store[딥 스토어] test",
-            internationalBrandName = "CARD_INTERNATIONAL_BRAND_VISA",
-            cardNumber = "9523*********8721",
-            cardNumberMask = "9523*********8721",
-            cardType = "DEBIT",
-            cardTypeOrigin = "5",
-            isBusinessCard = false,
-            createdAt = now,
-            updatedAt = now
-        )))
+        assertThat(
+            firstEntity, `is`(
+                CardEntity(
+                    cardId = 1,
+                    banksaladUserId = 1,
+                    cardCompanyId = "organizationId",
+                    cardCompanyCardId = "602640e6acb211fb19f5d580170bbeac78410dad",
+                    lastCheckAt = now,
+                    cardOwnerName = "홍길동",
+                    cardOwnerType = "SELF",
+                    cardOwnerTypeOrigin = "5",
+                    cardName = "Deep Store[딥 스토어] test",
+                    internationalBrandName = "CARD_INTERNATIONAL_BRAND_VISA",
+                    cardNumber = "9523*********8721",
+                    cardNumberMask = "9523*********8721",
+                    cardType = "DEBIT",
+                    cardTypeOrigin = "5",
+                    isBusinessCard = false,
+                    createdAt = now,
+                    updatedAt = now
+                )
+            )
+        )
     }
 
     private fun setupServer(mockResponseFileNames: List<String>) {

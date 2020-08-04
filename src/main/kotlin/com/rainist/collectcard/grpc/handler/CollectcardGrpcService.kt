@@ -41,14 +41,14 @@ class CollectcardGrpcService(
         kotlin.runCatching {
             CollectcardProto.HealthCheckResponse.newBuilder().build()
         }
-        .onSuccess {
-            responseObserver.onNext(it)
-            responseObserver.onCompleted()
-        }
-        .onFailure {
-            val ex = HealthCheckException()
-            responseObserver.onException(ex) // TODO it 으로 바꾸기
-        }
+            .onSuccess {
+                responseObserver.onNext(it)
+                responseObserver.onCompleted()
+            }
+            .onFailure {
+                val ex = HealthCheckException()
+                responseObserver.onException(ex) // TODO it 으로 바꾸기
+            }
     }
 
     override fun listCards(
@@ -57,8 +57,9 @@ class CollectcardGrpcService(
     ) {
         logger.debug("[사용자 카드 조회 시작 : {}]", request)
 
+        // TODO : userId validation, organizationId validation (userId는 Long 인지 여부, orngaizationId 는 변환후 null 여부
         val syncRequest = SyncRequest(
-            request.userId,
+            request.userId.toLong(),
             organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: ""
         )
 
@@ -87,7 +88,7 @@ class CollectcardGrpcService(
         logger.debug("[사용자 카드 내역 조회 시작 : {}]", request)
 
         val syncRequest = SyncRequest(
-            request.userId,
+            request.userId.toLong(),
             organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: ""
         )
         kotlin.runCatching {
@@ -117,13 +118,14 @@ class CollectcardGrpcService(
     ) {
         logger.debug("[사용자 청구서 조회 시작 : {}]", request)
 
-        val banksaladUserId = request.userId
-        val organization = organizationService.getOrganizationByObjectId(request.companyId.value)
+        val syncRequest = SyncRequest(
+            request.userId.toLong(),
+            organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: ""
+        )
 
         kotlin.runCatching {
             cardBillService.listUserCardBills(
-                banksaladUserId,
-                organization,
+                syncRequest,
                 request.takeIf { request.hasFromMs() }?.fromMs?.value
             ).toListCardBillsResponseProto()
         }.onSuccess {
@@ -148,7 +150,7 @@ class CollectcardGrpcService(
         logger.debug("[사용자 대출 내역 조회 시작 : {}]", request)
 
         val syncRequest = SyncRequest(
-            request.userId,
+            request.userId.toLong(),
             organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: ""
         )
 
@@ -177,7 +179,7 @@ class CollectcardGrpcService(
         responseObserver: StreamObserver<CollectcardProto.GetCreditLimitResponse>
     ) {
         val syncRequest = SyncRequest(
-            request.userId,
+            request.userId.toLong(),
             organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: ""
         )
 

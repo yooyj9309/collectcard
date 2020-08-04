@@ -97,8 +97,13 @@ data class CardLoanEntity(
 
 )
 
-fun CardLoanEntity.makeCardLoanEntity(lastCheckAt: LocalDateTime?, banksaladUserId: String, organizationId: String?, loan: Loan): CardLoanEntity {
-    this.banksaladUserId = banksaladUserId.toLong()
+fun CardLoanEntity.makeCardLoanEntity(
+    lastCheckAt: LocalDateTime?,
+    banksaladUserId: Long,
+    organizationId: String?,
+    loan: Loan
+): CardLoanEntity {
+    this.banksaladUserId = banksaladUserId
     this.cardCompanyId = organizationId
     this.cardCompanyLoanId = loan.loanId
     this.lastCheckAt = lastCheckAt ?: DateTimeUtil.utcNowLocalDateTime()

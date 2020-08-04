@@ -197,8 +197,8 @@ class CardLoanServiceImplTest {
     }
 
     private fun requestSetting(): SyncRequest {
-        val syncRequest = SyncRequest("1", "organizationId")
-        BDDMockito.given(headerService.makeHeader(syncRequest.banksaladUserId, syncRequest.organizationId))
+        val syncRequest = SyncRequest(1L, "organizationId")
+        BDDMockito.given(headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId))
             .willReturn(
                 mutableMapOf(
                     "contentType" to MediaType.APPLICATION_JSON_VALUE,

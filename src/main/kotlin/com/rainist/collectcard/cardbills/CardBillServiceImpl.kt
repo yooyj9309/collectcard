@@ -1,8 +1,8 @@
 package com.rainist.collectcard.cardbills
 
+import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collect.common.execution.ExecutionRequest
 import com.rainist.collect.common.execution.ExecutionResponse
-import com.rainist.collect.executor.ApiLog
 import com.rainist.collect.executor.CollectExecutorService
 import com.rainist.collectcard.cardbills.dto.CardBill
 import com.rainist.collectcard.cardbills.dto.CardBillTransaction
@@ -19,10 +19,12 @@ import com.rainist.collectcard.common.db.entity.CardPaymentScheduledEntity
 import com.rainist.collectcard.common.db.repository.CardBillRepository
 import com.rainist.collectcard.common.db.repository.CardBillTransactionRepository
 import com.rainist.collectcard.common.db.repository.CardPaymentScheduledRepository
+import com.rainist.collectcard.common.dto.CollectExecutionContext
+import com.rainist.collectcard.common.dto.SyncRequest
 import com.rainist.collectcard.common.exception.CollectcardException
 import com.rainist.collectcard.common.service.ApiLogService
-import com.rainist.collectcard.common.service.CardOrganization
 import com.rainist.collectcard.common.service.HeaderService
+import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.common.util.DateTimeUtil
 import java.math.BigDecimal
 import org.springframework.http.HttpStatus
@@ -33,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional
 class CardBillServiceImpl(
     val apiLogService: ApiLogService,
     val headerService: HeaderService,
+    val organizationService: OrganizationService,
     val collectExecutorService: CollectExecutorService,
     val cardBillRepository: CardBillRepository,
     val cardBillTransactionRepository: CardBillTransactionRepository,
@@ -43,12 +46,15 @@ class CardBillServiceImpl(
 
     @Transactional
     override fun listUserCardBills(
-        banksaladUserId: String,
-        organization: CardOrganization,
+        syncRequest: SyncRequest,
         startAt: Long?
     ): ListCardBillsResponse {
-        val header = headerService.makeHeader(banksaladUserId, organization.organizationId ?: "")
 
+        /* request header */
+        val header = headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId)
+
+        /* request body */
+        val organization = organizationService.getOrganizationByOrganizationId(syncRequest.organizationId)
         val request = ListCardBillsRequest().apply {
             dataBody = ListCardBillsRequestDataBody().apply {
                 this.startAt = startAt?.let {
@@ -61,19 +67,20 @@ class CardBillServiceImpl(
             }
         }
 
+        /* Execution Context */
+        val executionContext: ExecutionContext = CollectExecutionContext(
+            organizationId = syncRequest.organizationId,
+            userId = syncRequest.banksaladUserId.toString()
+        )
+
         // 청구서 execution
         val cardBillsExecutionResponse: ExecutionResponse<ListCardBillsResponse> = collectExecutorService.execute(
+            executionContext,
             Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.cardbills),
             ExecutionRequest.builder<ListCardBillsRequest>()
                 .headers(header)
                 .request(request)
-                .build(),
-            { apiLog: ApiLog ->
-                apiLogService.logRequest(organization.organizationId ?: "", banksaladUserId.toLong(), apiLog)
-            },
-            { apiLog: ApiLog ->
-                apiLogService.logResponse(organization.organizationId ?: "", banksaladUserId.toLong(), apiLog)
-            }
+                .build()
         )
         // TODO : error handling
         if (!HttpStatus.valueOf(cardBillsExecutionResponse.httpStatusCode).is2xxSuccessful) {
@@ -84,23 +91,19 @@ class CardBillServiceImpl(
 
         // 청구서 IO
         cardBillsResponse.dataBody?.cardBills?.forEach { cardBill ->
-            upsertCardBillAndTransactions(banksaladUserId, organization.organizationId, cardBill)
+            upsertCardBillAndTransactions(syncRequest.banksaladUserId, syncRequest.organizationId, cardBill)
         }
 
         // 결제 예정 내역 execution
-        val cardBillExpectedExecutionResponse: ExecutionResponse<ListCardBillsResponse> = collectExecutorService.execute(
-            Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.billTransactionExpected),
-            ExecutionRequest.builder<ListCardBillsRequest>()
-                .headers(header)
-                .request(request)
-                .build(),
-            { apiLog: ApiLog ->
-                apiLogService.logRequest(organization.organizationId ?: "", banksaladUserId.toLong(), apiLog)
-            },
-            { apiLog: ApiLog ->
-                apiLogService.logResponse(organization.organizationId ?: "", banksaladUserId.toLong(), apiLog)
-            }
-        )
+        val cardBillExpectedExecutionResponse: ExecutionResponse<ListCardBillsResponse> =
+            collectExecutorService.execute(
+                executionContext,
+                Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.billTransactionExpected),
+                ExecutionRequest.builder<ListCardBillsRequest>()
+                    .headers(header)
+                    .request(request)
+                    .build()
+            )
 
         // TODO : error handling
         if (!HttpStatus.valueOf(cardBillExpectedExecutionResponse.httpStatusCode).is2xxSuccessful) {
@@ -113,7 +116,7 @@ class CardBillServiceImpl(
         cardBillExpectedResponse.dataBody?.cardBills?.flatMap {
             it.transactions ?: mutableListOf()
         }?.let {
-            deleteAndInsertCardBillExpectedTransactions(banksaladUserId, organization.organizationId, it)
+            deleteAndInsertCardBillExpectedTransactions(syncRequest.banksaladUserId, syncRequest.organizationId, it)
         }
 
         // merge 청구서, 결제 예정 내역
@@ -124,9 +127,9 @@ class CardBillServiceImpl(
         return cardBillsResponse
     }
 
-    private fun upsertCardBillAndTransactions(banksaladUserId: String, organizationId: String?, cardBill: CardBill) {
+    private fun upsertCardBillAndTransactions(banksaladUserId: Long, organizationId: String?, cardBill: CardBill) {
         val cardBillEntity = cardBillRepository.findByBanksaladUserIdAndCardCompanyIdAndBillNumber(
-            banksaladUserId.toLong(),
+            banksaladUserId,
             organizationId ?: "",
             cardBill.billNumber ?: ""
         ) ?: CardBillEntity()
@@ -167,7 +170,12 @@ class CardBillServiceImpl(
         }
     }
 
-    private fun insertCardBillTransaction(banksaladUserId: String, organizationId: String?, cardBillTransactionNo: Int?, cardBillTransaction: CardBillTransaction) {
+    private fun insertCardBillTransaction(
+        banksaladUserId: Long,
+        organizationId: String?,
+        cardBillTransactionNo: Int?,
+        cardBillTransaction: CardBillTransaction
+    ) {
         CardBillTransactionEntity().apply {
             this.banksaladUserId = banksaladUserId.toLong()
             this.cardCompanyId = organizationId
@@ -235,15 +243,24 @@ class CardBillServiceImpl(
         return false
     }
 
-    private fun deleteAndInsertCardBillExpectedTransactions(banksaladUserId: String, organizationId: String?, cardBillTransactionExpected: List<CardBillTransaction>) {
-        cardPaymentScheduledRepository.deleteAllByBanksaladUserIdAndCardCompanyId(banksaladUserId.toLong(), organizationId)
+    private fun deleteAndInsertCardBillExpectedTransactions(
+        banksaladUserId: Long,
+        organizationId: String?,
+        cardBillTransactionExpected: List<CardBillTransaction>
+    ) {
+        cardPaymentScheduledRepository.deleteAllByBanksaladUserIdAndCardCompanyId(banksaladUserId, organizationId)
 
         cardBillTransactionExpected.forEachIndexed { index, cardBillTransaction ->
             insertCardBillExpectedTransaction(banksaladUserId, organizationId, index, cardBillTransaction)
         }
     }
 
-    private fun insertCardBillExpectedTransaction(banksaladUserId: String, organizationId: String?, paymentScheduledTransactionNo: Int?, cardBillTransaction: CardBillTransaction) {
+    private fun insertCardBillExpectedTransaction(
+        banksaladUserId: Long,
+        organizationId: String?,
+        paymentScheduledTransactionNo: Int?,
+        cardBillTransaction: CardBillTransaction
+    ) {
 
         CardPaymentScheduledEntity().apply {
             this.banksaladUserId = banksaladUserId.toLong()

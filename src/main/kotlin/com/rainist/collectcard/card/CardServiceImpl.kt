@@ -1,8 +1,8 @@
 package com.rainist.collectcard.card
 
+import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collect.common.execution.ExecutionRequest
 import com.rainist.collect.common.execution.ExecutionResponse
-import com.rainist.collect.executor.ApiLog
 import com.rainist.collect.executor.CollectExecutorService
 import com.rainist.collectcard.card.dto.Card
 import com.rainist.collectcard.card.dto.ListCardsRequest
@@ -16,9 +16,9 @@ import com.rainist.collectcard.common.db.entity.CardEntity
 import com.rainist.collectcard.common.db.entity.CardHistoryEntity
 import com.rainist.collectcard.common.db.repository.CardHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardRepository
+import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.dto.SyncRequest
 import com.rainist.collectcard.common.exception.CollectcardException
-import com.rainist.collectcard.common.service.ApiLogService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.util.SyncStatus
 import com.rainist.common.log.Log
@@ -30,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CardServiceImpl(
-    val apiLogService: ApiLogService,
     val collectExecutorService: CollectExecutorService,
     val headerService: HeaderService,
     val cardRepository: CardRepository,
@@ -46,27 +45,28 @@ class CardServiceImpl(
         logger.info("CardService.listCards start: syncRequest: {}", syncRequest)
 
         /* header */
-        val header = headerService.makeHeader(syncRequest.banksaladUserId, syncRequest.organizationId)
+        val header = headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId)
 
         /* request body */
         val listCardsRequest = ListCardsRequest().apply {
             dataBody = ListCardsRequestDataBody()
         }
 
+        /* Execution Context */
+        val executionContext: ExecutionContext = CollectExecutionContext(
+            organizationId = syncRequest.organizationId,
+            userId = syncRequest.banksaladUserId.toString()
+        )
+
         /* Call API */
         val executionResponse: ExecutionResponse<ListCardsResponse> =
             collectExecutorService.execute(
+                executionContext,
                 Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.cards),
                 ExecutionRequest.builder<ListCardsRequest>()
                     .headers(header)
                     .request(listCardsRequest)
-                    .build(),
-                { apiLog: ApiLog ->
-                    apiLogService.logRequest(syncRequest.organizationId, syncRequest.banksaladUserId.toLong(), apiLog)
-                },
-                { apiLog: ApiLog ->
-                    apiLogService.logResponse(syncRequest.organizationId, syncRequest.banksaladUserId.toLong(), apiLog)
-                }
+                    .build()
             )
 
         /* response error handling */
@@ -96,14 +96,18 @@ class CardServiceImpl(
         return executionResponse.response
     }
 
-    private fun upsertCardAndCardHistory(banksaladUserId: String, card: Card) {
+    private fun upsertCardAndCardHistory(banksaladUserId: Long, card: Card) {
         /* 카드 조회 */
-        cardRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardId(banksaladUserId.toLong(), card.cardCompanyId ?: "", card.cardCompanyCardId ?: "")
+        cardRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardId(
+            banksaladUserId.toLong(),
+            card.cardCompanyId ?: "",
+            card.cardCompanyCardId ?: ""
+        )
             ?.let { cardEntity ->
                 updateCardEntity(cardEntity, card)
             }
             ?: kotlin.run {
-                insertCardEntity(card, banksaladUserId.toLong())
+                insertCardEntity(card, banksaladUserId)
             }
     }
 

@@ -5,8 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import com.rainist.collect.common.log.IApiLogger
+import com.rainist.collect.common.log.IIdGenerator
 import com.rainist.collect.executor.CollectExecutorServiceImpl
-import com.rainist.collect.executor.IIdGenerator
 import com.rainist.collect.executor.ITransferClient
 import java.util.concurrent.Executor
 import org.springframework.context.annotation.Bean
@@ -16,7 +17,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 @Configuration
 class CollectConfig(
     private val transferClient: ITransferClient,
-    private val idGenerator: IIdGenerator
+    private val idGenerator: IIdGenerator,
+    private val iApiLogger: IApiLogger
 ) {
 
     fun collectObjectMapper(): ObjectMapper {
@@ -42,5 +44,11 @@ class CollectConfig(
 
     @Bean
     fun executorService() =
-        CollectExecutorServiceImpl(transferClient, idGenerator, threadPoolTaskExecutor(), collectObjectMapper())
+        CollectExecutorServiceImpl(
+            transferClient,
+            idGenerator,
+            iApiLogger,
+            threadPoolTaskExecutor(),
+            collectObjectMapper()
+        )
 }

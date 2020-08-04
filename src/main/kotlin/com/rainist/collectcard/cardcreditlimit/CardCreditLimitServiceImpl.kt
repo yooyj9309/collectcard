@@ -1,8 +1,8 @@
 package com.rainist.collectcard.cardcreditlimit
 
+import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collect.common.execution.ExecutionRequest
 import com.rainist.collect.common.execution.ExecutionResponse
-import com.rainist.collect.executor.ApiLog
 import com.rainist.collect.executor.CollectExecutorService
 import com.rainist.collectcard.cardcreditlimit.dto.CardCreditLimitRequestDataBody
 import com.rainist.collectcard.cardcreditlimit.dto.CardCreditLimitRequestDataHeader
@@ -16,6 +16,7 @@ import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.db.entity.CreditLimitEntity
 import com.rainist.collectcard.common.db.repository.CreditLimitHistoryRepository
 import com.rainist.collectcard.common.db.repository.CreditLimitRepository
+import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.dto.SyncRequest
 import com.rainist.collectcard.common.exception.CollectcardException
 import com.rainist.collectcard.common.service.ApiLogService
@@ -42,25 +43,30 @@ class CardCreditLimitServiceImpl(
     override fun cardCreditLimit(syncRequest: SyncRequest): CreditLimitResponse {
 
         val lastCheckAt = DateTimeUtil.utcNowLocalDateTime()
-        val header = headerService.makeHeader(syncRequest.banksaladUserId, syncRequest.organizationId)
+
+        /* request header */
+        val header = headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId)
+
+        /* request body */
         val creditLimitRequest = CreditLimitRequest().apply {
             this.dataHeader = CardCreditLimitRequestDataHeader()
             this.dataBody = CardCreditLimitRequestDataBody()
         }
 
+        /* Execution Context */
+        val executionContext: ExecutionContext = CollectExecutionContext(
+            organizationId = syncRequest.organizationId,
+            userId = syncRequest.banksaladUserId.toString()
+        )
+
         // get api call result
         val executionResponse: ExecutionResponse<CreditLimitResponse> = collectExecutorService.execute(
+            executionContext,
             Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.creditLimit),
             ExecutionRequest.builder<CreditLimitRequest>()
                 .headers(header)
                 .request(creditLimitRequest)
-                .build(),
-            { apiLog: ApiLog ->
-                apiLogService.logRequest(syncRequest.organizationId, syncRequest.banksaladUserId.toLong(), apiLog)
-            },
-            { apiLog: ApiLog ->
-                apiLogService.logResponse(syncRequest.organizationId, syncRequest.banksaladUserId.toLong(), apiLog)
-            }
+                .build()
         )
 
         // validate

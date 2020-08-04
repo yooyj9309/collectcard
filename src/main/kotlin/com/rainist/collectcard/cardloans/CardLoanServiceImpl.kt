@@ -1,8 +1,8 @@
 package com.rainist.collectcard.cardloans
 
+import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collect.common.execution.ExecutionRequest
 import com.rainist.collect.common.execution.ExecutionResponse
-import com.rainist.collect.executor.ApiLog
 import com.rainist.collect.executor.CollectExecutorService
 import com.rainist.collectcard.cardloans.dto.ListLoansRequest
 import com.rainist.collectcard.cardloans.dto.ListLoansRequestDataBody
@@ -18,6 +18,7 @@ import com.rainist.collectcard.common.db.entity.makeCardLoanEntity
 import com.rainist.collectcard.common.db.entity.makeCardLoanHistoryEntity
 import com.rainist.collectcard.common.db.repository.CardLoanHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardLoanRepository
+import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.dto.SyncRequest
 import com.rainist.collectcard.common.service.ApiLogService
 import com.rainist.collectcard.common.service.HeaderService
@@ -43,7 +44,7 @@ class CardLoanServiceImpl(
     override fun listCardLoans(syncRequest: SyncRequest): ListLoansResponse {
         /* request header */
         val lastCheckAt = DateTimeUtil.getLocalDateTime()
-        val header = headerService.makeHeader(syncRequest.banksaladUserId, syncRequest.organizationId)
+        val header = headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId)
 
         /* request body */
         val listLoansRequest = ListLoansRequest().apply {
@@ -51,19 +52,20 @@ class CardLoanServiceImpl(
             this.dataBody = ListLoansRequestDataBody()
         }
 
+        /* Execution Context */
+        val executionContext: ExecutionContext = CollectExecutionContext(
+            organizationId = syncRequest.organizationId,
+            userId = syncRequest.banksaladUserId.toString()
+        )
+
         /* service logic */
         val res: ExecutionResponse<ListLoansResponse> = collectExecutorService.execute(
+            executionContext,
             Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.loan),
             ExecutionRequest.builder<ListLoansRequest>()
                 .headers(header)
                 .request(listLoansRequest)
-                .build(),
-            { apiLog: ApiLog ->
-                apiLogService.logRequest(syncRequest.organizationId, syncRequest.banksaladUserId.toLong(), apiLog)
-            },
-            { apiLog: ApiLog ->
-                apiLogService.logResponse(syncRequest.organizationId, syncRequest.banksaladUserId.toLong(), apiLog)
-            }
+                .build()
         )
 
         /* validate logic */
@@ -75,33 +77,47 @@ class CardLoanServiceImpl(
         res.response.dataBody?.loans?.forEach { loan ->
 
             loan.loanId?.let {
-                cardLoanRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyLoanId(syncRequest.banksaladUserId.toLong(), syncRequest.organizationId, loan.loanId)
+                cardLoanRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyLoanId(
+                    syncRequest.banksaladUserId.toLong(),
+                    syncRequest.organizationId,
+                    loan.loanId
+                )
             }
-            ?.let { cardLoanEntity ->
-                // update
-                val prevLastCheckAt = cardLoanEntity.lastCheckAt
-                val prevUpdatedAt = cardLoanEntity.updatedAt
+                ?.let { cardLoanEntity ->
+                    // update
+                    val prevLastCheckAt = cardLoanEntity.lastCheckAt
+                    val prevUpdatedAt = cardLoanEntity.updatedAt
 
-                val bodyEntity = cardLoanEntity.makeCardLoanEntity(prevLastCheckAt, syncRequest.banksaladUserId, syncRequest.organizationId, loan)
-                val saveEntity = cardLoanRepository.saveAndFlush(bodyEntity)
+                    val bodyEntity = cardLoanEntity.makeCardLoanEntity(
+                        prevLastCheckAt,
+                        syncRequest.banksaladUserId,
+                        syncRequest.organizationId,
+                        loan
+                    )
+                    val saveEntity = cardLoanRepository.saveAndFlush(bodyEntity)
 
-                // history insert
-                if (true == saveEntity.updatedAt?.isAfter(prevUpdatedAt)) {
-                    cardLoanHistoryRepository.save(CardLoanHistoryEntity().makeCardLoanHistoryEntity(saveEntity))
+                    // history insert
+                    if (true == saveEntity.updatedAt?.isAfter(prevUpdatedAt)) {
+                        cardLoanHistoryRepository.save(CardLoanHistoryEntity().makeCardLoanHistoryEntity(saveEntity))
+                    }
+
+                    saveEntity.lastCheckAt = DateTimeUtil.utcNowLocalDateTime()
+                    cardLoanRepository.save(saveEntity)
                 }
+                ?: kotlin.run {
+                    // only insert
+                    val loanEntity = CardLoanEntity().makeCardLoanEntity(
+                        lastCheckAt,
+                        syncRequest.banksaladUserId,
+                        syncRequest.organizationId,
+                        loan
+                    )
 
-                saveEntity.lastCheckAt = DateTimeUtil.utcNowLocalDateTime()
-                cardLoanRepository.save(saveEntity)
-            }
-            ?: kotlin.run {
-                // only insert
-                val loanEntity = CardLoanEntity().makeCardLoanEntity(lastCheckAt, syncRequest.banksaladUserId, syncRequest.organizationId, loan)
-
-                cardLoanRepository.save(loanEntity).let { cardLoanEntity ->
-                    val history = CardLoanHistoryEntity().makeCardLoanHistoryEntity(cardLoanEntity)
-                    cardLoanHistoryRepository.save(history)
+                    cardLoanRepository.save(loanEntity).let { cardLoanEntity ->
+                        val history = CardLoanHistoryEntity().makeCardLoanHistoryEntity(cardLoanEntity)
+                        cardLoanHistoryRepository.save(history)
+                    }
                 }
-            }
         }
 
         return ListLoansResponse().apply {

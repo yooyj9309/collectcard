@@ -103,14 +103,15 @@ class CardTransactionServiceTest {
             cardTransaction
         )
 
-        val targetEntity = cardTransactionRepository.findByBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
-            syncRequest.banksaladUserId.toLong(),
-            syncRequest.organizationId,
-            cardTransaction.cardCompanyCardId,
-            cardTransaction.approvalNumber,
-            cardTransaction.approvalDay,
-            cardTransaction.approvalTime
-        )
+        val targetEntity =
+            cardTransactionRepository.findByBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
+                syncRequest.banksaladUserId.toLong(),
+                syncRequest.organizationId,
+                cardTransaction.cardCompanyCardId,
+                cardTransaction.approvalNumber,
+                cardTransaction.approvalDay,
+                cardTransaction.approvalTime
+            )
 
         assertNotNull(targetEntity)
 
@@ -140,17 +141,49 @@ class CardTransactionServiceTest {
         val server = MockRestServiceServer.bindTo(commonRestTemplate).ignoreExpectOrder(true).build()
 
         // 신용카드 국내
-        settingOnceMockServiceServer(server, creditDomesticAPI, "classpath:mock/shinhancard/card_transaction_expected_1_credit_domestic_p1.json")
-        settingOnceMockServiceServer(server, creditDomesticAPI, "classpath:mock/shinhancard/card_transaction_expected_1_credit_domestic_p2.json")
+        settingOnceMockServiceServer(
+            server,
+            creditDomesticAPI,
+            "classpath:mock/shinhancard/card_transaction_expected_1_credit_domestic_p1.json"
+        )
+        settingOnceMockServiceServer(
+            server,
+            creditDomesticAPI,
+            "classpath:mock/shinhancard/card_transaction_expected_1_credit_domestic_p2.json"
+        )
         // 신용카드 해외
-        settingOnceMockServiceServer(server, creditOverseaAPI, "classpath:mock/shinhancard/card_transaction_expected_1_credit_oversea_p1.json")
-        settingOnceMockServiceServer(server, creditOverseaAPI, "classpath:mock/shinhancard/card_transaction_expected_1_credit_oversea_p2.json")
+        settingOnceMockServiceServer(
+            server,
+            creditOverseaAPI,
+            "classpath:mock/shinhancard/card_transaction_expected_1_credit_oversea_p1.json"
+        )
+        settingOnceMockServiceServer(
+            server,
+            creditOverseaAPI,
+            "classpath:mock/shinhancard/card_transaction_expected_1_credit_oversea_p2.json"
+        )
         // 체크카드 국내
-        settingOnceMockServiceServer(server, checkDomesticAPI, "classpath:mock/shinhancard/card_transaction_expected_1_check_domestic_p1.json")
-        settingOnceMockServiceServer(server, checkDomesticAPI, "classpath:mock/shinhancard/card_transaction_expected_1_check_domestic_p2.json")
+        settingOnceMockServiceServer(
+            server,
+            checkDomesticAPI,
+            "classpath:mock/shinhancard/card_transaction_expected_1_check_domestic_p1.json"
+        )
+        settingOnceMockServiceServer(
+            server,
+            checkDomesticAPI,
+            "classpath:mock/shinhancard/card_transaction_expected_1_check_domestic_p2.json"
+        )
         // 체크카드 해외
-        settingOnceMockServiceServer(server, checkOverseaAPI, "classpath:mock/shinhancard/card_transaction_expected_1_check_oversea_p1.json")
-        settingOnceMockServiceServer(server, checkOverseaAPI, "classpath:mock/shinhancard/card_transaction_expected_1_check_oversea_p2.json")
+        settingOnceMockServiceServer(
+            server,
+            checkOverseaAPI,
+            "classpath:mock/shinhancard/card_transaction_expected_1_check_oversea_p1.json"
+        )
+        settingOnceMockServiceServer(
+            server,
+            checkOverseaAPI,
+            "classpath:mock/shinhancard/card_transaction_expected_1_check_oversea_p2.json"
+        )
     }
 
     private fun setupServer_updated() {
@@ -159,10 +192,26 @@ class CardTransactionServiceTest {
         val checkDomesticAPI = ShinhancardApis.card_shinhancard_check_domestic_transactions
         val checkOverseaAPI = ShinhancardApis.card_shinhancard_check_oversea_transactions
         val server = MockRestServiceServer.bindTo(commonRestTemplate).ignoreExpectOrder(true).build()
-        settingOnceMockServiceServer(server, creditDomesticAPI, "classpath:mock/shinhancard/card_transaction_expected_1_credit_domestic_updated.json")
-        settingOnceMockServiceServer(server, creditOverseaAPI, "classpath:mock/shinhancard/card_transaction_expected_1_credit_oversea_updated.json")
-        settingOnceMockServiceServer(server, checkDomesticAPI, "classpath:mock/shinhancard/card_transaction_expected_1_check_domestic_updated.json")
-        settingOnceMockServiceServer(server, checkOverseaAPI, "classpath:mock/shinhancard/card_transaction_expected_1_check_oversea_updated.json")
+        settingOnceMockServiceServer(
+            server,
+            creditDomesticAPI,
+            "classpath:mock/shinhancard/card_transaction_expected_1_credit_domestic_updated.json"
+        )
+        settingOnceMockServiceServer(
+            server,
+            creditOverseaAPI,
+            "classpath:mock/shinhancard/card_transaction_expected_1_credit_oversea_updated.json"
+        )
+        settingOnceMockServiceServer(
+            server,
+            checkDomesticAPI,
+            "classpath:mock/shinhancard/card_transaction_expected_1_check_domestic_updated.json"
+        )
+        settingOnceMockServiceServer(
+            server,
+            checkOverseaAPI,
+            "classpath:mock/shinhancard/card_transaction_expected_1_check_oversea_updated.json"
+        )
     }
 
     private fun readText(fileInClassPath: String): String {
@@ -170,9 +219,9 @@ class CardTransactionServiceTest {
     }
 
     private fun requestSetting(): SyncRequest {
-        val syncRequest = SyncRequest("1", "organizationId")
+        val syncRequest = SyncRequest(1L, "organizationId")
 
-        BDDMockito.given(headerService.makeHeader(syncRequest.banksaladUserId, syncRequest.organizationId))
+        BDDMockito.given(headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId))
             .willReturn(
                 mutableMapOf(
                     "contentType" to MediaType.APPLICATION_JSON_VALUE,

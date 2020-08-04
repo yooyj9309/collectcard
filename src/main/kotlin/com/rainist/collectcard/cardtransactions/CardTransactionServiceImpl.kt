@@ -1,8 +1,8 @@
 package com.rainist.collectcard.cardtransactions
 
+import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collect.common.execution.ExecutionRequest
 import com.rainist.collect.common.execution.ExecutionResponse
-import com.rainist.collect.executor.ApiLog
 import com.rainist.collect.executor.CollectExecutorService
 import com.rainist.collectcard.cardtransactions.dto.CardTransaction
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsRequest
@@ -16,6 +16,7 @@ import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.db.repository.CardTransactionRepository
+import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.dto.SyncRequest
 import com.rainist.collectcard.common.service.ApiLogService
 import com.rainist.collectcard.common.service.HeaderService
@@ -56,8 +57,10 @@ class CardTransactionServiceImpl(
     @Transactional
     @SyncStatus(transactionId = "cardTransactions")
     override fun listTransactions(syncRequest: SyncRequest, fromMs: Long?): ListTransactionsResponse {
-        val header = headerService.makeHeader(syncRequest.banksaladUserId, syncRequest.organizationId)
+        /* request header */
+        val header = headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId)
 
+        /* request body */
         val request = ListTransactionsRequest().apply {
             this.dataHeader = ListTransactionsRequestDataHeader()
             this.dataBody = ListTransactionsRequestDataBody().apply {
@@ -65,7 +68,13 @@ class CardTransactionServiceImpl(
             }
         }
 
-        val transactions = getListTransactionsByDivision(syncRequest, header, request)
+        /* Execution Context */
+        val executionContext: ExecutionContext = CollectExecutionContext(
+            organizationId = syncRequest.organizationId,
+            userId = syncRequest.banksaladUserId.toString()
+        )
+
+        val transactions = getListTransactionsByDivision(executionContext, header, request)
 
         // db insert
         transactions.forEach { cardTransaction ->
@@ -104,7 +113,7 @@ class CardTransactionServiceImpl(
     }
 
     private fun getListTransactionsByDivision(
-        syncRequest: SyncRequest,
+        executionContext: ExecutionContext,
         header: MutableMap<String, String?>,
         request: ListTransactionsRequest
     ): MutableList<CardTransaction> {
@@ -131,37 +140,24 @@ class CardTransactionServiceImpl(
                     }
                 }
             }
-            .map {
-                async {
-                    val res: ExecutionResponse<ListTransactionsResponse> =
-                        collectExecutorService.execute(
-                            Executions.valueOf(
-                                BusinessType.card,
-                                Organization.shinhancard,
-                                Transaction.cardTransaction
-                            ),
-                            ExecutionRequest.builder<ListTransactionsRequest>()
-                                .headers(header)
-                                .request(it)
-                                .build(),
-                            { apiLog: ApiLog ->
-                                apiLogService.logRequest(
-                                    syncRequest.organizationId,
-                                    syncRequest.banksaladUserId.toLong(),
-                                    apiLog
-                                )
-                            },
-                            { apiLog: ApiLog ->
-                                apiLogService.logResponse(
-                                    syncRequest.organizationId,
-                                    syncRequest.banksaladUserId.toLong(),
-                                    apiLog
-                                )
-                            }
-                        )
-                    res
+                .map {
+                    async {
+                        val res: ExecutionResponse<ListTransactionsResponse> =
+                            collectExecutorService.execute(
+                                executionContext,
+                                Executions.valueOf(
+                                    BusinessType.card,
+                                    Organization.shinhancard,
+                                    Transaction.cardTransaction
+                                ),
+                                ExecutionRequest.builder<ListTransactionsRequest>()
+                                    .headers(header)
+                                    .request(it)
+                                    .build()
+                            )
+                        res
+                    }
                 }
-            }
         }.let {
             it.map { deferred ->
                 deferred.getCompleted()
