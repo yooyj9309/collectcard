@@ -30,8 +30,8 @@ class TransferClientLogServiceImpl(
     override fun loggingTimeoutCount(uri: URI) {
         val tags = Tags
             .of("url", uri.toString())
-            .and("host", uri.host)
-            .and("path", uri.path)
+            .and("url_host", uri.host)
+            .and("url_path", uri.path)
 
         registry.counter("$activeName.$applicationName.$TRANSFER_ALL_TIMEOUT", tags).increment()
     }
@@ -40,8 +40,8 @@ class TransferClientLogServiceImpl(
         val tags = Tags
             .of("url", uri.toString())
             .and("code", httpStatus.value().toString())
-            .and("host", uri.host)
-            .and("path", uri.path)
+            .and("url_host", uri.host)
+            .and("url_path", uri.path)
 
         registry.counter("$activeName.$applicationName.$TRANSFER_ALL_FAILURE", tags).increment()
     }
@@ -49,8 +49,8 @@ class TransferClientLogServiceImpl(
     override fun loggingUnknownErrorCount(uri: URI) {
         val tags = Tags
             .of("url", uri.toString())
-            .and("host", uri.host)
-            .and("path", uri.path)
+            .and("url_host", uri.host)
+            .and("url_path", uri.path)
 
         registry.counter("$activeName.$applicationName.$TRANSFER_ALL_UNKNOWN", tags).increment()
     }
@@ -59,8 +59,8 @@ class TransferClientLogServiceImpl(
         val tags = Tags
             .of("url", uri.toString())
             .and("code", httpStatus.value().toString())
-            .and("host", uri.host)
-            .and("path", uri.path)
+            .and("url_host", uri.host)
+            .and("url_path", uri.path)
 
         registry.counter("$activeName.$applicationName.$TRANSFER_ALL_SUCCESS", tags).increment()
     }
@@ -68,8 +68,8 @@ class TransferClientLogServiceImpl(
     override fun loggingTiming(uri: URI, totalTimeMillis: Long) {
         val tags = Tags
             .of("url", uri.toString())
-            .and("host", uri.host)
-            .and("path", uri.path)
+            .and("url_host", uri.host)
+            .and("url_path", uri.path)
 
         registry.timer("$activeName.$applicationName.$TRANSFER_ALL_TIMING", tags).record(totalTimeMillis, TimeUnit.MILLISECONDS)
     }
