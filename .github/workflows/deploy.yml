@@ -42,8 +42,9 @@ jobs:
           -e SUB_ENV_ID \
           -e IMAGE_TAG=$GITHUB_SHA \
           -e DEVELOPMENT_COLLECTCARD_DB_PASSWORD \
-          -e DEVELOPMENT_MYDATA_DB_PASSWORD \
           -e DEVELOPMENT_SHINHANCARD_CLIENT_ID \
+          -e PRODUCTION_COLLECTCARD_DB_PASSWORD \
+          -e PRODUCTION_SHINHANCARD_CLIENT_ID \
           \
           hairyhenderson/gomplate:v3.5.0-slim -f - | \
           kubectl apply -f -
@@ -51,8 +52,9 @@ jobs:
           ENV: ${{ github.event.deployment.environment }}
           SUB_ENV_ID: ${{ github.event.deployment.environment }}
           DEVELOPMENT_COLLECTCARD_DB_PASSWORD: ${{ secrets.DEVELOPMENT_COLLECTCARD_DB_PASSWORD }}
-          DEVELOPMENT_MYDATA_DB_PASSWORD: ${{ secrets.DEVELOPMENT_COLLECTCARD_DB_PASSWORD }}
           DEVELOPMENT_SHINHANCARD_CLIENT_ID: ${{ secrets.DEVELOPMENT_SHINHANCARD_CLIENT_ID }}
+          PRODUCTION_COLLECTCARD_DB_PASSWORD: ${{ secrets.PRODUCTION_COLLECTCARD_DB_PASSWORD }}
+          PRODUCTION_SHINHANCARD_CLIENT_ID: ${{ secrets.PRODUCTION_SHINHANCARD_CLIENT_ID }}
 
       - name: Set deployment status to success
         if: always()

@@ -18,7 +18,7 @@ application:
 
 sentry:
   servername: collectcard
-  dsn: ${SENTRY_DATA_SOURCE_NAME}
+  dsn: https://a7343c0fbaea499199ed8d8c93787453@o26606.ingest.sentry.io/5357109
   level: ERROR
   stacktrace.app.packages: com.rainist.collectcard.*
 

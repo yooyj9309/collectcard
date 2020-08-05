@@ -3,31 +3,36 @@ spring:
     active: production
   jpa:
     show-sql: false
-
-sentry:
-  servername: collectcard
-  dsn: ${SENTRY_DATA_SOURCE_NAME}
-  level: ERROR
-  environment: production
-  stacktrace.app.packages: com.rainist.collectcard.*
-
-mydata:
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.MySQLDialect
+        default_batch_fetch_size: 100
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
   datasource:
-    url: jdbc:mysql://dev-barista-cluster.cluster-cejbmksulyv2.ap-northeast-2.rds.amazonaws.com:3306/connectcard?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
-    username: connectcard_was
-    password: ${MYDATA_DB_PASSWORD}
+    url: jdbc:mysql://prod-collectcard-cluster.cluster-cejbmksulyv2.ap-northeast-2.rds.amazonaws.com:3306/collectcard?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: collectcard_was
+    password: ${PRODUCTION_COLLECTCARD_DB_PASSWORD}
     hikari:
-      hikari:
-        idle-timeout: 30000
-        minimum-idle: 10
-        maximum-pool-size: 30
-        connection-timeout: 5000
-        validation-timeout: 4000
-        max-lifetime: 1800000
+      idle-timeout: 300000
+      minimum-idle: 10
+      maximum-pool-size: 30
+      connection-timeout: 5000
+      validation-timeout: 4000
+      max-lifetime: 1800000
+
+logging:
+   level:
+     com.zaxxer.hikari.HikariConfig: INFO
+     com.zaxxer.hikari: INFO
+     org.hibernate.SQL: INFO
+     org.hibernate.type.descriptor.sql.BasicBinder: INFO
 
 shinhancard:
   organizationId: shinhancard
-  objectId: 596d66692c4069c168b57c59
+  objectId: 5880ec0575c8e8fbdc00aced
   host: https://openapi.shinhancard.com:8443
   clientId: ${PRODUCTION_SHINHANCARD_CLIENT_ID}
-  
