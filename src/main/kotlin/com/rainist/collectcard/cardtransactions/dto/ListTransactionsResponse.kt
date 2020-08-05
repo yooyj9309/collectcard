@@ -78,8 +78,11 @@ fun ListTransactionsResponse.toListCardsTransactionResponseProto(): CollectcardP
                 // 할부여부
                 transaction.isInstallmentPayment?.let { cardTransactionBuilder.installment = it }
 
-                // 할부개월수
-                transaction.installment?.let { cardTransactionBuilder.installmentMonth = Int32Value.of(it) }
+                // 할부개월수 0 인경우 null 로 표시 ( 0 으로 넣을 경우 앱에서 할부개월 0 으로 표시 될껄?)
+                val installment = transaction.installment ?: 0
+                if (installment > 0) {
+                    cardTransactionBuilder.installmentMonth = Int32Value.of(installment)
+                }
 
                 // 승인금액
                 transaction.amount?.let { cardTransactionBuilder.approvedAmount = it.toDouble() }

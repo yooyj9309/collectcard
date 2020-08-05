@@ -85,29 +85,22 @@ class CollectcardGrpcService(
         request: CollectcardProto.ListCardTransactionsRequest,
         responseObserver: StreamObserver<CollectcardProto.ListCardTransactionsResponse>
     ) {
-        logger.debug("[사용자 카드 내역 조회 시작 : {}]", request)
-
         val syncRequest = SyncRequest(
             request.userId.toLong(),
             organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: ""
         )
+
         kotlin.runCatching {
+
             cardTransactionService.listTransactions(
                 syncRequest,
                 request.takeIf { request.hasFromMs() }?.fromMs?.value
             ).toListCardsTransactionResponseProto()
-            // cardTransactionService.listTransactions(request)
         }.onSuccess {
-            logger.info("[사용자 카드 내역 조회 결과 success]")
-            for (transaction in it.dataList) {
-                logger.info("[사용자 카드 내역 조회 결과 : {}]", transaction)
-            }
-
             responseObserver.onNext(it)
             responseObserver.onCompleted()
         }.onFailure {
             logger.error("[사용자 카드 내역 조회 에러 : {}]", it.localizedMessage, it)
-            // TODO 예상국 exception  처리 코드 추가 하기
             responseObserver.onException(it)
         }
     }
