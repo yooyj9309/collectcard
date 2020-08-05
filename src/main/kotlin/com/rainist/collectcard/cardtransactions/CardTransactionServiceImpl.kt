@@ -80,7 +80,7 @@ class CardTransactionServiceImpl(
         transactions.forEach { cardTransaction ->
 
             if (shinhancardOrganizationId == syncRequest.organizationId) {
-                cardTransaction.currencyCode = CardTransactionUtil.getCurrencyCode(cardTransaction.currencyCode)
+                cardTransaction.currencyCode = CardTransactionUtil.currencyCodeMap[cardTransaction.currencyCode] ?: cardTransaction.currencyCode
             }
 
             val approvalYearMonth = try {

@@ -108,7 +108,7 @@ class CollectcardGrpcService(
         }.onFailure {
             logger.error("[사용자 카드 내역 조회 에러 : {}]", it.localizedMessage, it)
             // TODO 예상국 exception  처리 코드 추가 하기
-            responseObserver.onError(it)
+            responseObserver.onException(it)
         }
     }
 

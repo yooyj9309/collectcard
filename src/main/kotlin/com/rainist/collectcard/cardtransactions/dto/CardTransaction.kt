@@ -4,7 +4,9 @@ import com.rainist.collectcard.common.enums.CardTransactionType
 import com.rainist.collectcard.common.enums.CardType
 import com.rainist.common.annotation.validation.StringDateFormat
 import com.rainist.common.annotation.validation.StringTimeFormat
+import com.rainist.common.util.DateTimeUtil
 import java.math.BigDecimal
+import java.time.LocalDateTime
 import javax.validation.constraints.NotEmpty
 import org.springframework.format.annotation.NumberFormat
 
@@ -37,7 +39,7 @@ data class CardTransaction(
 
     var cardTransactionTypeOrigin: String? = null,
 
-    var currencyCode: String? = null, //  9. 통화코드
+    var currencyCode: String = "KRW", //  9. 통화코드
 
     var isInstallmentPayment: Boolean? = null, //  10. 할부여부
 
@@ -81,4 +83,8 @@ data class CardTransaction(
     var storeCategory: String? = null, // 27. 업종타입
 
     var transactionCountry: String? = null // 28. 사용국가
-)
+) {
+    fun approvalDateTime(): LocalDateTime {
+        return DateTimeUtil.stringToLocalDateTime(approvalDay!!, "yyyyMMdd", approvalTime!!, "HHmmss")
+    }
+}

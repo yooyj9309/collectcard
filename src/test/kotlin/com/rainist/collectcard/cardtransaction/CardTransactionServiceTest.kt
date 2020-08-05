@@ -3,13 +3,16 @@ package com.rainist.collectcard.cardtransaction
 import com.rainist.collect.common.api.Api
 import com.rainist.collectcard.cardtransactions.CardTransactionService
 import com.rainist.collectcard.cardtransactions.dto.CardTransaction
+import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponse
+import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponseDataBody
+import com.rainist.collectcard.cardtransactions.dto.sortListTransactionsResponseByDesc
 import com.rainist.collectcard.cardtransactions.util.CardTransactionUtil
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
 import com.rainist.collectcard.common.db.repository.CardTransactionRepository
 import com.rainist.collectcard.common.dto.SyncRequest
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.common.util.DateTimeUtil
-import junit.framework.Assert.assertEquals
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -247,5 +250,43 @@ class CardTransactionServiceTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(readText(filePath))
             )
+    }
+
+    @Test()
+    @DisplayName("거래내역 sorting 테스트")
+    fun sortingTest() {
+        val response = ListTransactionsResponse()
+
+        val transaction1 = CardTransaction().apply {
+            this.approvalDay = "20190202"
+            this.approvalTime = "130000"
+        }
+
+        val transaction2 = CardTransaction().apply {
+            this.approvalDay = "20200202"
+            this.approvalTime = "130000"
+        }
+
+        val transaction3 = CardTransaction().apply {
+            this.approvalDay = "20200202"
+            this.approvalTime = "170000"
+        }
+
+        val transaction4 = CardTransaction().apply {
+            this.approvalDay = "20220202"
+            this.approvalTime = "130000"
+        }
+
+        val mockTransactions = mutableListOf(transaction4, transaction2, transaction3, transaction1)
+        response.dataBody = ListTransactionsResponseDataBody().apply {
+            this.transactions = mockTransactions
+        }
+
+        response.sortListTransactionsResponseByDesc()
+
+        assertEquals(mockTransactions[0], transaction4)
+        assertEquals(mockTransactions[1], transaction3)
+        assertEquals(mockTransactions[2], transaction2)
+        assertEquals(mockTransactions[3], transaction1)
     }
 }

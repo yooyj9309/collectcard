@@ -4,7 +4,7 @@ import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
 import com.google.protobuf.DoubleValue
 import com.google.protobuf.Int32Value
 import com.google.protobuf.StringValue
-import com.rainist.common.exception.ValidationException
+import com.rainist.collectcard.cardtransactions.util.CardTransactionUtil
 import com.rainist.common.util.DateTimeUtil
 
 data class ListTransactionsResponse(
@@ -30,56 +30,86 @@ data class ListTransactionsResponseDataBody(
 fun ListTransactionsResponse.toListCardsTransactionResponseProto(): CollectcardProto.ListCardTransactionsResponse {
 
     return kotlin.runCatching {
-        let {
-            this.dataBody?.transactions?.map { transaction ->
 
-                CollectcardProto.CardTransaction
-                    .newBuilder()
-                    .setApprovalNumber(transaction.approvalNumber) // TODO 예상국 무승인 거래 경우 대응하기
-                    .setTransactedAt(
-                        DateTimeUtil.stringToLocalDateTime(transaction.approvalDay!!, "yyyyMMdd", transaction.approvalTime!!, "HHmmss")
-                            .let { DateTimeUtil.kstLocalDateTimeToEpochMilliSecond(it) }.toInt()
-                    )
-                    .setStore(
-                        CollectcardProto.AffiliatedStoreSummary
-                            .newBuilder()
-                            .setName(transaction.storeName)
-                            .setType(StringValue.of(transaction.storeCategory ?: ""))
-                            .build()
-                    )
-                    .setCard(
-                        CollectcardProto.CardSummary
-                            .newBuilder()
-                            .setNumber(transaction.cardNumber)
-                            .setName(StringValue.of(transaction.cardName ?: ""))
-                            .setType(StringValue.of(transaction.cardType.name))
-                            .build()
-                    )
-                    .setInstallmentMonth(
-                        transaction.installment?.let { Int32Value.of(it) }
-                    )
-                    .setApprovedAmount(
-                        transaction.amount?.toDouble() ?: throw ValidationException("승인금액이 없습니다")
-                    )
-                    .setCancelledAmount(
-                        transaction.canceledAmount?.toDouble()
-                            ?.let { DoubleValue.of(it) }
-                            ?: throw ValidationException("취소금액이 없습니다")
-                    )
-                    .setCurrency(transaction.currencyCode ?: "KRW")
-                    .setForeign(transaction.isOverseaUse ?: false)
-                    .setInstallment(transaction.isInstallmentPayment ?: false)
-                    .build()
+        let {
+            // TODO Diff 종료후 삭제
+            it.sortListTransactionsResponseByDesc()
+
+            this.dataBody?.transactions?.map { transaction ->
+                // 카드내역
+                val cardTransactionBuilder = CollectcardProto.CardTransaction.newBuilder()
+
+                // 승인번호 (무승인인 경우 null )
+                transaction.approvalNumber?.let { cardTransactionBuilder.approvalNumber = (it) }
+
+                // 승인시간
+                cardTransactionBuilder.transactedAt = transaction.approvalDateTime().let { DateTimeUtil.kstLocalDateTimeToEpochMilliSecond(it) }.toInt()
+
+                // 가맹점 정보
+                val affiliatedStoreSummaryBuilder = CollectcardProto.AffiliatedStoreSummary.newBuilder()
+
+                // 가맹점 이름
+                transaction.storeName?.let { affiliatedStoreSummaryBuilder.name = it }
+
+                // 가맹점 업종
+                transaction.storeCategory?.let { affiliatedStoreSummaryBuilder.type = StringValue.of(it) }
+
+                // 가맹점 전화번호
+                transaction.storeNumber?.let { affiliatedStoreSummaryBuilder.telephoneNumber = StringValue.of(it) }
+
+                // 가맹정보 end
+                cardTransactionBuilder.store = affiliatedStoreSummaryBuilder.build()
+
+                // 카드정보
+                val cardSummaryBuilder = CollectcardProto.CardSummary.newBuilder()
+
+                // 카드번호
+                transaction.cardNumber?.let { cardSummaryBuilder.number = it }
+
+                // 카드이름
+                transaction.cardName?.let { cardSummaryBuilder.name = StringValue.of(it) }
+
+                // 카드타입
+                cardSummaryBuilder.type = StringValue.of(transaction.cardType.name)
+
+                // 카드정보 end
+                cardTransactionBuilder.card = cardSummaryBuilder.build()
+
+                // 할부여부
+                transaction.isInstallmentPayment?.let { cardTransactionBuilder.installment = it }
+
+                // 할부개월수
+                transaction.installment?.let { cardTransactionBuilder.installmentMonth = Int32Value.of(it) }
+
+                // 승인금액
+                transaction.amount?.let { cardTransactionBuilder.approvedAmount = it.toDouble() }
+
+                // 취소금액
+                transaction.canceledAmount?.let { cardTransactionBuilder.cancelledAmount = DoubleValue.of(it.toDouble()) }
+
+                // 통화코드
+                cardTransactionBuilder.currency = CardTransactionUtil.currencyCodeMap[transaction.currencyCode] ?: transaction.currencyCode
+
+                // 해외사용여부
+                transaction.isOverseaUse?.let { cardTransactionBuilder.foreign = it }
+
+                // 카드내역 end
+                cardTransactionBuilder.build()
             }
-            ?. toMutableList()
+            ?.toMutableList()
             ?: mutableListOf()
-            }
-            .let {
-                CollectcardProto.ListCardTransactionsResponse
-                    .newBuilder()
-                    .addAllData(it)
-                    .build()
-            }
+        }
+        .let {
+            CollectcardProto.ListCardTransactionsResponse
+                .newBuilder()
+                .addAllData(it)
+                .build()
+        }
     }
     .getOrThrow()
+}
+
+// TODO Diff 끝나면 없애기
+fun ListTransactionsResponse.sortListTransactionsResponseByDesc() {
+    this.dataBody?.transactions?.sortByDescending { it.approvalDay + it.approvalTime }
 }

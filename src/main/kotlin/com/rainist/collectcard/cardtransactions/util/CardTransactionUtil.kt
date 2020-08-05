@@ -39,18 +39,6 @@ class CardTransactionUtil {
             }
         }
 
-        fun getCurrencyCode(currencyCode: String?): String? {
-            if (currencyCode == null) {
-                return "KRW"
-            }
-
-            if (currencyCodeMap.containsKey(currencyCode)) {
-                return currencyCodeMap.get(currencyCode)
-            }
-
-            return currencyCode
-        }
-
         // 임시.. 더 좋은방안이 있을지 확인 필요
         val currencyCodeMap: HashMap<String, String> = hashMapOf(
             // "아프가니" to "AFA",
