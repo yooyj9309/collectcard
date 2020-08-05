@@ -11,7 +11,7 @@
                 "billId": .setlDay + .setlTypeNo,
                 "userName": "",
                 "userGrade": "",
-                "billNumber": .setlDay,
+                "billNumber": .setlTypeNo,
                 "paymentDay": .setlDay,
                 "nextPaymentDay": "",
                 "billingAmount": .bllAmt,

@@ -46,5 +46,5 @@ data class CardBill(
     var expiringPoints: Int?,
 
     // 결제예정금액 상세
-    var transactions: List<CardBillTransaction>?
+    var transactions: MutableList<CardBillTransaction>?
 )

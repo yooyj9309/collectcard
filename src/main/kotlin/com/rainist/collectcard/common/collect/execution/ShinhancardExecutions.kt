@@ -4,7 +4,6 @@ import com.rainist.collect.common.api.Pagination
 import com.rainist.collect.common.execution.Execution
 import com.rainist.collectcard.card.dto.ListCardsResponse
 import com.rainist.collectcard.cardbills.dto.CardBill
-import com.rainist.collectcard.cardbills.dto.CardBillTransaction
 import com.rainist.collectcard.cardbills.dto.ListBillTransactionsResponse
 import com.rainist.collectcard.cardbills.dto.ListCardBillsResponse
 import com.rainist.collectcard.cardcreditlimit.dto.CreditLimitResponse
@@ -47,7 +46,7 @@ class ShinhancardExecutions {
         val mergeBills =
             BinaryOperator { prev: ListCardBillsResponse, next: ListCardBillsResponse ->
 
-                prev.dataBody?.cardBills?.addAll(
+                next.dataBody?.cardBills?.addAll(
                     0,
                     prev.dataBody?.cardBills ?: mutableListOf()
                 )
@@ -57,7 +56,10 @@ class ShinhancardExecutions {
 
         val mergeBillTransaction =
             BiConsumer { master: CardBill, detail: ListBillTransactionsResponse ->
-                master.transactions = detail.dataBody?.billTransactions ?: mutableListOf<CardBillTransaction>()
+                if (master.transactions == null) {
+                    master.transactions = mutableListOf()
+                }
+                master.transactions?.addAll(detail.dataBody?.billTransactions ?: mutableListOf())
             }
 
         val mergeCards =
@@ -290,7 +292,8 @@ class ShinhancardExecutions {
                 )
                 .fetch { listCardBillsResponse ->
                     listCardBillsResponse as ListCardBillsResponse
-                    listCardBillsResponse.dataBody?.cardBills?.iterator() ?: mutableListOf<CardBill>().iterator()
+                    listCardBillsResponse.dataBody?.cardBills?.iterator()
+                        ?: mutableListOf<CardBill>().iterator()
                 }
                 .then(
                     Execution.create()
@@ -318,8 +321,6 @@ class ShinhancardExecutions {
                     Execution.create()
                         .exchange(ShinhancardApis.card_shinhancard_credit_bills)
                         .to(ListCardBillsResponse::class.java)
-                        .exchange(ShinhancardApis.card_shinhancard_check_bill_transactions)
-                        .to(ListBillTransactionsResponse::class.java)
                         .exceptionally { throwable: Throwable ->
                             ExecutionExceptionHandler.handle(
                                 organizationIdShinhancard,

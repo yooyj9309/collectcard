@@ -53,8 +53,16 @@ fun ListCardBillsResponse.toListCardBillsResponseProto(): CollectcardProto.ListC
                         .build()
                 }
                 ?.toMutableList()
+                ?: mutableListOf<CollectcardProto.CardBillTransaction>()
             )
-            .setTotalAmount(cardBill.transactions?.map { it.amount?.toDouble() ?: 0.0 }!!.sum()) // 2. 총 청구 금액
+            // 2. 총 청구 금액
+            .setTotalAmount(
+                cardBill.transactions?.map {
+                    it.amount?.toDouble() ?: 0.0
+                }
+                ?.sum()
+                ?: 0.0
+            )
             .build()
     }
     ?.let {
