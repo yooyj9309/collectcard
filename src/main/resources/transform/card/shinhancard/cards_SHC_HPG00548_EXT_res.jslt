@@ -40,7 +40,7 @@ let cardholder_name = .dataBody.clnHgNm
     "dataBody": {
         "cards": [for (.dataBody.grp001)
             {
-                "cardCompanyCardId": .enccardno,
+                "cardCompanyCardId": .cardno[size(.cardno) - 3 : size(.cardno)],
                 "cardOwnerName": $cardholder_name,
                 "cardOwnerType": get-key($CardOwnerType, .cardgubun, "SELF"),
                 "cardOwnerTypeOrigin": .cardgubun,

@@ -71,7 +71,7 @@ class CardServiceImplTest {
         assertThat(
             response.dataBody?.cards?.first(), `is`(Card().apply {
                 cardCompanyId = "organizationId"
-                cardCompanyCardId = "602640e6acb211fb19f5d580170bbeac78410dad"
+                cardCompanyCardId = "721"
                 cardOwnerName = "홍길동"
                 cardOwnerType = CardOwnerType.SELF
                 cardOwnerTypeOrigin = "1"
@@ -103,7 +103,7 @@ class CardServiceImplTest {
                     cardId = 1,
                     banksaladUserId = 1,
                     cardCompanyId = "organizationId",
-                    cardCompanyCardId = "602640e6acb211fb19f5d580170bbeac78410dad",
+                    cardCompanyCardId = "721",
                     lastCheckAt = now,
                     cardOwnerName = "홍길동",
                     cardOwnerType = "SELF",
@@ -148,7 +148,7 @@ class CardServiceImplTest {
         assertThat(
             response.dataBody?.cards?.first(), `is`(Card().apply {
                 cardCompanyId = "organizationId"
-                cardCompanyCardId = "602640e6acb211fb19f5d580170bbeac78410dad"
+                cardCompanyCardId = "721"
                 cardOwnerName = "홍길동"
                 cardOwnerType = CardOwnerType.SELF
                 cardOwnerTypeOrigin = "1"
@@ -180,7 +180,7 @@ class CardServiceImplTest {
                     cardId = 1,
                     banksaladUserId = 1,
                     cardCompanyId = "organizationId",
-                    cardCompanyCardId = "602640e6acb211fb19f5d580170bbeac78410dad",
+                    cardCompanyCardId = "721",
                     lastCheckAt = now,
                     cardOwnerName = "홍길동",
                     cardOwnerType = "SELF",
@@ -218,7 +218,7 @@ class CardServiceImplTest {
                 cardId = 1,
                 banksaladUserId = 1,
                 cardCompanyId = "organizationId",
-                cardCompanyCardId = "602640e6acb211fb19f5d580170bbeac78410dad",
+                cardCompanyCardId = "721",
                 lastCheckAt = now,
                 cardOwnerName = "홍길동",
                 cardOwnerType = "SELF",
@@ -243,7 +243,7 @@ class CardServiceImplTest {
         assertThat(
             response.dataBody?.cards?.first(), `is`(Card().apply {
                 cardCompanyId = "organizationId"
-                cardCompanyCardId = "602640e6acb211fb19f5d580170bbeac78410dad"
+                cardCompanyCardId = "721"
                 cardOwnerName = "홍길동"
                 cardOwnerType = CardOwnerType.SELF
                 cardOwnerTypeOrigin = "5"
@@ -274,7 +274,7 @@ class CardServiceImplTest {
                     cardId = 1,
                     banksaladUserId = 1,
                     cardCompanyId = "organizationId",
-                    cardCompanyCardId = "602640e6acb211fb19f5d580170bbeac78410dad",
+                    cardCompanyCardId = "721",
                     lastCheckAt = now,
                     cardOwnerName = "홍길동",
                     cardOwnerType = "SELF",
