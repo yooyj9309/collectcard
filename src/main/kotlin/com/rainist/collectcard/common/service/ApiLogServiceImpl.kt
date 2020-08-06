@@ -3,6 +3,7 @@ package com.rainist.collectcard.common.service
 import com.rainist.collect.executor.ApiLog
 import com.rainist.collectcard.common.db.entity.ApiLogEntity
 import com.rainist.collectcard.common.db.repository.ApiLogRepository
+import com.rainist.common.util.DateTimeUtil
 import java.time.LocalDateTime
 import java.time.ZoneId
 import org.springframework.stereotype.Service
@@ -37,8 +38,12 @@ class ApiLogServiceImpl(private val apiLogRepository: ApiLogRepository) : ApiLog
     }
 
     override fun logResponse(organizationId: String, banksaladUserId: Long, apiLog: ApiLog) {
-        val apiLogEntity = apiLogRepository.findByRequestId(apiLog.id)
-            ?: ApiLogEntity().apply {
+
+        val apiLogEntity = apiLogRepository.findByRequestIdAndCreatedAtBetween(
+                apiLog.id,
+                DateTimeUtil.utcNowLocalDateTime().minusDays(1),
+                DateTimeUtil.utcNowLocalDateTime().plusDays(1)
+            ) ?: ApiLogEntity().apply {
                 this.organizationId = organizationId
                 this.banksaladUserId = banksaladUserId
                 this.apiId = apiLog.api.id
