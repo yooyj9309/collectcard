@@ -23,9 +23,10 @@ class ExecutionExceptionHandler(private val collectMeterRegistry: CollectMeterRe
             collectMeterRegistry.registerExecutionErrorCount(organizationId, executionId, apiId)
 
             // write error log
-            log.error("[COLLECT][Execution] executionId: {}, message: {}, stacktrace: {}",
+            log.error("[COLLECT][Execution] executionId: {}\nmessage: {}\n, cause message: {}\nstacktrace: {}",
                 executionId,
                 throwable.message,
+                throwable.cause?.message ?: "",
                 ExceptionUtils.getStackTrace(throwable))
         }
     }
