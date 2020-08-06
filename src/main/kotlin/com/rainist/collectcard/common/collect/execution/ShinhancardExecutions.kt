@@ -54,6 +54,33 @@ class ShinhancardExecutions {
                 next
             }
 
+        val mergeAndSortBills =
+            BinaryOperator { prev: ListCardBillsResponse, next: ListCardBillsResponse ->
+                val prevMap = prev.dataBody?.cardBills?.associateBy { it.paymentDay }?.toMutableMap()
+                    ?: mutableMapOf()
+                val nextMap = next.dataBody?.cardBills?.associateBy { it.paymentDay }?.toMutableMap()
+                    ?: mutableMapOf()
+
+                prevMap.keys.forEach { key ->
+                    if (nextMap.contains(key)) {
+                        nextMap[key]!!.transactions?.let {
+                            nextMap[key]!!.transactions?.addAll(prevMap[key]!!.transactions ?: mutableListOf())
+                            nextMap[key]!!.billingAmount?.add(prevMap[key]!!.billingAmount)
+                        } ?: kotlin.run {
+                            nextMap[key]!!.transactions = prevMap[key]!!.transactions
+                        }
+                    } else {
+                        nextMap[key] = prevMap[key]!!
+                    }
+                }
+                next.dataBody?.cardBills = ArrayList(nextMap.values)
+
+                next.dataBody?.cardBills?.forEach { cardBill ->
+                    cardBill.transactions?.sortByDescending { transaction -> transaction.approvalDay }
+                }
+                next
+            }
+
         val mergeBillTransaction =
             BiConsumer { master: CardBill, detail: ListBillTransactionsResponse ->
                 if (master.transactions == null) {
@@ -221,6 +248,14 @@ class ShinhancardExecutions {
                     Execution.create()
                         .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_lump_sum)
                         .to(ListBillTransactionsResponse::class.java)
+                        .exceptionally { throwable: Throwable ->
+                            ExecutionExceptionHandler.handle(
+                                organizationIdShinhancard,
+                                "cardShinhancardBillTransactionExpected",
+                                ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_lump_sum.id,
+                                throwable
+                            )
+                        }
                         .build()
                 ).merge(mergeBillTransaction)
                 .with(
@@ -249,10 +284,19 @@ class ShinhancardExecutions {
                             Execution.create()
                                 .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_installment)
                                 .to(ListBillTransactionsResponse::class.java)
+                                .exceptionally { throwable: Throwable ->
+                                    ExecutionExceptionHandler.handle(
+                                        organizationIdShinhancard,
+                                        "cardShinhancardBillTransactionExpected",
+                                        ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_installment.id,
+                                        throwable
+                                    )
+                                }
                                 .build()
                         ).merge(mergeBillTransaction)
                         .build()
                 )
+                .merge(mergeAndSortBills)
                 .build()
 
         val cardShinhancardBills =
@@ -283,6 +327,14 @@ class ShinhancardExecutions {
                     Execution.create()
                         .exchange(ShinhancardApis.card_shinhancard_check_bill_transactions)
                         .to(ListBillTransactionsResponse::class.java)
+                        .exceptionally { throwable: Throwable ->
+                            ExecutionExceptionHandler.handle(
+                                organizationIdShinhancard,
+                                "cardShinhancardBills",
+                                ShinhancardApis.card_shinhancard_check_bill_transactions.id,
+                                throwable
+                            )
+                        }
                         .paging(
                             Pagination.builder()
                                 .method(Pagination.Method.NEXTKEY)
@@ -321,6 +373,14 @@ class ShinhancardExecutions {
                             Execution.create()
                                 .exchange(ShinhancardApis.card_shinhancard_credit_bill_transactions)
                                 .to(ListBillTransactionsResponse::class.java)
+                                .exceptionally { throwable: Throwable ->
+                                    ExecutionExceptionHandler.handle(
+                                        organizationIdShinhancard,
+                                        "cardShinhancardBills",
+                                        ShinhancardApis.card_shinhancard_credit_bill_transactions.id,
+                                        throwable
+                                    )
+                                }
                                 .paging(
                                     Pagination.builder()
                                         .method(Pagination.Method.NEXTKEY)
@@ -333,7 +393,7 @@ class ShinhancardExecutions {
                         .merge(mergeBillTransaction)
                         .build()
                 )
-                .merge(mergeBills)
+                .merge(mergeAndSortBills)
                 .build()
 
         // 사용자 정보 조회 (SHC_EXT_00001)
@@ -379,6 +439,14 @@ class ShinhancardExecutions {
                     Execution.create()
                         .exchange(ShinhancardApis.card_shinhancard_loan_detail)
                         .to(Loan::class.java)
+                        .exceptionally { throwable: Throwable ->
+                            ExecutionExceptionHandler.handle(
+                                organizationIdShinhancard,
+                                "cardShinhancardLoan",
+                                ShinhancardApis.card_shinhancard_loan_detail.id,
+                                throwable
+                            )
+                        }
                         .build()
                 )
                 .merge(mergeLoansDetail)

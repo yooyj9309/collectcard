@@ -25,8 +25,10 @@ import com.rainist.collectcard.common.exception.CollectcardException
 import com.rainist.collectcard.common.service.ApiLogService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.OrganizationService
+import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import java.math.BigDecimal
+import kotlin.collections.filter as filter
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -42,7 +44,10 @@ class CardBillServiceImpl(
     val cardPaymentScheduledRepository: CardPaymentScheduledRepository
 ) : CardBillService {
 
-    companion object Log
+    companion object : Log {
+        // TODO 해당부분 추후 organization 에서 상수를 전부 관리하는 형태로 변경 ( bill, transaction)
+        const val DEFAULT_MAX_BILL_MONTH = 6L
+    }
 
     @Transactional
     override fun listUserCardBills(
@@ -55,15 +60,17 @@ class CardBillServiceImpl(
 
         /* request body */
         val organization = organizationService.getOrganizationByOrganizationId(syncRequest.organizationId)
+        val checkStartTime = startAt?.let {
+            DateTimeUtil.epochMilliSecondToKSTLocalDateTime(startAt)
+        }?.let {
+            DateTimeUtil.localDatetimeToString(it, "yyyyMMdd")
+        } ?: DateTimeUtil.kstNowLocalDate()
+            .minusMonths(DEFAULT_MAX_BILL_MONTH)
+            .let { DateTimeUtil.localDateToString(it, "yyyyMMdd") }
+
         val request = ListCardBillsRequest().apply {
             dataBody = ListCardBillsRequestDataBody().apply {
-                this.startAt = startAt?.let {
-                    DateTimeUtil.epochMilliSecondToKSTLocalDateTime(startAt)
-                }?.let {
-                    DateTimeUtil.localDatetimeToString(it, "yyyyMMdd")
-                } ?: DateTimeUtil.kstNowLocalDate()
-                    .minusMonths(organization.maxMonth.toLong())
-                    .let { DateTimeUtil.localDateToString(it, "yyyyMMdd") }
+                this.startAt = checkStartTime
             }
         }
 
@@ -124,6 +131,13 @@ class CardBillServiceImpl(
             cardBillExpectedResponse.dataBody?.cardBills ?: mutableListOf()
         )
 
+        /**
+         * TODO 청구서와 청구내역을 합치게 되어 sort로직을 공통서비스에 추가, 내부 transaction은 Execution에 추가.
+         * paymentDay 값으로 sort하는 부분을 서비스 단이 아닌 Execution단에서 하고싶으나 현재 방법 확인중.
+         */
+
+        cardBillsResponse.dataBody?.cardBills = cardBillsResponse.dataBody?.cardBills?.filter { it -> it.paymentDay!! > checkStartTime }?.toMutableList()
+        cardBillsResponse.dataBody?.cardBills?.sortByDescending { cardBill -> cardBill.paymentDay }
         return cardBillsResponse
     }
 

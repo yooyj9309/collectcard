@@ -8,8 +8,8 @@
         "billTransactions": [for (.dataBody.grp001)
             if(.useD != "")(
                 {
-                    "cardNumber": .useCrdC,
-                    "cardNumberMasked": .useCrdC,
+                    "cardNumber": .useCrdC[size(.useCrdC) - 3 : size(.useCrdC)],
+                    "cardNumberMasked": .useCrdC[size(.useCrdC) - 3 : size(.useCrdC)],
                     "approvalDay" : .useD,
                     "storeName": .useMchtNm,
                     "installment": .dvdMnth,

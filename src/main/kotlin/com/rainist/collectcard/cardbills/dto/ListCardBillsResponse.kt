@@ -4,6 +4,7 @@ import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
 import com.google.protobuf.StringValue
 import com.rainist.collectcard.common.exception.CollectcardException
 import java.text.SimpleDateFormat
+import org.springframework.util.StringUtils
 
 data class ListCardBillsResponse(
     var dataHeader: ListCardBillsResponseDataHeader? = null,
@@ -38,44 +39,55 @@ fun ListCardBillsResponse.toListCardBillsResponseProto(): CollectcardProto.ListC
             ) // 청구 계좌
             .addAllTransactions( // 청구 내역
                 cardBill.transactions?.map { cardBillTransaction ->
+
+                    // diff를 위해서 Builder 선언
+                    val cardSummaryBuilder = CollectcardProto.CardSummary.newBuilder()
+                    cardBillTransaction.cardNumber?.let { cardSummaryBuilder.number = cardBillTransaction.cardNumber }
+                    cardBillTransaction.cardName?.let { cardSummaryBuilder.name = StringValue.of(cardBillTransaction.cardName) }
+
                     CollectcardProto.CardBillTransaction.newBuilder()
+                        .setTransactedAt(SimpleDateFormat("yyyy-MM-dd").format(SimpleDateFormat("yyyyMMdd").parse(cardBillTransaction.approvalDay)))
                         .setAmount(cardBillTransaction.amount?.toDouble() ?: 0.0)
-                        .setCurrency(cardBillTransaction.currencyCode ?: "KRW") // TODO 박두상 공통 상수 관리 부분으로 빼서 사용 필요.
+                        .setCurrency(
+                            if (StringUtils.isEmpty(cardBillTransaction.currencyCode)) { // 빈값으로 존재하는 value가 diff매칭이 안되는부분 수정
+                                "KRW"
+                            } else {
+                                cardBillTransaction.currencyCode
+                            }
+                        )
                         .setInstallment(false) // TODO 박두상 향후 해당부분 구현 필요
                         .setFee(cardBillTransaction.serviceChargeAmount?.toDouble() ?: 0.0)
-                        .setCard(CollectcardProto.CardSummary.newBuilder()
-                            .setNumber(cardBillTransaction.cardNumber)
-                            .build())
+                        .setCard(cardSummaryBuilder.build())
                         .setStore(CollectcardProto.AffiliatedStoreSummary.newBuilder()
                             .setName(cardBillTransaction.storeName)
                             .build()
                         )
                         .build()
                 }
-                ?.toMutableList()
-                ?: mutableListOf<CollectcardProto.CardBillTransaction>()
+                    ?.toMutableList()
+                    ?: mutableListOf<CollectcardProto.CardBillTransaction>()
             )
-            // 2. 총 청구 금액
+            // 2. 총 청구 금액 billingAmount로 하면 좋겠으나 청구서 이용내역시 겹치는 부분때문에 우선 수동계산으로 변
             .setTotalAmount(
                 cardBill.transactions?.map {
                     it.amount?.toDouble() ?: 0.0
                 }
-                ?.sum()
-                ?: 0.0
+                    ?.sum()
+                    ?: 0.0
             )
             .build()
     }
-    ?.let {
-        CollectcardProto.ListCardBillsResponse
-            .newBuilder()
-            .addAllData(it)
-            .build()
-    }
-    ?: kotlin.run {
-        CollectcardProto.ListCardBillsResponse
-            .newBuilder()
-            .build()
-    }
+        ?.let {
+            CollectcardProto.ListCardBillsResponse
+                .newBuilder()
+                .addAllData(it)
+                .build()
+        }
+        ?: kotlin.run {
+            CollectcardProto.ListCardBillsResponse
+                .newBuilder()
+                .build()
+        }
 }
 
 fun <T : Any> safeValue(input: T?): T {

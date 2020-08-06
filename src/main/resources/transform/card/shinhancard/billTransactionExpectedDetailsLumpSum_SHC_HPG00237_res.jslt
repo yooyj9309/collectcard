@@ -8,18 +8,20 @@
    },
    "dataBody": {
         "billTransactions": [for (.dataBody.grp001)
-            {
-                "approvalDay" : .date,                  // 이용일자
-                "amount": .prnTxn,                      // 이용원금금액
-                "storeName": .mchtNm,                   // 가맹점명
-                "cardNumber": .crdN,                    // 마스킹 카드번호
-                "cardNumberMasked": .crdN,              // 마스킹 카드번호
-                "billedAmount": .prnBll,                // 청구금액
-                "billedFee": .feeBll,                   // 수수료금액
-                "isPaidFull": .fullPaymentFlag,         // 완납여부
-                "cardName": .crdPdNm,                   // 카드상품명
-                "pointsRate": .pointRate                // 적립예정포인트율
-            }
+            if(.date != "")(
+                {
+                    "approvalDay" : .date,                  // 이용일자
+                    "amount": .prnTxn,                      // 이용원금금액
+                    "storeName": .mchtNm,                   // 가맹점명
+                    "cardNumber": replace(.crdN, "-", ""),  // 마스킹 카드번호
+                    "cardNumberMasked": .crdN,              // 마스킹 카드번호
+                    "billedAmount": .prnBll,                // 청구금액
+                    "billedFee": .feeBll,                   // 수수료금액
+                    "isPaidFull": if (.fullPaymentFlag == "Y") true else false, // 완납여부
+                    "cardName": .crdPdNm,                   // 카드상품명
+                    "pointsRate": .pointRate                // 적립예정포인트율
+                }
+            )
         ],
         "nextKey" : .dataBody.nxtQyKey
     }
