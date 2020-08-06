@@ -27,7 +27,7 @@ let CardTransactionType = {
                 "paymentDay": .stldate,                                                 // 결제예정일자
                 "storeNumber": .retlno,                                                 // 가맹점번호
                 "storeName": .retlname,                                                 // 가맹점이름
-                "canceledAmount": .subCla,                                              // 부분취소 금액
+                "canceledAmount": if(.status == "2") .aprvamt else .subCla,             // 부분취소 금액
                 "cardTransactionType": get-key($CardTransactionType, .status, "CARD_TRANSACTION_TYPE_UNKNOWN"),  // 상태
                 "cardTransactionTypeOrigin" : .status,
                 "cardType" : "CREDIT",

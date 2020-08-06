@@ -28,7 +28,8 @@ let CardType = {
                 "transactionCountry" : .ntn,                                      // 사용국가
                 //"cardType" : get-key($CardType, .ccd, "CARD_TYPE_UNKNOWN"),     // 거래구분 TODO 예상국 이게 여기서 왜 필요한지 내부 처리 로직 확인 ccd? cusccd?
                 "cardType" : "DEBIT",                                             //TODO 박두상. 현재 카드타입을 이용하는 값이 connectCard에서도 null이기에 해당부분 수정, 확인은 별도로 필요
-                "cardTransactionType" : if (number(.apva) > 0) "APPROVAL" else "APPROVAL_CANCEL" // 해외의 경우 승인 취소가 맞는지 확인필요.
+                "cardTransactionType" : if(number(.apva) > 0) "APPROVAL" else "APPROVAL_CANCEL",
+                "canceledAmount" : if(number(.apva) > 0) "0" else string(-1 * number(.apva))
             }
         ],
         "nextKey" : .dataBody.nxtQyKey  // 다음 조회 키
