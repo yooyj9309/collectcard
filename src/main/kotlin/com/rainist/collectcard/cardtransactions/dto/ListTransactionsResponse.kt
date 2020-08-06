@@ -43,7 +43,7 @@ fun ListTransactionsResponse.toListCardsTransactionResponseProto(): CollectcardP
                 transaction.approvalNumber?.let { cardTransactionBuilder.approvalNumber = (it) }
 
                 // 승인시간
-                cardTransactionBuilder.transactedAt = transaction.approvalDateTime().let { DateTimeUtil.kstLocalDateTimeToEpochMilliSecond(it) }.toInt()
+                cardTransactionBuilder.transactedAt = transaction.approvalDateTime().let { DateTimeUtil.kstLocalDateTimeToEpochMilliSecond(it) }
 
                 // 가맹점 정보
                 val affiliatedStoreSummaryBuilder = CollectcardProto.AffiliatedStoreSummary.newBuilder()
