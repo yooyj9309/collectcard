@@ -77,15 +77,10 @@ fun ListCardBillsResponse.toListCardBillsResponseProto(): CollectcardProto.ListC
             )
             .build()
     }
-        ?.let {
+        .let {
             CollectcardProto.ListCardBillsResponse
                 .newBuilder()
-                .addAllData(it)
-                .build()
-        }
-        ?: kotlin.run {
-            CollectcardProto.ListCardBillsResponse
-                .newBuilder()
+                .addAllData(it ?: mutableListOf())
                 .build()
         }
 }

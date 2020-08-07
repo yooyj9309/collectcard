@@ -45,7 +45,7 @@ fun ListCardsResponse.toListCardsResponseProto(): CollectcardProto.ListCardsResp
     }.let {
         CollectcardProto.ListCardsResponse
             .newBuilder()
-            .addAllData(it)
+            .addAllData(it ?: mutableListOf())
             .build()
     }
 }
