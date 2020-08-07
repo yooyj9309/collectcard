@@ -29,7 +29,8 @@ let CardTransactionType = {
                 "transactionCountry" : .nation,                                         // 사용국가
                 "cardType" : "CREDIT",
                 "cardTransactionType": get-key($CardTransactionType, .trantype, "CARD_TRANSACTION_TYPE_UNKNOWN"),  // 상태
-                "cardTransactionTypeOrigin" : .trantype
+                "cardTransactionTypeOrigin" : .trantype,
+                "isOverseaUse": true                                                    // 해외 내역이므로 항상 true
             }
         ],
         "nextKey" : .dataBody.nxtQyKey  // 다음 조회 키
