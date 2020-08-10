@@ -1,6 +1,6 @@
 {
     "dataHeader":{},
     "dataBody":{
-        "nxtQyKey": .nextKey
+        "nxtQyKey": .dataBody.nextKey
     }
 }
