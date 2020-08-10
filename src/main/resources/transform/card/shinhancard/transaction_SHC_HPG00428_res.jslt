@@ -23,7 +23,8 @@ let CardTransactionType = {
                 "amount": .aprvamt,                                                     // 승인금액
                 "cardNumber": .cardno,                                                  // 카드번호
                 "cardNumberMask" : .cardno,                                             // 카드넘버마스크
-                "installment": .insmon,                                                 // 할부개월
+                "installment": if (.insmon == "00") null else number(.insmon),         // 할부개월
+                "isInstallmentPayment": if (.insmon == "00") false else true,           // 할부 여부
                 "paymentDay": .stldate,                                                 // 결제예정일자
                 "storeNumber": .retlno,                                                 // 가맹점번호
                 "storeName": .retlname,                                                 // 가맹점이름
