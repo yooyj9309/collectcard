@@ -86,16 +86,20 @@ class CollectcardGrpcService(
         responseObserver: StreamObserver<CollectcardProto.ListCardTransactionsResponse>
     ) {
         val syncRequest = SyncRequest(
+            // banksalad user id
             request.userId.toLong(),
+
+            // monggo db object id -> organization id ( ex : 58392038209 -> shinhancard )
             organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: ""
         )
 
         kotlin.runCatching {
-
-            cardTransactionService.listTransactions(
-                syncRequest,
-                request.takeIf { request.hasFromMs() }?.fromMs?.value
-            ).toListCardsTransactionResponseProto()
+            cardTransactionService
+                .listTransactions(
+                    syncRequest,
+                    request.takeIf { request.hasFromMs() }?.fromMs?.value
+                )
+                .toListCardsTransactionResponseProto()
         }.onSuccess {
             responseObserver.onNext(it)
             responseObserver.onCompleted()

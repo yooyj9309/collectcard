@@ -229,7 +229,7 @@ class CardTransactionServiceTest {
     }
 
     private fun requestSetting(): SyncRequest {
-        val syncRequest = SyncRequest(1L, "organizationId")
+        val syncRequest = SyncRequest(1L, "shinhancard")
 
         BDDMockito.given(headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId))
             .willReturn(

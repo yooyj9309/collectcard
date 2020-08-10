@@ -10,10 +10,12 @@ data class CardOrganization(
     var organizationObjectId: String? = null,
 
     var maxMonth: Int = DEFAULT_MAX_MONTH,
-    var division: Int = DEFAULT_DIVISION
+    var division: Int = DEFAULT_DIVISION,
+    var researchInterval: Int = DEFAULT_RESEARCH_INTERVAL
 ) {
     companion object {
         var DEFAULT_MAX_MONTH = 12
         var DEFAULT_DIVISION = 3
+        var DEFAULT_RESEARCH_INTERVAL = 3
     }
 }

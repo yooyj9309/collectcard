@@ -31,6 +31,8 @@ class OrganizationServiceImpl : OrganizationService {
             this.clientId = shinhancardClientId
             this.organizationId = shinhancardOrganizationId
             this.organizationObjectId = shinhancardObjectId
+            this.maxMonth = 6
+            this.division = 2
         }
 
         organizationsByOrganizationId[shinhancardOrganizationId] = shinhancardOrganization

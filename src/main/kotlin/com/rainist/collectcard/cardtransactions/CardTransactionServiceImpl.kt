@@ -20,8 +20,8 @@ import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.dto.SyncRequest
 import com.rainist.collectcard.common.service.ApiLogService
 import com.rainist.collectcard.common.service.HeaderService
+import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.common.util.SyncStatus
-import com.rainist.common.log.Log
 import com.rainist.common.service.ValidationService
 import com.rainist.common.util.DateTimeUtil
 import java.time.LocalDate
@@ -43,16 +43,12 @@ class CardTransactionServiceImpl(
     val collectExecutorService: CollectExecutorService,
     val validationService: ValidationService,
     val cardTransactionRepository: CardTransactionRepository,
+    val organizationService: OrganizationService,
     @Qualifier("async-thread") val executor: Executor
 ) : CardTransactionService {
 
     @Value("\${shinhancard.organizationId}")
     lateinit var shinhancardOrganizationId: String
-
-    companion object : Log {
-        const val DEFAULT_MAX_MONTH = 12L
-        const val DEFAULT_DIVISION_MONTH = 3
-    }
 
     @Transactional
     @SyncStatus(transactionId = "cardTransactions")
@@ -64,7 +60,18 @@ class CardTransactionServiceImpl(
         val request = ListTransactionsRequest().apply {
             this.dataHeader = ListTransactionsRequestDataHeader()
             this.dataBody = ListTransactionsRequestDataBody().apply {
-                this.startAt = createStartAt(fromMs)
+                this.startAt = fromMs?.let {
+                        val researchInterval = organizationService.getOrganizationByOrganizationId(syncRequest.organizationId).researchInterval
+                        DateTimeUtil.epochMilliSecondToKSTLocalDateTime(it).minusDays(researchInterval.toLong())
+                    }
+                    ?.let { localDateTime ->
+
+                        DateTimeUtil.localDateToString(LocalDate.of(localDateTime.year, localDateTime.month, localDateTime.dayOfMonth), "yyyyMMdd")
+                    }
+                    ?: kotlin.run {
+                        val maxMonth = organizationService.getOrganizationByOrganizationId(syncRequest.organizationId).maxMonth
+                        DateTimeUtil.localDateToString(DateTimeUtil.kstNowLocalDate().minusMonths(maxMonth.toLong()), "yyyyMMdd")
+                    }
             }
         }
 
@@ -127,14 +134,16 @@ class CardTransactionServiceImpl(
     ): MutableList<CardTransaction> {
 
         val searchDateList = let {
-            validationService.validateOrThrows(request.dataBody)
-        }?.let { dataBody ->
-            val startDate = DateTimeUtil.stringToLocalDate(dataBody.startAt, "yyyyMMdd")
-            val endDate = DateTimeUtil.stringToLocalDate(dataBody.endAt, "yyyyMMdd")
-            DateTimeUtil.splitLocalDateRangeByMonth(
-                startDate, endDate, DEFAULT_DIVISION_MONTH
-            )
-        }?.toMutableList() ?: mutableListOf()
+                validationService.validateOrThrows(request.dataBody)
+            }
+            ?.let { dataBody ->
+                val startDate = DateTimeUtil.stringToLocalDate(dataBody.startAt, "yyyyMMdd")
+                val endDate = DateTimeUtil.stringToLocalDate(dataBody.endAt, "yyyyMMdd")
+                val division = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).division
+                DateTimeUtil.splitLocalDateRangeByMonth(startDate, endDate, division)
+            }
+            ?.toMutableList()
+            ?: mutableListOf()
 
         val resultBody = runBlocking(executor.asCoroutineDispatcher()) {
             // 조회 시간 분할
@@ -148,24 +157,24 @@ class CardTransactionServiceImpl(
                     }
                 }
             }
-                .map {
-                    async {
-                        val res: ExecutionResponse<ListTransactionsResponse> =
-                            collectExecutorService.execute(
-                                executionContext,
-                                Executions.valueOf(
-                                    BusinessType.card,
-                                    Organization.shinhancard,
-                                    Transaction.cardTransaction
-                                ),
-                                ExecutionRequest.builder<ListTransactionsRequest>()
-                                    .headers(header)
-                                    .request(it)
-                                    .build()
-                            )
-                        res
-                    }
+            .map {
+                async {
+                    val res: ExecutionResponse<ListTransactionsResponse> =
+                        collectExecutorService.execute(
+                            executionContext,
+                            Executions.valueOf(
+                                BusinessType.card,
+                                Organization.shinhancard,
+                                Transaction.cardTransaction
+                            ),
+                            ExecutionRequest.builder<ListTransactionsRequest>()
+                                .headers(header)
+                                .request(it)
+                                .build()
+                        )
+                    res
                 }
+            }
         }.let {
             it.map { deferred ->
                 deferred.getCompleted()
@@ -181,24 +190,5 @@ class CardTransactionServiceImpl(
             validationService.validateOrNull(it)
         }.sortedByDescending { cardTransaction -> cardTransaction.approvalDay + cardTransaction.approvalTime }
             .toMutableList()
-    }
-
-    private fun createStartAt(startAt: Long?): String {
-        return if (startAt != null) {
-            val localdateTime = DateTimeUtil.epochMilliSecondToKSTLocalDateTime(startAt)
-            DateTimeUtil.localDateToString(
-                LocalDate.of(
-                    localdateTime.year,
-                    localdateTime.month,
-                    localdateTime.dayOfMonth
-                ),
-                "yyyyMMdd"
-            )
-        } else {
-            DateTimeUtil.localDateToString(
-                DateTimeUtil.kstNowLocalDate().minusMonths(DEFAULT_MAX_MONTH),
-                "yyyyMMdd"
-            )
-        }
     }
 }
