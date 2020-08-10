@@ -69,8 +69,8 @@ fun ListTransactionsResponse.toListCardsTransactionResponseProto(): CollectcardP
                 // 카드이름
                 transaction.cardName?.let { cardSummaryBuilder.name = StringValue.of(it) }
 
-                // 카드타입
-                cardSummaryBuilder.type = StringValue.of(transaction.cardType.name)
+                // 카드타입 ( JG 는 이름이 다르므로 변환 꼭 확인 )
+                transaction.cardType.jg?.let { cardSummaryBuilder.type = StringValue.of(transaction.cardType.jg) }
 
                 // 카드정보 end
                 cardTransactionBuilder.card = cardSummaryBuilder.build()
