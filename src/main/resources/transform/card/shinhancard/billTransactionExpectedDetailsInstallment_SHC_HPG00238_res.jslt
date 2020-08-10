@@ -7,7 +7,7 @@ def _isInstallment(useMonth)
         false
 
 def _isInstallmentCancel(useMonth,monthCount)
-    if(isInstallment($useMonth) and $monthCount == 0)
+    if(_isInstallment($useMonth) and $monthCount == 0)
         true
     else
         false
@@ -21,9 +21,9 @@ def _isInstallmentCancel(useMonth,monthCount)
    "dataBody": {
         "billTransactions": [for (.dataBody.grp001)
             if(.useDate != "")(
-                let isInstallment = _isInstallment(.useMonth)
-                let isInstallmentCancel = _isInstallmentCancel(.useMonth, ,.monthCount)
                 {
+                    let isInstallment = _isInstallment(.useMonth)
+                    let isInstallmentCancel = _isInstallmentCancel(.useMonth ,.monthCount)
                     "cardNumber": replace(.crdN, "-", ""),  // 카드번호
                     "cardNumberMasked": .crdN,              // 마스킹 카드번호
                     "approvalDay" : .useDate,               // 이용일자
@@ -32,10 +32,10 @@ def _isInstallmentCancel(useMonth,monthCount)
                     "billingRound": .monthCount,            // 청구회차
                     "billedAmount": .monthAmt,              // 청구금액
                     "billedFee": .monthFee,                 // 수수료금액
-                    "isInstallmentPayment": if(isInstallment == true and isInstallmentCancel == false) true else false,  // 할부여부
-                    "installment" : if(isInstallment == false or isInstallmentCancel == true) null else .useMonth,       // 할부개월
-                    "installmentRound" : isInstallment == false or isInstallmentCancel == true) null else .monthCount,   // 할부회
-                    "remainingAmount": .dueReamin,          // 미도래금액차
+                    "isInstallmentPayment": if($isInstallment == true and $isInstallmentCancel == false) true else false,  // 할부여부
+                    "installment" : if($isInstallment == false or $isInstallmentCancel == true) null else .useMonth,       // 할부개월
+                    "installmentRound" : if($isInstallment == false or $isInstallmentCancel == true) null else .monthCount,   // 할부회차
+                    "remainingAmount": .dueReamin,          // 미도래금액
                     "pointsRate": .point                    // 적립예정포인트율
                 }
             )

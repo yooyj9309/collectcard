@@ -6,7 +6,7 @@ def _isInstallment(dvdMnth)
         false
 
 def _isInstallmentCancel(dvdMnth,rcpMnt)
-    if(isInstallment($dvdMnth) and $rcpMnt == 0)
+    if(_isInstallment($dvdMnth) and $rcpMnt == 0)
         true
     else
         false
@@ -21,16 +21,16 @@ def _isInstallmentCancel(dvdMnth,rcpMnt)
    "dataBody": {
         "billTransactions": [for (.dataBody.grp001)
             if(.useD != "" or .ppDssumCCd == "00")(
-                let isInstallment = _isInstallment(.dvdMnth)
-                let isInstallmentCancel= _isInstallmentCancel(.dvdMnth , .rcpMnt)
                 {
+                    let isInstallment = _isInstallment(.dvdMnth)
+                    let isInstallmentCancel= _isInstallmentCancel(.dvdMnth , .rcpMnt)
                     "cardNumber": .useCrdC[size(.useCrdC) - 3 : size(.useCrdC)],
                     "cardNumberMasked": .useCrdC[size(.useCrdC) - 3 : size(.useCrdC)],
                     "approvalDay" : .useD,
                     "storeName": .useMchtNm,
-                    "isInstallmentPayment": if(isInstallment == true and isInstallmentCancel == false) true else false,
-                    "installment" : if(isInstallment == false or isInstallmentCancel == true) null else .dvdMnth,
-                    "installmentRound" : isInstallment == false or isInstallmentCancel == true) null else .rcpMnt,
+                    "isInstallmentPayment": if($isInstallment == true and $isInstallmentCancel == false) true else false,
+                    "installment" : if($isInstallment == false or $isInstallmentCancel == true) null else .dvdMnth,
+                    "installmentRound" : if($isInstallment == false or $isInstallmentCancel == true) null else .rcpMnt,
                     "amount": .slsAmt,
                     "serviceChargeAmount": .useFeeInt,
                     "isOverseaUse": if (.frgnY == "Y") true else false,
