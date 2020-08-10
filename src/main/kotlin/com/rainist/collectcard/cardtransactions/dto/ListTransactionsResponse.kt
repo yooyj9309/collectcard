@@ -52,7 +52,8 @@ fun ListTransactionsResponse.toListCardsTransactionResponseProto(): CollectcardP
                 transaction.storeName?.let { affiliatedStoreSummaryBuilder.name = it }
 
                 // 가맹점 업종
-                transaction.storeCategory?.let { affiliatedStoreSummaryBuilder.type = StringValue.of(it) }
+                // TODO JG Decomp 에서 반영되는 부분 확인하기
+                // transaction.storeCategory?.let { affiliatedStoreSummaryBuilder.type = StringValue.of(it) }
 
                 // 가맹점 전화번호
                 transaction.storeNumber?.let { affiliatedStoreSummaryBuilder.telephoneNumber = StringValue.of(it) }
@@ -70,7 +71,8 @@ fun ListTransactionsResponse.toListCardsTransactionResponseProto(): CollectcardP
                 transaction.cardName?.let { cardSummaryBuilder.name = StringValue.of(it) }
 
                 // 카드타입 ( JG 는 이름이 다르므로 변환 꼭 확인 )
-                transaction.cardType.jg?.let { cardSummaryBuilder.type = StringValue.of(transaction.cardType.jg) }
+                // TODO JG Diff 이후에는 주석 풀기
+                // transaction.cardType.jg?.let { cardSummaryBuilder.type = StringValue.of(transaction.cardType.jg) }
 
                 // 카드정보 end
                 cardTransactionBuilder.card = cardSummaryBuilder.build()
