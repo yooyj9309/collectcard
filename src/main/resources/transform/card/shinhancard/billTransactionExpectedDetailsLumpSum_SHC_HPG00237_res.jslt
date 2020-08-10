@@ -17,7 +17,8 @@
                     "cardNumberMasked": .crdN,              // 마스킹 카드번호
                     "billedAmount": .prnBll,                // 청구금액
                     "billedFee": .feeBll,                   // 수수료금액
-                    "isPaidFull": if (.fullPaymentFlag == "Y") true else false, // 완납여부
+                    "isPaidFull": if (.fullPaymentFlag == "A") true else false, // 완납여부
+                    "isInstallmentPayment" : false,         // 할부여부
                     "cardName": .crdPdNm,                   // 카드상품명
                     "pointsRate": .pointRate                // 적립예정포인트율
                 }

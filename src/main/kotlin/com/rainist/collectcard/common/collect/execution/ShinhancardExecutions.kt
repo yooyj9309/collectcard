@@ -15,6 +15,7 @@ import com.rainist.collectcard.common.collect.api.ShinhancardApis
 import com.rainist.collectcard.userinfo.dto.UserInfoResponse
 import java.util.function.BiConsumer
 import java.util.function.BinaryOperator
+import org.apache.commons.lang3.StringUtils
 
 class ShinhancardExecutions {
 
@@ -54,30 +55,18 @@ class ShinhancardExecutions {
                 next
             }
 
-        val mergeAndSortBills =
+        val mergeBillsUnion =
             BinaryOperator { prev: ListCardBillsResponse, next: ListCardBillsResponse ->
-                val prevMap = prev.dataBody?.cardBills?.associateBy { it.paymentDay }?.toMutableMap()
-                    ?: mutableMapOf()
-                val nextMap = next.dataBody?.cardBills?.associateBy { it.paymentDay }?.toMutableMap()
-                    ?: mutableMapOf()
-
-                prevMap.keys.forEach { key ->
-                    if (nextMap.contains(key)) {
-                        nextMap[key]!!.transactions?.let {
-                            nextMap[key]!!.transactions?.addAll(prevMap[key]!!.transactions ?: mutableListOf())
-                            nextMap[key]!!.billingAmount?.add(prevMap[key]!!.billingAmount)
-                        } ?: kotlin.run {
-                            nextMap[key]!!.transactions = prevMap[key]!!.transactions
-                        }
-                    } else {
-                        nextMap[key] = prevMap[key]!!
+                next.dataBody?.cardBills?.forEachIndexed { idx, cardBill ->
+                    if (cardBill.transactions == null) {
+                        cardBill.transactions = mutableListOf()
+                    }
+                    prev.dataBody?.cardBills?.get(idx)?.transactions?.let {
+                        cardBill.transactions?.addAll(it)
                     }
                 }
-                next.dataBody?.cardBills = ArrayList(nextMap.values)
 
-                next.dataBody?.cardBills?.forEach { cardBill ->
-                    cardBill.transactions?.sortByDescending { transaction -> transaction.approvalDay }
-                }
+                next.dataBody?.cardBills?.sortByDescending { it -> it.paymentDay }
                 next
             }
 
@@ -87,6 +76,13 @@ class ShinhancardExecutions {
                     master.transactions = mutableListOf()
                 }
                 master.transactions?.addAll(detail.dataBody?.billTransactions ?: mutableListOf())
+
+                // 연회비인 경우 approvalDay가 없음
+                master.transactions?.forEach {
+                    if (StringUtils.isEmpty(it.approvalDay)) {
+                        it.approvalDay = master.paymentDay
+                    }
+                }
             }
 
         val mergeCards =
@@ -256,6 +252,13 @@ class ShinhancardExecutions {
                                 throwable
                             )
                         }
+                        .paging(
+                            Pagination.builder()
+                                .method(Pagination.Method.NEXTKEY)
+                                .nextkey(".dataBody.nextKey")
+                                .merge(mergeBills)
+                                .build()
+                        )
                         .build()
                 ).merge(mergeBillTransaction)
                 .with(
@@ -292,11 +295,18 @@ class ShinhancardExecutions {
                                         throwable
                                     )
                                 }
+                                .paging(
+                                    Pagination.builder()
+                                        .method(Pagination.Method.NEXTKEY)
+                                        .nextkey(".dataBody.nextKey")
+                                        .merge(mergeBills)
+                                        .build()
+                                )
                                 .build()
                         ).merge(mergeBillTransaction)
                         .build()
                 )
-                .merge(mergeAndSortBills)
+                .merge(mergeBillsUnion)
                 .build()
 
         val cardShinhancardBills =
@@ -393,7 +403,7 @@ class ShinhancardExecutions {
                         .merge(mergeBillTransaction)
                         .build()
                 )
-                .merge(mergeAndSortBills)
+                .merge(mergeBills)
                 .build()
 
         // 사용자 정보 조회 (SHC_EXT_00001)

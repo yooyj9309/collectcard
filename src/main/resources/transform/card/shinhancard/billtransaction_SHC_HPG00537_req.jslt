@@ -1,7 +1,7 @@
 {
   "dataBody": {
-    "seqN": .billId [ 8 : 12 ],
-    "inqdate": .billId [ 0 : 8 ],
+    "seqN": .billNumber [ 8 : 12 ],
+    "inqdate": .billNumber [ 0 : 8 ],
     "nxtQyKey": .nextKey
   },
    "dataHeader":{

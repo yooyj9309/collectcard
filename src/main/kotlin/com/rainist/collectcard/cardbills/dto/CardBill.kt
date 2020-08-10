@@ -9,6 +9,9 @@ data class CardBill(
     // 청구번호
     var billNumber: String?,
 
+    // 명세서제목 또는 발급사등 구분
+    var billType: String?,
+
     // 마스킹 된 고객 이름 (e.g. 김X샐)
     var userName: String?,
 

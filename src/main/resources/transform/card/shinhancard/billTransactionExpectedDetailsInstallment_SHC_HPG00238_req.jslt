@@ -3,8 +3,8 @@
        "EMPTY" : ""
    },
   "dataBody": {
-    "setlTypeNo": .billId [ 8 : 12 ],
-    "setlDay": .billId [ 0 : 8 ],
+    "setlTypeNo": .billNumber [ 8 : 12 ],
+    "setlDay": .billNumber [ 0 : 8 ],
     "nxtQyKey": .nextKey
   }
 }

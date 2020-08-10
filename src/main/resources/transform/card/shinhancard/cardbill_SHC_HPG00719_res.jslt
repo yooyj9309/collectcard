@@ -8,17 +8,17 @@
         "cardBills": [for(.dataBody.grp001)
             if (.setlDay != "") (
                 {
-                    "billId": .setlDay + .setlTypeNo,
+                    "billNumber": .setlDay + .setlTypeNo,
+                    "billType" : .setlTypeNo,
                     "userName": "",
                     "userGrade": "",
-                    "billNumber": .setlTypeNo,
                     "paymentDay": .setlDay,
                     "nextPaymentDay": "",
                     "billingAmount": .bllAmt,
                     "prepaidAmount": "",
                     "paymentBankId": .bankno,
-                    "paymentAccountNumber": "",
-                    "billedYearMonth": "",
+                    "paymentAccountNumber": .accno,
+                    "billedYearMonth": .setlDay [ 0 : 6 ],
                     "totalPoints": "",
                     "expiringPoints": ""
                 }

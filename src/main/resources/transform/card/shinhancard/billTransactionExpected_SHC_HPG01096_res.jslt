@@ -8,10 +8,10 @@
       for (.dataBody.grp001)
           if (.setlTypeNo != "") (
               {
-                "billId": .setlDay + .setlTypeNo,
+                "billNumber": .setlDay + .setlTypeNo,
+                "billType" : .setlTypeNo,
                 "userName": "",
                 "userGrade": "",
-                "billNumber": .setlTypeNo,
                 "paymentDay": .setlDay,
                 "nextPaymentDay": "",
                 "billingAmount": .billAmt,

@@ -127,9 +127,9 @@ class CollectcardGrpcService(
             ).toListCardBillsResponseProto()
         }.onSuccess {
             logger.info("[사용자 청구서 조회 결과 success]")
-
+            logger.info("time parameter is : " + request.takeIf { request.hasFromMs() }?.fromMs?.value)
             for (card in it.dataList) {
-                logger.info("[사용자 청구서 조회 결과 : {}]", card)
+                logger.debug("[사용자 청구서 조회 결과 : {}]", card)
             }
 
             responseObserver.onNext(it)

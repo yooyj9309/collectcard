@@ -28,7 +28,6 @@ import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import java.math.BigDecimal
-import kotlin.collections.filter as filter
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -126,18 +125,20 @@ class CardBillServiceImpl(
             deleteAndInsertCardBillExpectedTransactions(syncRequest.banksaladUserId, syncRequest.organizationId, it)
         }
 
+        // 결제 예정 내역은 남기고 필터링필요.
+        cardBillsResponse.dataBody?.cardBills = cardBillsResponse.dataBody?.cardBills?.filter { it -> it.paymentDay!! > checkStartTime }?.toMutableList()
+
         // merge 청구서, 결제 예정 내역
         cardBillsResponse.dataBody?.cardBills?.addAll(
+            0,
             cardBillExpectedResponse.dataBody?.cardBills ?: mutableListOf()
         )
 
-        /**
-         * TODO 청구서와 청구내역을 합치게 되어 sort로직을 공통서비스에 추가, 내부 transaction은 Execution에 추가.
-         * paymentDay 값으로 sort하는 부분을 서비스 단이 아닌 Execution단에서 하고싶으나 현재 방법 확인중.
-         */
+        // 2depth sorting
+        cardBillsResponse.dataBody?.cardBills?.forEach { cardBill ->
+            cardBill.transactions?.sortByDescending { transaction -> transaction.approvalDay }
+        }
 
-        cardBillsResponse.dataBody?.cardBills = cardBillsResponse.dataBody?.cardBills?.filter { it -> it.paymentDay!! > checkStartTime }?.toMutableList()
-        cardBillsResponse.dataBody?.cardBills?.sortByDescending { cardBill -> cardBill.paymentDay }
         return cardBillsResponse
     }
 
