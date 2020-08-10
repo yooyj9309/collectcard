@@ -13,6 +13,7 @@ import com.rainist.collectcard.cardloans.dto.toListCardLoansResponseProto
 import com.rainist.collectcard.cardtransactions.CardTransactionService
 import com.rainist.collectcard.cardtransactions.dto.toListCardsTransactionResponseProto
 import com.rainist.collectcard.common.dto.SyncRequest
+import com.rainist.collectcard.common.exception.CollectcardServiceExceptionHandler
 import com.rainist.collectcard.common.exception.HealthCheckException
 import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.config.onException
@@ -40,15 +41,13 @@ class CollectcardGrpcService(
     ) {
         kotlin.runCatching {
             CollectcardProto.HealthCheckResponse.newBuilder().build()
+        }.onSuccess {
+            responseObserver.onNext(it)
+            responseObserver.onCompleted()
+        }.onFailure {
+            val ex = HealthCheckException()
+            responseObserver.onException(ex) // TODO it 으로 바꾸기
         }
-            .onSuccess {
-                responseObserver.onNext(it)
-                responseObserver.onCompleted()
-            }
-            .onFailure {
-                val ex = HealthCheckException()
-                responseObserver.onException(ex) // TODO it 으로 바꾸기
-            }
     }
 
     override fun listCards(
@@ -57,13 +56,13 @@ class CollectcardGrpcService(
     ) {
         logger.debug("[사용자 카드 조회 시작 : {}]", request)
 
-        // TODO : userId validation, organizationId validation (userId는 Long 인지 여부, orngaizationId 는 변환후 null 여부
-        val syncRequest = SyncRequest(
-            request.userId.toLong(),
-            organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: ""
-        )
-
         kotlin.runCatching {
+            // TODO : userId validation, organizationId validation (userId는 Long 인지 여부, orngaizationId 는 변환후 null 여부
+            val syncRequest = SyncRequest(
+                request.userId.toLong(),
+                organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: ""
+            )
+
             cardService.listCards(syncRequest).toListCardsResponseProto()
         }.onSuccess {
             logger.info("[사용자 카드 조회 결과 success]")
@@ -75,7 +74,9 @@ class CollectcardGrpcService(
             responseObserver.onNext(it)
             responseObserver.onCompleted()
         }.onFailure {
-            logger.error("[사용자 카드 조회 에러 : {}]", it.localizedMessage, it)
+//            logger.error("[사용자 카드 조회 에러 : {}]", it.localizedMessage, it)
+            CollectcardServiceExceptionHandler.handle("listCards", "사용자카드조회", it)
+
             responseObserver.onError(it)
         }
     }
@@ -85,26 +86,22 @@ class CollectcardGrpcService(
         request: CollectcardProto.ListCardTransactionsRequest,
         responseObserver: StreamObserver<CollectcardProto.ListCardTransactionsResponse>
     ) {
-        val syncRequest = SyncRequest(
-            // banksalad user id
-            request.userId.toLong(),
-
-            // monggo db object id -> organization id ( ex : 58392038209 -> shinhancard )
-            organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: ""
-        )
-
         kotlin.runCatching {
-            cardTransactionService
-                .listTransactions(
-                    syncRequest,
-                    request.takeIf { request.hasFromMs() }?.fromMs?.value
-                )
-                .toListCardsTransactionResponseProto()
+            val syncRequest = SyncRequest(
+                request.userId.toLong(),
+                organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: ""
+            )
+
+            cardTransactionService.listTransactions(
+                syncRequest,
+                request.takeIf { request.hasFromMs() }?.fromMs?.value
+            ).toListCardsTransactionResponseProto()
         }.onSuccess {
             responseObserver.onNext(it)
             responseObserver.onCompleted()
         }.onFailure {
-            logger.error("[사용자 카드 내역 조회 에러 : {}]", it.localizedMessage, it)
+//            logger.error("[사용자 카드 내역 조회 에러 : {}]", it.localizedMessage, it)
+            CollectcardServiceExceptionHandler.handle("listCardTransactions", "사용자카드내역조회", it)
             responseObserver.onException(it)
         }
     }
@@ -115,12 +112,12 @@ class CollectcardGrpcService(
     ) {
         logger.debug("[사용자 청구서 조회 시작 : {}]", request)
 
-        val syncRequest = SyncRequest(
-            request.userId.toLong(),
-            organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: ""
-        )
-
         kotlin.runCatching {
+            val syncRequest = SyncRequest(
+                request.userId.toLong(),
+                organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: ""
+            )
+
             cardBillService.listUserCardBills(
                 syncRequest,
                 request.takeIf { request.hasFromMs() }?.fromMs?.value
@@ -135,7 +132,8 @@ class CollectcardGrpcService(
             responseObserver.onNext(it)
             responseObserver.onCompleted()
         }.onFailure {
-            logger.error("[사용자 청구서 조회 에러 : {}]", it.localizedMessage, it)
+//            logger.error("[사용자 청구서 조회 에러 : {}]", it.localizedMessage, it)
+            CollectcardServiceExceptionHandler.handle("listCardBills", "사용자청구서조회", it)
             responseObserver.onError(it)
         }
     }
@@ -146,15 +144,14 @@ class CollectcardGrpcService(
     ) {
         logger.debug("[사용자 대출 내역 조회 시작 : {}]", request)
 
-        val syncRequest = SyncRequest(
-            request.userId.toLong(),
-            organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: ""
-        )
-
         kotlin.runCatching {
+            val syncRequest = SyncRequest(
+                request.userId.toLong(),
+                organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: ""
+            )
+
             cardLoanService.listCardLoans(syncRequest).toListCardLoansResponseProto()
-        }
-            .onSuccess {
+        }.onSuccess {
                 logger.info("[사용자 대출내역 조회 결과 success]")
                 it.let {
                     for (loan in it.dataList) {
@@ -163,32 +160,33 @@ class CollectcardGrpcService(
                 }
                 responseObserver.onNext(it)
                 responseObserver.onCompleted()
-            }
-            .onFailure {
-                logger.error("[사용자 대출 내역 조회 에러 : {}]", it.localizedMessage, it)
-                // TODO 예상국 exception  처리 코드 추가 하기
-                responseObserver.onError(it)
-            }
+        }.onFailure {
+//                logger.error("[사용자 대출 내역 조회 에러 : {}]", it.localizedMessage, it)
+            CollectcardServiceExceptionHandler.handle("listCardLoans", "사용자대출내역조회", it)
+            // TODO 예상국 exception  처리 코드 추가 하기
+            responseObserver.onError(it)
+        }
     }
 
     override fun getCreditLimit(
         request: CollectcardProto.GetCreditLimitRequest,
         responseObserver: StreamObserver<CollectcardProto.GetCreditLimitResponse>
     ) {
-        val syncRequest = SyncRequest(
-            request.userId.toLong(),
-            organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: ""
-        )
-
         logger.debug("[사용자 개인 한도 조회 시작 : {}]", request)
 
         kotlin.runCatching {
+            val syncRequest = SyncRequest(
+                request.userId.toLong(),
+                organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: ""
+            )
+
             cardCreditLimitService.cardCreditLimit(syncRequest).toCreditLimitResponseProto()
         }.onSuccess {
             responseObserver.onNext(it)
             responseObserver.onCompleted()
         }.onFailure {
-            logger.error("사용자 개인 한도 조회 에러 . {}", it.message)
+//            logger.error("사용자 개인 한도 조회 에러 . {}", it.message)
+            CollectcardServiceExceptionHandler.handle("getCreditLimit", "사용자개인한도조회", it)
             responseObserver.onError(it)
         }
     }

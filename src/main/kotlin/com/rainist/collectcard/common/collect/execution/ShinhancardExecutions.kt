@@ -12,6 +12,7 @@ import com.rainist.collectcard.cardloans.dto.Loan
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponse
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponseDataBody
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
+import com.rainist.collectcard.common.exception.CollectExecutionExceptionHandler
 import com.rainist.collectcard.userinfo.dto.UserInfoResponse
 import java.util.function.BiConsumer
 import java.util.function.BinaryOperator
@@ -116,7 +117,7 @@ class ShinhancardExecutions {
                 .exchange(ShinhancardApis.card_shinhancard_cards)
                 .to(ListCardsResponse::class.java)
                 .exceptionally { throwable: Throwable ->
-                    ExecutionExceptionHandler.handle(
+                    CollectExecutionExceptionHandler.handle(
                         organizationIdShinhancard,
                         "cardShinhancardCards",
                         ShinhancardApis.card_shinhancard_cards.id,
@@ -137,7 +138,7 @@ class ShinhancardExecutions {
                 .exchange(ShinhancardApis.card_shinhancard_credit_domestic_transactions)
                 .to(ListTransactionsResponse::class.java)
                 .exceptionally { throwable: Throwable ->
-                    ExecutionExceptionHandler.handle(
+                    CollectExecutionExceptionHandler.handle(
                         organizationIdShinhancard,
                         "cardShinhancardTransactions",
                         ShinhancardApis.card_shinhancard_credit_domestic_transactions.id,
@@ -157,7 +158,7 @@ class ShinhancardExecutions {
                         .exchange(ShinhancardApis.card_shinhancard_credit_oversea_transactions)
                         .to(ListTransactionsResponse::class.java)
                         .exceptionally { throwable: Throwable ->
-                            ExecutionExceptionHandler.handle(
+                            CollectExecutionExceptionHandler.handle(
                                 organizationIdShinhancard,
                                 "cardShinhancardTransactions",
                                 ShinhancardApis.card_shinhancard_credit_oversea_transactions.id,
@@ -178,7 +179,7 @@ class ShinhancardExecutions {
                         .exchange(ShinhancardApis.card_shinhancard_check_domestic_transactions)
                         .to(ListTransactionsResponse::class.java)
                         .exceptionally { throwable: Throwable ->
-                            ExecutionExceptionHandler.handle(
+                            CollectExecutionExceptionHandler.handle(
                                 organizationIdShinhancard,
                                 "cardShinhancardTransactions",
                                 ShinhancardApis.card_shinhancard_check_domestic_transactions.id,
@@ -200,7 +201,7 @@ class ShinhancardExecutions {
                         .exchange(ShinhancardApis.card_shinhancard_check_oversea_transactions)
                         .to(ListTransactionsResponse::class.java)
                         .exceptionally { throwable: Throwable ->
-                            ExecutionExceptionHandler.handle(
+                            CollectExecutionExceptionHandler.handle(
                                 organizationIdShinhancard,
                                 "cardShinhancardTransactions",
                                 ShinhancardApis.card_shinhancard_check_oversea_transactions.id,
@@ -223,7 +224,7 @@ class ShinhancardExecutions {
                 .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected)
                 .to(ListCardBillsResponse::class.java)
                 .exceptionally { throwable: Throwable ->
-                    ExecutionExceptionHandler.handle(
+                    CollectExecutionExceptionHandler.handle(
                         organizationIdShinhancard,
                         "cardShinhancardBillTransactionExpected",
                         ShinhancardApis.card_shinhancard_list_user_card_bills_expected.id,
@@ -245,7 +246,7 @@ class ShinhancardExecutions {
                         .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_lump_sum)
                         .to(ListBillTransactionsResponse::class.java)
                         .exceptionally { throwable: Throwable ->
-                            ExecutionExceptionHandler.handle(
+                            CollectExecutionExceptionHandler.handle(
                                 organizationIdShinhancard,
                                 "cardShinhancardBillTransactionExpected",
                                 ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_lump_sum.id,
@@ -266,7 +267,7 @@ class ShinhancardExecutions {
                         .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected)
                         .to(ListCardBillsResponse::class.java)
                         .exceptionally { throwable: Throwable ->
-                            ExecutionExceptionHandler.handle(
+                            CollectExecutionExceptionHandler.handle(
                                 organizationIdShinhancard,
                                 "cardShinhancardBillTransactionExpected",
                                 ShinhancardApis.card_shinhancard_list_user_card_bills_expected.id,
@@ -288,7 +289,7 @@ class ShinhancardExecutions {
                                 .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_installment)
                                 .to(ListBillTransactionsResponse::class.java)
                                 .exceptionally { throwable: Throwable ->
-                                    ExecutionExceptionHandler.handle(
+                                    CollectExecutionExceptionHandler.handle(
                                         organizationIdShinhancard,
                                         "cardShinhancardBillTransactionExpected",
                                         ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_installment.id,
@@ -314,7 +315,7 @@ class ShinhancardExecutions {
                 .exchange(ShinhancardApis.card_shinhancard_check_bills)
                 .to(ListCardBillsResponse::class.java)
                 .exceptionally { throwable: Throwable ->
-                    ExecutionExceptionHandler.handle(
+                    CollectExecutionExceptionHandler.handle(
                         organizationIdShinhancard,
                         "cardShinhancardBills",
                         ShinhancardApis.card_shinhancard_check_bills.id,
@@ -338,7 +339,7 @@ class ShinhancardExecutions {
                         .exchange(ShinhancardApis.card_shinhancard_check_bill_transactions)
                         .to(ListBillTransactionsResponse::class.java)
                         .exceptionally { throwable: Throwable ->
-                            ExecutionExceptionHandler.handle(
+                            CollectExecutionExceptionHandler.handle(
                                 organizationIdShinhancard,
                                 "cardShinhancardBills",
                                 ShinhancardApis.card_shinhancard_check_bill_transactions.id,
@@ -360,7 +361,7 @@ class ShinhancardExecutions {
                         .exchange(ShinhancardApis.card_shinhancard_credit_bills)
                         .to(ListCardBillsResponse::class.java)
                         .exceptionally { throwable: Throwable ->
-                            ExecutionExceptionHandler.handle(
+                            CollectExecutionExceptionHandler.handle(
                                 organizationIdShinhancard,
                                 "cardShinhancardBills",
                                 ShinhancardApis.card_shinhancard_credit_bills.id,
@@ -384,7 +385,7 @@ class ShinhancardExecutions {
                                 .exchange(ShinhancardApis.card_shinhancard_credit_bill_transactions)
                                 .to(ListBillTransactionsResponse::class.java)
                                 .exceptionally { throwable: Throwable ->
-                                    ExecutionExceptionHandler.handle(
+                                    CollectExecutionExceptionHandler.handle(
                                         organizationIdShinhancard,
                                         "cardShinhancardBills",
                                         ShinhancardApis.card_shinhancard_credit_bill_transactions.id,
@@ -412,7 +413,7 @@ class ShinhancardExecutions {
                 .exchange(ShinhancardApis.card_shinhancard_user_info)
                 .to(UserInfoResponse::class.java)
                 .exceptionally { throwable: Throwable ->
-                    ExecutionExceptionHandler.handle(
+                    CollectExecutionExceptionHandler.handle(
                         organizationIdShinhancard,
                         "cardShinhancardUserInfo",
                         ShinhancardApis.card_shinhancard_user_info.id,
@@ -427,7 +428,7 @@ class ShinhancardExecutions {
                 .exchange(ShinhancardApis.card_shinhancard_loan_info)
                 .to(ListLoansResponse::class.java)
                 .exceptionally { throwable: Throwable ->
-                    ExecutionExceptionHandler.handle(
+                    CollectExecutionExceptionHandler.handle(
                         organizationIdShinhancard,
                         "cardShinhancardLoan",
                         ShinhancardApis.card_shinhancard_loan_info.id,
@@ -450,7 +451,7 @@ class ShinhancardExecutions {
                         .exchange(ShinhancardApis.card_shinhancard_loan_detail)
                         .to(Loan::class.java)
                         .exceptionally { throwable: Throwable ->
-                            ExecutionExceptionHandler.handle(
+                            CollectExecutionExceptionHandler.handle(
                                 organizationIdShinhancard,
                                 "cardShinhancardLoan",
                                 ShinhancardApis.card_shinhancard_loan_detail.id,
@@ -467,7 +468,7 @@ class ShinhancardExecutions {
                 .exchange(ShinhancardApis.card_shinhancard_credit_limit)
                 .to(CreditLimitResponse::class.java)
                 .exceptionally { throwable: Throwable ->
-                    ExecutionExceptionHandler.handle(
+                    CollectExecutionExceptionHandler.handle(
                         organizationIdShinhancard,
                         "cardShinhancardCreditLimit",
                         ShinhancardApis.card_shinhancard_credit_limit.id,
