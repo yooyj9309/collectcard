@@ -17,13 +17,13 @@ let CardTransactionType = {
                 "approvalTime" : if(size(.aprvtime) >= 14) .aprvtime[ 8 : 14] else "",  // 승인시간 HHmmss
                 "cardCompanyCardId" : "",
                 "approvalNumber": .aprvno,                                              // 승인번호
-                "amount": .aprvamt,                                                     // 승인금액
+                "amount": replace(.aprvamt, ",", ""),                                   // 승인금액
                 "cardNumber": .cardno,                                                  // 카드번호
                 "cardNumberMask" : .cardno,                                             // 카드넘버마스크
                 "storeName" : .retlname,                                                // 가맹점명
                 "paymentDay": .stldate,                                                 // 결제예정일자
                 "storeNumber": .retlno,                                                 // 가맹점번호
-                "canceledAmount": if(number(.aprvamt) > 0) "0" else string(-1 * number(.aprvamt)),  // 부분취소 금액
+                "canceledAmount": if(number(replace(.aprvamt, ",", "")) > 0) "0" else string(-1 * number(replace(.aprvamt, ",", ""))),  // 부분취소 금액
                 "storeCategory" : .ryCd,                                                // 업종코드명
                 "currencyCode" : .engcrcycd,                                            // 통화코드
                 "transactionCountry" : .nation,                                         // 사용국가
