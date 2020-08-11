@@ -10,7 +10,7 @@
                 {
                     "approvalDay" : .comm,
                     "amount": .capital,
-                    "serviceChargeAmount": .commission,
+                    "billedFee": .commission,
                     "cardNumber": .class,
                     "cardNumberMasked": .class,
                     "cardType" : "DEBIT",

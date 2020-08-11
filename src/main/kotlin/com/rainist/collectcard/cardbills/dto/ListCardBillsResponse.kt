@@ -52,6 +52,7 @@ fun ListCardBillsResponse.toListCardBillsResponseProto(): CollectcardProto.ListC
                     cardBillTransaction.installment?.let { cardTransactionBuilder.installmentMonth = Int32Value.of(it) }
                     cardBillTransaction.installmentRound?.let { cardTransactionBuilder.installmentRound = Int32Value.of(it) }
                     cardBillTransaction.discountAmount?.let { cardTransactionBuilder.savedAmount = DoubleValue.of(it.toDouble()) }
+                    cardBillTransaction.billedFee?.let { cardTransactionBuilder.fee = it.toDouble() }
 
                     if (!isAllNullValue(cardBillTransaction.cardNumber, cardBillTransaction.cardName, cardBillTransaction.cardType)) {
                         val cardSummaryBuilder = CollectcardProto.CardSummary.newBuilder()

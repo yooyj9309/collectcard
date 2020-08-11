@@ -74,7 +74,7 @@ class ShinhancardExecutions {
                         cardBill.transactions?.addAll(it)
                     }
                 }
-
+                next.dataBody?.cardBills?.sortByDescending { it -> it.paymentDay }
                 next
             }
 
