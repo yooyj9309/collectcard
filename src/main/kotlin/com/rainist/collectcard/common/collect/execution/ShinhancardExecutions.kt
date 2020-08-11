@@ -2,6 +2,7 @@ package com.rainist.collectcard.common.collect.execution
 
 import com.rainist.collect.common.api.Pagination
 import com.rainist.collect.common.execution.Execution
+import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.card.dto.ListCardsResponse
 import com.rainist.collectcard.cardbills.dto.CardBill
 import com.rainist.collectcard.cardbills.dto.ListBillTransactionsResponse
@@ -14,6 +15,7 @@ import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponseData
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
 import com.rainist.collectcard.common.exception.CollectExecutionExceptionHandler
 import com.rainist.collectcard.userinfo.dto.UserInfoResponse
+import com.rainist.common.util.DateTimeUtil
 import java.util.function.BiConsumer
 import java.util.function.BinaryOperator
 import java.util.regex.Pattern
@@ -72,7 +74,6 @@ class ShinhancardExecutions {
                     }
                 }
 
-                next.dataBody?.cardBills?.sortByDescending { it -> it.paymentDay }
                 next
             }
 
@@ -81,6 +82,9 @@ class ShinhancardExecutions {
                 next.dataBody?.cardBills?.addAll(
                     0, prev.dataBody?.cardBills ?: mutableListOf()
                 )
+
+                // transactions 없는 리스트 제거
+                next.dataBody?.cardBills = next.dataBody?.cardBills?.filter { it.transactions != null }?.toMutableList() ?: mutableListOf()
 
                 // cardNumber 한글 제거 처리 진행
                 val pattern = Pattern.compile("[0-9]*\$")
@@ -356,9 +360,12 @@ class ShinhancardExecutions {
                         .merge(mergeBills)
                         .build()
                 )
-                .fetch { listCardBillsResponse ->
+                .fetch { executionContext, listCardBillsResponse ->
                     listCardBillsResponse as ListCardBillsResponse
-                    listCardBillsResponse.dataBody?.cardBills?.iterator()
+                    executionContext as ExecutionContext
+                    val paymentDay = DateTimeUtil.localDatetimeToString(executionContext.startAt, "yyyyMMdd")
+
+                    listCardBillsResponse.dataBody?.cardBills?.filter { it -> it.paymentDay!! >= paymentDay }?.iterator()
                         ?: mutableListOf<CardBill>().iterator()
                 }
                 .then(
@@ -402,10 +409,12 @@ class ShinhancardExecutions {
                                 .merge(mergeBills)
                                 .build()
                         )
-                        .fetch { listCardBillsResponse ->
+                        .fetch { executionContext, listCardBillsResponse ->
                             listCardBillsResponse as ListCardBillsResponse
-                            // startAt
-                            listCardBillsResponse.dataBody?.cardBills?.iterator()
+                            executionContext as ExecutionContext
+                            val paymentDay = DateTimeUtil.localDatetimeToString(executionContext.startAt, "yyyyMMdd")
+
+                            listCardBillsResponse.dataBody?.cardBills?.filter { it -> it.paymentDay!! >= paymentDay }?.iterator()
                                 ?: mutableListOf<CardBill>().iterator()
                         }
                         .then(

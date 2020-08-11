@@ -24,7 +24,7 @@ def _isInstallmentCancel(useMonth,monthCount)
                 {
                     let isInstallment = _isInstallment(.useMonth)
                     let isInstallmentCancel = _isInstallmentCancel(.useMonth ,.monthCount)
-                    "cardNumber": replace(.crdN, "-", ""),  // 카드번호
+                    // TODO 해당부분 diff를 위하여 주석처리 "cardNumber": replace(.crdN, "-", ""),  // 카드번호
                     "cardNumberMasked": .crdN,              // 마스킹 카드번호
                     "approvalDay" : .useDate,               // 이용일자
                     "amount": .amount,                      // 이용원금금액

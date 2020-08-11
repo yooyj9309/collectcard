@@ -1,6 +1,7 @@
 package com.rainist.collectcard.cardbills.dto
 
 import com.rainist.collectcard.common.enums.CardTransactionType
+import com.rainist.collectcard.common.enums.CardType
 import com.rainist.common.annotation.validation.StringDateFormat
 import com.rainist.common.annotation.validation.StringTimeFormat
 import java.math.BigDecimal
@@ -28,7 +29,7 @@ data class CardBillTransaction(
 
     var storeNumber: String? = null, // 가맹점 번호
 
-    var cardType: String? = null, // 카드타입 (신용카드, 체크카드)
+    var cardType: CardType? = null, // 카드타입 (신용카드, 체크카드)
 
     var cardTypeOrigin: String? = null, // 카드타입 (신용카드, 체크카드) 원본값
 

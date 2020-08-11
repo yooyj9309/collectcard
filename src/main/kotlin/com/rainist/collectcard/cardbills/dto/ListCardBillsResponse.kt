@@ -1,9 +1,9 @@
 package com.rainist.collectcard.cardbills.dto
 
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
+import com.google.protobuf.DoubleValue
 import com.google.protobuf.Int32Value
 import com.google.protobuf.StringValue
-import com.rainist.collectcard.common.exception.CollectcardException
 import java.text.SimpleDateFormat
 import org.springframework.util.StringUtils
 
@@ -42,23 +42,30 @@ fun ListCardBillsResponse.toListCardBillsResponseProto(): CollectcardProto.ListC
                 cardBill.transactions?.map { cardBillTransaction ->
 
                     // diff를 위해서 Builder 선언
-                    val cardSummaryBuilder = CollectcardProto.CardSummary.newBuilder()
-                    cardBillTransaction.cardNumber?.let { cardSummaryBuilder.number = cardBillTransaction.cardNumber }
-                    cardBillTransaction.cardName?.let { cardSummaryBuilder.name = StringValue.of(cardBillTransaction.cardName) }
-
-                    val store = CollectcardProto.AffiliatedStoreSummary.newBuilder()
-                    store.name = cardBillTransaction.storeName
-
                     val cardTransactionBuilder = CollectcardProto.CardBillTransaction.newBuilder()
                     cardTransactionBuilder.transactedAt = SimpleDateFormat("yyyy-MM-dd").format(SimpleDateFormat("yyyyMMdd").parse(cardBillTransaction.approvalDay))
                     cardTransactionBuilder.amount = cardBillTransaction.amount?.toDouble() ?: 0.0
                     cardTransactionBuilder.currency = if (StringUtils.isEmpty(cardBillTransaction.currencyCode)) "KRW" else cardBillTransaction.currencyCode
                     cardTransactionBuilder.installment = cardBillTransaction.isInstallmentPayment ?: false
+                    cardTransactionBuilder.fee = cardBillTransaction.serviceChargeAmount?.toDouble() ?: 0.0
+
                     cardBillTransaction.installment?.let { cardTransactionBuilder.installmentMonth = Int32Value.of(it) }
                     cardBillTransaction.installmentRound?.let { cardTransactionBuilder.installmentRound = Int32Value.of(it) }
-                    cardTransactionBuilder.fee = cardBillTransaction.serviceChargeAmount?.toDouble() ?: 0.0
-                    cardTransactionBuilder.card = cardSummaryBuilder.build()
-                    cardTransactionBuilder.store = store.build()
+                    cardBillTransaction.discountAmount?.let { cardTransactionBuilder.savedAmount = DoubleValue.of(it.toDouble()) }
+
+                    if (!isAllNullValue(cardBillTransaction.cardNumber, cardBillTransaction.cardName, cardBillTransaction.cardType)) {
+                        val cardSummaryBuilder = CollectcardProto.CardSummary.newBuilder()
+                        cardBillTransaction.cardNumber?.let { cardSummaryBuilder.number = it }
+                        cardBillTransaction.cardName?.let { cardSummaryBuilder.name = StringValue.of(it) }
+                        cardBillTransaction.cardType?.let { cardSummaryBuilder.type = StringValue.of(it.jg) }
+                        cardTransactionBuilder.card = cardSummaryBuilder.build()
+                    }
+
+                    cardBillTransaction.storeName?.let {
+                        val store = CollectcardProto.AffiliatedStoreSummary.newBuilder()
+                        store.name = cardBillTransaction.storeName
+                        cardTransactionBuilder.store = store.build()
+                    }
 
                     cardTransactionBuilder.build()
                 }
@@ -76,6 +83,12 @@ fun ListCardBillsResponse.toListCardBillsResponseProto(): CollectcardProto.ListC
         }
 }
 
-fun <T : Any> safeValue(input: T?): T {
-    return input?.let { input } ?: throw CollectcardException("parameter is null") // TODO 임시 코드 NULL CHECK를 하는부분을 공통으로 빼거나 하는 처리로직 필요.
+fun isAllNullValue(vararg list: Any?): Boolean {
+    for (value in list) {
+        if (value == null) {
+            continue
+        }
+        return false
+    }
+    return true
 }

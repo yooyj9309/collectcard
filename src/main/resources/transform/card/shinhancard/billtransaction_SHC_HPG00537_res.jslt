@@ -13,6 +13,7 @@
                     "serviceChargeAmount": .commission,
                     "cardNumber": .class,
                     "cardNumberMasked": .class,
+                    "cardType" : "DEBIT",
                     "storeName": .joinnm,
                     "discountAmount": .dcntamt
                 }

@@ -28,6 +28,7 @@ import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import java.math.BigDecimal
+import java.time.LocalDateTime
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -59,27 +60,22 @@ class CardBillServiceImpl(
 
         /* request body */
         val organization = organizationService.getOrganizationByOrganizationId(syncRequest.organizationId)
-        val checkStartTime = startAt?.let {
+        val checkStartTime: LocalDateTime = startAt?.let {
             DateTimeUtil.epochMilliSecondToKSTLocalDateTime(startAt)
-        }?.let {
-            DateTimeUtil.localDatetimeToString(it, "yyyyMMdd")
-        } ?: DateTimeUtil.kstNowLocalDate()
-            .minusMonths(DEFAULT_MAX_BILL_MONTH)
-            .let { DateTimeUtil.localDateToString(it, "yyyyMMdd") }
+        } ?: DateTimeUtil.kstNowLocalDateTime().minusMonths(DEFAULT_MAX_BILL_MONTH)
 
         // TODO 제거예정 diff확인용
         logger.info("CARDBILL_TIME_INFO $checkStartTime $startAt $syncRequest.banksaladUserId ")
+
         val request = ListCardBillsRequest().apply {
-            dataBody = ListCardBillsRequestDataBody().apply {
-                this.startAt = checkStartTime
-            }
+            dataBody = ListCardBillsRequestDataBody()
         }
 
         /* Execution Context */
         val executionContext: ExecutionContext = CollectExecutionContext(
             organizationId = syncRequest.organizationId,
             userId = syncRequest.banksaladUserId.toString(),
-            startAt = DateTimeUtil.utcNowLocalDateTime() // TODO : set
+            startAt = checkStartTime // TODO : set
         )
 
         // 청구서 execution
@@ -128,14 +124,14 @@ class CardBillServiceImpl(
             deleteAndInsertCardBillExpectedTransactions(syncRequest.banksaladUserId, syncRequest.organizationId, it)
         }
 
-        // 결제 예정 내역은 남기고 필터링필요.
-        cardBillsResponse.dataBody?.cardBills = cardBillsResponse.dataBody?.cardBills?.filter { it -> it.paymentDay!! > checkStartTime }?.toMutableList()
-
         // merge 청구서, 결제 예정 내역
         cardBillsResponse.dataBody?.cardBills?.addAll(
             0,
             cardBillExpectedResponse.dataBody?.cardBills ?: mutableListOf()
         )
+
+        // 1depth sorting
+        cardBillsResponse.dataBody?.cardBills?.sortByDescending { cardBill -> cardBill.paymentDay }
 
         // 2depth sorting
         cardBillsResponse.dataBody?.cardBills?.forEach { cardBill ->
@@ -213,7 +209,7 @@ class CardBillServiceImpl(
             this.businessLicenseNumber = cardBillTransaction.businessLicenseNumber
             this.storeName = cardBillTransaction.storeName
             this.storeNumber = cardBillTransaction.storeNumber
-            this.cardType = cardBillTransaction.cardType
+            this.cardType = cardBillTransaction.cardType?.name
             this.cardTypeOrigin = cardBillTransaction.cardTypeOrigin
             this.cardTransactionType = cardBillTransaction.cardTransactionType?.name
             this.cardTransactionTypeOrigin = cardBillTransaction.cardTransactionTypeOrigin
@@ -298,7 +294,7 @@ class CardBillServiceImpl(
             this.businessLicenseNumber = cardBillTransaction.businessLicenseNumber
             this.storeName = cardBillTransaction.storeName
             this.storeNumber = cardBillTransaction.storeNumber
-            this.cardType = cardBillTransaction.cardType
+            this.cardType = cardBillTransaction.cardType?.name
             this.cardTypeOrigin = cardBillTransaction.cardTypeOrigin
             this.cardTransactionType = cardBillTransaction.cardTransactionType?.name
             this.cardTransactionTypeOrigin = cardBillTransaction.cardTransactionTypeOrigin
