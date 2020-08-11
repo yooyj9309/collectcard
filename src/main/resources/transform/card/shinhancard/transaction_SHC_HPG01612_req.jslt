@@ -3,7 +3,6 @@
       "bctag": if( size(.tag) > 0) .tag else "0",
       "fromdate": .dataBody.startAt,
       "todate": .dataBody.endAt,
-      "pagetag": if (size(.dataBody.nextKey) > 0) "2" else "1",
       "nxtQyKey": if( size(.dataBody.nextKey) == 0 ) "" else .dataBody.nextKey,
       "fmlOCrdC" : .dataBody.cardOwnerType,
       "cardNoEnc" : .dataBody.cardId
