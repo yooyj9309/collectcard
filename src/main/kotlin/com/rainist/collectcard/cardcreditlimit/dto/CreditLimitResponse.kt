@@ -22,19 +22,19 @@ fun CreditLimitResponse.toCreditLimitResponseProto(): CollectcardProto.GetCredit
 
         val cardCreditLimitBuilder = CollectcardProto.CreditLimit.newBuilder()
 
-        if (false == it.onetimePaymentLimit?.isAllZeroAmount()) {
+        if (false == it.onetimePaymentLimit?.isAllZeroAmountOrNull()) {
             cardCreditLimitBuilder.singlePaymentLimit = makeLimitStatusProtoResponse(it.onetimePaymentLimit)
         }
 
-        if (false == it.loanLimit?.isAllZeroAmount()) {
+        if (false == it.loanLimit?.isAllZeroAmountOrNull()) {
             cardCreditLimitBuilder.totalLimit = makeLimitStatusProtoResponse(it.loanLimit)
         }
 
-        if (false == it.cardLoanLimit?.isAllZeroAmount()) {
+        if (false == it.cardLoanLimit?.isAllZeroAmountOrNull()) {
             cardCreditLimitBuilder.loanLimit = makeLimitStatusProtoResponse(it.cardLoanLimit)
         }
 
-        if (false == it.installmentLimit?.isAllZeroAmount()) {
+        if (false == it.installmentLimit?.isAllZeroAmountOrNull()) {
             cardCreditLimitBuilder.installmentLimit = makeLimitStatusProtoResponse(it.installmentLimit)
         }
 

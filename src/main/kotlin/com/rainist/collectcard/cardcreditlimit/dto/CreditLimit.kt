@@ -41,9 +41,9 @@ data class Limit(
     @NumberFormat(style = NumberFormat.Style.NUMBER)
     var usedAmount: BigDecimal? = null // 사용금액
 ) {
-    fun isAllZeroAmount(): Boolean {
-        return BigDecimal.ZERO == totalLimitAmount &&
-            BigDecimal.ZERO == remainedAmount &&
-            BigDecimal.ZERO == usedAmount
+    fun isAllZeroAmountOrNull(): Boolean {
+        return BigDecimal.ZERO == (totalLimitAmount ?: BigDecimal.ZERO) &&
+            BigDecimal.ZERO == (remainedAmount ?: BigDecimal.ZERO) &&
+            BigDecimal.ZERO == (usedAmount ?: BigDecimal.ZERO)
     }
 }
