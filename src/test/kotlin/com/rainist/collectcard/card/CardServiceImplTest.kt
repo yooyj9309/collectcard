@@ -7,6 +7,7 @@ import com.rainist.collectcard.common.db.repository.CardRepository
 import com.rainist.collectcard.common.dto.SyncRequest
 import com.rainist.collectcard.common.enums.CardOwnerType
 import com.rainist.collectcard.common.enums.CardType
+import com.rainist.collectcard.common.enums.ResultCode
 import com.rainist.collectcard.common.service.HeaderService
 import java.time.LocalDateTime
 import org.hamcrest.MatcherAssert.assertThat
@@ -66,7 +67,7 @@ class CardServiceImplTest {
 
         val response = cardService.listCards(syncRequest)
 
-        assertThat(response.dataHeader?.resultCode, `is`("0004"))
+        assertThat(response.dataHeader?.resultCode, `is`(ResultCode.OK))
         assertThat(response.dataBody?.cards?.size, `is`(4))
         assertThat(
             response.dataBody?.cards?.first(), `is`(Card().apply {
@@ -142,7 +143,7 @@ class CardServiceImplTest {
 
         val response = cardService.listCards(syncRequest)
 
-        assertThat(response.dataHeader?.resultCode, `is`("0004"))
+        assertThat(response.dataHeader?.resultCode, `is`(ResultCode.OK))
         assertThat(response.dataBody?.cards?.size, `is`(19))
 
         assertThat(
@@ -237,7 +238,7 @@ class CardServiceImplTest {
 
         val response = cardService.listCards(syncRequest)
 
-        assertThat(response.dataHeader?.resultCode, `is`("0004"))
+        assertThat(response.dataHeader?.resultCode, `is`(ResultCode.OK))
         assertThat(response.dataBody?.cards?.size, `is`(1))
 
         assertThat(

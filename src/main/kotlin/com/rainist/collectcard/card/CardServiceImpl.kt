@@ -18,20 +18,20 @@ import com.rainist.collectcard.common.db.repository.CardHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardRepository
 import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.dto.SyncRequest
-import com.rainist.collectcard.common.exception.CollectcardException
+import com.rainist.collectcard.common.enums.ResultCode
 import com.rainist.collectcard.common.service.HeaderService
-import com.rainist.collectcard.common.util.SyncStatus
+import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import org.modelmapper.ModelMapper
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CardServiceImpl(
-    val collectExecutorService: CollectExecutorService,
+    val userSyncStatusService: UserSyncStatusService,
     val headerService: HeaderService,
+    val collectExecutorService: CollectExecutorService,
     val cardRepository: CardRepository,
     val cardHistoryRepository: CardHistoryRepository,
     val modelMapper: ModelMapper
@@ -40,9 +40,10 @@ class CardServiceImpl(
     companion object : Log
 
     @Transactional
-    @SyncStatus(transactionId = "cards")
     override fun listCards(syncRequest: SyncRequest): ListCardsResponse {
         logger.info("CardService.listCards start: syncRequest: {}", syncRequest)
+
+        val userSyncStatusLastCheckedAt = DateTimeUtil.utcNowLocalDateTime()
 
         /* header */
         val header = headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId)
@@ -70,11 +71,9 @@ class CardServiceImpl(
                     .build()
             )
 
-        /* response error handling */
-        // TODO : error handling
-        if (!HttpStatus.valueOf(executionResponse.httpStatusCode).is2xxSuccessful) {
-            throw CollectcardException("Resopnse status is not success")
-        }
+//        if (executionResponse.isExceptionOccurred){
+//            TODO("excution exception handling")
+//        }
 
         val listCardsResponse = executionResponse.response
 
@@ -92,8 +91,16 @@ class CardServiceImpl(
             upsertCardAndCardHistory(syncRequest.banksaladUserId, card)
         }
 
-        logger.info("CardService.listCards end: syncRequest: {}", syncRequest)
+        val isSuccess = listCardsResponse.resultCodes.filter { it != ResultCode.OK }.isEmpty()
+        if (isSuccess) {
+            userSyncStatusService.updateUserSyncStatus(syncRequest.banksaladUserId, syncRequest.organizationId, Transaction.cards.name, DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(userSyncStatusLastCheckedAt))
+        }
 
+//        if (listCardsResponse.resultCodes.contains(ResultCode.EXTERNAL_SERVER_ERROR)){
+//            TODO("result code handling")
+//        }
+
+        logger.info("CardService.listCards end: syncRequest: {}", syncRequest)
         return executionResponse.response
     }
 

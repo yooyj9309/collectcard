@@ -5,14 +5,16 @@ import com.google.protobuf.BoolValue
 import com.google.protobuf.StringValue
 import com.rainist.collectcard.common.enums.CardStatus
 import com.rainist.collectcard.common.enums.CardType
+import com.rainist.collectcard.common.enums.ResultCode
 
 data class ListCardsResponse(
+    var resultCodes: MutableList<ResultCode> = mutableListOf(),
     var dataHeader: ListCardsResponseDataHeader?,
     var dataBody: ListCardsResponseDataBody?
 )
 
 data class ListCardsResponseDataHeader(
-    var resultCode: String?,
+    var resultCode: ResultCode?,
     var resultMessage: String?
 )
 
