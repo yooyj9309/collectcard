@@ -9,13 +9,20 @@ let cardLoanRepaymentMethod = {
     "99": "UNKNOWN",  //  알수없음
 }
 
+def parse_zfill_number(s)
+  let value = replace($s, "^0+", "")
+  if(test($value, "^\\d+$"))
+    number($value)
+  else
+    $s
+
 {
     "loanId": .dataBody.loanNo,
-    "loanNumber": .dataBody.loanNo,                 // 대출번호
-    "loanAmount": .dataBody.loanAmt,                // 대출금액
-    "issuedDay": .dataBody.loanDt,                 // 대출일자
-    "expirationDay": .dataBody.expireDt,           // 만기일
-    "interestRate": .dataBody.interestRt,           // 이자율재
+    "loanNumber": .dataBody.loanNo,                                 // 대출번호
+    "loanAmount": .dataBody.loanAmt,                                // 대출금액
+    "issuedDay": .dataBody.loanDt,                                  // 대출일자
+    "expirationDay": .dataBody.expireDt,                            // 만기일
+    "interestRate": parse_zfill_number(.dataBody.interestRt) / 100,  // 이자율
     "repaymentMethod": get-key($cardLoanRepaymentMethod, .dataBody.repaymentMthd, "UNKNOWN"), // 상환방법
     "repaymentMethodOrigin": .dataBody.repaymentMthd,
     "remainingAmount": .dataBody.loanBal,          // 대출잔액
