@@ -16,6 +16,7 @@ import com.rainist.collectcard.common.exception.CollectExecutionExceptionHandler
 import com.rainist.collectcard.userinfo.dto.UserInfoResponse
 import java.util.function.BiConsumer
 import java.util.function.BinaryOperator
+import java.util.regex.Pattern
 import org.apache.commons.lang3.StringUtils
 
 class ShinhancardExecutions {
@@ -47,16 +48,20 @@ class ShinhancardExecutions {
 
         val mergeBills =
             BinaryOperator { prev: ListCardBillsResponse, next: ListCardBillsResponse ->
-
                 next.dataBody?.cardBills?.addAll(
-                    0,
-                    prev.dataBody?.cardBills ?: mutableListOf()
+                    0, prev.dataBody?.cardBills ?: mutableListOf()
                 )
-
                 next
             }
 
-        val mergeBillsUnion =
+        val mergeTransactions =
+            BinaryOperator { prev: ListBillTransactionsResponse, next: ListBillTransactionsResponse ->
+                next.dataBody?.billTransactions?.addAll(0, prev.dataBody?.billTransactions ?: mutableListOf())
+                    ?: kotlin.run { next.dataBody?.billTransactions = mutableListOf() }
+                next
+            }
+
+        val mergeBillByBillTransactionExpected =
             BinaryOperator { prev: ListCardBillsResponse, next: ListCardBillsResponse ->
                 next.dataBody?.cardBills?.forEachIndexed { idx, cardBill ->
                     if (cardBill.transactions == null) {
@@ -68,6 +73,28 @@ class ShinhancardExecutions {
                 }
 
                 next.dataBody?.cardBills?.sortByDescending { it -> it.paymentDay }
+                next
+            }
+
+        val mergeBillByBills =
+            BinaryOperator { prev: ListCardBillsResponse, next: ListCardBillsResponse ->
+                next.dataBody?.cardBills?.addAll(
+                    0, prev.dataBody?.cardBills ?: mutableListOf()
+                )
+
+                // cardNumber 한글 제거 처리 진행
+                val pattern = Pattern.compile("[0-9]*\$")
+                next.dataBody?.cardBills?.forEach { cardBill ->
+                    cardBill.transactions?.forEach { cardBillTransaction ->
+                        cardBillTransaction.cardNumber?.let { cardNumber ->
+                            val matcher = pattern.matcher(cardNumber)
+                            if (matcher.find()) {
+                                cardBillTransaction.cardNumber = matcher.group(0)
+                            }
+                        }
+                    }
+                }
+
                 next
             }
 
@@ -257,7 +284,7 @@ class ShinhancardExecutions {
                             Pagination.builder()
                                 .method(Pagination.Method.NEXTKEY)
                                 .nextkey(".dataBody.nextKey")
-                                .merge(mergeBills)
+                                .merge(mergeTransactions)
                                 .build()
                         )
                         .build()
@@ -300,14 +327,14 @@ class ShinhancardExecutions {
                                     Pagination.builder()
                                         .method(Pagination.Method.NEXTKEY)
                                         .nextkey(".dataBody.nextKey")
-                                        .merge(mergeBills)
+                                        .merge(mergeTransactions)
                                         .build()
                                 )
                                 .build()
                         ).merge(mergeBillTransaction)
                         .build()
                 )
-                .merge(mergeBillsUnion)
+                .merge(mergeBillByBillTransactionExpected)
                 .build()
 
         val cardShinhancardBills =
@@ -350,7 +377,7 @@ class ShinhancardExecutions {
                             Pagination.builder()
                                 .method(Pagination.Method.NEXTKEY)
                                 .nextkey(".dataBody.nextKey")
-                                .merge(mergeBills)
+                                .merge(mergeTransactions)
                                 .build()
                         )
                         .build()
@@ -377,6 +404,7 @@ class ShinhancardExecutions {
                         )
                         .fetch { listCardBillsResponse ->
                             listCardBillsResponse as ListCardBillsResponse
+                            // startAt
                             listCardBillsResponse.dataBody?.cardBills?.iterator()
                                 ?: mutableListOf<CardBill>().iterator()
                         }
@@ -396,7 +424,7 @@ class ShinhancardExecutions {
                                     Pagination.builder()
                                         .method(Pagination.Method.NEXTKEY)
                                         .nextkey(".dataBody.nextKey")
-                                        .merge(mergeBills)
+                                        .merge(mergeTransactions)
                                         .build()
                                 )
                                 .build()
@@ -404,7 +432,7 @@ class ShinhancardExecutions {
                         .merge(mergeBillTransaction)
                         .build()
                 )
-                .merge(mergeBills)
+                .merge(mergeBillByBills)
                 .build()
 
         // 사용자 정보 조회 (SHC_EXT_00001)

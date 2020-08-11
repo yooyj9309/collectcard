@@ -67,6 +67,8 @@ class CardBillServiceImpl(
             .minusMonths(DEFAULT_MAX_BILL_MONTH)
             .let { DateTimeUtil.localDateToString(it, "yyyyMMdd") }
 
+        // TODO 제거예정 diff확인용
+        logger.info("CARDBILL_TIME_INFO $checkStartTime $startAt $syncRequest.banksaladUserId ")
         val request = ListCardBillsRequest().apply {
             dataBody = ListCardBillsRequestDataBody().apply {
                 this.startAt = checkStartTime

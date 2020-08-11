@@ -49,5 +49,12 @@ data class CardBill(
     var expiringPoints: Int?,
 
     // 결제예정금액 상세
-    var transactions: MutableList<CardBillTransaction>?
+    var transactions: MutableList<CardBillTransaction>?,
+
+    var dataBody: CardBillNextKey?
 )
+
+// nextKey 이슈로 인하여 2depth에 적용
+class CardBillNextKey {
+    var nextKey: String = ""
+}

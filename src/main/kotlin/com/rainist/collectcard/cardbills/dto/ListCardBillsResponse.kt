@@ -30,7 +30,7 @@ fun ListCardBillsResponse.toListCardBillsResponseProto(): CollectcardProto.ListC
     return this.dataBody?.cardBills?.map { cardBill ->
         CollectcardProto.CardBill.newBuilder()
             .setDueDate(SimpleDateFormat("yyyy-MM-dd").format(SimpleDateFormat("yyyyMMdd").parse(cardBill.paymentDay)))
-            .setCurrency("KRW") // TODO 3. iso 4217??  받아오는 값인지 의미잇는
+            .setCurrency("KRW")
             .setBillType(cardBill.billType?.let { StringValue.of(it) } ?: StringValue.getDefaultInstance())
             .setLinkedAccount(
                 CollectcardProto.BankAccountSummary.newBuilder()

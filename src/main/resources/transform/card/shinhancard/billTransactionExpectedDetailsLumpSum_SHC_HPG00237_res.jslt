@@ -11,7 +11,7 @@
             if(.date != "")(
                 {
                     "approvalDay" : .date,                  // 이용일자
-                    "amount": .prnTxn,                      // 이용원금금액
+                    "amount": .prnBll,                      // 이용원금금액
                     "storeName": .mchtNm,                   // 가맹점명
                     "cardNumber": replace(.crdN, "-", ""),  // 마스킹 카드번호
                     "cardNumberMasked": .crdN,              // 마스킹 카드번호

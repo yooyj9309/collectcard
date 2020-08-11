@@ -2,7 +2,7 @@
   "dataBody": {
     "setlTypeNo": .billNumber [ 8 : 12 ],
     "setlDay": .billNumber [ 0 : 8 ],
-    "nxtQyKey": .nextKey
+    "nxtQyKey": .dataBody.nextKey
   },
    "dataHeader":{
        "EMPTY" : ""

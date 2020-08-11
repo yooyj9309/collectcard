@@ -2,7 +2,7 @@
   "dataBody": {
     "seqN": .billNumber [ 8 : 12 ],
     "inqdate": .billNumber [ 0 : 8 ],
-    "nxtQyKey": .nextKey
+    "nxtQyKey": .dataBody.nextKey
   },
    "dataHeader":{
        "EMPTY" : ""

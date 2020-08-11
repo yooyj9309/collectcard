@@ -12,6 +12,13 @@ def _isInstallmentCancel(dvdMnth,rcpMnt)
         false
 
 
+def parse_zfil_number(s)
+    let value = replace($s, "^0+", "")
+    if( $value == "")
+        0
+    else
+        $value
+
 {
    "dataHeader": {
         "resultCode": .dataBody.resultCode,
@@ -22,8 +29,8 @@ def _isInstallmentCancel(dvdMnth,rcpMnt)
         "billTransactions": [for (.dataBody.grp001)
             if(.useD != "" or .ppDssumCCd == "00")(
                 {
-                    let isInstallment = _isInstallment(.dvdMnth)
-                    let isInstallmentCancel= _isInstallmentCancel(.dvdMnth , .rcpMnt)
+                    let isInstallment = _isInstallment(parse_zfil_number(.dvdMnth))
+                    let isInstallmentCancel= _isInstallmentCancel(parse_zfil_number(.dvdMnth) , parse_zfil_number(.rcpMnt))
                     "cardNumber": .useCrdC[size(.useCrdC) - 3 : size(.useCrdC)],
                     "cardNumberMasked": .useCrdC[size(.useCrdC) - 3 : size(.useCrdC)],
                     "approvalDay" : .useD,
