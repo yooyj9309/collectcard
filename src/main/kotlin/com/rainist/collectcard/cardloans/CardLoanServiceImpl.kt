@@ -55,7 +55,8 @@ class CardLoanServiceImpl(
         /* Execution Context */
         val executionContext: ExecutionContext = CollectExecutionContext(
             organizationId = syncRequest.organizationId,
-            userId = syncRequest.banksaladUserId.toString()
+            userId = syncRequest.banksaladUserId.toString(),
+            startAt = DateTimeUtil.utcNowLocalDateTime()
         )
 
         /* service logic */

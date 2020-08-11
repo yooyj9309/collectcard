@@ -78,7 +78,8 @@ class CardTransactionServiceImpl(
         /* Execution Context */
         val executionContext: ExecutionContext = CollectExecutionContext(
             organizationId = syncRequest.organizationId,
-            userId = syncRequest.banksaladUserId.toString()
+            userId = syncRequest.banksaladUserId.toString(),
+            startAt = DateTimeUtil.utcNowLocalDateTime()
         )
 
         val transactions = getListTransactionsByDivision(executionContext, header, request)
