@@ -4,6 +4,7 @@ import com.rainist.collectcard.common.db.entity.CardEntity
 import com.rainist.collectcard.common.enums.CardOwnerType
 import com.rainist.collectcard.common.enums.CardStatus
 import com.rainist.collectcard.common.enums.CardType
+import com.rainist.common.log.Log
 import java.math.BigDecimal
 import org.apache.commons.lang3.builder.EqualsBuilder
 
@@ -63,13 +64,20 @@ data class Card(
     var trafficSupported: Boolean = false
 ) {
 
-    companion object {
+    companion object : Log {
         val EXCLUDE_EQUALS_FIELD = mutableListOf(
             CardEntity::cardId.name
         )
     }
 
     fun unequals(other: Any?): Boolean {
-        return !EqualsBuilder.reflectionEquals(this, other, EXCLUDE_EQUALS_FIELD)
+
+        val unequals = !EqualsBuilder.reflectionEquals(this, other, EXCLUDE_EQUALS_FIELD)
+
+        if (true == unequals) {
+            logger.error("[Card Unequals] this-{} : other-{}", this, other)
+        }
+
+        return unequals
     }
 }

@@ -25,7 +25,6 @@ import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import org.mapstruct.factory.Mappers
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CardServiceImpl(
@@ -40,7 +39,6 @@ class CardServiceImpl(
 
     val cardMapper = Mappers.getMapper(CardMapper::class.java)
 
-    @Transactional
     override fun listCards(syncRequest: SyncRequest): ListCardsResponse {
         logger.info("CardService.listCards start: syncRequest: {}", syncRequest)
 

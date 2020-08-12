@@ -204,8 +204,8 @@ class CardBillServiceImpl(
             this.cardBillTransactionNo = cardBillTransactionNo
             this.cardCompanyCardId = cardBillTransaction.cardCompanyCardId ?: ""
             this.cardName = cardBillTransaction.cardName
-            this.cardNumber = cardBillTransaction.cardNumber
-            this.cardNumberMask = cardBillTransaction.cardNumberMasked
+            this.cardNumber = cardBillTransaction.cardNumber?.replace("-", "")?.trim()
+            this.cardNumberMask = cardBillTransaction.cardNumberMasked?.replace("-", "")?.trim()
             this.businessLicenseNumber = cardBillTransaction.businessLicenseNumber
             this.storeName = cardBillTransaction.storeName
             this.storeNumber = cardBillTransaction.storeNumber
@@ -289,8 +289,8 @@ class CardBillServiceImpl(
             this.paymentScheduledTransactionNo = paymentScheduledTransactionNo
             this.cardCompanyCardId = cardBillTransaction.cardCompanyCardId ?: ""
             this.cardName = cardBillTransaction.cardName
-            this.cardNumber = cardBillTransaction.cardNumber
-            this.cardNumberMask = cardBillTransaction.cardNumberMasked
+            this.cardNumber = cardBillTransaction.cardNumber?.replace("-", "")?.trim()
+            this.cardNumberMask = cardBillTransaction.cardNumberMasked?.replace("-", "")?.trim()
             this.businessLicenseNumber = cardBillTransaction.businessLicenseNumber
             this.storeName = cardBillTransaction.storeName
             this.storeNumber = cardBillTransaction.storeNumber
