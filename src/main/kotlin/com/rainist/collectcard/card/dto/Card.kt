@@ -1,6 +1,5 @@
 package com.rainist.collectcard.card.dto
 
-import com.rainist.collectcard.common.db.entity.CardEntity
 import com.rainist.collectcard.common.enums.CardOwnerType
 import com.rainist.collectcard.common.enums.CardStatus
 import com.rainist.collectcard.common.enums.CardType
@@ -66,7 +65,8 @@ data class Card(
 
     companion object : Log {
         val EXCLUDE_EQUALS_FIELD = mutableListOf(
-            CardEntity::cardId.name
+            Card::cardId.name,
+            Card::trafficSupported.name
         )
     }
 

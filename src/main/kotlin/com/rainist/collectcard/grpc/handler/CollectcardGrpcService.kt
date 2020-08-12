@@ -92,6 +92,8 @@ class CollectcardGrpcService(
         responseObserver: StreamObserver<CollectcardProto.ListCardTransactionsResponse>
     ) {
         kotlin.runCatching {
+            logger.info("transaction request userId : {}, companyId : {}, fromMs : {}", request.userId, request.companyId.value, request.takeIf { request.hasFromMs() }?.fromMs?.value ?: "fromMsNull")
+
             val syncRequest = SyncRequest(
                 request.userId.toLong(),
                 organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: ""
