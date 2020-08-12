@@ -1,3 +1,17 @@
+let resultCodes = {
+    "": "Unknown",
+    "0004": "OK",
+    "0010": "OK",
+    "0013": "OK",
+    "9800": "INVALID_USER",
+    "400": "INVALID_ACCESS_TOKEN",
+    "503": "EXTERNAL_SERVER_ERROR",
+    "0002": "EXTERNAL_SERVER_ERROR",
+    "9971": "EXTERNAL_SERVER_ERROR",
+    "9999": "EXTERNAL_SERVER_ERROR"
+}
+
+
 let CardTransactionType = {
     "": "APPROVAL",                         //  승인
     "1": "PURCHASE",                        //  매입
@@ -8,12 +22,13 @@ let CardTransactionType = {
 }
 
 {
-   "dataHeader": {
-        "resultCode": .dataHeader.resultCode,           // 결과 코드
+    "resultCodes": [get-key($resultCodes, .dataHeader.resultCode, "Unknown")],
+    "dataHeader": {
+        "resultCode": get-key($resultCodes, .dataHeader.resultCode, "Unknown"), // 결과코드
         "resultMessage": .dataHeader.resultMessage,     // 결과 메세지
         "successCode": .dataHeader.successCode          // 성공 코드
-   },
-   "dataBody": {
+    },
+    "dataBody": {
         "transactions": [for (.dataBody.grp001)
             {
                 "approvalDay" : if(size(.aprvtime) >= 14) .aprvtime[ 0 : 8 ] else "",   // 승인일자

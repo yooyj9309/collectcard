@@ -129,19 +129,18 @@ class ShinhancardExecutions {
                 listCardsResponse1
             }
 
-        // TODO 박두상 파악해본결과, 현재 해당 구조에서는 이전의 에러코드를 전부 덮어버리는 형태. 최소한의 기록을 위해서라도 따로 resultCode, Message를 기록할 방법 고려 (진짜 에러가 있을 수 있으니까)
+        /* 카드 이용내역 merge */
         val cardShinhancardTransactionsMerge =
-            BinaryOperator { prevTransactions: ListTransactionsResponse, nextTransactions: ListTransactionsResponse ->
-                var filteredTransactions =
-                    prevTransactions.dataBody?.transactions?.filter { it -> it.approvalDay != "" } ?: mutableListOf()
-                nextTransactions.dataBody?.transactions?.addAll(
-                    0, filteredTransactions
-                ) ?: kotlin.run {
-                    nextTransactions.dataBody =
-                        ListTransactionsResponseDataBody(filteredTransactions.toMutableList(), "")
-                }
 
-                nextTransactions
+            BinaryOperator { prev: ListTransactionsResponse, next: ListTransactionsResponse ->
+                prev.resultCodes.add(next.dataHeader?.resultCode ?: ResultCode.UNKNOWN)
+
+                val prevTransactions = prev.dataBody?.transactions ?: mutableListOf()
+                val nextTransactions = next.dataBody?.transactions ?: mutableListOf()
+                prevTransactions.addAll(nextTransactions)
+
+                prev.dataBody = ListTransactionsResponseDataBody(transactions = prevTransactions, nextKey = next.dataBody?.nextKey)
+                prev
             }
 
         val cardShinhancardCards =

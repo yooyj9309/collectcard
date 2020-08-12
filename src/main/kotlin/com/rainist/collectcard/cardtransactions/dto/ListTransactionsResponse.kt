@@ -5,16 +5,18 @@ import com.google.protobuf.DoubleValue
 import com.google.protobuf.Int32Value
 import com.google.protobuf.StringValue
 import com.rainist.collectcard.cardtransactions.util.CardTransactionUtil
+import com.rainist.collectcard.common.enums.ResultCode
 import com.rainist.common.util.DateTimeUtil
 
 data class ListTransactionsResponse(
+    var resultCodes: MutableList<ResultCode> = mutableListOf(),
     var dataHeader: ListTransactionsResponseDataHeader? = null,
     var dataBody: ListTransactionsResponseDataBody? = null
 )
 
 data class ListTransactionsResponseDataHeader(
     var successCode: String? = null,
-    var resultCode: String? = null,
+    var resultCode: ResultCode? = null,
     var resultMessage: String? = null
 )
 

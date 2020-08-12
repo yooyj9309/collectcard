@@ -26,7 +26,6 @@ data class CardTransaction(
 
     var businessLicenseNumber: String? = null, //  4. 사업자 번호
 
-    @field:NotEmpty
     var storeName: String? = null, //  5. 가맹점이름
 
     var storeNumber: String? = null, //  6. 가맹점 번호
@@ -59,7 +58,6 @@ data class CardTransaction(
 
     var discountAmount: BigDecimal? = null, //  18. 할인금액
 
-    // TODO 예상국 숫자체크로 변경
     @field:NumberFormat(style = NumberFormat.Style.CURRENCY)
     var amount: BigDecimal? = null, //  19. 매출액
 
