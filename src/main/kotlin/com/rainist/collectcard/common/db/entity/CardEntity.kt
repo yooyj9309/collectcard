@@ -1,6 +1,5 @@
 package com.rainist.collectcard.common.db.entity
 
-import com.rainist.common.util.DateTimeUtil
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import javax.persistence.Column
@@ -78,7 +77,7 @@ data class CardEntity(
     var isBusinessCard: Boolean? = false,
 
     @CreatedDate
-    var createdAt: LocalDateTime? = DateTimeUtil.utcNowLocalDateTime(),
+    var createdAt: LocalDateTime? = null,
 
     @LastModifiedDate
     var updatedAt: LocalDateTime? = null

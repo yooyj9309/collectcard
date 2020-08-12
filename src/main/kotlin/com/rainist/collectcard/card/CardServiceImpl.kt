@@ -8,12 +8,12 @@ import com.rainist.collectcard.card.dto.Card
 import com.rainist.collectcard.card.dto.ListCardsRequest
 import com.rainist.collectcard.card.dto.ListCardsRequestDataBody
 import com.rainist.collectcard.card.dto.ListCardsResponse
+import com.rainist.collectcard.card.mapper.CardMapper
 import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.db.entity.CardEntity
-import com.rainist.collectcard.common.db.entity.CardHistoryEntity
 import com.rainist.collectcard.common.db.repository.CardHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardRepository
 import com.rainist.collectcard.common.dto.CollectExecutionContext
@@ -23,7 +23,7 @@ import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
-import org.modelmapper.ModelMapper
+import org.mapstruct.factory.Mappers
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -33,11 +33,12 @@ class CardServiceImpl(
     val headerService: HeaderService,
     val collectExecutorService: CollectExecutorService,
     val cardRepository: CardRepository,
-    val cardHistoryRepository: CardHistoryRepository,
-    val modelMapper: ModelMapper
+    val cardHistoryRepository: CardHistoryRepository
 ) : CardService {
 
     companion object : Log
+
+    val cardMapper = Mappers.getMapper(CardMapper::class.java)
 
     @Transactional
     override fun listCards(syncRequest: SyncRequest): ListCardsResponse {
@@ -121,14 +122,14 @@ class CardServiceImpl(
 
     /* 기존 카드 */
     private fun updateCardEntity(cardEntity: CardEntity, card: Card) {
-        val entityDto = modelMapper.map(cardEntity, Card::class.java)
+        val entityDto = cardMapper.toCardDto(cardEntity)
 
         if (entityDto.unequals(card)) {
             /* update field */
-            modelMapper.map(card, cardEntity)
+            cardMapper.merge(card, cardEntity)
             cardEntity.lastCheckAt = DateTimeUtil.utcNowLocalDateTime()
 
-            val cardHistoryEntity = modelMapper.map(cardEntity, CardHistoryEntity::class.java)
+            val cardHistoryEntity = cardMapper.toCardHistoryEntity(cardEntity)
             cardHistoryRepository.save(cardHistoryEntity)
         }
 
@@ -137,14 +138,13 @@ class CardServiceImpl(
 
     /* 신규 카드 */
     private fun insertCardEntity(card: Card, banksaladUserId: Long) {
-
-        val cardEntity = modelMapper.map(card, CardEntity::class.java).apply {
+        val cardEntity = cardMapper.toCardEntity(card).apply {
             this.banksaladUserId = banksaladUserId
             this.lastCheckAt = DateTimeUtil.utcNowLocalDateTime()
         }
         cardRepository.save(cardEntity)
 
-        val cardHistoryEntity = modelMapper.map(cardEntity, CardHistoryEntity::class.java)
+        val cardHistoryEntity = cardMapper.toCardHistoryEntity(cardEntity) // modelMapper.map(cardEntity, CardHistoryEntity::class.java)
         cardHistoryRepository.save(cardHistoryEntity)
     }
 }

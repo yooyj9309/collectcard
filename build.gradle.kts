@@ -90,12 +90,13 @@ dependencies {
     // coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
 
-    // model mapper
-    implementation("org.modelmapper:modelmapper:2.3.8")
-
     // apache common
     implementation("org.apache.commons:commons-lang3:3.10")
 
+    // mapstruct
+    implementation("org.mapstruct:mapstruct:1.3.0.Final")
+    kapt("org.mapstruct:mapstruct-processor:1.3.0.Final")
+    kaptTest("org.mapstruct:mapstruct-processor:1.3.0.Final")
 }
 
 tasks.withType<Test> {

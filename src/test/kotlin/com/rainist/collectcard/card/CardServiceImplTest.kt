@@ -175,6 +175,7 @@ class CardServiceImplTest {
             createdAt = now
             updatedAt = now
         }
+
         assertThat(
             firstEntity, `is`(
                 CardEntity(
@@ -228,7 +229,7 @@ class CardServiceImplTest {
                 internationalBrandName = "CARD_INTERNATIONAL_BRAND_MASTERCARD",
                 cardNumber = "9523*********8721",
                 cardNumberMask = "9523*********8721",
-                cardType = "CARD_TYPE_CREDIT",
+                cardType = "CREDIT",
                 cardTypeOrigin = "1",
                 isBusinessCard = false,
                 createdAt = now,
