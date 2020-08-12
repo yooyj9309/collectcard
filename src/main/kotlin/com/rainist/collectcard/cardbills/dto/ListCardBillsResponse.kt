@@ -4,16 +4,18 @@ import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
 import com.google.protobuf.DoubleValue
 import com.google.protobuf.Int32Value
 import com.google.protobuf.StringValue
+import com.rainist.collectcard.common.enums.ResultCode
 import java.text.SimpleDateFormat
 import org.springframework.util.StringUtils
 
 data class ListCardBillsResponse(
+    var resultCodes: MutableList<ResultCode> = mutableListOf(),
     var dataHeader: ListCardBillsResponseDataHeader? = null,
     var dataBody: ListCardBillsResponseDataBody? = null
 )
 
 data class ListCardBillsResponseDataHeader(
-    var resultCode: String?,
+    var resultCode: ResultCode?,
     var resultMessage: String?,
     var successCode: String?
 )
@@ -22,7 +24,7 @@ data class ListCardBillsResponseDataBody(
     // 결제 예정 상세 내역
     var cardBills: MutableList<CardBill>? = null,
     // 다음 조회 key
-    var nextKey: String = ""
+    var nextKey: String? = ""
 )
 
 fun ListCardBillsResponse.toListCardBillsResponseProto(): CollectcardProto.ListCardBillsResponse {

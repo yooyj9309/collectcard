@@ -1,3 +1,16 @@
+let resultCodes = {
+    "": "Unknown",
+    "0004": "OK",
+    "0010": "OK",
+    "0013": "OK",
+    "9800": "INVALID_USER",
+    "400": "INVALID_ACCESS_TOKEN",
+    "503": "EXTERNAL_SERVER_ERROR",
+    "0002": "EXTERNAL_SERVER_ERROR",
+    "9971": "EXTERNAL_SERVER_ERROR",
+    "9999": "EXTERNAL_SERVER_ERROR"
+}
+
 
 def _isInstallment(dvdMnth)
     if($dvdMnth != 0)
@@ -20,12 +33,13 @@ def parse_zfil_number(s)
         $value
 
 {
-   "dataHeader": {
-        "resultCode": .dataBody.resultCode,
+    "resultCodes": [get-key($resultCodes, .dataHeader.resultCode, "Unknown")],
+    "dataHeader": {
+        "resultCode": get-key($resultCodes, .dataHeader.resultCode, "Unknown"), // 결과코드
         "resultMessage": .dataHeader.resultMessage,
         "successCode": .dataHeader.successCode
-   },
-   "dataBody": {
+    },
+    "dataBody": {
         "billTransactions": [for (.dataBody.grp001)
             if(.useD != "" or .ppDssumCCd == "00")(
                 {

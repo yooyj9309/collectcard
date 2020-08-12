@@ -6,7 +6,9 @@ import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.card.dto.ListCardsResponse
 import com.rainist.collectcard.cardbills.dto.CardBill
 import com.rainist.collectcard.cardbills.dto.ListBillTransactionsResponse
+import com.rainist.collectcard.cardbills.dto.ListBillTransactionsResponseDataBody
 import com.rainist.collectcard.cardbills.dto.ListCardBillsResponse
+import com.rainist.collectcard.cardbills.dto.ListCardBillsResponseDataBody
 import com.rainist.collectcard.cardcreditlimit.dto.CreditLimitResponse
 import com.rainist.collectcard.cardloans.dto.ListLoansResponse
 import com.rainist.collectcard.cardloans.dto.Loan
@@ -20,7 +22,6 @@ import com.rainist.common.util.DateTimeUtil
 import java.util.function.BiConsumer
 import java.util.function.BinaryOperator
 import java.util.regex.Pattern
-import org.apache.commons.lang3.StringUtils
 
 class ShinhancardExecutions {
 
@@ -51,45 +52,68 @@ class ShinhancardExecutions {
 
         val mergeBills =
             BinaryOperator { prev: ListCardBillsResponse, next: ListCardBillsResponse ->
-                next?.dataBody?.cardBills?.addAll(
-                    0, prev?.dataBody?.cardBills ?: mutableListOf()
-                )
-                next
+                prev.resultCodes.add(next.dataHeader?.resultCode ?: ResultCode.UNKNOWN)
+
+                val prevCardBill = prev.dataBody?.cardBills ?: mutableListOf()
+                val nextCardBill = next.dataBody?.cardBills ?: mutableListOf()
+
+                prevCardBill.addAll(nextCardBill)
+
+                prev.dataBody = ListCardBillsResponseDataBody(cardBills = prevCardBill, nextKey = next.dataBody?.nextKey)
+
+                prev
             }
 
-        val mergeTransactions =
+        val mergeBillTransactions =
             BinaryOperator { prev: ListBillTransactionsResponse, next: ListBillTransactionsResponse ->
-                next?.dataBody?.billTransactions?.addAll(0, prev?.dataBody?.billTransactions ?: mutableListOf())
-                    ?: kotlin.run { next?.dataBody?.billTransactions = mutableListOf() }
-                next
+                prev.resultCodes.add(next.dataHeader?.resultCode ?: ResultCode.UNKNOWN)
+
+                val prevTransaction = prev.dataBody?.billTransactions ?: mutableListOf()
+                val nextTransaction = next.dataBody?.billTransactions ?: mutableListOf()
+                prevTransaction.addAll(nextTransaction)
+
+                prev.dataBody = ListBillTransactionsResponseDataBody(billTransactions = prevTransaction, nextKey = next.dataBody?.nextKey)
+
+                prev
             }
 
         val mergeBillByBillTransactionExpected =
             BinaryOperator { prev: ListCardBillsResponse, next: ListCardBillsResponse ->
-                next?.dataBody?.cardBills?.forEachIndexed { idx, cardBill ->
-                    if (cardBill.transactions == null) {
-                        cardBill.transactions = mutableListOf()
-                    }
-                    prev?.dataBody?.cardBills?.get(idx)?.transactions?.let {
+
+                val prevCardBills = prev.dataBody?.cardBills ?: mutableListOf()
+                val nextCardBills = next.dataBody?.cardBills ?: mutableListOf()
+
+                prevCardBills.forEach {
+                    it.transactions = it.transactions ?: mutableListOf()
+                }
+
+                nextCardBills.forEach {
+                    it.transactions = it.transactions ?: mutableListOf()
+                }
+
+                prevCardBills.forEachIndexed { idx, cardBill ->
+                    nextCardBills.getOrNull(idx)?.transactions?.let {
                         cardBill.transactions?.addAll(it)
                     }
                 }
-                next?.dataBody?.cardBills?.sortByDescending { it -> it.paymentDay }
-                next
+                prevCardBills.sortByDescending { it.paymentDay }
+
+                prev.dataBody = ListCardBillsResponseDataBody(cardBills = prevCardBills, nextKey = next.dataBody?.nextKey)
+
+                prev
             }
 
         val mergeBillByBills =
             BinaryOperator { prev: ListCardBillsResponse, next: ListCardBillsResponse ->
-                next?.dataBody?.cardBills?.addAll(
-                    0, prev?.dataBody?.cardBills ?: mutableListOf()
-                )
 
-                // transactions 없는 리스트 제거
-                next?.dataBody?.cardBills = next?.dataBody?.cardBills?.filter { it.transactions != null }?.toMutableList() ?: mutableListOf()
+                val prevCardBills = prev.dataBody?.cardBills ?: mutableListOf()
+                val nextCardBills = next.dataBody?.cardBills ?: mutableListOf()
+                prevCardBills.addAll(nextCardBills)
 
                 // cardNumber 한글 제거 처리 진행
                 val pattern = Pattern.compile("[0-9]*\$")
-                next.dataBody?.cardBills?.forEach { cardBill ->
+
+                prevCardBills.forEach { cardBill ->
                     cardBill.transactions?.forEach { cardBillTransaction ->
                         cardBillTransaction.cardNumber?.let { cardNumber ->
                             val matcher = pattern.matcher(cardNumber)
@@ -100,22 +124,25 @@ class ShinhancardExecutions {
                     }
                 }
 
-                next
+                prev.dataBody = ListCardBillsResponseDataBody(cardBills = prevCardBills, nextKey = next.dataBody?.nextKey)
+
+                prev
             }
 
         val mergeBillTransaction =
             BiConsumer { master: CardBill, detail: ListBillTransactionsResponse ->
-                if (master.transactions == null) {
-                    master.transactions = mutableListOf()
-                }
-                master.transactions?.addAll(detail?.dataBody?.billTransactions ?: mutableListOf())
 
-                // 연회비인 경우 approvalDay가 없음
-                master.transactions?.forEach {
-                    if (StringUtils.isEmpty(it.approvalDay)) {
-                        it.approvalDay = master.paymentDay
-                    }
+                val masterTransaction = master.transactions ?: mutableListOf()
+                val detailTransaction = detail.dataBody?.billTransactions ?: mutableListOf()
+
+                masterTransaction.addAll(detailTransaction)
+
+                masterTransaction.forEach {
+                    // 연회비인 경우 approvalDay가 없음
+                    it.approvalDay = it.approvalDay?.let { it } ?: master.paymentDay
                 }
+
+                master.transactions = masterTransaction
             }
 
         val mergeCards =
@@ -288,7 +315,7 @@ class ShinhancardExecutions {
                             Pagination.builder()
                                 .method(Pagination.Method.NEXTKEY)
                                 .nextkey(".dataBody.nextKey")
-                                .merge(mergeTransactions)
+                                .merge(mergeBillTransactions)
                                 .build()
                         )
                         .build()
@@ -331,7 +358,7 @@ class ShinhancardExecutions {
                                     Pagination.builder()
                                         .method(Pagination.Method.NEXTKEY)
                                         .nextkey(".dataBody.nextKey")
-                                        .merge(mergeTransactions)
+                                        .merge(mergeBillTransactions)
                                         .build()
                                 )
                                 .build()
@@ -384,7 +411,7 @@ class ShinhancardExecutions {
                             Pagination.builder()
                                 .method(Pagination.Method.NEXTKEY)
                                 .nextkey(".dataBody.nextKey")
-                                .merge(mergeTransactions)
+                                .merge(mergeBillTransactions)
                                 .build()
                         )
                         .build()
@@ -433,7 +460,7 @@ class ShinhancardExecutions {
                                     Pagination.builder()
                                         .method(Pagination.Method.NEXTKEY)
                                         .nextkey(".dataBody.nextKey")
-                                        .merge(mergeTransactions)
+                                        .merge(mergeBillTransactions)
                                         .build()
                                 )
                                 .build()

@@ -1,5 +1,18 @@
 //카드_[EXT] 결제예정금액(일시불,현금서비스 상세) SHC_HPG00237
 
+let resultCodes = {
+    "": "Unknown",
+    "0004": "OK",
+    "0010": "OK",
+    "0013": "OK",
+    "9800": "INVALID_USER",
+    "400": "INVALID_ACCESS_TOKEN",
+    "503": "EXTERNAL_SERVER_ERROR",
+    "0002": "EXTERNAL_SERVER_ERROR",
+    "9971": "EXTERNAL_SERVER_ERROR",
+    "9999": "EXTERNAL_SERVER_ERROR"
+}
+
 def _isInstallment(useMonth)
     if($useMonth != 0)
         true
@@ -13,18 +26,19 @@ def _isInstallmentCancel(useMonth,monthCount)
         false
 
 {
-   "dataHeader": {
-        "resultCode": .dataBody.resultCode,
+    "resultCodes": [get-key($resultCodes, .dataHeader.resultCode, "Unknown")],
+    "dataHeader": {
+        "resultCode": get-key($resultCodes, .dataHeader.resultCode, "Unknown"), // 결과코드
         "resultMessage": .dataHeader.resultMessage,
         "successCode": .dataHeader.successCode
-   },
-   "dataBody": {
+    },
+    "dataBody": {
         "billTransactions": [for (.dataBody.grp001)
             if(.useDate != "")(
                 {
                     let isInstallment = _isInstallment(.useMonth)
                     let isInstallmentCancel = _isInstallmentCancel(.useMonth ,.monthCount)
-                    // TODO 해당부분 diff를 위하여 주석처리 "cardNumber": replace(.crdN, "-", ""),  // 카드번호
+                    "cardNumber": .crdN,                    // 카드번호
                     "cardNumberMasked": .crdN,              // 마스킹 카드번호
                     "approvalDay" : .useDate,               // 이용일자
                     "amount": .amount,                      // 이용원금금액
