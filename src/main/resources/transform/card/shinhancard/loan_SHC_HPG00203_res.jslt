@@ -1,5 +1,20 @@
 // 카드 인터넷대출-대출현황 조회 SHC_HPG00203 응답
+
+let resultCodes = {
+    "": "Unknown",
+    "0004": "OK",
+    "0010": "OK",
+    "0013": "OK",
+    "9800": "INVALID_USER",
+    "400": "INVALID_ACCESS_TOKEN",
+    "503": "EXTERNAL_SERVER_ERROR",
+    "0002": "EXTERNAL_SERVER_ERROR",
+    "9971": "EXTERNAL_SERVER_ERROR",
+    "9999": "EXTERNAL_SERVER_ERROR"
+}
+
 {
+    "resultCodes": [get-key($resultCodes, .dataHeader.resultCode, "Unknown")],
     "dataBody":{
         "loans": [for (.dataBody.grp001)
             {
@@ -12,7 +27,7 @@
         "nextKey" : .dataBody.nxtQyKey      // 다음 조회 키
     },
     "dataHeader":{
-        "resultCode": .dataHeader.resultCode,
+        "resultCode": get-key($resultCodes, .dataHeader.resultCode, "Unknown"),
         "resultMessage": .dataHeader.resultMessage
     }
 }

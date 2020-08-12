@@ -4,6 +4,7 @@ import com.rainist.collect.common.api.Pagination
 import com.rainist.collect.common.execution.Execution
 import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.card.dto.ListCardsResponse
+import com.rainist.collectcard.card.dto.ListCardsResponseDataBody
 import com.rainist.collectcard.cardbills.dto.CardBill
 import com.rainist.collectcard.cardbills.dto.ListBillTransactionsResponse
 import com.rainist.collectcard.cardbills.dto.ListBillTransactionsResponseDataBody
@@ -11,6 +12,7 @@ import com.rainist.collectcard.cardbills.dto.ListCardBillsResponse
 import com.rainist.collectcard.cardbills.dto.ListCardBillsResponseDataBody
 import com.rainist.collectcard.cardcreditlimit.dto.CreditLimitResponse
 import com.rainist.collectcard.cardloans.dto.ListLoansResponse
+import com.rainist.collectcard.cardloans.dto.ListLoansResponseDataBody
 import com.rainist.collectcard.cardloans.dto.Loan
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponse
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponseDataBody
@@ -43,11 +45,15 @@ class ShinhancardExecutions {
 
         // 대출 정보
         val mergeLoans =
-            BinaryOperator { prevListLoanResponse: ListLoansResponse, nextListLoanResponse: ListLoansResponse ->
-                nextListLoanResponse?.dataBody?.loans?.addAll(
-                    0, prevListLoanResponse?.dataBody?.loans ?: mutableListOf()
-                )
-                nextListLoanResponse
+            BinaryOperator { prev: ListLoansResponse, next: ListLoansResponse ->
+
+                val prevLoans = prev.dataBody?.loans ?: mutableListOf()
+                val nextLoans = next.dataBody?.loans ?: mutableListOf()
+
+                prevLoans.addAll(nextLoans)
+
+                prev.dataBody = ListLoansResponseDataBody(loans = prevLoans, nextKey = next.dataBody?.nextKey)
+                prev
             }
 
         val mergeBills =
@@ -146,14 +152,16 @@ class ShinhancardExecutions {
             }
 
         val mergeCards =
-            BinaryOperator { listCardsResponse1: ListCardsResponse, listCardsResponse2: ListCardsResponse ->
-                listCardsResponse1.resultCodes.add(listCardsResponse2.dataHeader?.resultCode ?: ResultCode.UNKNOWN)
+            BinaryOperator { prev: ListCardsResponse, next: ListCardsResponse ->
+                prev.resultCodes.add(next.dataHeader?.resultCode ?: ResultCode.UNKNOWN)
 
-                listCardsResponse1.dataBody?.cards?.addAll(
-                    listCardsResponse2.dataBody?.cards ?: mutableListOf()
-                )
+                val prevCards = prev.dataBody?.cards ?: mutableListOf()
+                val nextCards = next.dataBody?.cards ?: mutableListOf()
 
-                listCardsResponse1
+                prevCards.addAll(nextCards)
+
+                prev.dataBody = ListCardsResponseDataBody(cards = prevCards, nextKey = next.dataBody?.nextKey)
+                prev
             }
 
         /* 카드 이용내역 merge */
@@ -298,7 +306,7 @@ class ShinhancardExecutions {
                 )
                 .fetch { listCardBillResponse ->
                     listCardBillResponse as ListCardBillsResponse
-                    listCardBillResponse?.dataBody?.cardBills?.iterator()
+                    listCardBillResponse.dataBody?.cardBills?.iterator()
                 }.then(
                     Execution.create()
                         .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_lump_sum)
@@ -341,7 +349,7 @@ class ShinhancardExecutions {
                         )
                         .fetch { listCardBillResponse ->
                             listCardBillResponse as ListCardBillsResponse
-                            listCardBillResponse?.dataBody?.cardBills?.iterator()
+                            listCardBillResponse.dataBody?.cardBills?.iterator()
                         }.then(
                             Execution.create()
                                 .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_installment)
@@ -392,7 +400,7 @@ class ShinhancardExecutions {
                     executionContext as ExecutionContext
                     val paymentDay = DateTimeUtil.localDatetimeToString(executionContext.startAt, "yyyyMMdd")
 
-                    listCardBillsResponse?.dataBody?.cardBills?.filter { it -> it.paymentDay!! >= paymentDay }?.iterator()
+                    listCardBillsResponse.dataBody?.cardBills?.filter { it -> it.paymentDay!! >= paymentDay }?.iterator()
                         ?: mutableListOf<CardBill>().iterator()
                 }
                 .then(
@@ -441,7 +449,7 @@ class ShinhancardExecutions {
                             executionContext as ExecutionContext
                             val paymentDay = DateTimeUtil.localDatetimeToString(executionContext.startAt, "yyyyMMdd")
 
-                            listCardBillsResponse?.dataBody?.cardBills?.filter { it -> it.paymentDay!! >= paymentDay }?.iterator()
+                            listCardBillsResponse.dataBody?.cardBills?.filter { it -> it.paymentDay!! >= paymentDay }?.iterator()
                                 ?: mutableListOf<CardBill>().iterator()
                         }
                         .then(
@@ -508,7 +516,7 @@ class ShinhancardExecutions {
                 )
                 .fetch { listLoansResponse ->
                     listLoansResponse as ListLoansResponse
-                    listLoansResponse?.dataBody?.loans?.iterator() ?: listOf<Any>().iterator()
+                    listLoansResponse.dataBody?.loans?.iterator() ?: listOf<Any>().iterator()
                 }
                 .then(
                     Execution.create()

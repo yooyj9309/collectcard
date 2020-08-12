@@ -2,23 +2,25 @@ package com.rainist.collectcard.cardloans.dto
 
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
 import com.google.protobuf.StringValue
+import com.rainist.collectcard.common.enums.ResultCode
 import com.rainist.common.exception.ValidationException
 import com.rainist.common.util.DateTimeUtil
 
 data class ListLoansResponse(
+    var resultCodes: MutableList<ResultCode> = mutableListOf(),
     var dataHeader: ListLoansResponseDataHeader? = null,
     var dataBody: ListLoansResponseDataBody? = null
 )
 
 data class ListLoansResponseDataHeader(
     var successCode: String? = null,
-    var resultCode: String? = null,
+    var resultCode: ResultCode? = null,
     var resultMessage: String? = null
 )
 
 data class ListLoansResponseDataBody(
     var loans: MutableList<Loan>? = null,
-    var nextKey: String = ""
+    var nextKey: String ? = ""
 )
 
 fun ListLoansResponse.toListCardLoansResponseProto(): CollectcardProto.ListCardLoansResponse {

@@ -2,6 +2,7 @@ package com.rainist.collectcard.cardcreditlimit.dto
 
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
 import com.rainist.collectcard.card.CardsException
+import com.rainist.collectcard.common.enums.ResultCode
 
 data class CreditLimitResponse(
     var dataHeader: CreditLimitResponseDataHeader?,
@@ -9,7 +10,7 @@ data class CreditLimitResponse(
 )
 
 data class CreditLimitResponseDataHeader(
-    var resultCode: String? = null,
+    var resultCode: ResultCode? = null,
     var resultMessage: String? = null
 )
 

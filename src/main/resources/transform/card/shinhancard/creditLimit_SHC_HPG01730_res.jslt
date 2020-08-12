@@ -1,6 +1,19 @@
+let resultCodes = {
+    "": "Unknown",
+    "0004": "OK",
+    "0010": "OK",
+    "0013": "OK",
+    "9800": "INVALID_USER",
+    "400": "INVALID_ACCESS_TOKEN",
+    "503": "EXTERNAL_SERVER_ERROR",
+    "0002": "EXTERNAL_SERVER_ERROR",
+    "9971": "EXTERNAL_SERVER_ERROR",
+    "9999": "EXTERNAL_SERVER_ERROR"
+}
+
 {
     "dataHeader": {
-        "resultCode": .dataHeader.resultCode,
+        "resultCode": get-key($resultCodes, .dataHeader.resultCode, "Unknown"),
         "resultMessage": .dataHeader.resultMessage
     },
     "dataBody": {
