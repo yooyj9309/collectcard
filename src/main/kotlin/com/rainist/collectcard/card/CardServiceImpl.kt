@@ -16,9 +16,8 @@ import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.db.entity.CardEntity
 import com.rainist.collectcard.common.db.repository.CardHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardRepository
-import com.rainist.collectcard.common.dto.CollectExecutionContext
-import com.rainist.collectcard.common.dto.SyncRequest
 import com.rainist.collectcard.common.enums.ResultCode
+import com.rainist.collectcard.common.exception.CollectcardException
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.common.log.Log
@@ -39,25 +38,18 @@ class CardServiceImpl(
 
     val cardMapper = Mappers.getMapper(CardMapper::class.java)
 
-    override fun listCards(syncRequest: SyncRequest): ListCardsResponse {
-        logger.info("CardService.listCards start: syncRequest: {}", syncRequest)
+    override fun listCards(executionContext: ExecutionContext): ListCardsResponse {
+        logger.info("CardService.listCards start: executionContext: {}", executionContext)
 
-        val userSyncStatusLastCheckedAt = DateTimeUtil.utcNowLocalDateTime()
+        val banksaladUserId = executionContext.userId.toLong()
 
         /* header */
-        val header = headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId)
+        val header = headerService.makeHeader(executionContext.userId, executionContext.organizationId)
 
         /* request body */
         val listCardsRequest = ListCardsRequest().apply {
             dataBody = ListCardsRequestDataBody()
         }
-
-        /* Execution Context */
-        val executionContext: ExecutionContext = CollectExecutionContext(
-            organizationId = syncRequest.organizationId,
-            userId = syncRequest.banksaladUserId.toString(),
-            startAt = DateTimeUtil.utcNowLocalDateTime()
-        )
 
         /* Call API */
         val executionResponse: ExecutionResponse<ListCardsResponse> =
@@ -70,10 +62,6 @@ class CardServiceImpl(
                     .build()
             )
 
-//        if (executionResponse.isExceptionOccurred){
-//            TODO("excution exception handling")
-//        }
-
         val listCardsResponse = executionResponse.response
 
         /* convert type and format if necessary */
@@ -81,25 +69,26 @@ class CardServiceImpl(
             card.apply {
                 cardNumber = cardNumber?.replace("-", "")
                 cardNumberMask = cardNumberMask?.replace("-", "")
-                cardCompanyId = syncRequest.organizationId
+                cardCompanyId = executionContext.organizationId
             }
         }
 
         /* Save to DB and return */
         listCardsResponse?.dataBody?.cards?.forEach { card ->
-            upsertCardAndCardHistory(syncRequest.banksaladUserId, card)
+            upsertCardAndCardHistory(executionContext.userId.toLong(), card)
         }
 
-        val isSuccess = listCardsResponse.resultCodes.filter { it != ResultCode.OK }.isEmpty()
-        if (isSuccess) {
-            userSyncStatusService.updateUserSyncStatus(syncRequest.banksaladUserId, syncRequest.organizationId, Transaction.cards.name, DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(userSyncStatusLastCheckedAt))
-        }
+        /* check response result */
+        validateResponseAndThrow(executionResponse)
 
-//        if (listCardsResponse.resultCodes.contains(ResultCode.EXTERNAL_SERVER_ERROR)){
-//            TODO("result code handling")
-//        }
+        userSyncStatusService.updateUserSyncStatus(
+            banksaladUserId,
+            executionContext.organizationId,
+            Transaction.cards.name,
+            DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(executionContext.startAt)
+        )
 
-        logger.info("CardService.listCards end: syncRequest: {}", syncRequest)
+        logger.info("CardService.listCards end: executionContext: {}", executionContext)
         return executionResponse.response
     }
 
@@ -142,7 +131,33 @@ class CardServiceImpl(
         }
         cardRepository.save(cardEntity)
 
-        val cardHistoryEntity = cardMapper.toCardHistoryEntity(cardEntity) // modelMapper.map(cardEntity, CardHistoryEntity::class.java)
+        val cardHistoryEntity =
+            cardMapper.toCardHistoryEntity(cardEntity) // modelMapper.map(cardEntity, CardHistoryEntity::class.java)
         cardHistoryRepository.save(cardHistoryEntity)
+    }
+
+    private fun validateResponseAndThrow(executionResponse: ExecutionResponse<ListCardsResponse>) {
+        /* check response result */
+        if (executionResponse.isExceptionOccurred) {
+            throw CollectcardException(ResultCode.UNKNOWN.name)
+        }
+
+        val listCardsResponse = executionResponse.response
+
+        if (listCardsResponse.resultCodes.contains(ResultCode.EXTERNAL_SERVER_ERROR)) {
+            throw CollectcardException(ResultCode.EXTERNAL_SERVER_ERROR.name, "")
+        }
+
+        if (listCardsResponse.resultCodes.contains(ResultCode.INVALID_ACCESS_TOKEN)) {
+            throw CollectcardException(ResultCode.INVALID_ACCESS_TOKEN.name, "")
+        }
+
+        if (listCardsResponse.resultCodes.contains(ResultCode.INVALID_USER)) {
+            throw CollectcardException(ResultCode.INVALID_USER.name, "")
+        }
+
+        if (listCardsResponse.resultCodes.contains(ResultCode.UNKNOWN)) {
+            throw CollectcardException(ResultCode.UNKNOWN.name, "")
+        }
     }
 }

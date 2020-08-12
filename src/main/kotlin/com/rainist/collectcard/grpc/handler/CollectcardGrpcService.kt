@@ -2,6 +2,7 @@ package com.rainist.collectcard.grpc.handler
 
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardGrpc
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
+import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.card.CardService
 import com.rainist.collectcard.card.dto.toListCardsResponseProto
 import com.rainist.collectcard.cardbills.CardBillService
@@ -12,6 +13,7 @@ import com.rainist.collectcard.cardloans.CardLoanService
 import com.rainist.collectcard.cardloans.dto.toListCardLoansResponseProto
 import com.rainist.collectcard.cardtransactions.CardTransactionService
 import com.rainist.collectcard.cardtransactions.dto.toListCardsTransactionResponseProto
+import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.dto.SyncRequest
 import com.rainist.collectcard.common.exception.CollectcardServiceExceptionHandler
 import com.rainist.collectcard.common.exception.HealthCheckException
@@ -19,6 +21,7 @@ import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.config.onException
 import com.rainist.common.interceptor.StatsUnaryServerInterceptor
 import com.rainist.common.log.Log
+import com.rainist.common.util.DateTimeUtil
 import io.grpc.stub.StreamObserver
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.lognet.springboot.grpc.GRpcService
@@ -58,12 +61,15 @@ class CollectcardGrpcService(
 
         kotlin.runCatching {
             // TODO : userId validation, organizationId validation (userId는 Long 인지 여부, orngaizationId 는 변환후 null 여부
-            val syncRequest = SyncRequest(
-                request.userId.toLong(),
-                organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: ""
+
+            /* Execution Context */
+            val executionContext: ExecutionContext = CollectExecutionContext(
+                organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
+                userId = request.userId,
+                startAt = DateTimeUtil.utcNowLocalDateTime()
             )
 
-            cardService.listCards(syncRequest).toListCardsResponseProto()
+            cardService.listCards(executionContext).toListCardsResponseProto()
         }.onSuccess {
             logger.info("[사용자 카드 조회 결과 success]")
 
@@ -76,7 +82,6 @@ class CollectcardGrpcService(
         }.onFailure {
 //            logger.error("[사용자 카드 조회 에러 : {}]", it.localizedMessage, it)
             CollectcardServiceExceptionHandler.handle("listCards", "사용자카드조회", it)
-
             responseObserver.onError(it)
         }
     }

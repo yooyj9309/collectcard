@@ -1,14 +1,16 @@
 package com.rainist.collectcard.card
 
+import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.card.dto.Card
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
 import com.rainist.collectcard.common.db.entity.CardEntity
 import com.rainist.collectcard.common.db.repository.CardRepository
-import com.rainist.collectcard.common.dto.SyncRequest
+import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.enums.CardOwnerType
 import com.rainist.collectcard.common.enums.CardType
 import com.rainist.collectcard.common.enums.ResultCode
 import com.rainist.collectcard.common.service.HeaderService
+import com.rainist.common.util.DateTimeUtil
 import java.time.LocalDateTime
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.Is.`is`
@@ -50,13 +52,17 @@ class CardServiceImplTest {
     @MockBean
     lateinit var headerService: HeaderService
 
-    val syncRequest = SyncRequest(1L, "organizationId")
+    val executionContext: ExecutionContext = CollectExecutionContext(
+        organizationId = "organizationId",
+        userId = "1",
+        startAt = DateTimeUtil.utcNowLocalDateTime()
+    )
 
     @Test
     fun listCard_success() {
         setupServer(listOf("mock/shinhancard/card_shinhancard_cards.json"))
 
-        given(headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId))
+        given(headerService.makeHeader(executionContext.userId, executionContext.organizationId))
             .willReturn(
                 mutableMapOf(
                     "contentType" to MediaType.APPLICATION_JSON_VALUE,
@@ -65,7 +71,7 @@ class CardServiceImplTest {
                 )
             )
 
-        val response = cardService.listCards(syncRequest)
+        val response = cardService.listCards(executionContext)
 
         assertThat(response.dataHeader?.resultCode, `is`(ResultCode.OK))
         assertThat(response.dataBody?.cards?.size, `is`(4))
@@ -132,7 +138,7 @@ class CardServiceImplTest {
             )
         )
 
-        given(headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId))
+        given(headerService.makeHeader(executionContext.userId, executionContext.organizationId))
             .willReturn(
                 mutableMapOf(
                     "contentType" to MediaType.APPLICATION_JSON_VALUE,
@@ -141,7 +147,7 @@ class CardServiceImplTest {
                 )
             )
 
-        val response = cardService.listCards(syncRequest)
+        val response = cardService.listCards(executionContext)
 
         assertThat(response.dataHeader?.resultCode, `is`(ResultCode.OK))
         assertThat(response.dataBody?.cards?.size, `is`(19))
@@ -205,7 +211,7 @@ class CardServiceImplTest {
     fun listCard_updated() {
         setupServer(listOf("mock/shinhancard/card_shinhancard_cards_update.json"))
 
-        given(headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId))
+        given(headerService.makeHeader(executionContext.userId, executionContext.organizationId))
             .willReturn(
                 mutableMapOf(
                     "contentType" to MediaType.APPLICATION_JSON_VALUE,
@@ -237,7 +243,7 @@ class CardServiceImplTest {
             )
         )
 
-        val response = cardService.listCards(syncRequest)
+        val response = cardService.listCards(executionContext)
 
         assertThat(response.dataHeader?.resultCode, `is`(ResultCode.OK))
         assertThat(response.dataBody?.cards?.size, `is`(1))
