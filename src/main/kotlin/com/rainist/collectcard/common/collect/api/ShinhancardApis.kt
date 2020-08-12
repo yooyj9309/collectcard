@@ -224,7 +224,7 @@ class ShinhancardApis {
                     )
                 ).build()
 
-        // 체크카드 월별 청구내역(SHC_HPG00698)
+        // 신용카드 월별 청구내역(SHC_HPG00698)
         card_shinhancard_credit_bill_transactions =
             Api.builder()
                 .id("card_shinhancard_credit_bill_transactions")

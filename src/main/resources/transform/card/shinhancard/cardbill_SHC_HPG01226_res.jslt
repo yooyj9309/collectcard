@@ -28,7 +28,7 @@ let resultCodes = {
                     "userGrade": "",
                     "paymentDay": .setlDay,
                     "nextPaymentDay": "",
-                    "billingAmount": .bllAmt,
+                    // "billingAmount": .bllAmt, // check bill amount는 sum(transaction.bill_amount)
                     "prepaidAmount": "",
                     "paymentBankId": .bankno,
                     "paymentAccountNumber": .accno,

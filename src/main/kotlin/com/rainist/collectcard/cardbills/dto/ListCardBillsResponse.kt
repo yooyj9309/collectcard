@@ -46,7 +46,7 @@ fun ListCardBillsResponse.toListCardBillsResponseProto(): CollectcardProto.ListC
                     // diff를 위해서 Builder 선언
                     val cardTransactionBuilder = CollectcardProto.CardBillTransaction.newBuilder()
                     cardTransactionBuilder.transactedAt = SimpleDateFormat("yyyy-MM-dd").format(SimpleDateFormat("yyyyMMdd").parse(cardBillTransaction.approvalDay))
-                    cardTransactionBuilder.amount = cardBillTransaction.amount?.toDouble() ?: 0.0
+                    cardTransactionBuilder.amount = cardBillTransaction.billedAmount?.toDouble() ?: 0.0
                     cardTransactionBuilder.currency = if (StringUtils.isEmpty(cardBillTransaction.currencyCode)) "KRW" else cardBillTransaction.currencyCode
                     cardTransactionBuilder.installment = cardBillTransaction.isInstallmentPayment ?: false
                     cardTransactionBuilder.fee = cardBillTransaction.serviceChargeAmount?.toDouble() ?: 0.0

@@ -85,7 +85,6 @@ class ShinhancardExecutions {
 
         val mergeBillByBillTransactionExpected =
             BinaryOperator { prev: ListCardBillsResponse, next: ListCardBillsResponse ->
-
                 val prevCardBills = prev.dataBody?.cardBills ?: mutableListOf()
                 val nextCardBills = next.dataBody?.cardBills ?: mutableListOf()
 
@@ -145,10 +144,28 @@ class ShinhancardExecutions {
 
                 masterTransaction.forEach {
                     // 연회비인 경우 approvalDay가 없음
-                    it.approvalDay = it.approvalDay?.let { it } ?: master.paymentDay
+                    if (it.approvalDay?.isEmpty() ?: false) {
+                        it.approvalDay = master.paymentDay
+                    }
                 }
 
                 master.transactions = masterTransaction
+            }
+
+        val mergeCheckBillTransaction =
+            BiConsumer { master: CardBill, detail: ListBillTransactionsResponse ->
+                if (master.transactions == null) {
+                    master.transactions = mutableListOf()
+                }
+                master.transactions?.addAll(detail.dataBody?.billTransactions ?: mutableListOf())
+                master.billingAmount = master.transactions?.sumBy { it.billedAmount?.toInt() ?: 0 }?.toBigDecimal()
+
+                // 연회비인 경우 approvalDay가 없음
+                master.transactions?.forEach {
+                    if (it.approvalDay?.isEmpty() ?: false) {
+                        it.approvalDay = master.paymentDay
+                    }
+                }
             }
 
         val mergeCards =
@@ -424,7 +441,7 @@ class ShinhancardExecutions {
                         )
                         .build()
                 )
-                .merge(mergeBillTransaction)
+                .merge(mergeCheckBillTransaction)
                 .with(
                     Execution.create()
                         .exchange(ShinhancardApis.card_shinhancard_credit_bills)

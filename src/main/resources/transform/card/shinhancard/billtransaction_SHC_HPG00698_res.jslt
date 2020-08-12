@@ -53,6 +53,7 @@ def parse_zfil_number(s)
                     "installment" : if($isInstallment == false or $isInstallmentCancel == true) null else .dvdMnth,
                     "installmentRound" : if($isInstallment == false or $isInstallmentCancel == true) null else .rcpMnt,
                     "amount": .slsAmt,
+                    "billedAmount" : .slsAmt,
                     "billedFee": .useFeeInt,
                     "isOverseaUse": if (.frgnY == "Y") true else false,
                     // "currencyCode": .crcyUnt TODO connectcard에서는 전부 KRW,diff 종료후 주석 해제

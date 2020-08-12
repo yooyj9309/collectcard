@@ -21,10 +21,11 @@ let resultCodes = {
     },
     "dataBody": {
         "billTransactions": [for (.dataBody.grp001)
-            if(.comm != "")(
+            if(.comm != "" and .class != "재난지원금")(
                 {
                     "approvalDay" : .comm,
                     "amount": .capital,
+                    "billedAmount" : .capital,
                     "billedFee": .commission,
                     "cardNumber": .class,
                     "cardNumberMasked": .class,
