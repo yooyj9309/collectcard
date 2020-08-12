@@ -79,7 +79,7 @@ class CardServiceImpl(
         val listCardsResponse = executionResponse.response
 
         /* convert type and format if necessary */
-        listCardsResponse.dataBody?.cards?.forEach { card ->
+        listCardsResponse?.dataBody?.cards?.forEach { card ->
             card.apply {
                 cardNumber = cardNumber?.replace("-", "")
                 cardNumberMask = cardNumberMask?.replace("-", "")
@@ -88,7 +88,7 @@ class CardServiceImpl(
         }
 
         /* Save to DB and return */
-        listCardsResponse.dataBody?.cards?.forEach { card ->
+        listCardsResponse?.dataBody?.cards?.forEach { card ->
             upsertCardAndCardHistory(syncRequest.banksaladUserId, card)
         }
 

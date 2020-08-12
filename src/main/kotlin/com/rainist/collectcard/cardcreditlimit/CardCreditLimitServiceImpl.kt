@@ -71,7 +71,7 @@ class CardCreditLimitServiceImpl(
         )
 
         // validate
-        if (executionResponse.response.dataBody == null || executionResponse.response.dataBody?.creditLimitInfo == null)
+        if (executionResponse.response?.dataBody == null || executionResponse.response?.dataBody?.creditLimitInfo == null)
             throw CollectcardException("DataBody is null")
 
         // db insert
@@ -84,7 +84,7 @@ class CardCreditLimitServiceImpl(
             lastCheckAt,
             syncRequest.banksaladUserId.toLong(),
             syncRequest.organizationId,
-            executionResponse.response.dataBody?.creditLimitInfo!!
+            executionResponse.response?.dataBody?.creditLimitInfo
         )
 
         if (CreditLimitEntityUtil.isUpdated(creditLimitEntity, resEntity)) {

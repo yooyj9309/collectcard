@@ -184,12 +184,11 @@ class CardTransactionServiceImpl(
 
         // TODO 박두상 validate를 추가한다면 여기서 한번에, 여러 API의 응답을 합쳐서 내려주기에 각각의 API에서 에러발생 가능성 있음, 해당 부분은 어떻게 처리할것인가.
         return resultBody.flatMap {
-            it.response.dataBody?.transactions?.toMutableList() ?: mutableListOf()
+            it.response?.dataBody?.transactions?.toMutableList() ?: mutableListOf()
         }.filter {
             it.cardNumber?.length ?: 0 > 0
         }.mapNotNull {
             validationService.validateOrNull(it)
-        }.sortedByDescending { cardTransaction -> cardTransaction.approvalDay + cardTransaction.approvalTime }
-            .toMutableList()
+        }.toMutableList()
     }
 }

@@ -95,7 +95,7 @@ class CardBillServiceImpl(
         val cardBillsResponse = cardBillsExecutionResponse.response
 
         // 청구서 IO
-        cardBillsResponse.dataBody?.cardBills?.forEach { cardBill ->
+        cardBillsResponse?.dataBody?.cardBills?.forEach { cardBill ->
             upsertCardBillAndTransactions(syncRequest.banksaladUserId, syncRequest.organizationId, cardBill)
         }
 
@@ -118,23 +118,23 @@ class CardBillServiceImpl(
         val cardBillExpectedResponse = cardBillExpectedExecutionResponse.response
 
         // 결제 예정 내역 DB IO
-        cardBillExpectedResponse.dataBody?.cardBills?.flatMap {
+        cardBillExpectedResponse?.dataBody?.cardBills?.flatMap {
             it.transactions ?: mutableListOf()
         }?.let {
             deleteAndInsertCardBillExpectedTransactions(syncRequest.banksaladUserId, syncRequest.organizationId, it)
         }
 
         // merge 청구서, 결제 예정 내역
-        cardBillsResponse.dataBody?.cardBills?.addAll(
+        cardBillsResponse?.dataBody?.cardBills?.addAll(
             0,
-            cardBillExpectedResponse.dataBody?.cardBills ?: mutableListOf()
+            cardBillExpectedResponse?.dataBody?.cardBills ?: mutableListOf()
         )
 
         // 1depth sorting
-        cardBillsResponse.dataBody?.cardBills?.sortByDescending { cardBill -> cardBill.paymentDay }
+        cardBillsResponse?.dataBody?.cardBills?.sortByDescending { cardBill -> cardBill.paymentDay }
 
         // 2depth sorting
-        cardBillsResponse.dataBody?.cardBills?.forEach { cardBill ->
+        cardBillsResponse?.dataBody?.cardBills?.forEach { cardBill ->
             cardBill.transactions?.sortByDescending { transaction -> transaction.approvalDay }
         }
 

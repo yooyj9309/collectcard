@@ -43,49 +43,49 @@ class ShinhancardExecutions {
         // 대출 정보
         val mergeLoans =
             BinaryOperator { prevListLoanResponse: ListLoansResponse, nextListLoanResponse: ListLoansResponse ->
-                nextListLoanResponse.dataBody?.loans?.addAll(
-                    0, prevListLoanResponse.dataBody?.loans ?: mutableListOf()
+                nextListLoanResponse?.dataBody?.loans?.addAll(
+                    0, prevListLoanResponse?.dataBody?.loans ?: mutableListOf()
                 )
                 nextListLoanResponse
             }
 
         val mergeBills =
             BinaryOperator { prev: ListCardBillsResponse, next: ListCardBillsResponse ->
-                next.dataBody?.cardBills?.addAll(
-                    0, prev.dataBody?.cardBills ?: mutableListOf()
+                next?.dataBody?.cardBills?.addAll(
+                    0, prev?.dataBody?.cardBills ?: mutableListOf()
                 )
                 next
             }
 
         val mergeTransactions =
             BinaryOperator { prev: ListBillTransactionsResponse, next: ListBillTransactionsResponse ->
-                next.dataBody?.billTransactions?.addAll(0, prev.dataBody?.billTransactions ?: mutableListOf())
-                    ?: kotlin.run { next.dataBody?.billTransactions = mutableListOf() }
+                next?.dataBody?.billTransactions?.addAll(0, prev?.dataBody?.billTransactions ?: mutableListOf())
+                    ?: kotlin.run { next?.dataBody?.billTransactions = mutableListOf() }
                 next
             }
 
         val mergeBillByBillTransactionExpected =
             BinaryOperator { prev: ListCardBillsResponse, next: ListCardBillsResponse ->
-                next.dataBody?.cardBills?.forEachIndexed { idx, cardBill ->
+                next?.dataBody?.cardBills?.forEachIndexed { idx, cardBill ->
                     if (cardBill.transactions == null) {
                         cardBill.transactions = mutableListOf()
                     }
-                    prev.dataBody?.cardBills?.get(idx)?.transactions?.let {
+                    prev?.dataBody?.cardBills?.get(idx)?.transactions?.let {
                         cardBill.transactions?.addAll(it)
                     }
                 }
-                next.dataBody?.cardBills?.sortByDescending { it -> it.paymentDay }
+                next?.dataBody?.cardBills?.sortByDescending { it -> it.paymentDay }
                 next
             }
 
         val mergeBillByBills =
             BinaryOperator { prev: ListCardBillsResponse, next: ListCardBillsResponse ->
-                next.dataBody?.cardBills?.addAll(
-                    0, prev.dataBody?.cardBills ?: mutableListOf()
+                next?.dataBody?.cardBills?.addAll(
+                    0, prev?.dataBody?.cardBills ?: mutableListOf()
                 )
 
                 // transactions 없는 리스트 제거
-                next.dataBody?.cardBills = next.dataBody?.cardBills?.filter { it.transactions != null }?.toMutableList() ?: mutableListOf()
+                next?.dataBody?.cardBills = next?.dataBody?.cardBills?.filter { it.transactions != null }?.toMutableList() ?: mutableListOf()
 
                 // cardNumber 한글 제거 처리 진행
                 val pattern = Pattern.compile("[0-9]*\$")
@@ -108,7 +108,7 @@ class ShinhancardExecutions {
                 if (master.transactions == null) {
                     master.transactions = mutableListOf()
                 }
-                master.transactions?.addAll(detail.dataBody?.billTransactions ?: mutableListOf())
+                master.transactions?.addAll(detail?.dataBody?.billTransactions ?: mutableListOf())
 
                 // 연회비인 경우 approvalDay가 없음
                 master.transactions?.forEach {
@@ -272,7 +272,7 @@ class ShinhancardExecutions {
                 )
                 .fetch { listCardBillResponse ->
                     listCardBillResponse as ListCardBillsResponse
-                    listCardBillResponse.dataBody?.cardBills?.iterator()
+                    listCardBillResponse?.dataBody?.cardBills?.iterator()
                 }.then(
                     Execution.create()
                         .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_lump_sum)
@@ -315,7 +315,7 @@ class ShinhancardExecutions {
                         )
                         .fetch { listCardBillResponse ->
                             listCardBillResponse as ListCardBillsResponse
-                            listCardBillResponse.dataBody?.cardBills?.iterator()
+                            listCardBillResponse?.dataBody?.cardBills?.iterator()
                         }.then(
                             Execution.create()
                                 .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_installment)
@@ -366,7 +366,7 @@ class ShinhancardExecutions {
                     executionContext as ExecutionContext
                     val paymentDay = DateTimeUtil.localDatetimeToString(executionContext.startAt, "yyyyMMdd")
 
-                    listCardBillsResponse.dataBody?.cardBills?.filter { it -> it.paymentDay!! >= paymentDay }?.iterator()
+                    listCardBillsResponse?.dataBody?.cardBills?.filter { it -> it.paymentDay!! >= paymentDay }?.iterator()
                         ?: mutableListOf<CardBill>().iterator()
                 }
                 .then(
@@ -415,7 +415,7 @@ class ShinhancardExecutions {
                             executionContext as ExecutionContext
                             val paymentDay = DateTimeUtil.localDatetimeToString(executionContext.startAt, "yyyyMMdd")
 
-                            listCardBillsResponse.dataBody?.cardBills?.filter { it -> it.paymentDay!! >= paymentDay }?.iterator()
+                            listCardBillsResponse?.dataBody?.cardBills?.filter { it -> it.paymentDay!! >= paymentDay }?.iterator()
                                 ?: mutableListOf<CardBill>().iterator()
                         }
                         .then(
@@ -482,7 +482,7 @@ class ShinhancardExecutions {
                 )
                 .fetch { listLoansResponse ->
                     listLoansResponse as ListLoansResponse
-                    listLoansResponse.dataBody?.loans?.iterator() ?: listOf<Any>().iterator()
+                    listLoansResponse?.dataBody?.loans?.iterator() ?: listOf<Any>().iterator()
                 }
                 .then(
                     Execution.create()

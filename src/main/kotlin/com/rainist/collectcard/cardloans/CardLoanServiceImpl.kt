@@ -75,7 +75,7 @@ class CardLoanServiceImpl(
         }
 
         /* db insert */
-        res.response.dataBody?.loans?.forEach { loan ->
+        res.response?.dataBody?.loans?.forEach { loan ->
 
             loan.loanId?.let {
                 cardLoanRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyLoanId(
