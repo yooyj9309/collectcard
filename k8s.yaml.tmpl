@@ -242,6 +242,8 @@ spec:
               value: {{ $sub_env_id }}
             - name: NAMESPACE
               value: {{ $namespace }}
+            - name: SENTRY_ENVIRONMENT
+              value: {{ $env }}
             - name: DEVELOPMENT_COLLECTCARD_DB_PASSWORD
               value: {{ $development_collectcard_db_password }}
             - name: DEVELOPMENT_SHINHANCARD_CLIENT_ID
