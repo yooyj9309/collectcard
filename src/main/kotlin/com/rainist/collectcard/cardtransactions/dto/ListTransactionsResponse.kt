@@ -65,7 +65,7 @@ fun ListTransactionsResponse.toListCardsTransactionResponseProto(): CollectcardP
                 val cardSummaryBuilder = CollectcardProto.CardSummary.newBuilder()
 
                 // 카드번호
-                transaction.cardNumber?.let { cardSummaryBuilder.number = it }
+                transaction.cardNumber?.let { cardSummaryBuilder.number = it.replace("-", "").trim() }
 
                 // 카드이름
                 transaction.cardName?.let { cardSummaryBuilder.name = StringValue.of(it) }
