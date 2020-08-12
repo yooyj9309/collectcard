@@ -3,6 +3,7 @@
     "dataBody":{
         "loans": [for (.dataBody.grp001)
             {
+                "loanId": .loanno,           // 대출번호
                 "loanNumber" : .loanno,     // 대출번호
                 "loanName" : .scd           // 대출상품명
                 //"rgugun" : .rgugun        // 접수 구분 코드 (미사용)
@@ -15,4 +16,3 @@
         "resultMessage": .dataHeader.resultMessage
     }
 }
-
