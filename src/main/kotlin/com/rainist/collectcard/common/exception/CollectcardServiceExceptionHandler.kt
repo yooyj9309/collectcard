@@ -1,5 +1,6 @@
 package com.rainist.collectcard.common.exception
 
+import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.common.meters.CollectMeterRegistry
 import javax.annotation.PostConstruct
 import org.apache.commons.lang3.exception.ExceptionUtils
@@ -28,6 +29,29 @@ class CollectcardServiceExceptionHandler(private val collectMeterRegistry: Colle
                     "message: {}\n" +
                     "cause message: {}\n" +
                     "stacktrace: {}",
+                serviceId,
+                serviceName,
+                throwable.message,
+                throwable.cause?.message ?: "",
+                ExceptionUtils.getStackTrace(throwable),
+                throwable)
+        }
+
+        fun handle(executionContext: ExecutionContext, serviceId: String, serviceName: String, throwable: Throwable) {
+            // register meter count
+            collectMeterRegistry.registerServiceErrorCount(serviceId)
+
+            // write error log
+            log.error("[COLLECT][Service] " +
+                    "banksaladUserId: {}\n" +
+                    "organizationId: {}\n" +
+                    "serviceId: {}\n" +
+                    "serviceName: {}\n" +
+                    "message: {}\n" +
+                    "cause message: {}\n" +
+                    "stacktrace: {}",
+                executionContext.userId,
+                executionContext.organizationId,
                 serviceId,
                 serviceName,
                 throwable.message,

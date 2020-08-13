@@ -59,16 +59,14 @@ class CollectcardGrpcService(
     ) {
         logger.debug("[사용자 카드 조회 시작 : {}]", request)
 
+        /* Execution Context */
+        val executionContext: ExecutionContext = CollectExecutionContext(
+            organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
+            userId = request.userId,
+            startAt = DateTimeUtil.utcNowLocalDateTime()
+        )
+
         kotlin.runCatching {
-            // TODO : userId validation, organizationId validation (userId는 Long 인지 여부, orngaizationId 는 변환후 null 여부
-
-            /* Execution Context */
-            val executionContext: ExecutionContext = CollectExecutionContext(
-                organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
-                userId = request.userId,
-                startAt = DateTimeUtil.utcNowLocalDateTime()
-            )
-
             cardService.listCards(executionContext).toListCardsResponseProto()
         }.onSuccess {
             logger.info("[사용자 카드 조회 결과 success]")
@@ -81,7 +79,7 @@ class CollectcardGrpcService(
             responseObserver.onCompleted()
         }.onFailure {
 //            logger.error("[사용자 카드 조회 에러 : {}]", it.localizedMessage, it)
-            CollectcardServiceExceptionHandler.handle("listCards", "사용자카드조회", it)
+            CollectcardServiceExceptionHandler.handle(executionContext, "listCards", "사용자카드조회", it)
             responseObserver.onError(it)
         }
     }

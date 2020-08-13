@@ -16,12 +16,12 @@ import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.db.entity.CardEntity
 import com.rainist.collectcard.common.db.repository.CardHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardRepository
-import com.rainist.collectcard.common.enums.ResultCode
-import com.rainist.collectcard.common.exception.CollectcardException
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.UserSyncStatusService
+import com.rainist.collectcard.common.util.ExecutionResponseValidator
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
+import java.time.LocalDateTime
 import org.mapstruct.factory.Mappers
 import org.springframework.stereotype.Service
 
@@ -62,6 +62,9 @@ class CardServiceImpl(
                     .build()
             )
 
+        /* check response result */
+        ExecutionResponseValidator.validateResponseAndThrow(executionResponse, executionResponse.response.resultCodes)
+
         val listCardsResponse = executionResponse.response
 
         /* convert type and format if necessary */
@@ -75,11 +78,8 @@ class CardServiceImpl(
 
         /* Save to DB and return */
         listCardsResponse?.dataBody?.cards?.forEach { card ->
-            upsertCardAndCardHistory(executionContext.userId.toLong(), card)
+            upsertCardAndCardHistory(executionContext.userId.toLong(), card, executionContext.startAt)
         }
-
-        /* check response result */
-        validateResponseAndThrow(executionResponse)
 
         userSyncStatusService.updateUserSyncStatus(
             banksaladUserId,
@@ -92,7 +92,7 @@ class CardServiceImpl(
         return executionResponse.response
     }
 
-    private fun upsertCardAndCardHistory(banksaladUserId: Long, card: Card) {
+    private fun upsertCardAndCardHistory(banksaladUserId: Long, card: Card, startAt: LocalDateTime) {
         /* 카드 조회 */
         cardRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardId(
             banksaladUserId.toLong(),
@@ -100,64 +100,39 @@ class CardServiceImpl(
             card.cardCompanyCardId ?: ""
         )
             ?.let { cardEntity ->
-                updateCardEntity(cardEntity, card)
+                updateCardEntity(cardEntity, card, startAt)
             }
             ?: kotlin.run {
-                insertCardEntity(card, banksaladUserId)
+                insertCardEntity(card, banksaladUserId, startAt)
             }
     }
 
     /* 기존 카드 */
-    private fun updateCardEntity(cardEntity: CardEntity, card: Card) {
+    private fun updateCardEntity(cardEntity: CardEntity, card: Card, startAt: LocalDateTime) {
         val entityDto = cardMapper.toCardDto(cardEntity)
 
         if (entityDto.unequals(card)) {
             /* update field */
             cardMapper.merge(card, cardEntity)
-            cardEntity.lastCheckAt = DateTimeUtil.utcNowLocalDateTime()
+            cardEntity.lastCheckAt = startAt
+
+            cardRepository.save(cardEntity)
 
             val cardHistoryEntity = cardMapper.toCardHistoryEntity(cardEntity)
             cardHistoryRepository.save(cardHistoryEntity)
         }
-
-        cardRepository.save(cardEntity)
     }
 
     /* 신규 카드 */
-    private fun insertCardEntity(card: Card, banksaladUserId: Long) {
+    private fun insertCardEntity(card: Card, banksaladUserId: Long, startAt: LocalDateTime) {
         val cardEntity = cardMapper.toCardEntity(card).apply {
             this.banksaladUserId = banksaladUserId
-            this.lastCheckAt = DateTimeUtil.utcNowLocalDateTime()
+            this.lastCheckAt = startAt
         }
         cardRepository.save(cardEntity)
 
         val cardHistoryEntity =
             cardMapper.toCardHistoryEntity(cardEntity) // modelMapper.map(cardEntity, CardHistoryEntity::class.java)
         cardHistoryRepository.save(cardHistoryEntity)
-    }
-
-    private fun validateResponseAndThrow(executionResponse: ExecutionResponse<ListCardsResponse>) {
-        /* check response result */
-        if (executionResponse.isExceptionOccurred) {
-            throw CollectcardException(ResultCode.UNKNOWN.name)
-        }
-
-        val listCardsResponse = executionResponse.response
-
-        if (listCardsResponse.resultCodes.contains(ResultCode.EXTERNAL_SERVER_ERROR)) {
-            throw CollectcardException(ResultCode.EXTERNAL_SERVER_ERROR.name, "")
-        }
-
-        if (listCardsResponse.resultCodes.contains(ResultCode.INVALID_ACCESS_TOKEN)) {
-            throw CollectcardException(ResultCode.INVALID_ACCESS_TOKEN.name, "")
-        }
-
-        if (listCardsResponse.resultCodes.contains(ResultCode.INVALID_USER)) {
-            throw CollectcardException(ResultCode.INVALID_USER.name, "")
-        }
-
-        if (listCardsResponse.resultCodes.contains(ResultCode.UNKNOWN)) {
-            throw CollectcardException(ResultCode.UNKNOWN.name, "")
-        }
     }
 }
