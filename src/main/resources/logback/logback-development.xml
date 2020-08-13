@@ -5,8 +5,13 @@
 
     <appender name="ConsoleJson" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="com.rainist.common.log.LogbackPatternLayout">
-                <pattern>{"application_time":"%d{yyyy:MM:dd HH:mm:ss.SSS,Asia/Seoul}","level":"%-5level","request_id":"%request" ,"session_id":"%session","thread":"%thread","class":"%C{36}","method":"%M","line":"%line","log":"%msg"}%n</pattern>
+            <layout class="com.rainist.common.log.CollectJsonLayout">
+                <timestampFormat>yyyy-MM-dd'T'HH:mm:ss.SSSX</timestampFormat>
+                <timestampFormatTimezoneId>Etc/UTC</timestampFormatTimezoneId>
+                <appendLineSeparator>true</appendLineSeparator>
+                <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
+                    <prettyPrint>false</prettyPrint>
+                </jsonFormatter>
             </layout>
         </encoder>
     </appender>
@@ -24,7 +29,7 @@
 
         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
             <layout class="com.rainist.common.log.LogbackPatternLayout">
-                <pattern>[%d{yyyy:MM:dd HH:mm:ss.SSS}] [%-5level] [%session] [%thread] [%C{36}] [%M] [%line] - %msg %n</pattern>
+                <pattern>[%d{yyyy:MM:dd HH:mm:ss.SSS}] [%-5level] [%session] [%thread] [%C{36}] [%M] [%line] [%mdc]- %msg %n</pattern>
             </layout>
         </encoder>
     </appender>
