@@ -63,7 +63,9 @@ class CardServiceImpl(
             )
 
         /* check response result */
-        ExecutionResponseValidator.validateResponseAndThrow(executionResponse, executionResponse.response.resultCodes)
+        ExecutionResponseValidator.validateResponseAndThrow(
+            executionResponse,
+            executionResponse.response.resultCodes)
 
         val listCardsResponse = executionResponse.response
 

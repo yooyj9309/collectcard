@@ -1,11 +1,13 @@
 package com.rainist.collectcard.cardloan
 
+import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.cardloans.CardLoanService
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
 import com.rainist.collectcard.common.db.repository.CardLoanHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardLoanRepository
-import com.rainist.collectcard.common.dto.SyncRequest
+import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.service.HeaderService
+import com.rainist.common.util.DateTimeUtil
 import java.math.BigDecimal
 import junit.framework.Assert.assertEquals
 import org.junit.jupiter.api.DisplayName
@@ -55,9 +57,9 @@ class CardLoanServiceImplTest {
     fun cardLoanTest() {
         setupServer()
 
-        val syncRequest = requestSetting()
+        val executionContext = requestSetting()
 
-        val loans = cardLoanService.listCardLoans(syncRequest)
+        val loans = cardLoanService.listCardLoans(executionContext)
         val listLoan = cardLoanRepository.findAll()
         val listLoanHistory = cardLoanHistoryRepository.findAll()
         assertEquals(loans.dataBody?.loans?.size, 2)
@@ -196,9 +198,15 @@ class CardLoanServiceImplTest {
         return ResourceUtils.getFile(fileInClassPath).readText(Charsets.UTF_8)
     }
 
-    private fun requestSetting(): SyncRequest {
-        val syncRequest = SyncRequest(1L, "organizationId")
-        BDDMockito.given(headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId))
+    private fun requestSetting(): ExecutionContext {
+
+        val executionContext: ExecutionContext = CollectExecutionContext(
+            organizationId = "shinhancard",
+            userId = "1",
+            startAt = DateTimeUtil.utcNowLocalDateTime()
+        )
+
+        BDDMockito.given(headerService.makeHeader(executionContext.userId, executionContext.organizationId))
             .willReturn(
                 mutableMapOf(
                     "contentType" to MediaType.APPLICATION_JSON_VALUE,
@@ -206,6 +214,6 @@ class CardLoanServiceImplTest {
                     "clientId" to "596d66692c4069c168b57c59"
                 )
             )
-        return syncRequest
+        return executionContext
     }
 }

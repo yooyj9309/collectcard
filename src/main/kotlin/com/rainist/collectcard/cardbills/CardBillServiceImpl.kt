@@ -19,25 +19,18 @@ import com.rainist.collectcard.common.db.entity.CardPaymentScheduledEntity
 import com.rainist.collectcard.common.db.repository.CardBillRepository
 import com.rainist.collectcard.common.db.repository.CardBillTransactionRepository
 import com.rainist.collectcard.common.db.repository.CardPaymentScheduledRepository
-import com.rainist.collectcard.common.dto.CollectExecutionContext
-import com.rainist.collectcard.common.dto.SyncRequest
-import com.rainist.collectcard.common.exception.CollectcardException
-import com.rainist.collectcard.common.service.ApiLogService
 import com.rainist.collectcard.common.service.HeaderService
-import com.rainist.collectcard.common.service.OrganizationService
+import com.rainist.collectcard.common.util.ExecutionResponseValidator
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import java.math.BigDecimal
 import java.time.LocalDateTime
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CardBillServiceImpl(
-    val apiLogService: ApiLogService,
     val headerService: HeaderService,
-    val organizationService: OrganizationService,
     val collectExecutorService: CollectExecutorService,
     val cardBillRepository: CardBillRepository,
     val cardBillTransactionRepository: CardBillTransactionRepository,
@@ -51,32 +44,27 @@ class CardBillServiceImpl(
 
     @Transactional
     override fun listUserCardBills(
-        syncRequest: SyncRequest,
+        executionContext: ExecutionContext,
         startAt: Long?
     ): ListCardBillsResponse {
 
+        val banksaladUserId = executionContext.userId.toLong()
+
         /* request header */
-        val header = headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId)
+        val header = headerService.makeHeader(executionContext.userId, executionContext.organizationId)
 
         /* request body */
-        val organization = organizationService.getOrganizationByOrganizationId(syncRequest.organizationId)
+
         val checkStartTime: LocalDateTime = startAt?.let {
             DateTimeUtil.epochMilliSecondToKSTLocalDateTime(startAt)
         } ?: DateTimeUtil.kstNowLocalDateTime().minusMonths(DEFAULT_MAX_BILL_MONTH)
 
         // TODO 제거예정 diff확인용
-        logger.info("CARDBILL_TIME_INFO $checkStartTime $startAt $syncRequest.banksaladUserId ")
+        logger.info("CARDBILL_TIME_INFO $checkStartTime $startAt $banksaladUserId ")
 
         val request = ListCardBillsRequest().apply {
             dataBody = ListCardBillsRequestDataBody()
         }
-
-        /* Execution Context */
-        val executionContext: ExecutionContext = CollectExecutionContext(
-            organizationId = syncRequest.organizationId,
-            userId = syncRequest.banksaladUserId.toString(),
-            startAt = checkStartTime // TODO : set
-        )
 
         // 청구서 execution
         val cardBillsExecutionResponse: ExecutionResponse<ListCardBillsResponse> = collectExecutorService.execute(
@@ -87,16 +75,17 @@ class CardBillServiceImpl(
                 .request(request)
                 .build()
         )
-        // TODO : error handling
-        if (!HttpStatus.valueOf(cardBillsExecutionResponse.httpStatusCode).is2xxSuccessful) {
-            throw CollectcardException("Resopnse status is not success")
-        }
+
+        /* check response result */
+        ExecutionResponseValidator.validateResponseAndThrow(
+            cardBillsExecutionResponse,
+            cardBillsExecutionResponse.response.resultCodes)
 
         val cardBillsResponse = cardBillsExecutionResponse.response
 
         // 청구서 IO
         cardBillsResponse?.dataBody?.cardBills?.forEach { cardBill ->
-            upsertCardBillAndTransactions(syncRequest.banksaladUserId, syncRequest.organizationId, cardBill)
+            upsertCardBillAndTransactions(banksaladUserId, executionContext.organizationId, cardBill)
         }
 
         // 결제 예정 내역 execution
@@ -110,10 +99,10 @@ class CardBillServiceImpl(
                     .build()
             )
 
-        // TODO : error handling
-        if (!HttpStatus.valueOf(cardBillExpectedExecutionResponse.httpStatusCode).is2xxSuccessful) {
-            throw CollectcardException("Resopnse status is not success")
-        }
+        /* check response result */
+        ExecutionResponseValidator.validateResponseAndThrow(
+            cardBillExpectedExecutionResponse,
+            cardBillExpectedExecutionResponse.response.resultCodes)
 
         val cardBillExpectedResponse = cardBillExpectedExecutionResponse.response
 
@@ -121,7 +110,7 @@ class CardBillServiceImpl(
         cardBillExpectedResponse?.dataBody?.cardBills?.flatMap {
             it.transactions ?: mutableListOf()
         }?.let {
-            deleteAndInsertCardBillExpectedTransactions(syncRequest.banksaladUserId, syncRequest.organizationId, it)
+            deleteAndInsertCardBillExpectedTransactions(banksaladUserId, executionContext.organizationId, it)
         }
 
         // merge 청구서, 결제 예정 내역

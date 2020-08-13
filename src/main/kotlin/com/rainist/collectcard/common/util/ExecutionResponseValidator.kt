@@ -31,5 +31,30 @@ class ExecutionResponseValidator {
                 throw CollectcardException(ResultCode.UNKNOWN.name, ResultCode.UNKNOWN.name)
             }
         }
+
+        fun validateResponseAndThrow(
+            executionResponse: ExecutionResponse<*>,
+            resultCode: ResultCode?
+        ) {
+            if (executionResponse.isExceptionOccurred) {
+                throw CollectcardException(ResultCode.UNKNOWN.name, ResultCode.UNKNOWN.name)
+            }
+
+            if (resultCode == ResultCode.EXTERNAL_SERVER_ERROR) {
+                throw CollectcardException(ResultCode.EXTERNAL_SERVER_ERROR.name, ResultCode.EXTERNAL_SERVER_ERROR.name)
+            }
+
+            if (resultCode == ResultCode.INVALID_ACCESS_TOKEN) {
+                throw CollectcardException(ResultCode.INVALID_ACCESS_TOKEN.name, ResultCode.INVALID_ACCESS_TOKEN.name)
+            }
+
+            if (resultCode == ResultCode.INVALID_USER) {
+                throw CollectcardException(ResultCode.INVALID_USER.name, ResultCode.INVALID_USER.name)
+            }
+
+            if (resultCode == ResultCode.UNKNOWN) {
+                throw CollectcardException(ResultCode.UNKNOWN.name, ResultCode.UNKNOWN.name)
+            }
+        }
     }
 }

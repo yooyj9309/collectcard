@@ -1,6 +1,7 @@
 package com.rainist.collectcard.cardtransaction
 
 import com.rainist.collect.common.api.Api
+import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.cardtransactions.CardTransactionService
 import com.rainist.collectcard.cardtransactions.dto.CardTransaction
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponse
@@ -9,7 +10,7 @@ import com.rainist.collectcard.cardtransactions.dto.sortListTransactionsResponse
 import com.rainist.collectcard.cardtransactions.util.CardTransactionUtil
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
 import com.rainist.collectcard.common.db.repository.CardTransactionRepository
-import com.rainist.collectcard.common.dto.SyncRequest
+import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.common.util.DateTimeUtil
 import org.junit.Assert.assertEquals
@@ -53,10 +54,10 @@ class CardTransactionServiceTest {
     fun cardTransactionTest1() {
         // 최초 내역 조회 (페이징)
         setupServerPaging()
-        val syncRequest = requestSetting()
+        val executionContext = requestSetting()
 
         val transactions = cardTransactionService.listTransactions(
-            syncRequest,
+            executionContext,
             DateTimeUtil.utcLocalDateTimeToEpochMilliSecond()
         )
 
@@ -87,10 +88,10 @@ class CardTransactionServiceTest {
     fun cardTransactionTest3() {
         // 추가 내역 조회 (기존 로직 + 추가 로직, 그리고 조회 결과가 전부 신규인경우 테스트)
         setupServer_updated()
-        val syncRequest = requestSetting()
+        val executionContext = requestSetting()
 
         val transactions = cardTransactionService.listTransactions(
-            syncRequest,
+            executionContext,
             DateTimeUtil.utcLocalDateTimeToEpochMilliSecond()
         )
         val entitys = cardTransactionRepository.findAll()
@@ -101,8 +102,8 @@ class CardTransactionServiceTest {
         val cardTransaction = transactions.dataBody?.transactions?.get(0) ?: CardTransaction()
 
         val sourceEntity = CardTransactionUtil.makeCardTransactionEntity(
-            syncRequest.banksaladUserId.toLong(),
-            syncRequest.organizationId,
+            executionContext.userId.toLong(),
+            executionContext.organizationId,
             cardTransaction
         )
 
@@ -115,8 +116,8 @@ class CardTransactionServiceTest {
         val targetEntity =
             cardTransactionRepository.findByApprovalYearMonthAndBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
                 approvalYearMonth,
-                syncRequest.banksaladUserId.toLong(),
-                syncRequest.organizationId,
+                executionContext.userId.toLong(),
+                executionContext.organizationId,
                 cardTransaction.cardCompanyCardId,
                 cardTransaction.approvalNumber,
                 cardTransaction.approvalDay,
@@ -228,10 +229,15 @@ class CardTransactionServiceTest {
         return ResourceUtils.getFile(fileInClassPath).readText(Charsets.UTF_8)
     }
 
-    private fun requestSetting(): SyncRequest {
-        val syncRequest = SyncRequest(1L, "shinhancard")
+    private fun requestSetting(): ExecutionContext {
 
-        BDDMockito.given(headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId))
+        val executionContext: ExecutionContext = CollectExecutionContext(
+            organizationId = "shinhancard",
+            userId = "1",
+            startAt = DateTimeUtil.utcNowLocalDateTime()
+        )
+
+        BDDMockito.given(headerService.makeHeader(executionContext.userId, executionContext.organizationId))
             .willReturn(
                 mutableMapOf(
                     "contentType" to MediaType.APPLICATION_JSON_VALUE,
@@ -239,7 +245,7 @@ class CardTransactionServiceTest {
                     "clientId" to "596d66692c4069c168b57c59"
                 )
             )
-        return syncRequest
+        return executionContext
     }
 
     private fun settingOnceMockServiceServer(server: MockRestServiceServer, api: Api, filePath: String) {

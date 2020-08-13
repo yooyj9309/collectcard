@@ -18,10 +18,8 @@ import com.rainist.collectcard.common.db.entity.makeCardLoanEntity
 import com.rainist.collectcard.common.db.entity.makeCardLoanHistoryEntity
 import com.rainist.collectcard.common.db.repository.CardLoanHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardLoanRepository
-import com.rainist.collectcard.common.dto.CollectExecutionContext
-import com.rainist.collectcard.common.dto.SyncRequest
-import com.rainist.collectcard.common.service.ApiLogService
 import com.rainist.collectcard.common.service.HeaderService
+import com.rainist.collectcard.common.util.ExecutionResponseValidator
 import com.rainist.collectcard.common.util.SyncStatus
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
@@ -30,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CardLoanServiceImpl(
-    val apiLogService: ApiLogService,
     val headerService: HeaderService,
     val collectExecutorService: CollectExecutorService,
     val cardLoanRepository: CardLoanRepository,
@@ -41,10 +38,12 @@ class CardLoanServiceImpl(
 
     @Transactional
     @SyncStatus(transactionId = "cardLoans")
-    override fun listCardLoans(syncRequest: SyncRequest): ListLoansResponse {
+    override fun listCardLoans(executionContext: ExecutionContext): ListLoansResponse {
+        val banksaladUserId = executionContext.userId.toLong()
+
         /* request header */
         val lastCheckAt = DateTimeUtil.getLocalDateTime()
-        val header = headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId)
+        val header = headerService.makeHeader(executionContext.userId, executionContext.organizationId)
 
         /* request body */
         val listLoansRequest = ListLoansRequest().apply {
@@ -52,15 +51,8 @@ class CardLoanServiceImpl(
             this.dataBody = ListLoansRequestDataBody()
         }
 
-        /* Execution Context */
-        val executionContext: ExecutionContext = CollectExecutionContext(
-            organizationId = syncRequest.organizationId,
-            userId = syncRequest.banksaladUserId.toString(),
-            startAt = DateTimeUtil.utcNowLocalDateTime()
-        )
-
         /* service logic */
-        val res: ExecutionResponse<ListLoansResponse> = collectExecutorService.execute(
+        val executionResponse: ExecutionResponse<ListLoansResponse> = collectExecutorService.execute(
             executionContext,
             Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.loan),
             ExecutionRequest.builder<ListLoansRequest>()
@@ -69,18 +61,18 @@ class CardLoanServiceImpl(
                 .build()
         )
 
-        /* validate logic */
-        if (res.httpStatusCode != 200) {
-            // TODO 예상국 기존 에러 처리 로직 확인해서 반영하기
-        }
+        /* check response result */
+        ExecutionResponseValidator.validateResponseAndThrow(
+            executionResponse,
+            executionResponse.response.resultCodes)
 
         /* db insert */
-        res.response?.dataBody?.loans?.forEach { loan ->
+        executionResponse.response?.dataBody?.loans?.forEach { loan ->
 
             loan.loanId?.let {
                 cardLoanRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyLoanId(
-                    syncRequest.banksaladUserId.toLong(),
-                    syncRequest.organizationId,
+                    banksaladUserId,
+                    executionContext.organizationId,
                     loan.loanId
                 )
             }
@@ -91,8 +83,8 @@ class CardLoanServiceImpl(
 
                     val bodyEntity = cardLoanEntity.makeCardLoanEntity(
                         prevLastCheckAt,
-                        syncRequest.banksaladUserId,
-                        syncRequest.organizationId,
+                        banksaladUserId,
+                        executionContext.organizationId,
                         loan
                     )
                     val saveEntity = cardLoanRepository.saveAndFlush(bodyEntity)
@@ -109,8 +101,8 @@ class CardLoanServiceImpl(
                     // only insert
                     val loanEntity = CardLoanEntity().makeCardLoanEntity(
                         lastCheckAt,
-                        syncRequest.banksaladUserId,
-                        syncRequest.organizationId,
+                        banksaladUserId,
+                        executionContext.organizationId,
                         loan
                     )
 
@@ -122,7 +114,7 @@ class CardLoanServiceImpl(
         }
 
         return ListLoansResponse().apply {
-            this.dataBody = res.response.dataBody
+            this.dataBody = executionResponse.response.dataBody
         }
     }
 }

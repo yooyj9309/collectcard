@@ -1,6 +1,6 @@
 package com.rainist.collectcard.common.util
 
-import com.rainist.collectcard.common.dto.SyncRequest
+import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.common.service.UserSyncStatusService
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
@@ -21,13 +21,13 @@ class SyncStatusAspect(private val userSyncStatusService: UserSyncStatusService)
         val start = System.currentTimeMillis()
         val result = joinPoint.proceed()
 
-        val syncRequest = joinPoint.args.filter { arg ->
-            arg is SyncRequest
-        }[0] as SyncRequest?
+        val executionContext = joinPoint.args.filter { arg ->
+            arg is ExecutionContext
+        }[0] as ExecutionContext?
 
-        syncRequest?.let {
+        executionContext?.let {
             userSyncStatusService.updateUserSyncStatus(
-                it.banksaladUserId.toLong(),
+                it.userId.toLong(),
                 it.organizationId,
                 syncStatus.transactionId,
                 start

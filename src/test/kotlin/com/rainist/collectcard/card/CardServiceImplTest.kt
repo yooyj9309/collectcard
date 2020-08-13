@@ -53,7 +53,7 @@ class CardServiceImplTest {
     lateinit var headerService: HeaderService
 
     val executionContext: ExecutionContext = CollectExecutionContext(
-        organizationId = "organizationId",
+        organizationId = "shinhancard",
         userId = "1",
         startAt = DateTimeUtil.utcNowLocalDateTime()
     )
@@ -77,7 +77,7 @@ class CardServiceImplTest {
         assertThat(response.dataBody?.cards?.size, `is`(4))
         assertThat(
             response.dataBody?.cards?.first(), `is`(Card().apply {
-                cardCompanyId = "organizationId"
+                cardCompanyId = "shinhancard"
                 cardCompanyCardId = "721"
                 cardOwnerName = "홍길동"
                 cardOwnerType = CardOwnerType.SELF
@@ -109,7 +109,7 @@ class CardServiceImplTest {
                 CardEntity(
                     cardId = 1,
                     banksaladUserId = 1,
-                    cardCompanyId = "organizationId",
+                    cardCompanyId = "shinhancard",
                     cardCompanyCardId = "721",
                     lastCheckAt = now,
                     cardOwnerName = "홍길동",
@@ -154,7 +154,7 @@ class CardServiceImplTest {
 
         assertThat(
             response.dataBody?.cards?.first(), `is`(Card().apply {
-                cardCompanyId = "organizationId"
+                cardCompanyId = "shinhancard"
                 cardCompanyCardId = "721"
                 cardOwnerName = "홍길동"
                 cardOwnerType = CardOwnerType.SELF
@@ -187,7 +187,7 @@ class CardServiceImplTest {
                 CardEntity(
                     cardId = 1,
                     banksaladUserId = 1,
-                    cardCompanyId = "organizationId",
+                    cardCompanyId = "shinhancard",
                     cardCompanyCardId = "721",
                     lastCheckAt = now,
                     cardOwnerName = "홍길동",
@@ -225,7 +225,7 @@ class CardServiceImplTest {
             CardEntity(
                 cardId = 1,
                 banksaladUserId = 1,
-                cardCompanyId = "organizationId",
+                cardCompanyId = "shinhancard",
                 cardCompanyCardId = "721",
                 lastCheckAt = now,
                 cardOwnerName = "홍길동",
@@ -250,7 +250,7 @@ class CardServiceImplTest {
 
         assertThat(
             response.dataBody?.cards?.first(), `is`(Card().apply {
-                cardCompanyId = "organizationId"
+                cardCompanyId = "shinhancard"
                 cardCompanyCardId = "721"
                 cardOwnerName = "홍길동"
                 cardOwnerType = CardOwnerType.SELF
@@ -281,7 +281,7 @@ class CardServiceImplTest {
                 CardEntity(
                     cardId = 1,
                     banksaladUserId = 1,
-                    cardCompanyId = "organizationId",
+                    cardCompanyId = "shinhancard",
                     cardCompanyCardId = "721",
                     lastCheckAt = now,
                     cardOwnerName = "홍길동",

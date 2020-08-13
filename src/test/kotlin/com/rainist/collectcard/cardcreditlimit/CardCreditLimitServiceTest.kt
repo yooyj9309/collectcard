@@ -1,10 +1,12 @@
 package com.rainist.collectcard.cardcreditlimit
 
+import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
 import com.rainist.collectcard.common.db.repository.CreditLimitHistoryRepository
 import com.rainist.collectcard.common.db.repository.CreditLimitRepository
-import com.rainist.collectcard.common.dto.SyncRequest
+import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.service.HeaderService
+import com.rainist.common.util.DateTimeUtil
 import java.math.BigDecimal
 import org.junit.Assert
 import org.junit.jupiter.api.DisplayName
@@ -48,9 +50,13 @@ class CardCreditLimitServiceTest {
     fun cardCreditLimitTest() {
         setupServer()
 
-        val syncRequest = SyncRequest(1L, "organizationId")
+        val executionContext: ExecutionContext = CollectExecutionContext(
+            organizationId = "shinhancard",
+            userId = "1",
+            startAt = DateTimeUtil.utcNowLocalDateTime()
+        )
 
-        given(headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId))
+        given(headerService.makeHeader(executionContext.userId, executionContext.organizationId))
             .willReturn(
                 mutableMapOf(
                     "contentType" to MediaType.APPLICATION_JSON_VALUE,
@@ -59,7 +65,7 @@ class CardCreditLimitServiceTest {
                 )
             )
 
-        val creditLimit = cardCreditLimitService.cardCreditLimit(syncRequest)
+        val creditLimit = cardCreditLimitService.cardCreditLimit(executionContext)
         Assert.assertEquals(
             creditLimit.dataBody?.creditLimitInfo?.onetimePaymentLimit?.totalLimitAmount,
             BigDecimal(10000000)
@@ -72,7 +78,7 @@ class CardCreditLimitServiceTest {
         Assert.assertEquals(listCreditLimitHistoryEntity.size, 1)
         Assert.assertEquals(listCreditLimitEntity[0].onetimePaymentLimitAmount, BigDecimal("10000000.00"))
 
-        val creditLimit2 = cardCreditLimitService.cardCreditLimit(syncRequest)
+        val creditLimit2 = cardCreditLimitService.cardCreditLimit(executionContext)
         Assert.assertEquals(
             creditLimit2.dataBody?.creditLimitInfo?.onetimePaymentLimit?.totalLimitAmount,
             BigDecimal(7100000)

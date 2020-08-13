@@ -16,20 +16,16 @@ import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.db.entity.CreditLimitEntity
 import com.rainist.collectcard.common.db.repository.CreditLimitHistoryRepository
 import com.rainist.collectcard.common.db.repository.CreditLimitRepository
-import com.rainist.collectcard.common.dto.CollectExecutionContext
-import com.rainist.collectcard.common.dto.SyncRequest
 import com.rainist.collectcard.common.exception.CollectcardException
-import com.rainist.collectcard.common.service.ApiLogService
 import com.rainist.collectcard.common.service.HeaderService
+import com.rainist.collectcard.common.util.ExecutionResponseValidator
 import com.rainist.collectcard.common.util.SyncStatus
 import com.rainist.common.log.Log
-import com.rainist.common.util.DateTimeUtil
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CardCreditLimitServiceImpl(
-    val apiLogService: ApiLogService,
     val headerService: HeaderService,
     val collectExecutorService: CollectExecutorService,
     val creditLimitRepository: CreditLimitRepository,
@@ -40,25 +36,19 @@ class CardCreditLimitServiceImpl(
 
     @Transactional
     @SyncStatus(transactionId = "cardCreditLimit")
-    override fun cardCreditLimit(syncRequest: SyncRequest): CreditLimitResponse {
+    override fun cardCreditLimit(executionContext: ExecutionContext): CreditLimitResponse {
 
-        val lastCheckAt = DateTimeUtil.utcNowLocalDateTime()
+        val banksaladUserId = executionContext.userId.toLong()
+        val lastCheckAt = executionContext.startAt
 
         /* request header */
-        val header = headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId)
+        val header = headerService.makeHeader(executionContext.userId, executionContext.organizationId)
 
         /* request body */
         val creditLimitRequest = CreditLimitRequest().apply {
             this.dataHeader = CardCreditLimitRequestDataHeader()
             this.dataBody = CardCreditLimitRequestDataBody()
         }
-
-        /* Execution Context */
-        val executionContext: ExecutionContext = CollectExecutionContext(
-            organizationId = syncRequest.organizationId,
-            userId = syncRequest.banksaladUserId.toString(),
-            startAt = DateTimeUtil.utcNowLocalDateTime()
-        )
 
         // get api call result
         val executionResponse: ExecutionResponse<CreditLimitResponse> = collectExecutorService.execute(
@@ -70,20 +60,25 @@ class CardCreditLimitServiceImpl(
                 .build()
         )
 
+        /* check response result */
+        ExecutionResponseValidator.validateResponseAndThrow(
+            executionResponse,
+            executionResponse.response.dataHeader?.resultCode)
+
         // validate
         if (executionResponse.response?.dataBody == null || executionResponse.response?.dataBody?.creditLimitInfo == null)
             throw CollectcardException("DataBody is null")
 
         // db insert
         var creditLimitEntity = creditLimitRepository.findCreditLimitEntitiesByBanksaladUserIdAndCardCompanyId(
-            syncRequest.banksaladUserId.toLong(),
-            syncRequest.organizationId
+            banksaladUserId,
+            executionContext.organizationId
         ) ?: CreditLimitEntity()
 
         val resEntity = CreditLimitEntityUtil.makeCreditLimitEntity(
             lastCheckAt,
-            syncRequest.banksaladUserId.toLong(),
-            syncRequest.organizationId,
+            banksaladUserId,
+            executionContext.organizationId,
             executionResponse.response?.dataBody?.creditLimitInfo
         )
 

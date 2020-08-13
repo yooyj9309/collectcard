@@ -14,7 +14,6 @@ import com.rainist.collectcard.cardloans.dto.toListCardLoansResponseProto
 import com.rainist.collectcard.cardtransactions.CardTransactionService
 import com.rainist.collectcard.cardtransactions.dto.toListCardsTransactionResponseProto
 import com.rainist.collectcard.common.dto.CollectExecutionContext
-import com.rainist.collectcard.common.dto.SyncRequest
 import com.rainist.collectcard.common.exception.CollectcardServiceExceptionHandler
 import com.rainist.collectcard.common.exception.HealthCheckException
 import com.rainist.collectcard.common.service.OrganizationService
@@ -69,10 +68,11 @@ class CollectcardGrpcService(
         kotlin.runCatching {
             cardService.listCards(executionContext).toListCardsResponseProto()
         }.onSuccess {
-            logger.info("[사용자 카드 조회 결과 success]")
+            // TODO: remove debug logging
+            logger.warn("[사용자 카드 조회 결과 success]")
 
             for (card in it.dataList) {
-                logger.info("[사용자 카드 조회 결과 : {}]", card)
+                logger.warn("[사용자 카드 조회 결과 : {}]", card)
             }
 
             responseObserver.onNext(it)
@@ -89,16 +89,19 @@ class CollectcardGrpcService(
         request: CollectcardProto.ListCardTransactionsRequest,
         responseObserver: StreamObserver<CollectcardProto.ListCardTransactionsResponse>
     ) {
+
+        /* Execution Context */
+        val executionContext: ExecutionContext = CollectExecutionContext(
+            organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
+            userId = request.userId,
+            startAt = DateTimeUtil.utcNowLocalDateTime()
+        )
+
         kotlin.runCatching {
             logger.info("transaction request userId : {}, companyId : {}, fromMs : {}", request.userId, request.companyId.value, request.takeIf { request.hasFromMs() }?.fromMs?.value ?: "fromMsNull")
 
-            val syncRequest = SyncRequest(
-                request.userId.toLong(),
-                organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: ""
-            )
-
             cardTransactionService.listTransactions(
-                syncRequest,
+                executionContext,
                 request.takeIf { request.hasFromMs() }?.fromMs?.value
             ).toListCardsTransactionResponseProto()
         }.onSuccess {
@@ -106,7 +109,7 @@ class CollectcardGrpcService(
             responseObserver.onCompleted()
         }.onFailure {
 //            logger.error("[사용자 카드 내역 조회 에러 : {}]", it.localizedMessage, it)
-            CollectcardServiceExceptionHandler.handle("listCardTransactions", "사용자카드내역조회", it)
+            CollectcardServiceExceptionHandler.handle(executionContext, "listCardTransactions", "사용자카드내역조회", it)
             responseObserver.onException(it)
         }
     }
@@ -117,14 +120,16 @@ class CollectcardGrpcService(
     ) {
         logger.debug("[사용자 청구서 조회 시작 : {}]", request)
 
-        kotlin.runCatching {
-            val syncRequest = SyncRequest(
-                request.userId.toLong(),
-                organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: ""
-            )
+        /* Execution Context */
+        val executionContext: ExecutionContext = CollectExecutionContext(
+            organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
+            userId = request.userId,
+            startAt = DateTimeUtil.utcNowLocalDateTime()
+        )
 
+        kotlin.runCatching {
             cardBillService.listUserCardBills(
-                syncRequest,
+                executionContext,
                 request.takeIf { request.hasFromMs() }?.fromMs?.value
             ).toListCardBillsResponseProto()
         }.onSuccess {
@@ -137,7 +142,7 @@ class CollectcardGrpcService(
             responseObserver.onCompleted()
         }.onFailure {
 //            logger.error("[사용자 청구서 조회 에러 : {}]", it.localizedMessage, it)
-            CollectcardServiceExceptionHandler.handle("listCardBills", "사용자청구서조회", it)
+            CollectcardServiceExceptionHandler.handle(executionContext, "listCardBills", "사용자청구서조회", it)
             responseObserver.onError(it)
         }
     }
@@ -148,13 +153,15 @@ class CollectcardGrpcService(
     ) {
         logger.debug("[사용자 대출 내역 조회 시작 : {}]", request)
 
-        kotlin.runCatching {
-            val syncRequest = SyncRequest(
-                request.userId.toLong(),
-                organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: ""
-            )
+        /* Execution Context */
+        val executionContext: ExecutionContext = CollectExecutionContext(
+            organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
+            userId = request.userId,
+            startAt = DateTimeUtil.utcNowLocalDateTime()
+        )
 
-            cardLoanService.listCardLoans(syncRequest).toListCardLoansResponseProto()
+        kotlin.runCatching {
+            cardLoanService.listCardLoans(executionContext).toListCardLoansResponseProto()
         }.onSuccess {
                 logger.info("[사용자 대출내역 조회 결과 success]")
                 it.let {
@@ -166,7 +173,7 @@ class CollectcardGrpcService(
                 responseObserver.onCompleted()
         }.onFailure {
 //                logger.error("[사용자 대출 내역 조회 에러 : {}]", it.localizedMessage, it)
-            CollectcardServiceExceptionHandler.handle("listCardLoans", "사용자대출내역조회", it)
+            CollectcardServiceExceptionHandler.handle(executionContext, "listCardLoans", "사용자대출내역조회", it)
             // TODO 예상국 exception  처리 코드 추가 하기
             responseObserver.onError(it)
         }
@@ -178,19 +185,21 @@ class CollectcardGrpcService(
     ) {
         logger.debug("[사용자 개인 한도 조회 시작 : {}]", request)
 
-        kotlin.runCatching {
-            val syncRequest = SyncRequest(
-                request.userId.toLong(),
-                organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: ""
-            )
+        /* Execution Context */
+        val executionContext: ExecutionContext = CollectExecutionContext(
+            organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
+            userId = request.userId,
+            startAt = DateTimeUtil.utcNowLocalDateTime()
+        )
 
-            cardCreditLimitService.cardCreditLimit(syncRequest).toCreditLimitResponseProto()
+        kotlin.runCatching {
+            cardCreditLimitService.cardCreditLimit(executionContext).toCreditLimitResponseProto()
         }.onSuccess {
             responseObserver.onNext(it)
             responseObserver.onCompleted()
         }.onFailure {
 //            logger.error("사용자 개인 한도 조회 에러 . {}", it.message)
-            CollectcardServiceExceptionHandler.handle("getCreditLimit", "사용자개인한도조회", it)
+            CollectcardServiceExceptionHandler.handle(executionContext, "getCreditLimit", "사용자개인한도조회", it)
             responseObserver.onError(it)
         }
     }

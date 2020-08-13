@@ -16,11 +16,9 @@ import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.db.repository.CardTransactionRepository
-import com.rainist.collectcard.common.dto.CollectExecutionContext
-import com.rainist.collectcard.common.dto.SyncRequest
-import com.rainist.collectcard.common.service.ApiLogService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.OrganizationService
+import com.rainist.collectcard.common.util.ExecutionResponseValidator
 import com.rainist.collectcard.common.util.SyncStatus
 import com.rainist.common.service.ValidationService
 import com.rainist.common.util.DateTimeUtil
@@ -38,7 +36,6 @@ import org.springframework.transaction.annotation.Transactional
 @ExperimentalCoroutinesApi
 @Service
 class CardTransactionServiceImpl(
-    val apiLogService: ApiLogService,
     val headerService: HeaderService,
     val collectExecutorService: CollectExecutorService,
     val validationService: ValidationService,
@@ -52,16 +49,18 @@ class CardTransactionServiceImpl(
 
     @Transactional
     @SyncStatus(transactionId = "cardTransactions")
-    override fun listTransactions(syncRequest: SyncRequest, fromMs: Long?): ListTransactionsResponse {
+    override fun listTransactions(executionContext: ExecutionContext, fromMs: Long?): ListTransactionsResponse {
+        val banksaladUserId = executionContext.userId.toLong()
+
         /* request header */
-        val header = headerService.makeHeader(syncRequest.banksaladUserId.toString(), syncRequest.organizationId)
+        val header = headerService.makeHeader(executionContext.userId, executionContext.organizationId)
 
         /* request body */
         val request = ListTransactionsRequest().apply {
             this.dataHeader = ListTransactionsRequestDataHeader()
             this.dataBody = ListTransactionsRequestDataBody().apply {
                 this.startAt = fromMs?.let {
-                        val researchInterval = organizationService.getOrganizationByOrganizationId(syncRequest.organizationId).researchInterval
+                        val researchInterval = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).researchInterval
                         DateTimeUtil.epochMilliSecondToKSTLocalDateTime(it).minusDays(researchInterval.toLong())
                     }
                     ?.let { localDateTime ->
@@ -69,25 +68,18 @@ class CardTransactionServiceImpl(
                         DateTimeUtil.localDateToString(LocalDate.of(localDateTime.year, localDateTime.month, localDateTime.dayOfMonth), "yyyyMMdd")
                     }
                     ?: kotlin.run {
-                        val maxMonth = organizationService.getOrganizationByOrganizationId(syncRequest.organizationId).maxMonth
+                        val maxMonth = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).maxMonth
                         DateTimeUtil.localDateToString(DateTimeUtil.kstNowLocalDate().minusMonths(maxMonth.toLong()), "yyyyMMdd")
                     }
             }
         }
-
-        /* Execution Context */
-        val executionContext: ExecutionContext = CollectExecutionContext(
-            organizationId = syncRequest.organizationId,
-            userId = syncRequest.banksaladUserId.toString(),
-            startAt = DateTimeUtil.utcNowLocalDateTime()
-        )
 
         val transactions = getListTransactionsByDivision(executionContext, header, request)
 
         // db insert
         transactions.forEach { cardTransaction ->
 
-            if (shinhancardOrganizationId == syncRequest.organizationId) {
+            if (shinhancardOrganizationId == executionContext.organizationId) {
                 val code = cardTransaction.currencyCode.replace(" ", "").trim()
                 cardTransaction.currencyCode = CardTransactionUtil.currencyCodeMap[code] ?: code
             }
@@ -101,8 +93,8 @@ class CardTransactionServiceImpl(
             val cardTransactionEntity =
                 cardTransactionRepository.findByApprovalYearMonthAndBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
                     approvalYearMonth,
-                    syncRequest.banksaladUserId,
-                    syncRequest.organizationId,
+                    banksaladUserId,
+                    executionContext.organizationId,
                     cardTransaction.cardCompanyCardId,
                     cardTransaction.approvalNumber,
                     cardTransaction.approvalDay,
@@ -112,8 +104,8 @@ class CardTransactionServiceImpl(
             if (cardTransactionEntity == null) {
                 cardTransactionRepository.save(
                     CardTransactionUtil.makeCardTransactionEntity(
-                        syncRequest.banksaladUserId.toLong(),
-                        syncRequest.organizationId,
+                        banksaladUserId,
+                        executionContext.organizationId,
                         cardTransaction
                     )
                 )
@@ -160,7 +152,7 @@ class CardTransactionServiceImpl(
             }
             .map {
                 async {
-                    val res: ExecutionResponse<ListTransactionsResponse> =
+                    val executionResponse: ExecutionResponse<ListTransactionsResponse> =
                         collectExecutorService.execute(
                             executionContext,
                             Executions.valueOf(
@@ -173,7 +165,12 @@ class CardTransactionServiceImpl(
                                 .request(it)
                                 .build()
                         )
-                    res
+                    /* check response result */
+                    ExecutionResponseValidator.validateResponseAndThrow(
+                        executionResponse,
+                        executionResponse.response.resultCodes)
+
+                    executionResponse
                 }
             }
         }.let {
@@ -182,7 +179,6 @@ class CardTransactionServiceImpl(
             }
         }
 
-        // TODO 박두상 validate를 추가한다면 여기서 한번에, 여러 API의 응답을 합쳐서 내려주기에 각각의 API에서 에러발생 가능성 있음, 해당 부분은 어떻게 처리할것인가.
         return resultBody.flatMap {
             it.response?.dataBody?.transactions?.toMutableList() ?: mutableListOf()
         }.filter {
