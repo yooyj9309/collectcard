@@ -71,13 +71,6 @@ data class Card(
     }
 
     fun unequals(other: Any?): Boolean {
-
-        val unequals = !EqualsBuilder.reflectionEquals(this, other, EXCLUDE_EQUALS_FIELD)
-
-        if (true == unequals) {
-            logger.error("[Card Unequals] this-{} : other-{}", this, other)
-        }
-
-        return unequals
+        return !EqualsBuilder.reflectionEquals(this, other, EXCLUDE_EQUALS_FIELD)
     }
 }

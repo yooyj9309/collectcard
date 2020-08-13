@@ -56,13 +56,11 @@ fun ListCardBillsResponse.toListCardBillsResponseProto(): CollectcardProto.ListC
                     cardBillTransaction.discountAmount?.let { cardTransactionBuilder.savedAmount = DoubleValue.of(it.toDouble()) }
                     cardBillTransaction.billedFee?.let { cardTransactionBuilder.fee = it.toDouble() }
 
-                    if (!isAllNullValue(cardBillTransaction.cardNumber, cardBillTransaction.cardName, cardBillTransaction.cardType)) {
-                        val cardSummaryBuilder = CollectcardProto.CardSummary.newBuilder()
-                        cardBillTransaction.cardNumber?.let { cardSummaryBuilder.number = it }
-                        cardBillTransaction.cardName?.let { cardSummaryBuilder.name = StringValue.of(it) }
-                        cardBillTransaction.cardType?.let { cardSummaryBuilder.type = StringValue.of(it.jg) }
-                        cardTransactionBuilder.card = cardSummaryBuilder.build()
-                    }
+                    val cardSummaryBuilder = CollectcardProto.CardSummary.newBuilder()
+                    cardBillTransaction.cardNumber?.let { cardSummaryBuilder.number = it }
+                    cardBillTransaction.cardName?.let { cardSummaryBuilder.name = StringValue.of(it) }
+                    cardBillTransaction.cardType?.let { cardSummaryBuilder.type = StringValue.of(it.jg) }
+                    cardTransactionBuilder.card = cardSummaryBuilder.build()
 
                     cardBillTransaction.storeName?.let {
                         val store = CollectcardProto.AffiliatedStoreSummary.newBuilder()
@@ -84,14 +82,4 @@ fun ListCardBillsResponse.toListCardBillsResponseProto(): CollectcardProto.ListC
                 .addAllData(it ?: mutableListOf())
                 .build()
         }
-}
-
-fun isAllNullValue(vararg list: Any?): Boolean {
-    for (value in list) {
-        if (value == null) {
-            continue
-        }
-        return false
-    }
-    return true
 }

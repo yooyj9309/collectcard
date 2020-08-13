@@ -20,6 +20,8 @@ import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.common.util.ExecutionResponseValidator
 import com.rainist.collectcard.common.util.SyncStatus
+import com.rainist.collectcard.grpc.handler.CollectcardGrpcService.Companion.warn
+import com.rainist.common.log.Log
 import com.rainist.common.service.ValidationService
 import com.rainist.common.util.DateTimeUtil
 import java.time.LocalDate
@@ -43,6 +45,8 @@ class CardTransactionServiceImpl(
     val organizationService: OrganizationService,
     @Qualifier("async-thread") val executor: Executor
 ) : CardTransactionService {
+
+    companion object : Log
 
     @Value("\${shinhancard.organizationId}")
     lateinit var shinhancardOrganizationId: String
@@ -73,6 +77,12 @@ class CardTransactionServiceImpl(
                     }
             }
         }
+
+        val logMap = mapOf(
+            "banksaladUserId" to executionContext.userId,
+            "startAt" to (request.dataBody?.startAt ?: "startAtNull")
+        )
+        logger.warn(logMap)
 
         val transactions = getListTransactionsByDivision(executionContext, header, request)
 
@@ -137,6 +147,11 @@ class CardTransactionServiceImpl(
             }
             ?.toMutableList()
             ?: mutableListOf()
+
+        val logMap = mapOf(
+            "searchDateList" to searchDateList
+        )
+        logger.warn(logMap)
 
         val resultBody = runBlocking(executor.asCoroutineDispatcher()) {
             // 조회 시간 분할

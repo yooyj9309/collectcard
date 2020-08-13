@@ -98,7 +98,11 @@ class CollectcardGrpcService(
         )
 
         kotlin.runCatching {
-            logger.info("transaction request userId : {}, companyId : {}, fromMs : {}", request.userId, request.companyId.value, request.takeIf { request.hasFromMs() }?.fromMs?.value ?: "fromMsNull")
+            val logMap = mapOf(
+                "banksaladUserId" to request.userId,
+                "fromMs" to (request.takeIf { request.hasFromMs() }?.fromMs?.value ?: "fromMsNull")
+            )
+            logger.warn(logMap)
 
             cardTransactionService.listTransactions(
                 executionContext,

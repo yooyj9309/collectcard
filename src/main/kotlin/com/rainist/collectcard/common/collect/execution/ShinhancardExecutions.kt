@@ -20,6 +20,7 @@ import com.rainist.collectcard.common.collect.api.ShinhancardApis
 import com.rainist.collectcard.common.enums.ResultCode
 import com.rainist.collectcard.common.exception.CollectExecutionExceptionHandler
 import com.rainist.collectcard.userinfo.dto.UserInfoResponse
+import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import java.util.function.BiConsumer
 import java.util.function.BinaryOperator
@@ -27,7 +28,8 @@ import java.util.regex.Pattern
 
 class ShinhancardExecutions {
 
-    companion object {
+    companion object : Log {
+
         val organizationIdShinhancard = "shinhancard"
 
         // 대출 상세
@@ -58,28 +60,29 @@ class ShinhancardExecutions {
 
         val mergeBills =
             BinaryOperator { prev: ListCardBillsResponse, next: ListCardBillsResponse ->
-                prev.resultCodes.add(next.dataHeader?.resultCode ?: ResultCode.UNKNOWN)
 
                 val prevCardBill = prev.dataBody?.cardBills ?: mutableListOf()
                 val nextCardBill = next.dataBody?.cardBills ?: mutableListOf()
-
                 prevCardBill.addAll(nextCardBill)
+                /* diff end */
+
+                /* 원본코드 */
+                next.dataBody?.cardBills?.addAll(
+                    0, prev.dataBody?.cardBills ?: mutableListOf()
+                )
+                /* 원본코드 */
 
                 prev.dataBody = ListCardBillsResponseDataBody(cardBills = prevCardBill, nextKey = next.dataBody?.nextKey)
-
                 prev
             }
 
-        val mergeBillTransactions =
+        val mergeTransactions =
             BinaryOperator { prev: ListBillTransactionsResponse, next: ListBillTransactionsResponse ->
-                prev.resultCodes.add(next.dataHeader?.resultCode ?: ResultCode.UNKNOWN)
-
                 val prevTransaction = prev.dataBody?.billTransactions ?: mutableListOf()
                 val nextTransaction = next.dataBody?.billTransactions ?: mutableListOf()
                 prevTransaction.addAll(nextTransaction)
 
                 prev.dataBody = ListBillTransactionsResponseDataBody(billTransactions = prevTransaction, nextKey = next.dataBody?.nextKey)
-
                 prev
             }
 
@@ -96,47 +99,52 @@ class ShinhancardExecutions {
                     it.transactions = it.transactions ?: mutableListOf()
                 }
 
-                prevCardBills.forEachIndexed { idx, cardBill ->
-                    nextCardBills.getOrNull(idx)?.transactions?.let {
-                        cardBill.transactions?.addAll(it)
+                nextCardBills.forEach { nextCardBill ->
+                    val billerNumber = nextCardBill.billNumber
+
+                    prevCardBills.forEach { prevCardBill ->
+                        if (prevCardBill.billNumber == billerNumber) {
+                            prevCardBill.transactions?.addAll(nextCardBill.transactions ?: mutableListOf())
+                        }
                     }
                 }
-                prevCardBills.sortByDescending { it.paymentDay }
+
+                prevCardBills.sortByDescending { it -> it.paymentDay }
 
                 prev.dataBody = ListCardBillsResponseDataBody(cardBills = prevCardBills, nextKey = next.dataBody?.nextKey)
-
                 prev
             }
 
         val mergeBillByBills =
             BinaryOperator { prev: ListCardBillsResponse, next: ListCardBillsResponse ->
 
-                val prevCardBills = prev.dataBody?.cardBills ?: mutableListOf()
+                var prevCardBills = prev.dataBody?.cardBills ?: mutableListOf()
                 val nextCardBills = next.dataBody?.cardBills ?: mutableListOf()
                 prevCardBills.addAll(nextCardBills)
 
-                // cardNumber 한글 제거 처리 진행
-                val pattern = Pattern.compile("[0-9]*\$")
+                // transactions 없는 리스트 제거
+                prevCardBills = prevCardBills.filter { it.transactions != null }.toMutableList()
 
+                // cardNumber 한글 제거 처리 진행
+                val patterns = Pattern.compile("[0-9]*\$")
                 prevCardBills.forEach { cardBill ->
                     cardBill.transactions?.forEach { cardBillTransaction ->
                         cardBillTransaction.cardNumber?.let { cardNumber ->
-                            val matcher = pattern.matcher(cardNumber)
+                            val matcher = patterns.matcher(cardNumber)
                             if (matcher.find()) {
                                 cardBillTransaction.cardNumber = matcher.group(0)
                             }
                         }
                     }
                 }
+                /* diff end */
 
                 prev.dataBody = ListCardBillsResponseDataBody(cardBills = prevCardBills, nextKey = next.dataBody?.nextKey)
-
                 prev
             }
 
         val mergeBillTransaction =
             BiConsumer { master: CardBill, detail: ListBillTransactionsResponse ->
-
                 val masterTransaction = master.transactions ?: mutableListOf()
                 val detailTransaction = detail.dataBody?.billTransactions ?: mutableListOf()
 
@@ -144,7 +152,7 @@ class ShinhancardExecutions {
 
                 masterTransaction.forEach {
                     // 연회비인 경우 approvalDay가 없음
-                    if (it.approvalDay?.isEmpty() ?: false) {
+                    if (it.approvalDay.isNullOrEmpty()) {
                         it.approvalDay = master.paymentDay
                     }
                 }
@@ -154,18 +162,21 @@ class ShinhancardExecutions {
 
         val mergeCheckBillTransaction =
             BiConsumer { master: CardBill, detail: ListBillTransactionsResponse ->
-                if (master.transactions == null) {
-                    master.transactions = mutableListOf()
-                }
-                master.transactions?.addAll(detail.dataBody?.billTransactions ?: mutableListOf())
-                master.billingAmount = master.transactions?.sumBy { it.billedAmount?.toInt() ?: 0 }?.toBigDecimal()
 
-                // 연회비인 경우 approvalDay가 없음
-                master.transactions?.forEach {
-                    if (it.approvalDay?.isEmpty() ?: false) {
+                val masterTransaction = master.transactions ?: mutableListOf()
+                val detailTransaction = detail.dataBody?.billTransactions ?: mutableListOf()
+
+                masterTransaction.addAll(detailTransaction)
+
+                masterTransaction.forEach {
+                    // 연회비인 경우 approvalDay가 없음
+                    if (it.approvalDay.isNullOrEmpty()) {
                         it.approvalDay = master.paymentDay
                     }
                 }
+
+                master.transactions = masterTransaction
+                master.billingAmount = master.transactions?.sumBy { it.billedAmount?.toInt() ?: 0 }?.toBigDecimal()
             }
 
         val mergeCards =
@@ -304,6 +315,7 @@ class ShinhancardExecutions {
 
         val cardShinhancardBillTransactionExpected =
             Execution.create()
+                // 카드_[EXT] 결제예정금액총괄 SHC_HPG01096_EXT
                 .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected)
                 .to(ListCardBillsResponse::class.java)
                 .exceptionally { throwable: Throwable ->
@@ -325,6 +337,7 @@ class ShinhancardExecutions {
                     listCardBillResponse as ListCardBillsResponse
                     listCardBillResponse.dataBody?.cardBills?.iterator()
                 }.then(
+                    // 결제예정금액(일시불,현금서비스 상세)(SHC_HPG00237)
                     Execution.create()
                         .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_lump_sum)
                         .to(ListBillTransactionsResponse::class.java)
@@ -340,13 +353,14 @@ class ShinhancardExecutions {
                             Pagination.builder()
                                 .method(Pagination.Method.NEXTKEY)
                                 .nextkey(".dataBody.nextKey")
-                                .merge(mergeBillTransactions)
+                                .merge(mergeTransactions)
                                 .build()
                         )
                         .build()
                 ).merge(mergeBillTransaction)
                 .with(
                     Execution.create()
+                        // 카드_[EXT] 결제예정금액총괄 SHC_HPG01096_EXT
                         .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected)
                         .to(ListCardBillsResponse::class.java)
                         .exceptionally { throwable: Throwable ->
@@ -368,6 +382,7 @@ class ShinhancardExecutions {
                             listCardBillResponse as ListCardBillsResponse
                             listCardBillResponse.dataBody?.cardBills?.iterator()
                         }.then(
+                            // (할부) 결제예정금액(할부, 론 상세)(SHC_HPG00238)
                             Execution.create()
                                 .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_installment)
                                 .to(ListBillTransactionsResponse::class.java)
@@ -383,7 +398,7 @@ class ShinhancardExecutions {
                                     Pagination.builder()
                                         .method(Pagination.Method.NEXTKEY)
                                         .nextkey(".dataBody.nextKey")
-                                        .merge(mergeBillTransactions)
+                                        .merge(mergeTransactions)
                                         .build()
                                 )
                                 .build()
@@ -436,7 +451,7 @@ class ShinhancardExecutions {
                             Pagination.builder()
                                 .method(Pagination.Method.NEXTKEY)
                                 .nextkey(".dataBody.nextKey")
-                                .merge(mergeBillTransactions)
+                                .merge(mergeTransactions)
                                 .build()
                         )
                         .build()
@@ -485,7 +500,7 @@ class ShinhancardExecutions {
                                     Pagination.builder()
                                         .method(Pagination.Method.NEXTKEY)
                                         .nextkey(".dataBody.nextKey")
-                                        .merge(mergeBillTransactions)
+                                        .merge(mergeTransactions)
                                         .build()
                                 )
                                 .build()
