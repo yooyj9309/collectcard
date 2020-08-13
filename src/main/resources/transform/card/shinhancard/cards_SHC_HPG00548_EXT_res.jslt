@@ -31,7 +31,7 @@ let brands = {
 }
 
 let resultCodes = {
-    "": "Unknown",
+    "": "UNKNOWN",
     "0004": "OK",
     "0010": "OK",
     "0013": "OK",
@@ -46,9 +46,9 @@ let resultCodes = {
 let cardholder_name = .dataBody.clnHgNm
 
 {
-    "resultCodes": [get-key($resultCodes, .dataHeader.resultCode, "Unknown")],
+    "resultCodes": [get-key($resultCodes, .dataHeader.resultCode, "UNKNOWN")],
     "dataHeader": {
-        "resultCode": get-key($resultCodes, .dataHeader.resultCode, "Unknown"),
+        "resultCode": get-key($resultCodes, .dataHeader.resultCode, "UNKNOWN"),
         "resultMessage": .dataHeader.resultMessage
     },
     "dataBody": {

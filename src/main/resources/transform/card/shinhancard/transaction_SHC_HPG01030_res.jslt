@@ -1,16 +1,12 @@
 let resultCodes = {
-    "": "Unknown",
+    "": "UNKNOWN",
     "0004": "OK",
     "0010": "OK",
     "0013": "OK",
-    "9800": "INVALID_USER",
     "400": "INVALID_ACCESS_TOKEN",
     "503": "EXTERNAL_SERVER_ERROR",
-    "0002": "EXTERNAL_SERVER_ERROR",
-    "9971": "EXTERNAL_SERVER_ERROR",
     "9999": "EXTERNAL_SERVER_ERROR"
 }
-
 let CardTransactionType = {
     "": "APPROVAL",                         //  승인
     "1": "PURCHASE",                        //  매입
@@ -28,9 +24,9 @@ let CardType = {
 }
 
 {
-    "resultCodes": [get-key($resultCodes, .dataHeader.resultCode, "Unknown")],
+    "resultCodes": [get-key($resultCodes, .dataHeader.resultCode, "UNKNOWN")],
     "dataHeader": {
-        "resultCode": get-key($resultCodes, .dataHeader.resultCode, "Unknown"), // 결과 코드
+        "resultCode": get-key($resultCodes, .dataHeader.resultCode, "UNKNOWN"), // 결과 코드
         "resultMessage": .dataHeader.resultMessage,     // 결과 메세지
         "successCode": .dataHeader.successCode          // 성공 코드
     },
