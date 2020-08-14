@@ -206,6 +206,7 @@ class ShinhancardExecutions {
                 prev
             }
 
+        // 유효카드 정보조회 SHC_HPG00548
         val cardShinhancardCards =
             Execution.create()
                 .exchange(ShinhancardApis.card_shinhancard_cards)
@@ -408,8 +409,10 @@ class ShinhancardExecutions {
                 .merge(mergeBillByBillTransactionExpected)
                 .build()
 
+        // card bill
         val cardShinhancardBills =
             Execution.create()
+                // 체크카드 월별 청구내역(SHC_HPG01226)
                 .exchange(ShinhancardApis.card_shinhancard_check_bills)
                 .to(ListCardBillsResponse::class.java)
                 .exceptionally { throwable: Throwable ->
@@ -437,6 +440,8 @@ class ShinhancardExecutions {
                 }
                 .then(
                     Execution.create()
+
+                        // 카드_[EXT] (체크) 월별청구내역조회(상세총괄) (SHC_HPG00537)
                         .exchange(ShinhancardApis.card_shinhancard_check_bill_transactions)
                         .to(ListBillTransactionsResponse::class.java)
                         .exceptionally { throwable: Throwable ->
@@ -459,6 +464,7 @@ class ShinhancardExecutions {
                 .merge(mergeCheckBillTransaction)
                 .with(
                     Execution.create()
+                        // 신용카드 월별 청구내역(SHC_HPG00719)
                         .exchange(ShinhancardApis.card_shinhancard_credit_bills)
                         .to(ListCardBillsResponse::class.java)
                         .exceptionally { throwable: Throwable ->
@@ -486,6 +492,7 @@ class ShinhancardExecutions {
                         }
                         .then(
                             Execution.create()
+                                // 카드_[EXT] (신용) 월별청구내역조회(상세총괄) (SHC_HPG00698)
                                 .exchange(ShinhancardApis.card_shinhancard_credit_bill_transactions)
                                 .to(ListBillTransactionsResponse::class.java)
                                 .exceptionally { throwable: Throwable ->
@@ -567,6 +574,7 @@ class ShinhancardExecutions {
                 .merge(mergeLoansDetail)
                 .build()
 
+        // 개인한도조회 (SHC_HPG01730)
         val cardShinhancardCreditLimit =
             Execution.create()
                 .exchange(ShinhancardApis.card_shinhancard_credit_limit)

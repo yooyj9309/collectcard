@@ -75,6 +75,7 @@ class CardTransactionServiceImpl(
                         val maxMonth = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).maxMonth
                         DateTimeUtil.localDateToString(DateTimeUtil.kstNowLocalDate().minusMonths(maxMonth.toLong()), "yyyyMMdd")
                     }
+                this.endAt = DateTimeUtil.kstNowLocalDateString("yyyyMMdd")
             }
         }
 
@@ -166,6 +167,14 @@ class CardTransactionServiceImpl(
                 }
             }
             .map {
+                logger.warn(
+                    mapOf(
+                        "startAt" to (it.dataBody?.startAt ?: "startAtNull"),
+                        "endAt" to (it.dataBody?.endAt ?: "endAtNull"),
+                        "banksaladUserId" to executionContext.userId
+                    )
+                )
+
                 async {
                     val executionResponse: ExecutionResponse<ListTransactionsResponse> =
                         collectExecutorService.execute(

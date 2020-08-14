@@ -1,8 +1,6 @@
 package com.rainist.collectcard.cardtransactions.dto
 
-import com.rainist.collectcard.common.service.CardOrganization.Companion.DEFAULT_MAX_MONTH
 import com.rainist.common.annotation.validation.StringDateFormat
-import com.rainist.common.util.DateTimeUtil
 import javax.validation.constraints.NotNull
 
 data class ListTransactionsRequest(
@@ -19,11 +17,11 @@ data class ListTransactionsRequestDataBody(
 
     // 조회기간 시작일 YYYYMMDD default now() prev 12month
     @field:StringDateFormat(pattern = "yyyyMMdd")
-    var startAt: String = DateTimeUtil.kstNowLocalDate().minusMonths(DEFAULT_MAX_MONTH.toLong()).let { DateTimeUtil.localDateToString(it, "yyyyMMdd") },
+    var startAt: String = "",
 
     // 조회기간 종료일 YYYYMMDD default now()
     @field:StringDateFormat(pattern = "yyyyMMdd")
-    var endAt: String = DateTimeUtil.kstNowLocalDateString("yyyyMMdd"),
+    var endAt: String = "",
 
     var cardId: String? = null, // 카드 구분자 ( 카드번호, 암호화된 카드번호 , CID 등등 )
 

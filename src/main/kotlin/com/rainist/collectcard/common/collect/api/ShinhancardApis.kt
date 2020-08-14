@@ -356,10 +356,10 @@ class ShinhancardApis {
         // 신용카드 월별 청구내역(SHC_HPG00719)
         lateinit var card_shinhancard_credit_bills: Api
 
-        // 체크카드 월별 청구내역(SHC_HPG00537)
+        // 카드_[EXT] (체크) 월별청구내역조회(상세총괄) (SHC_HPG00537)
         lateinit var card_shinhancard_check_bill_transactions: Api
 
-        // 신용카드 월별 청구내역(SHC_HPG00698)
+        // 카드_[EXT] (신용) 월별청구내역조회(상세총괄) (SHC_HPG00698)
         lateinit var card_shinhancard_credit_bill_transactions: Api
 
         // 개인 거래 정보 조회 (SHC_EXT_00001)
