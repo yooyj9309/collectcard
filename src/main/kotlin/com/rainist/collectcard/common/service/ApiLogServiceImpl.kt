@@ -1,5 +1,7 @@
 package com.rainist.collectcard.common.service
 
+import com.jayway.jsonpath.JsonPath
+import com.jayway.jsonpath.PathNotFoundException
 import com.rainist.collect.executor.ApiLog
 import com.rainist.collectcard.common.db.entity.ApiLogEntity
 import com.rainist.collectcard.common.db.repository.ApiLogRepository
@@ -39,6 +41,8 @@ class ApiLogServiceImpl(private val apiLogRepository: ApiLogRepository) : ApiLog
 
     override fun logResponse(organizationId: String, banksaladUserId: Long, apiLog: ApiLog) {
 
+        val resultCodeAndMessage = parseResultCodeAndMessage(apiLog.response?.transformedBody)
+
         val apiLogEntity = apiLogRepository.findByRequestIdAndCreatedAtBetween(
                 apiLog.id,
                 DateTimeUtil.utcNowLocalDateTime().minusDays(1),
@@ -64,7 +68,7 @@ class ApiLogServiceImpl(private val apiLogRepository: ApiLogRepository) : ApiLog
         apiLogEntity.apply {
             this.responseCode = apiLog.response?.responseCode
             // TODO jayden-lee resultCode java-banksalad Response 객체 프로퍼티에 추가해야함
-            this.resultCode = ""
+            this.resultCode = resultCodeAndMessage.first
 
             this.responseHeaderText = apiLog.response?.header
             this.responseBodyText = apiLog.response?.body
@@ -76,5 +80,24 @@ class ApiLogServiceImpl(private val apiLogRepository: ApiLogRepository) : ApiLog
         }
 
         apiLogRepository.save(apiLogEntity)
+    }
+
+    fun parseResultCodeAndMessage(json: String?): Pair<String, String> {
+        return json.let {
+
+            val resultCode = try {
+                JsonPath.parse(json).read("\$.dataHeader.resultCode", String::class.java)
+            } catch (e: PathNotFoundException) {
+                ""
+            }
+
+            val resultMessage = try {
+                JsonPath.parse(json).read("\$.dataHeader.resultMessage", String::class.java)
+            } catch (e: PathNotFoundException) {
+                ""
+            }
+
+            Pair(resultCode, resultMessage)
+        }
     }
 }

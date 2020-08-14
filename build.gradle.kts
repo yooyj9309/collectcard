@@ -44,6 +44,7 @@ repositories {
 val grpc_spring_boot_version = "3.5.2"
 val http_client_version = "4.5.11"
 val camel_version = "3.2.0"
+val json_path_version = "2.4.0"
 
 dependencies {
     implementation("com.rainist:kotlin-banksalad:1.0.19.RELEASE")
@@ -58,6 +59,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     implementation("org.apache.httpcomponents:httpclient:$http_client_version")
+
+    implementation("com.jayway.jsonpath:json-path:$json_path_version")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
