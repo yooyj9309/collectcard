@@ -1,8 +1,8 @@
 package com.rainist.collectcard.card
 
-import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.card.dto.ListCardsResponse
+import com.rainist.collectcard.common.dto.CollectExecutionContext
 
 interface CardService {
-    fun listCards(executionContext: ExecutionContext): ListCardsResponse
+    fun listCards(executionContext: CollectExecutionContext): ListCardsResponse
 }

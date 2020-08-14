@@ -1,8 +1,8 @@
 package com.rainist.collectcard.cardloans
 
-import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.cardloans.dto.ListLoansResponse
+import com.rainist.collectcard.common.dto.CollectExecutionContext
 
 interface CardLoanService {
-    fun listCardLoans(executionContext: ExecutionContext): ListLoansResponse
+    fun listCardLoans(executionContext: CollectExecutionContext): ListLoansResponse
 }

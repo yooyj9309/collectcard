@@ -1,6 +1,5 @@
 package com.rainist.collectcard.cardcreditlimit
 
-import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collect.common.execution.ExecutionRequest
 import com.rainist.collect.common.execution.ExecutionResponse
 import com.rainist.collect.executor.CollectExecutorService
@@ -16,11 +15,13 @@ import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.db.entity.CreditLimitEntity
 import com.rainist.collectcard.common.db.repository.CreditLimitHistoryRepository
 import com.rainist.collectcard.common.db.repository.CreditLimitRepository
+import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.exception.CollectcardException
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.util.ExecutionResponseValidator
 import com.rainist.collectcard.common.util.SyncStatus
 import com.rainist.common.log.Log
+import com.rainist.common.util.DateTimeUtil
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -36,10 +37,9 @@ class CardCreditLimitServiceImpl(
 
     @Transactional
     @SyncStatus(transactionId = "cardCreditLimit")
-    override fun cardCreditLimit(executionContext: ExecutionContext): CreditLimitResponse {
-
+    override fun cardCreditLimit(executionContext: CollectExecutionContext): CreditLimitResponse {
         val banksaladUserId = executionContext.userId.toLong()
-        val lastCheckAt = executionContext.startAt
+        val now = DateTimeUtil.utcNowLocalDateTime()
 
         /* request header */
         val header = headerService.makeHeader(executionContext.userId, executionContext.organizationId)
@@ -76,7 +76,7 @@ class CardCreditLimitServiceImpl(
         ) ?: CreditLimitEntity()
 
         val resEntity = CreditLimitEntityUtil.makeCreditLimitEntity(
-            lastCheckAt,
+            now,
             banksaladUserId,
             executionContext.organizationId,
             executionResponse.response?.dataBody?.creditLimitInfo
@@ -84,13 +84,13 @@ class CardCreditLimitServiceImpl(
 
         if (CreditLimitEntityUtil.isUpdated(creditLimitEntity, resEntity)) {
             // update
-            CreditLimitEntityUtil.copyCreditLimitEntity(lastCheckAt, resEntity, creditLimitEntity)
+            CreditLimitEntityUtil.copyCreditLimitEntity(now, resEntity, creditLimitEntity)
             creditLimitEntity = creditLimitRepository.save(creditLimitEntity)
             creditLimitHistoryRepository.save(
                 CreditLimitEntityUtil.makeCreditLimitHistoryEntity(creditLimitEntity)
             )
         } else {
-            creditLimitEntity.lastCheckAt = lastCheckAt
+            creditLimitEntity.lastCheckAt = now
         }
 
         // return

@@ -1,6 +1,5 @@
 package com.rainist.collectcard.cardloan
 
-import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.cardloans.CardLoanService
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
 import com.rainist.collectcard.common.db.repository.CardLoanHistoryRepository
@@ -198,9 +197,9 @@ class CardLoanServiceImplTest {
         return ResourceUtils.getFile(fileInClassPath).readText(Charsets.UTF_8)
     }
 
-    private fun requestSetting(): ExecutionContext {
+    private fun requestSetting(): CollectExecutionContext {
 
-        val executionContext: ExecutionContext = CollectExecutionContext(
+        val executionContext: CollectExecutionContext = CollectExecutionContext(
             organizationId = "shinhancard",
             userId = "1",
             startAt = DateTimeUtil.utcNowLocalDateTime()

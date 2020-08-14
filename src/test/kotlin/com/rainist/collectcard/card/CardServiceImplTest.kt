@@ -1,6 +1,5 @@
 package com.rainist.collectcard.card
 
-import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.card.dto.Card
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
 import com.rainist.collectcard.common.db.entity.CardEntity
@@ -52,7 +51,7 @@ class CardServiceImplTest {
     @MockBean
     lateinit var headerService: HeaderService
 
-    val executionContext: ExecutionContext = CollectExecutionContext(
+    val executionContext: CollectExecutionContext = CollectExecutionContext(
         organizationId = "shinhancard",
         userId = "1",
         startAt = DateTimeUtil.utcNowLocalDateTime()

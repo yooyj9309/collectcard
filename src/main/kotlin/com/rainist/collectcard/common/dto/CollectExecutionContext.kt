@@ -4,20 +4,24 @@ import com.rainist.collect.common.execution.ExecutionContext
 import java.time.LocalDateTime
 
 class CollectExecutionContext(
-    private val organizationId: String,
-    private val userId: String,
-    private val startAt: LocalDateTime
+    private var userId: String,
+    private var organizationId: String,
+    private var startAt: LocalDateTime? = null
 ) : ExecutionContext {
 
-    override fun getOrganizationId(): String {
-        return organizationId
+    fun setStartAt(startAt: LocalDateTime?) {
+        this.startAt = startAt
     }
 
     override fun getUserId(): String {
-        return userId
+        return this.userId
     }
 
-    override fun getStartAt(): LocalDateTime {
-        return startAt
+    override fun getStartAt(): LocalDateTime? {
+        return this.startAt
+    }
+
+    override fun getOrganizationId(): String {
+        return this.organizationId
     }
 }

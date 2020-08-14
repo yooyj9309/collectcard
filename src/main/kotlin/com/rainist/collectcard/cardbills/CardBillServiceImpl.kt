@@ -1,6 +1,5 @@
 package com.rainist.collectcard.cardbills
 
-import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collect.common.execution.ExecutionRequest
 import com.rainist.collect.common.execution.ExecutionResponse
 import com.rainist.collect.executor.CollectExecutorService
@@ -19,6 +18,7 @@ import com.rainist.collectcard.common.db.entity.CardPaymentScheduledEntity
 import com.rainist.collectcard.common.db.repository.CardBillRepository
 import com.rainist.collectcard.common.db.repository.CardBillTransactionRepository
 import com.rainist.collectcard.common.db.repository.CardPaymentScheduledRepository
+import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.util.ExecutionResponseValidator
 import com.rainist.common.log.Log
@@ -44,7 +44,7 @@ class CardBillServiceImpl(
 
     @Transactional
     override fun listUserCardBills(
-        executionContext: ExecutionContext,
+        executionContext: CollectExecutionContext,
         startAt: Long?
     ): ListCardBillsResponse {
 
@@ -54,10 +54,13 @@ class CardBillServiceImpl(
         val header = headerService.makeHeader(executionContext.userId, executionContext.organizationId)
 
         /* request body */
-
+        /* set startAt */
         val checkStartTime: LocalDateTime = startAt?.let {
             DateTimeUtil.epochMilliSecondToKSTLocalDateTime(startAt)
         } ?: DateTimeUtil.kstNowLocalDateTime().minusMonths(DEFAULT_MAX_BILL_MONTH)
+
+        executionContext.setStartAt(checkStartTime)
+        val now = DateTimeUtil.utcNowLocalDateTime()
 
         // TODO 제거예정 diff확인용
         logger.info("CARDBILL_TIME_INFO $checkStartTime $startAt $banksaladUserId ")

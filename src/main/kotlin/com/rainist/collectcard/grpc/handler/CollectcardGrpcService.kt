@@ -2,7 +2,6 @@ package com.rainist.collectcard.grpc.handler
 
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardGrpc
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
-import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.card.CardService
 import com.rainist.collectcard.card.dto.toListCardsResponseProto
 import com.rainist.collectcard.cardbills.CardBillService
@@ -20,7 +19,6 @@ import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.config.onException
 import com.rainist.common.interceptor.StatsUnaryServerInterceptor
 import com.rainist.common.log.Log
-import com.rainist.common.util.DateTimeUtil
 import io.grpc.stub.StreamObserver
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.lognet.springboot.grpc.GRpcService
@@ -59,10 +57,9 @@ class CollectcardGrpcService(
         logger.debug("[사용자 카드 조회 시작 : {}]", request)
 
         /* Execution Context */
-        val executionContext: ExecutionContext = CollectExecutionContext(
+        val executionContext: CollectExecutionContext = CollectExecutionContext(
             organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
-            userId = request.userId,
-            startAt = DateTimeUtil.utcNowLocalDateTime()
+            userId = request.userId
         )
 
         kotlin.runCatching {
@@ -91,10 +88,9 @@ class CollectcardGrpcService(
     ) {
 
         /* Execution Context */
-        val executionContext: ExecutionContext = CollectExecutionContext(
+        val executionContext: CollectExecutionContext = CollectExecutionContext(
             organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
-            userId = request.userId,
-            startAt = DateTimeUtil.utcNowLocalDateTime()
+            userId = request.userId
         )
 
         kotlin.runCatching {
@@ -125,10 +121,9 @@ class CollectcardGrpcService(
         logger.debug("[사용자 청구서 조회 시작 : {}]", request)
 
         /* Execution Context */
-        val executionContext: ExecutionContext = CollectExecutionContext(
+        val executionContext: CollectExecutionContext = CollectExecutionContext(
             organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
-            userId = request.userId,
-            startAt = DateTimeUtil.utcNowLocalDateTime()
+            userId = request.userId
         )
 
         kotlin.runCatching {
@@ -158,10 +153,9 @@ class CollectcardGrpcService(
         logger.debug("[사용자 대출 내역 조회 시작 : {}]", request)
 
         /* Execution Context */
-        val executionContext: ExecutionContext = CollectExecutionContext(
+        val executionContext: CollectExecutionContext = CollectExecutionContext(
             organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
-            userId = request.userId,
-            startAt = DateTimeUtil.utcNowLocalDateTime()
+            userId = request.userId
         )
 
         kotlin.runCatching {
@@ -190,10 +184,9 @@ class CollectcardGrpcService(
         logger.debug("[사용자 개인 한도 조회 시작 : {}]", request)
 
         /* Execution Context */
-        val executionContext: ExecutionContext = CollectExecutionContext(
+        val executionContext: CollectExecutionContext = CollectExecutionContext(
             organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
-            userId = request.userId,
-            startAt = DateTimeUtil.utcNowLocalDateTime()
+            userId = request.userId
         )
 
         kotlin.runCatching {

@@ -1,7 +1,6 @@
 package com.rainist.collectcard.cardtransaction
 
 import com.rainist.collect.common.api.Api
-import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.cardtransactions.CardTransactionService
 import com.rainist.collectcard.cardtransactions.dto.CardTransaction
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponse
@@ -229,9 +228,9 @@ class CardTransactionServiceTest {
         return ResourceUtils.getFile(fileInClassPath).readText(Charsets.UTF_8)
     }
 
-    private fun requestSetting(): ExecutionContext {
+    private fun requestSetting(): CollectExecutionContext {
 
-        val executionContext: ExecutionContext = CollectExecutionContext(
+        val executionContext: CollectExecutionContext = CollectExecutionContext(
             organizationId = "shinhancard",
             userId = "1",
             startAt = DateTimeUtil.utcNowLocalDateTime()

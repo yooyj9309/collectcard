@@ -1,6 +1,5 @@
 package com.rainist.collectcard.cardloans
 
-import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collect.common.execution.ExecutionRequest
 import com.rainist.collect.common.execution.ExecutionResponse
 import com.rainist.collect.executor.CollectExecutorService
@@ -18,6 +17,7 @@ import com.rainist.collectcard.common.db.entity.makeCardLoanEntity
 import com.rainist.collectcard.common.db.entity.makeCardLoanHistoryEntity
 import com.rainist.collectcard.common.db.repository.CardLoanHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardLoanRepository
+import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.util.ExecutionResponseValidator
 import com.rainist.collectcard.common.util.SyncStatus
@@ -38,8 +38,9 @@ class CardLoanServiceImpl(
 
     @Transactional
     @SyncStatus(transactionId = "cardLoans")
-    override fun listCardLoans(executionContext: ExecutionContext): ListLoansResponse {
+    override fun listCardLoans(executionContext: CollectExecutionContext): ListLoansResponse {
         val banksaladUserId = executionContext.userId.toLong()
+        val now = DateTimeUtil.utcNowLocalDateTime()
 
         /* request header */
         val lastCheckAt = DateTimeUtil.getLocalDateTime()
@@ -94,7 +95,7 @@ class CardLoanServiceImpl(
                         cardLoanHistoryRepository.save(CardLoanHistoryEntity().makeCardLoanHistoryEntity(saveEntity))
                     }
 
-                    saveEntity.lastCheckAt = DateTimeUtil.utcNowLocalDateTime()
+                    saveEntity.lastCheckAt = now
                     cardLoanRepository.save(saveEntity)
                 }
                 ?: kotlin.run {

@@ -1,6 +1,5 @@
 package com.rainist.collectcard.cardcreditlimit
 
-import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
 import com.rainist.collectcard.common.db.repository.CreditLimitHistoryRepository
 import com.rainist.collectcard.common.db.repository.CreditLimitRepository
@@ -50,7 +49,7 @@ class CardCreditLimitServiceTest {
     fun cardCreditLimitTest() {
         setupServer()
 
-        val executionContext: ExecutionContext = CollectExecutionContext(
+        val executionContext: CollectExecutionContext = CollectExecutionContext(
             organizationId = "shinhancard",
             userId = "1",
             startAt = DateTimeUtil.utcNowLocalDateTime()

@@ -16,11 +16,11 @@ import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.db.repository.CardTransactionRepository
+import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.common.util.ExecutionResponseValidator
 import com.rainist.collectcard.common.util.SyncStatus
-import com.rainist.collectcard.grpc.handler.CollectcardGrpcService.Companion.warn
 import com.rainist.common.log.Log
 import com.rainist.common.service.ValidationService
 import com.rainist.common.util.DateTimeUtil
@@ -53,7 +53,8 @@ class CardTransactionServiceImpl(
 
     @Transactional
     @SyncStatus(transactionId = "cardTransactions")
-    override fun listTransactions(executionContext: ExecutionContext, fromMs: Long?): ListTransactionsResponse {
+    override fun listTransactions(executionContext: CollectExecutionContext, fromMs: Long?): ListTransactionsResponse {
+        val now = DateTimeUtil.utcNowLocalDateTime()
         val banksaladUserId = executionContext.userId.toLong()
 
         /* request header */

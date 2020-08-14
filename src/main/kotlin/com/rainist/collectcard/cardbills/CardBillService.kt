@@ -1,8 +1,8 @@
 package com.rainist.collectcard.cardbills
 
-import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.cardbills.dto.ListCardBillsResponse
+import com.rainist.collectcard.common.dto.CollectExecutionContext
 
 interface CardBillService {
-    fun listUserCardBills(executionContext: ExecutionContext, startAt: Long?): ListCardBillsResponse
+    fun listUserCardBills(executionContext: CollectExecutionContext, startAt: Long?): ListCardBillsResponse
 }

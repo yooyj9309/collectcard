@@ -1,6 +1,5 @@
 package com.rainist.collectcard.card
 
-import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collect.common.execution.ExecutionRequest
 import com.rainist.collect.common.execution.ExecutionResponse
 import com.rainist.collect.executor.CollectExecutorService
@@ -16,6 +15,7 @@ import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.db.entity.CardEntity
 import com.rainist.collectcard.common.db.repository.CardHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardRepository
+import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.collectcard.common.util.ExecutionResponseValidator
@@ -38,9 +38,10 @@ class CardServiceImpl(
 
     val cardMapper = Mappers.getMapper(CardMapper::class.java)
 
-    override fun listCards(executionContext: ExecutionContext): ListCardsResponse {
+    override fun listCards(executionContext: CollectExecutionContext): ListCardsResponse {
         logger.info("CardService.listCards start: executionContext: {}", executionContext)
 
+        val now = DateTimeUtil.utcNowLocalDateTime()
         val banksaladUserId = executionContext.userId.toLong()
 
         /* header */
@@ -80,43 +81,43 @@ class CardServiceImpl(
 
         /* Save to DB and return */
         listCardsResponse?.dataBody?.cards?.forEach { card ->
-            upsertCardAndCardHistory(executionContext.userId.toLong(), card, executionContext.startAt)
+            upsertCardAndCardHistory(executionContext.userId.toLong(), card, now)
         }
 
         userSyncStatusService.updateUserSyncStatus(
             banksaladUserId,
             executionContext.organizationId,
             Transaction.cards.name,
-            DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(executionContext.startAt)
+            DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now)
         )
 
         logger.info("CardService.listCards end: executionContext: {}", executionContext)
         return executionResponse.response
     }
 
-    private fun upsertCardAndCardHistory(banksaladUserId: Long, card: Card, startAt: LocalDateTime) {
+    private fun upsertCardAndCardHistory(banksaladUserId: Long, card: Card, now: LocalDateTime) {
         /* 카드 조회 */
         cardRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardId(
-            banksaladUserId.toLong(),
+            banksaladUserId,
             card.cardCompanyId ?: "",
             card.cardCompanyCardId ?: ""
         )
             ?.let { cardEntity ->
-                updateCardEntity(cardEntity, card, startAt)
+                updateCardEntity(cardEntity, card, now)
             }
             ?: kotlin.run {
-                insertCardEntity(card, banksaladUserId, startAt)
+                insertCardEntity(card, banksaladUserId, now)
             }
     }
 
     /* 기존 카드 */
-    private fun updateCardEntity(cardEntity: CardEntity, card: Card, startAt: LocalDateTime) {
+    private fun updateCardEntity(cardEntity: CardEntity, card: Card, now: LocalDateTime) {
         val entityDto = cardMapper.toCardDto(cardEntity)
 
         if (entityDto.unequals(card)) {
             /* update field */
             cardMapper.merge(card, cardEntity)
-            cardEntity.lastCheckAt = startAt
+            cardEntity.lastCheckAt = now
 
             cardRepository.save(cardEntity)
 
@@ -126,10 +127,10 @@ class CardServiceImpl(
     }
 
     /* 신규 카드 */
-    private fun insertCardEntity(card: Card, banksaladUserId: Long, startAt: LocalDateTime) {
+    private fun insertCardEntity(card: Card, banksaladUserId: Long, now: LocalDateTime) {
         val cardEntity = cardMapper.toCardEntity(card).apply {
             this.banksaladUserId = banksaladUserId
-            this.lastCheckAt = startAt
+            this.lastCheckAt = now
         }
         cardRepository.save(cardEntity)
 

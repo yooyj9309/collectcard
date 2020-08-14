@@ -2,9 +2,9 @@ let resultCodes = {
     "": "UNKNOWN",
     "0004": "OK",
     "0010": "OK",
+    "0013": "OK",   // 내려줄 내역이 없는 경우 (해외 결제 내역없음)
     "400": "INVALID_ACCESS_TOKEN",
     "503": "EXTERNAL_SERVER_ERROR",
-    "0013": "EXTERNAL_SERVER_ERROR",
     "9971": "EXTERNAL_SERVER_ERROR",
     "9999": "EXTERNAL_SERVER_ERROR"
 }
