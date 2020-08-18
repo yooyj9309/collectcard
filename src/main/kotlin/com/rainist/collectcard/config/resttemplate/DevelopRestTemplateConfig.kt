@@ -38,6 +38,7 @@ class DevelopRestTemplateConfig {
         val httpClient = HttpClients.custom()
             .setMaxConnTotal(maxConnTotal)
             .setMaxConnPerRoute(maxConnPerRoute)
+            .setConnectionTimeToLive(30, TimeUnit.SECONDS)
             .setSSLSocketFactory(csf)
             .build()
 

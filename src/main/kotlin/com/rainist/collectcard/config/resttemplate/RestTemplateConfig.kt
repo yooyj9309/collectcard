@@ -29,6 +29,7 @@ class RestTemplateConfig {
         factory.httpClient = HttpClientBuilder.create()
             .setMaxConnTotal(maxConnTotal)
             .setMaxConnPerRoute(maxConnPerRoute)
+            .setConnectionTimeToLive(30, TimeUnit.SECONDS)
             // .setProxy(HttpHost(forwardProxyHost, forwardProxyPort))
             .build()
         return createRestTemplate(factory)
