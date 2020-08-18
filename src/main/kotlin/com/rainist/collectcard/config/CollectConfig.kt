@@ -34,10 +34,13 @@ class CollectConfig(
     @Bean
     fun threadPoolTaskExecutor(): Executor {
         val executor = ThreadPoolTaskExecutor()
-        executor.setThreadNamePrefix("TaskExecutor-")
-        executor.corePoolSize = 5
-        executor.maxPoolSize = 10
-        executor.setQueueCapacity(10)
+        executor.setThreadNamePrefix("Async-Thread-Collect-")
+        executor.corePoolSize = 10
+        executor.maxPoolSize = 20
+        executor.setQueueCapacity(1000)
+        executor.keepAliveSeconds = 20
+        executor.setWaitForTasksToCompleteOnShutdown(true)
+        executor.setAwaitTerminationSeconds(15)
         executor.initialize()
         return executor
     }

@@ -14,10 +14,11 @@ class ThreadPoolConfig {
         executor.setThreadNamePrefix("Async-Thread-")
         executor.corePoolSize = 10
         executor.maxPoolSize = 20
-        executor.setQueueCapacity(100)
+        executor.setQueueCapacity(1000)
         executor.keepAliveSeconds = 20
         executor.setWaitForTasksToCompleteOnShutdown(true)
         executor.setAwaitTerminationSeconds(15)
+        executor.initialize()
         return executor
     }
 }
