@@ -77,7 +77,7 @@ class CardServiceImplTest {
         assertThat(
             response.dataBody?.cards?.first(), `is`(Card().apply {
                 cardCompanyId = "shinhancard"
-                cardCompanyCardId = "721"
+                cardCompanyCardId = "9523*********8721"
                 cardOwnerName = "홍길동"
                 cardOwnerType = CardOwnerType.SELF
                 cardOwnerTypeOrigin = "1"
@@ -109,7 +109,7 @@ class CardServiceImplTest {
                     cardId = 1,
                     banksaladUserId = 1,
                     cardCompanyId = "shinhancard",
-                    cardCompanyCardId = "721",
+                    cardCompanyCardId = "9523*********8721",
                     lastCheckAt = now,
                     cardOwnerName = "홍길동",
                     cardOwnerType = "SELF",
@@ -154,7 +154,7 @@ class CardServiceImplTest {
         assertThat(
             response.dataBody?.cards?.first(), `is`(Card().apply {
                 cardCompanyId = "shinhancard"
-                cardCompanyCardId = "721"
+                cardCompanyCardId = "9523*********8721"
                 cardOwnerName = "홍길동"
                 cardOwnerType = CardOwnerType.SELF
                 cardOwnerTypeOrigin = "1"
@@ -187,7 +187,7 @@ class CardServiceImplTest {
                     cardId = 1,
                     banksaladUserId = 1,
                     cardCompanyId = "shinhancard",
-                    cardCompanyCardId = "721",
+                    cardCompanyCardId = "9523*********8721",
                     lastCheckAt = now,
                     cardOwnerName = "홍길동",
                     cardOwnerType = "SELF",
@@ -225,7 +225,7 @@ class CardServiceImplTest {
                 cardId = 1,
                 banksaladUserId = 1,
                 cardCompanyId = "shinhancard",
-                cardCompanyCardId = "721",
+                cardCompanyCardId = "9523*********8721",
                 lastCheckAt = now,
                 cardOwnerName = "홍길동",
                 cardOwnerType = "SELF",
@@ -250,7 +250,7 @@ class CardServiceImplTest {
         assertThat(
             response.dataBody?.cards?.first(), `is`(Card().apply {
                 cardCompanyId = "shinhancard"
-                cardCompanyCardId = "721"
+                cardCompanyCardId = "9523*********8721"
                 cardOwnerName = "홍길동"
                 cardOwnerType = CardOwnerType.SELF
                 cardOwnerTypeOrigin = "5"
@@ -281,7 +281,7 @@ class CardServiceImplTest {
                     cardId = 1,
                     banksaladUserId = 1,
                     cardCompanyId = "shinhancard",
-                    cardCompanyCardId = "721",
+                    cardCompanyCardId = "9523*********8721",
                     lastCheckAt = now,
                     cardOwnerName = "홍길동",
                     cardOwnerType = "SELF",
