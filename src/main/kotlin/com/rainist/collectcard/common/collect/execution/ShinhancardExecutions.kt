@@ -336,7 +336,7 @@ class ShinhancardExecutions {
                 )
                 .fetch { listCardBillResponse ->
                     listCardBillResponse as ListCardBillsResponse
-                    listCardBillResponse.dataBody?.cardBills?.iterator()
+                    listCardBillResponse.dataBody?.cardBills?.iterator() ?: listOf<Any>().iterator()
                 }.then(
                     // 결제예정금액(일시불,현금서비스 상세)(SHC_HPG00237)
                     Execution.create()
@@ -381,7 +381,7 @@ class ShinhancardExecutions {
                         )
                         .fetch { listCardBillResponse ->
                             listCardBillResponse as ListCardBillsResponse
-                            listCardBillResponse.dataBody?.cardBills?.iterator()
+                            listCardBillResponse.dataBody?.cardBills?.iterator() ?: listOf<Any>().iterator()
                         }.then(
                             // (할부) 결제예정금액(할부, 론 상세)(SHC_HPG00238)
                             Execution.create()
