@@ -18,9 +18,9 @@ import com.rainist.collectcard.common.db.entity.makeCardLoanHistoryEntity
 import com.rainist.collectcard.common.db.repository.CardLoanHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardLoanRepository
 import com.rainist.collectcard.common.dto.CollectExecutionContext
+import com.rainist.collectcard.common.service.ExecutionResponseValidateService
 import com.rainist.collectcard.common.service.HeaderService
-import com.rainist.collectcard.common.util.ExecutionResponseValidator
-import com.rainist.collectcard.common.util.SyncStatus
+import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import org.springframework.stereotype.Service
@@ -29,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class CardLoanServiceImpl(
     val headerService: HeaderService,
+    val userSyncStatusService: UserSyncStatusService,
+    val executionResponseValidateService: ExecutionResponseValidateService,
     val collectExecutorService: CollectExecutorService,
     val cardLoanRepository: CardLoanRepository,
     val cardLoanHistoryRepository: CardLoanHistoryRepository
@@ -37,7 +39,6 @@ class CardLoanServiceImpl(
     companion object : Log
 
     @Transactional
-    @SyncStatus(transactionId = "cardLoans")
     override fun listCardLoans(executionContext: CollectExecutionContext): ListLoansResponse {
         val banksaladUserId = executionContext.userId.toLong()
         val now = DateTimeUtil.utcNowLocalDateTime()
@@ -61,11 +62,6 @@ class CardLoanServiceImpl(
                 .request(listLoansRequest)
                 .build()
         )
-
-        /* check response result */
-        ExecutionResponseValidator.validateResponseAndThrow(
-            executionResponse,
-            executionResponse.response.resultCodes)
 
         /* db insert */
         executionResponse.response?.dataBody?.loans?.forEach { loan ->
@@ -112,6 +108,15 @@ class CardLoanServiceImpl(
                         cardLoanHistoryRepository.save(history)
                     }
                 }
+        }
+
+        /* check response result */
+        if (! executionResponseValidateService.validate(executionContext.executionRequestId, executionResponse)) {
+            userSyncStatusService.updateUserSyncStatus(
+                banksaladUserId,
+                executionContext.organizationId,
+                Transaction.loan.name,
+                DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now))
         }
 
         return ListLoansResponse().apply {

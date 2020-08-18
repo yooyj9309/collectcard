@@ -16,9 +16,9 @@ import com.rainist.collectcard.common.db.entity.CardEntity
 import com.rainist.collectcard.common.db.repository.CardHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardRepository
 import com.rainist.collectcard.common.dto.CollectExecutionContext
+import com.rainist.collectcard.common.service.ExecutionResponseValidateService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.UserSyncStatusService
-import com.rainist.collectcard.common.util.ExecutionResponseValidator
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import java.time.LocalDateTime
@@ -27,15 +27,15 @@ import org.springframework.stereotype.Service
 
 @Service
 class CardServiceImpl(
-    val userSyncStatusService: UserSyncStatusService,
     val headerService: HeaderService,
+    val userSyncStatusService: UserSyncStatusService,
+    val executionResponseValidateService: ExecutionResponseValidateService,
     val collectExecutorService: CollectExecutorService,
     val cardRepository: CardRepository,
     val cardHistoryRepository: CardHistoryRepository
 ) : CardService {
 
     companion object : Log
-
     val cardMapper = Mappers.getMapper(CardMapper::class.java)
 
     override fun listCards(executionContext: CollectExecutionContext): ListCardsResponse {
@@ -63,11 +63,6 @@ class CardServiceImpl(
                     .build()
             )
 
-        /* check response result */
-        ExecutionResponseValidator.validateResponseAndThrow(
-            executionResponse,
-            executionResponse.response.resultCodes)
-
         val listCardsResponse = executionResponse.response
 
         /* convert type and format if necessary */
@@ -84,12 +79,14 @@ class CardServiceImpl(
             upsertCardAndCardHistory(executionContext.userId.toLong(), card, now)
         }
 
-        userSyncStatusService.updateUserSyncStatus(
-            banksaladUserId,
-            executionContext.organizationId,
-            Transaction.cards.name,
-            DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now)
-        )
+        /* check response result */
+        if (! executionResponseValidateService.validate(executionContext.executionRequestId, executionResponse)) {
+            userSyncStatusService.updateUserSyncStatus(
+                banksaladUserId,
+                executionContext.organizationId,
+                Transaction.cards.name,
+                DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now))
+        }
 
         logger.info("CardService.listCards end: executionContext: {}", executionContext)
         return executionResponse.response

@@ -12,6 +12,7 @@ import com.rainist.collectcard.common.db.repository.CardTransactionRepository
 import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.common.util.DateTimeUtil
+import java.util.UUID
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.jupiter.api.DisplayName
@@ -231,6 +232,7 @@ class CardTransactionServiceTest {
     private fun requestSetting(): CollectExecutionContext {
 
         val executionContext: CollectExecutionContext = CollectExecutionContext(
+            executionRequestId = UUID.randomUUID().toString(),
             organizationId = "shinhancard",
             userId = "1",
             startAt = DateTimeUtil.utcNowLocalDateTime()

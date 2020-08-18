@@ -20,7 +20,7 @@ import com.rainist.collectcard.common.db.repository.CardBillTransactionRepositor
 import com.rainist.collectcard.common.db.repository.CardPaymentScheduledRepository
 import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.service.HeaderService
-import com.rainist.collectcard.common.util.ExecutionResponseValidator
+import com.rainist.collectcard.common.util.SyncStatus
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import java.math.BigDecimal
@@ -43,6 +43,7 @@ class CardBillServiceImpl(
     }
 
     @Transactional
+    @SyncStatus(transactionId = "cardbills")
     override fun listUserCardBills(
         executionContext: CollectExecutionContext,
         startAt: Long?
@@ -79,11 +80,6 @@ class CardBillServiceImpl(
                 .build()
         )
 
-        /* check response result */
-        ExecutionResponseValidator.validateResponseAndThrow(
-            cardBillsExecutionResponse,
-            cardBillsExecutionResponse.response.resultCodes)
-
         val cardBillsResponse = cardBillsExecutionResponse.response
 
         // 청구서 IO
@@ -101,11 +97,6 @@ class CardBillServiceImpl(
                     .request(request)
                     .build()
             )
-
-        /* check response result */
-        ExecutionResponseValidator.validateResponseAndThrow(
-            cardBillExpectedExecutionResponse,
-            cardBillExpectedExecutionResponse.response.resultCodes)
 
         val cardBillExpectedResponse = cardBillExpectedExecutionResponse.response
 
@@ -129,6 +120,8 @@ class CardBillServiceImpl(
         cardBillsResponse?.dataBody?.cardBills?.forEach { cardBill ->
             cardBill.transactions?.sortByDescending { transaction -> transaction.approvalDay }
         }
+
+        // TODO : validate Execution Response
 
         return cardBillsResponse
     }

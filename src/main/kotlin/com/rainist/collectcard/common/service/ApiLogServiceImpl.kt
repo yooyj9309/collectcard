@@ -16,10 +16,11 @@ class ApiLogServiceImpl(private val apiLogRepository: ApiLogRepository) : ApiLog
         val ZONE_ID_UTC = "UTC"
     }
 
-    override fun logRequest(organizationId: String, banksaladUserId: Long, apiLog: ApiLog) {
+    override fun logRequest(executionRequestId: String, organizationId: String, banksaladUserId: Long, apiLog: ApiLog) {
         apiLogRepository.save(
             ApiLogEntity().apply {
-                this.requestId = apiLog.id
+                this.executionRequestId = executionRequestId
+                this.apiRequestId = apiLog.id
                 this.organizationId = organizationId
                 this.banksaladUserId = banksaladUserId
 
@@ -39,15 +40,17 @@ class ApiLogServiceImpl(private val apiLogRepository: ApiLogRepository) : ApiLog
         )
     }
 
-    override fun logResponse(organizationId: String, banksaladUserId: Long, apiLog: ApiLog) {
+    override fun logResponse(executionRequestId: String, organizationId: String, banksaladUserId: Long, apiLog: ApiLog) {
 
         val resultCodeAndMessage = parseResultCodeAndMessage(apiLog.response?.transformedBody)
 
-        val apiLogEntity = apiLogRepository.findByRequestIdAndCreatedAtBetween(
+        val apiLogEntity = apiLogRepository.findByExecutionRequestIdAndApiRequestIdAndCreatedAtBetween(
+                executionRequestId,
                 apiLog.id,
                 DateTimeUtil.utcNowLocalDateTime().minusDays(1),
                 DateTimeUtil.utcNowLocalDateTime().plusDays(1)
             ) ?: ApiLogEntity().apply {
+                this.executionRequestId = executionRequestId
                 this.organizationId = organizationId
                 this.banksaladUserId = banksaladUserId
                 this.apiId = apiLog.api.id
@@ -55,7 +58,7 @@ class ApiLogServiceImpl(private val apiLogRepository: ApiLogRepository) : ApiLog
                 this.httpMethod = apiLog.api.method.name
                 this.organizationApiId = apiLog.api.name
 
-                this.requestId = ""
+                this.apiRequestId = ""
                 this.requestHeaderText = ""
                 this.requestBodyText = ""
 

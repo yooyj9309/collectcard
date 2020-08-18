@@ -4,6 +4,7 @@ import com.rainist.collect.common.execution.ExecutionContext
 import java.time.LocalDateTime
 
 class CollectExecutionContext(
+    private var executionRequestId: String,
     private var userId: String,
     private var organizationId: String,
     private var startAt: LocalDateTime? = null
@@ -15,6 +16,10 @@ class CollectExecutionContext(
 
     override fun getUserId(): String {
         return this.userId
+    }
+
+    override fun getExecutionRequestId(): String {
+        return this.executionRequestId
     }
 
     override fun getStartAt(): LocalDateTime? {

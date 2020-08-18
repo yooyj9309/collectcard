@@ -17,9 +17,9 @@ import com.rainist.collectcard.common.db.repository.CreditLimitHistoryRepository
 import com.rainist.collectcard.common.db.repository.CreditLimitRepository
 import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.exception.CollectcardException
+import com.rainist.collectcard.common.service.ExecutionResponseValidateService
 import com.rainist.collectcard.common.service.HeaderService
-import com.rainist.collectcard.common.util.ExecutionResponseValidator
-import com.rainist.collectcard.common.util.SyncStatus
+import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import org.springframework.stereotype.Service
@@ -28,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class CardCreditLimitServiceImpl(
     val headerService: HeaderService,
+    val userSyncStatusService: UserSyncStatusService,
+    val executionResponseValidateService: ExecutionResponseValidateService,
     val collectExecutorService: CollectExecutorService,
     val creditLimitRepository: CreditLimitRepository,
     val creditLimitHistoryRepository: CreditLimitHistoryRepository
@@ -36,7 +38,6 @@ class CardCreditLimitServiceImpl(
     companion object : Log
 
     @Transactional
-    @SyncStatus(transactionId = "cardCreditLimit")
     override fun cardCreditLimit(executionContext: CollectExecutionContext): CreditLimitResponse {
         val banksaladUserId = executionContext.userId.toLong()
         val now = DateTimeUtil.utcNowLocalDateTime()
@@ -60,12 +61,8 @@ class CardCreditLimitServiceImpl(
                 .build()
         )
 
-        /* check response result */
-        ExecutionResponseValidator.validateResponseAndThrow(
-            executionResponse,
-            executionResponse.response.dataHeader?.resultCode)
-
         // validate
+        // TODO : DataBody 가 null이면 throw 하는 이유 파악
         if (executionResponse.response?.dataBody == null || executionResponse.response?.dataBody?.creditLimitInfo == null)
             throw CollectcardException("DataBody is null")
 
@@ -91,6 +88,15 @@ class CardCreditLimitServiceImpl(
             )
         } else {
             creditLimitEntity.lastCheckAt = now
+        }
+
+        /* check response result */
+        if (! executionResponseValidateService.validate(executionContext.executionRequestId, executionResponse)) {
+            userSyncStatusService.updateUserSyncStatus(
+                banksaladUserId,
+                executionContext.organizationId,
+                Transaction.creditLimit.name,
+                DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now))
         }
 
         // return

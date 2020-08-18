@@ -11,11 +11,11 @@ class ApiLogger(private val apiLogService: ApiLogService) : IApiLogger {
 
     override fun onRequest(context: ExecutionContext, apiLog: ApiLog) {
         val userId: Long = context.userId.toLong()
-        apiLogService.logRequest(context.organizationId, userId, apiLog)
+        apiLogService.logRequest(context.executionRequestId, context.organizationId, userId, apiLog)
     }
 
     override fun onResponse(context: ExecutionContext, apiLog: ApiLog) {
         val userId: Long = context.userId.toLong()
-        apiLogService.logResponse(context.organizationId, userId, apiLog)
+        apiLogService.logResponse(context.executionRequestId, context.organizationId, userId, apiLog)
     }
 }

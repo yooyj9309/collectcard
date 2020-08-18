@@ -17,9 +17,10 @@ import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.db.repository.CardTransactionRepository
 import com.rainist.collectcard.common.dto.CollectExecutionContext
+import com.rainist.collectcard.common.service.ExecutionResponseValidateService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.OrganizationService
-import com.rainist.collectcard.common.util.ExecutionResponseValidator
+import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.collectcard.common.util.SyncStatus
 import com.rainist.common.log.Log
 import com.rainist.common.service.ValidationService
@@ -39,6 +40,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class CardTransactionServiceImpl(
     val headerService: HeaderService,
+    val userSyncStatusService: UserSyncStatusService,
+    val executionResponseValidateService: ExecutionResponseValidateService,
     val collectExecutorService: CollectExecutorService,
     val validationService: ValidationService,
     val cardTransactionRepository: CardTransactionRepository,
@@ -124,6 +127,16 @@ class CardTransactionServiceImpl(
             }
         }
 
+        /* check response result */
+        // TODO : response validation
+//        if (! executionResonseValidateService.validate(executionContext.executionRequestId, executionResponse)) {
+//            userSyncStatusService.updateUserSyncStatus(
+//                banksaladUserId,
+//                executionContext.organizationId,
+//                Transaction.cardTransaction.name,
+//                DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now))
+//        }
+
         // return
         return ListTransactionsResponse().apply {
             this.dataBody = ListTransactionsResponseDataBody().apply {
@@ -190,10 +203,6 @@ class CardTransactionServiceImpl(
                                 .request(it)
                                 .build()
                         )
-                    /* check response result */
-                    ExecutionResponseValidator.validateResponseAndThrow(
-                        executionResponse,
-                        executionResponse.response.resultCodes)
 
                     executionResponse
                 }

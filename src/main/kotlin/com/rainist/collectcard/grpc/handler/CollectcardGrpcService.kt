@@ -20,6 +20,7 @@ import com.rainist.collectcard.config.onException
 import com.rainist.common.interceptor.StatsUnaryServerInterceptor
 import com.rainist.common.log.Log
 import io.grpc.stub.StreamObserver
+import java.util.UUID
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.lognet.springboot.grpc.GRpcService
 
@@ -58,6 +59,7 @@ class CollectcardGrpcService(
 
         /* Execution Context */
         val executionContext: CollectExecutionContext = CollectExecutionContext(
+            executionRequestId = generateExecutioRequestId(),
             organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
             userId = request.userId
         )
@@ -89,6 +91,7 @@ class CollectcardGrpcService(
 
         /* Execution Context */
         val executionContext: CollectExecutionContext = CollectExecutionContext(
+            executionRequestId = generateExecutioRequestId(),
             organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
             userId = request.userId
         )
@@ -122,6 +125,7 @@ class CollectcardGrpcService(
 
         /* Execution Context */
         val executionContext: CollectExecutionContext = CollectExecutionContext(
+            executionRequestId = generateExecutioRequestId(),
             organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
             userId = request.userId
         )
@@ -154,6 +158,7 @@ class CollectcardGrpcService(
 
         /* Execution Context */
         val executionContext: CollectExecutionContext = CollectExecutionContext(
+            executionRequestId = generateExecutioRequestId(),
             organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
             userId = request.userId
         )
@@ -185,6 +190,7 @@ class CollectcardGrpcService(
 
         /* Execution Context */
         val executionContext: CollectExecutionContext = CollectExecutionContext(
+            executionRequestId = generateExecutioRequestId(),
             organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
             userId = request.userId
         )
@@ -199,5 +205,9 @@ class CollectcardGrpcService(
             CollectcardServiceExceptionHandler.handle(executionContext, "getCreditLimit", "사용자개인한도조회", it)
             responseObserver.onError(it)
         }
+    }
+
+    private fun generateExecutioRequestId(): String {
+        return UUID.randomUUID().toString()
     }
 }

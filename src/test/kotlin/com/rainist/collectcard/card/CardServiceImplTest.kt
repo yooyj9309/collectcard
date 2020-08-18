@@ -11,6 +11,7 @@ import com.rainist.collectcard.common.enums.ResultCode
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.common.util.DateTimeUtil
 import java.time.LocalDateTime
+import java.util.UUID
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.Is.`is`
 import org.junit.jupiter.api.DisplayName
@@ -52,6 +53,7 @@ class CardServiceImplTest {
     lateinit var headerService: HeaderService
 
     val executionContext: CollectExecutionContext = CollectExecutionContext(
+        executionRequestId = UUID.randomUUID().toString(),
         organizationId = "shinhancard",
         userId = "1",
         startAt = DateTimeUtil.utcNowLocalDateTime()

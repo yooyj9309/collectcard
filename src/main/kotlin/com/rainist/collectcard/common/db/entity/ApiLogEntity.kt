@@ -21,7 +21,10 @@ data class ApiLogEntity(
     var apiLogId: Long? = null,
 
     @Column(nullable = false)
-    var requestId: String? = null,
+    var executionRequestId: String? = null,
+
+    @Column(nullable = false)
+    var apiRequestId: String? = null,
 
     @Column(nullable = false)
     var organizationId: String? = null,

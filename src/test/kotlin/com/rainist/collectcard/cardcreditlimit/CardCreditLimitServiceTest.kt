@@ -7,6 +7,7 @@ import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.common.util.DateTimeUtil
 import java.math.BigDecimal
+import java.util.UUID
 import org.junit.Assert
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -50,6 +51,7 @@ class CardCreditLimitServiceTest {
         setupServer()
 
         val executionContext: CollectExecutionContext = CollectExecutionContext(
+            executionRequestId = UUID.randomUUID().toString(),
             organizationId = "shinhancard",
             userId = "1",
             startAt = DateTimeUtil.utcNowLocalDateTime()
