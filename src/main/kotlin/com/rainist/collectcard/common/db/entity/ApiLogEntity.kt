@@ -28,7 +28,7 @@ data class ApiLogEntity(
 
     // TODO : remove field after db change
     @Column(nullable = false)
-    var requestId: String? = "",
+    var requestId: String? = null,
 
     @Column(nullable = false)
     var organizationId: String? = null,
