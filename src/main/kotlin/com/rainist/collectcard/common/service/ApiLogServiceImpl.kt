@@ -21,7 +21,6 @@ class ApiLogServiceImpl(private val apiLogRepository: ApiLogRepository) : ApiLog
             ApiLogEntity().apply {
                 this.executionRequestId = executionRequestId
                 this.apiRequestId = apiLog.id
-                this.requestId = apiLog.id // TODO remove after db change
                 this.organizationId = organizationId
                 this.banksaladUserId = banksaladUserId
 
