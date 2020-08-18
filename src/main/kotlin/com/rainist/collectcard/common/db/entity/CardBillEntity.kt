@@ -31,6 +31,9 @@ data class CardBillEntity(
     var billNumber: String? = null,
 
     @Column(nullable = false)
+    var billType: String? = null,
+
+    @Column(nullable = false)
     var lastCheckAt: LocalDateTime? = null,
 
     var userName: String? = null,
@@ -66,4 +69,10 @@ data class CardBillEntity(
 
     @LastModifiedDate
     var updatedAt: LocalDateTime? = null
-)
+) {
+    fun equal(other: CardBillEntity): Boolean {
+        val t = this.copy(cardBillId = null, lastCheckAt = null, createdAt = null, updatedAt = null)
+        val o = other.copy(cardBillId = null, lastCheckAt = null, createdAt = null, updatedAt = null)
+        return t == o
+    }
+}

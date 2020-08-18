@@ -100,5 +100,7 @@ data class CardBillTransaction(
 
     var pointsRate: BigDecimal? = null, // 적립예정포인트율
 
-    var billNumber: String? = null // 청구서 번호
+    var billNumber: String? = null, // 청구서 번호
+
+    var billType: String? = null // 청구서 타입
 )

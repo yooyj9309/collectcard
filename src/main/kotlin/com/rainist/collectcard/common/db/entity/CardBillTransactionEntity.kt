@@ -35,6 +35,9 @@ data class CardBillTransactionEntity(
     var billNumber: String? = null,
 
     @Column(nullable = false)
+    var billType: String? = null,
+
+    @Column(nullable = false)
     var cardBillTransactionNo: Int? = null,
 
     @Column(nullable = false)
@@ -131,6 +134,9 @@ data class CardBillTransactionEntity(
     var cashbackAmount: BigDecimal? = null,
 
     var pointsRate: BigDecimal? = null,
+
+    @Column(nullable = false)
+    var isDeleted: Boolean? = false,
 
     @Column(nullable = false)
     var lastCheckAt: LocalDateTime? = null,

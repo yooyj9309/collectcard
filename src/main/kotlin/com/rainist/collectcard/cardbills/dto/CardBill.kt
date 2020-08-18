@@ -1,7 +1,6 @@
 package com.rainist.collectcard.cardbills.dto
 
 import java.math.BigDecimal
-import java.time.ZonedDateTime
 
 data class CardBill(
     var billId: String?,
@@ -25,7 +24,7 @@ data class CardBill(
     var paymentDay: String?,
 
     // 청구년월
-    var billedYearMonth: ZonedDateTime?,
+    var billedYearMonth: String?,
 
     // 다음 결제 예정일
     var nextPaymentDay: String?,

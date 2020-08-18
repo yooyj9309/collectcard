@@ -155,6 +155,8 @@ class ShinhancardExecutions {
                     if (it.approvalDay.isNullOrEmpty()) {
                         it.approvalDay = master.paymentDay
                     }
+                    it.billNumber = master.billNumber
+                    it.billType = master.billType
                 }
 
                 master.transactions = masterTransaction
@@ -173,6 +175,8 @@ class ShinhancardExecutions {
                     if (it.approvalDay.isNullOrEmpty()) {
                         it.approvalDay = master.paymentDay
                     }
+                    it.billNumber = master.billNumber
+                    it.billType = master.billType
                 }
 
                 master.transactions = masterTransaction
