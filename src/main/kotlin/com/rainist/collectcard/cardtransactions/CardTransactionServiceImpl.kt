@@ -93,6 +93,9 @@ class CardTransactionServiceImpl(
         val transactions = executionResponses.flatMap {
                 it.response?.dataBody?.transactions ?: mutableListOf()
             }
+            .filter {
+                it.cardNumber?.length ?: 0 > 0 // 신한카드 처럼 list 갯수 맞추기 위해 공백으로 넣은 쓰레기 데이터 제거
+            }
             .mapNotNull {
                 validationService.validateOrNull(it)
             }
