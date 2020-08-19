@@ -2,6 +2,12 @@ package com.rainist.collectcard.cardbills.dto
 
 import java.math.BigDecimal
 
+enum class BillCardType {
+    CREDIT,
+    DEBIT,
+    ALL
+}
+
 data class CardBill(
     var billId: String?,
 
@@ -10,6 +16,9 @@ data class CardBill(
 
     // 명세서제목 또는 발급사등 구분
     var billType: String?,
+
+    // 명세서제목 또는 발급사등 구분
+    var cardType: BillCardType?,
 
     // 마스킹 된 고객 이름 (e.g. 김X샐)
     var userName: String?,

@@ -16,6 +16,7 @@ class CardBillUtil {
                 this.cardCompanyId = organizationId
                 this.billNumber = cardBill.billNumber
                 this.billType = cardBill.billType
+                this.cardType = cardBill.cardType?.name ?: ""
                 this.lastCheckAt = DateTimeUtil.getLocalDateTime()
                 this.userName = cardBill.userName
                 this.userGrade = cardBill.userGrade

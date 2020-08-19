@@ -22,6 +22,7 @@ let resultCodes = {
                 {
                     "billNumber": .setlDay + .setlTypeNo,
                     "billType" : .setlTypeNo,
+                    "cardType" : "CREDIT",
                     "userName": "",
                     "userGrade": "",
                     "paymentDay": .setlDay,

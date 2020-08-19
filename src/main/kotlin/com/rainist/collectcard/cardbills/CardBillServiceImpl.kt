@@ -140,10 +140,12 @@ class CardBillServiceImpl(
 
     private fun upsertCardBillAndTransactions(banksaladUserId: Long, organizationId: String?, cardBill: CardBill) {
         val newCardBillEntity = CardBillUtil.makeCardBillEntity(banksaladUserId, organizationId ?: "", cardBill)
-        val oldCardBillEntity = cardBillRepository.findByBanksaladUserIdAndCardCompanyIdAndBillNumber(
+        val oldCardBillEntity = cardBillRepository.findByBanksaladUserIdAndCardCompanyIdAndBillNumberAndBillTypeAndCardType(
             banksaladUserId,
             organizationId ?: "",
-            cardBill.billNumber ?: ""
+            cardBill.billNumber ?: "",
+            cardBill.billType ?: "",
+            cardBill.cardType?.name ?: ""
         ) ?: CardBillEntity()
 
         if (newCardBillEntity.equal(oldCardBillEntity)) {

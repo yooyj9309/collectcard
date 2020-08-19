@@ -34,6 +34,9 @@ data class CardBillEntity(
     var billType: String? = null,
 
     @Column(nullable = false)
+    var cardType: String? = null,
+
+    @Column(nullable = false)
     var lastCheckAt: LocalDateTime? = null,
 
     var userName: String? = null,
