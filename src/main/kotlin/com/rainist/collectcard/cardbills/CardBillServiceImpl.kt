@@ -150,6 +150,11 @@ class CardBillServiceImpl(
             return
         }
 
+        // TEMP: bill table에 card type 추가 전까지는 update logic 태우지 않음
+        if (oldCardBillEntity != CardBillEntity()) {
+            return
+        }
+
         val transactions = cardBillTransactionRepository.getAllByBilledYearMonthAndBanksaladUserIdAndCardCompanyCardIdAndBillNumber(
             oldCardBillEntity.billedYearMonth ?: "",
             banksaladUserId,
