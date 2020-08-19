@@ -35,8 +35,8 @@ class CollectConfig(
     fun threadPoolTaskExecutor(): Executor {
         val executor = ThreadPoolTaskExecutor()
         executor.setThreadNamePrefix("Async-Thread-Collect-")
-        executor.corePoolSize = 10
-        executor.maxPoolSize = 20
+        executor.corePoolSize = 50
+        executor.maxPoolSize = 100
         executor.setQueueCapacity(1000)
         executor.keepAliveSeconds = 20
         executor.setWaitForTasksToCompleteOnShutdown(true)
