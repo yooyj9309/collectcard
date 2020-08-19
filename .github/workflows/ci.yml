@@ -6,7 +6,8 @@ on:
 jobs:
   tests:
     name: Lint and Test
-    runs-on: [self-hosted, jvm]
+#    runs-on: [self-hosted, jvm]
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -40,7 +41,8 @@ jobs:
 
   build:
     name: Build and Push
-    runs-on: [self-hosted, jvm]
+#    runs-on: [self-hosted, jvm]
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -80,7 +82,8 @@ jobs:
 
   build-grpc-gateway:
     name: Build gRPC-gateway
-    runs-on: [self-hosted, default]
+#    runs-on: [self-hosted, default]
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v2

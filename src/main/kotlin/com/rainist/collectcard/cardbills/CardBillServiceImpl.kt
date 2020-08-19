@@ -8,6 +8,7 @@ import com.rainist.collectcard.cardbills.dto.CardBillTransaction
 import com.rainist.collectcard.cardbills.dto.ListCardBillsRequest
 import com.rainist.collectcard.cardbills.dto.ListCardBillsRequestDataBody
 import com.rainist.collectcard.cardbills.dto.ListCardBillsResponse
+import com.rainist.collectcard.cardbills.dto.ListCardBillsResponseDataBody
 import com.rainist.collectcard.cardbills.util.CardBillUtil
 import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
@@ -94,7 +95,9 @@ class CardBillServiceImpl(
             bill.transactions?.sortByDescending { transaction -> transaction.approvalDay }
         }
 
-        return cardBillsResponse
+        return cardBillsResponse.apply {
+            this.dataBody = ListCardBillsResponseDataBody().apply { this.cardBills = bills }
+        }
     }
 
     private fun executeCardBill(executionContext: CollectExecutionContext, header: MutableMap<String, String?>, request: ListCardBillsRequest): ListCardBillsResponse {
