@@ -92,7 +92,7 @@ class ApiLogServiceImpl(
         /* count result_code */
         collectMeterRegistry.registerExecutionApiResultCodeCount(
             organizationId = apiLogEntity.organizationId ?: "",
-            executionId = apiLogEntity.executionRequestId ?: "",
+            executionId = "",
             apiId = apiLogEntity.apiId ?: "",
             resultCode = apiLogEntity.resultCode ?: ""
         )
