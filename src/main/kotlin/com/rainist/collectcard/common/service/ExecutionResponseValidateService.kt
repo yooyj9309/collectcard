@@ -54,4 +54,20 @@ class ExecutionResponseValidateService(private val apiLogRepository: ApiLogRepos
 
         return true
     }
+
+    fun validate(
+        executionRequestId: String,
+        executionResponse: List<ExecutionResponse<*>>
+    ): Boolean {
+
+        val falseCount = executionResponse.map {
+            validate(executionRequestId, it)
+        }
+        .filter {
+            it == false
+        }
+        .count()
+
+        return falseCount == 0
+    }
 }

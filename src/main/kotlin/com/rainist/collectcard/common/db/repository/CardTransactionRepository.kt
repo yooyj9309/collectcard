@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface CardTransactionRepository : JpaRepository<CardTransactionEntity, Long> {
     fun findByApprovalYearMonthAndBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
-        approvalYearMonth: String,
+        approvalYearMonth: String?,
         banksaladUserId: Long,
         cardCompanyId: String?,
         cardCompanyCardId: String?,

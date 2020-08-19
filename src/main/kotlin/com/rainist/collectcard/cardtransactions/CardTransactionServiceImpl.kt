@@ -4,7 +4,6 @@ import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collect.common.execution.ExecutionRequest
 import com.rainist.collect.common.execution.ExecutionResponse
 import com.rainist.collect.executor.CollectExecutorService
-import com.rainist.collectcard.cardtransactions.dto.CardTransaction
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsRequest
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsRequestDataBody
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsRequestDataHeader
@@ -89,25 +88,26 @@ class CardTransactionServiceImpl(
         )
         logger.warn(logMap)
 
-        val transactions = getListTransactionsByDivision(executionContext, header, request)
+        val executionResponses = getListTransactionsByDivision(executionContext, header, request)
+
+        val transactions = executionResponses.flatMap {
+                it.response?.dataBody?.transactions ?: mutableListOf()
+            }
+            .mapNotNull {
+                validationService.validateOrNull(it)
+            }
+            .toMutableList()
 
         // db insert
         transactions.forEach { cardTransaction ->
-
             if (shinhancardOrganizationId == executionContext.organizationId) {
                 val code = cardTransaction.currencyCode.replace(" ", "").trim()
                 cardTransaction.currencyCode = CardTransactionUtil.currencyCodeMap[code] ?: code
             }
 
-            val approvalYearMonth = try {
-                cardTransaction.approvalDay?.substring(0, 6) ?: ""
-            } catch (e: ArrayIndexOutOfBoundsException) {
-                ""
-            }
-
             val cardTransactionEntity =
                 cardTransactionRepository.findByApprovalYearMonthAndBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
-                    approvalYearMonth,
+                    cardTransaction.approvalDay?.substring(0, 6),
                     banksaladUserId,
                     executionContext.organizationId,
                     cardTransaction.cardCompanyCardId,
@@ -127,17 +127,14 @@ class CardTransactionServiceImpl(
             }
         }
 
-        /* check response result */
-        // TODO : response validation
-//        if (! executionResonseValidateService.validate(executionContext.executionRequestId, executionResponse)) {
-//            userSyncStatusService.updateUserSyncStatus(
-//                banksaladUserId,
-//                executionContext.organizationId,
-//                Transaction.cardTransaction.name,
-//                DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now))
-//        }
+        if (executionResponseValidateService.validate(executionContext.executionRequestId, executionResponses)) {
+                userSyncStatusService.updateUserSyncStatus(
+                banksaladUserId,
+                executionContext.organizationId,
+                Transaction.cardTransaction.name,
+                DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now))
+        }
 
-        // return
         return ListTransactionsResponse().apply {
             this.dataBody = ListTransactionsResponseDataBody().apply {
                 this.transactions = transactions
@@ -149,7 +146,7 @@ class CardTransactionServiceImpl(
         executionContext: ExecutionContext,
         header: MutableMap<String, String?>,
         request: ListTransactionsRequest
-    ): MutableList<CardTransaction> {
+    ): List<ExecutionResponse<ListTransactionsResponse>> {
 
         val searchDateList = let {
                 validationService.validateOrThrows(request.dataBody)
@@ -168,7 +165,7 @@ class CardTransactionServiceImpl(
         )
         logger.warn(logMap)
 
-        val resultBody = runBlocking(executor.asCoroutineDispatcher()) {
+        return runBlocking(executor.asCoroutineDispatcher()) {
             // 조회 시간 분할
             searchDateList.map {
                 ListTransactionsRequest().apply {
@@ -212,13 +209,5 @@ class CardTransactionServiceImpl(
                 deferred.getCompleted()
             }
         }
-
-        return resultBody.flatMap {
-            it.response?.dataBody?.transactions?.toMutableList() ?: mutableListOf()
-        }.filter {
-            it.cardNumber?.length ?: 0 > 0
-        }.mapNotNull {
-            validationService.validateOrNull(it)
-        }.toMutableList()
     }
 }
