@@ -5,13 +5,18 @@ import com.jayway.jsonpath.PathNotFoundException
 import com.rainist.collect.executor.ApiLog
 import com.rainist.collectcard.common.db.entity.ApiLogEntity
 import com.rainist.collectcard.common.db.repository.ApiLogRepository
+import com.rainist.collectcard.common.meters.CollectMeterRegistry
 import com.rainist.common.util.DateTimeUtil
 import java.time.LocalDateTime
 import java.time.ZoneId
 import org.springframework.stereotype.Service
 
 @Service
-class ApiLogServiceImpl(private val apiLogRepository: ApiLogRepository) : ApiLogService {
+class ApiLogServiceImpl(
+    private val apiLogRepository: ApiLogRepository,
+    private val collectMeterRegistry: CollectMeterRegistry
+) : ApiLogService {
+
     companion object {
         val ZONE_ID_UTC = "UTC"
     }
@@ -83,6 +88,14 @@ class ApiLogServiceImpl(private val apiLogRepository: ApiLogRepository) : ApiLog
         }
 
         apiLogRepository.save(apiLogEntity)
+
+        /* count result_code */
+        collectMeterRegistry.registerExecutionApiResultCodeCount(
+            organizationId = apiLogEntity.organizationId ?: "",
+            executionId = apiLogEntity.executionRequestId ?: "",
+            apiId = apiLogEntity.apiId ?: "",
+            resultCode = apiLogEntity.resultCode ?: ""
+        )
     }
 
     fun parseResultCodeAndMessage(json: String?): Pair<String, String> {

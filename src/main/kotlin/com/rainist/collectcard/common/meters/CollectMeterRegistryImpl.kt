@@ -10,10 +10,13 @@ private const val TAG_ORGANIZATION_ID = "organizationId"
 private const val TAG_EXECUTION_ID = "executionId"
 private const val TAG_API_ID = "apiId"
 
+private const val TAG_RESULT_CODE = "resultCode"
+
 private const val TAG_SERVICE_NAME = "serviceName"
 
 private const val COLLECT_EXECUTION_ERROR_COUNT = "collect.execution.error.count"
 private const val COLLECT_SERVICE_ERROR_COUNT = "collect.service.error.count"
+private const val COLLECT_EXECUTION_API_RESULT_CODE_COUNT = "collect.execution.api.result_code.count"
 
 @Service
 class CollectMeterRegistryImpl(private val meterRegistry: MeterRegistry) : CollectMeterRegistry {
@@ -25,11 +28,13 @@ class CollectMeterRegistryImpl(private val meterRegistry: MeterRegistry) : Colle
 
     private var executionErrorCountName: String? = null
     private var serviceErrorCountName: String? = null
+    private var executionApiResultCodeCountName: String? = null
 
     @PostConstruct
     fun init() {
         executionErrorCountName = "$activeName.$applicationName.$COLLECT_EXECUTION_ERROR_COUNT"
         serviceErrorCountName = "$activeName.$applicationName.$COLLECT_SERVICE_ERROR_COUNT"
+        executionApiResultCodeCountName = "$activeName.$applicationName.$COLLECT_EXECUTION_API_RESULT_CODE_COUNT"
     }
 
     override fun registerExecutionErrorCount(organizationId: String, executionId: String, apiId: String) {
@@ -44,5 +49,14 @@ class CollectMeterRegistryImpl(private val meterRegistry: MeterRegistry) : Colle
         val tags = Tags.of(TAG_SERVICE_NAME, serviceName)
 
         meterRegistry.counter(serviceErrorCountName ?: "", tags).increment()
+    }
+
+    override fun registerExecutionApiResultCodeCount(organizationId: String, executionId: String, apiId: String, resultCode: String) {
+        val tags = Tags.of(TAG_ORGANIZATION_ID, organizationId)
+            .and(TAG_EXECUTION_ID, executionId)
+            .and(TAG_API_ID, apiId)
+            .and(TAG_RESULT_CODE, resultCode)
+
+        meterRegistry.counter(executionApiResultCodeCountName ?: "", tags).increment()
     }
 }
