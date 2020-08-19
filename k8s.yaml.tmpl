@@ -254,7 +254,7 @@ spec:
               value: {{ $production_shinhancard_client_id }}
           resources:
             limits:
-              memory: 1Gi
+              memory: 4Gi
             requests:
               cpu: 250m
               memory: 512Mi
@@ -303,6 +303,13 @@ spec:
             privileged: false
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
+      {{ if eq $env "production" }}
+      tolerations:
+        - effect: NoSchedule
+          key: dedicated
+          operator: Equal
+          value: jvm
+      {{ end }}
       dnsPolicy: ClusterFirst
       dnsConfig:
         options:
