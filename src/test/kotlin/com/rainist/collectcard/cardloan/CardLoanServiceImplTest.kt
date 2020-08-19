@@ -123,7 +123,7 @@ class CardLoanServiceImplTest {
             .andRespond(
                 MockRestResponseCreators.withStatus(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/shinhancard/card_loan_expected_1.json"))
+                    .body(readText("classpath:mock/shinhancard/loan/card_loan_expected_1.json"))
             )
 
         server.expect(ExpectedCount.once(), MockRestRequestMatchers.requestTo(loanDetailAPI.endpoint))
@@ -132,7 +132,7 @@ class CardLoanServiceImplTest {
             .andRespond(
                 MockRestResponseCreators.withStatus(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/shinhancard/card_loan_expected_1_detail_1.json"))
+                    .body(readText("classpath:mock/shinhancard/loan/card_loan_expected_1_detail_1.json"))
             )
 
         server.expect(ExpectedCount.once(), MockRestRequestMatchers.requestTo(loanDetailAPI.endpoint))
@@ -141,7 +141,7 @@ class CardLoanServiceImplTest {
             .andRespond(
                 MockRestResponseCreators.withStatus(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/shinhancard/card_loan_expected_1_detail_2.json"))
+                    .body(readText("classpath:mock/shinhancard/loan/card_loan_expected_1_detail_2.json"))
             )
     }
 
@@ -155,7 +155,7 @@ class CardLoanServiceImplTest {
             .andRespond(
                 MockRestResponseCreators.withStatus(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/shinhancard/card_loan_expected_2_p1.json"))
+                    .body(readText("classpath:mock/shinhancard/loan/card_loan_expected_2_p1.json"))
             )
 
         server.expect(ExpectedCount.once(), MockRestRequestMatchers.requestTo(loanInfoAPI.endpoint))
@@ -163,7 +163,7 @@ class CardLoanServiceImplTest {
             .andRespond(
                 MockRestResponseCreators.withStatus(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/shinhancard/card_loan_expected_2_p2.json"))
+                    .body(readText("classpath:mock/shinhancard/loan/card_loan_expected_2_p2.json"))
             )
 
         server.expect(ExpectedCount.once(), MockRestRequestMatchers.requestTo(loanDetailAPI.endpoint))
@@ -172,7 +172,7 @@ class CardLoanServiceImplTest {
             .andRespond(
                 MockRestResponseCreators.withStatus(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/shinhancard/card_loan_expected_2_detail_1.json"))
+                    .body(readText("classpath:mock/shinhancard/loan/card_loan_expected_2_detail_1.json"))
             )
 
         server.expect(ExpectedCount.once(), MockRestRequestMatchers.requestTo(loanDetailAPI.endpoint))
@@ -181,7 +181,7 @@ class CardLoanServiceImplTest {
             .andRespond(
                 MockRestResponseCreators.withStatus(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/shinhancard/card_loan_expected_2_detail_2.json"))
+                    .body(readText("classpath:mock/shinhancard/loan/card_loan_expected_2_detail_2.json"))
             )
 
         server.expect(ExpectedCount.once(), MockRestRequestMatchers.requestTo(loanDetailAPI.endpoint))
@@ -190,7 +190,7 @@ class CardLoanServiceImplTest {
             .andRespond(
                 MockRestResponseCreators.withStatus(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/shinhancard/card_loan_expected_2_detail_3.json"))
+                    .body(readText("classpath:mock/shinhancard/loan/card_loan_expected_2_detail_3.json"))
             )
     }
 

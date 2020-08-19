@@ -61,7 +61,7 @@ class CardServiceImplTest {
 
     @Test
     fun listCard_success() {
-        setupServer(listOf("mock/shinhancard/card_shinhancard_cards.json"))
+        setupServer(listOf("mock/shinhancard/card/card_shinhancard_cards.json"))
 
         given(headerService.makeHeader(executionContext.userId, executionContext.organizationId))
             .willReturn(
@@ -134,8 +134,8 @@ class CardServiceImplTest {
     fun listCard_pagination() {
         setupServer(
             listOf(
-                "mock/shinhancard/card_shinhancard_cards_paging_1.json",
-                "mock/shinhancard/card_shinhancard_cards_paging_2.json"
+                "mock/shinhancard/card/card_shinhancard_cards_paging_1.json",
+                "mock/shinhancard/card/card_shinhancard_cards_paging_2.json"
             )
         )
 
@@ -210,7 +210,7 @@ class CardServiceImplTest {
 
     @Test
     fun listCard_updated() {
-        setupServer(listOf("mock/shinhancard/card_shinhancard_cards_update.json"))
+        setupServer(listOf("mock/shinhancard/card/card_shinhancard_cards_update.json"))
 
         given(headerService.makeHeader(executionContext.userId, executionContext.organizationId))
             .willReturn(

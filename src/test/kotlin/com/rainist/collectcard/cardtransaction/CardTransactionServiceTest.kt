@@ -155,45 +155,45 @@ class CardTransactionServiceTest {
         settingOnceMockServiceServer(
             server,
             creditDomesticAPI,
-            "classpath:mock/shinhancard/card_transaction_expected_1_credit_domestic_p1.json"
+            "classpath:mock/shinhancard/transaction/card_transaction_expected_1_credit_domestic_p1.json"
         )
         settingOnceMockServiceServer(
             server,
             creditDomesticAPI,
-            "classpath:mock/shinhancard/card_transaction_expected_1_credit_domestic_p2.json"
+            "classpath:mock/shinhancard/transaction/card_transaction_expected_1_credit_domestic_p2.json"
         )
         // 신용카드 해외
         settingOnceMockServiceServer(
             server,
             creditOverseaAPI,
-            "classpath:mock/shinhancard/card_transaction_expected_1_credit_oversea_p1.json"
+            "classpath:mock/shinhancard/transaction/card_transaction_expected_1_credit_oversea_p1.json"
         )
         settingOnceMockServiceServer(
             server,
             creditOverseaAPI,
-            "classpath:mock/shinhancard/card_transaction_expected_1_credit_oversea_p2.json"
+            "classpath:mock/shinhancard/transaction/card_transaction_expected_1_credit_oversea_p2.json"
         )
         // 체크카드 국내
         settingOnceMockServiceServer(
             server,
             checkDomesticAPI,
-            "classpath:mock/shinhancard/card_transaction_expected_1_check_domestic_p1.json"
+            "classpath:mock/shinhancard/transaction/card_transaction_expected_1_check_domestic_p1.json"
         )
         settingOnceMockServiceServer(
             server,
             checkDomesticAPI,
-            "classpath:mock/shinhancard/card_transaction_expected_1_check_domestic_p2.json"
+            "classpath:mock/shinhancard/transaction/card_transaction_expected_1_check_domestic_p2.json"
         )
         // 체크카드 해외
         settingOnceMockServiceServer(
             server,
             checkOverseaAPI,
-            "classpath:mock/shinhancard/card_transaction_expected_1_check_oversea_p1.json"
+            "classpath:mock/shinhancard/transaction/card_transaction_expected_1_check_oversea_p1.json"
         )
         settingOnceMockServiceServer(
             server,
             checkOverseaAPI,
-            "classpath:mock/shinhancard/card_transaction_expected_1_check_oversea_p2.json"
+            "classpath:mock/shinhancard/transaction/card_transaction_expected_1_check_oversea_p2.json"
         )
     }
 
@@ -206,22 +206,22 @@ class CardTransactionServiceTest {
         settingOnceMockServiceServer(
             server,
             creditDomesticAPI,
-            "classpath:mock/shinhancard/card_transaction_expected_1_credit_domestic_updated.json"
+            "classpath:mock/shinhancard/transaction/card_transaction_expected_1_credit_domestic_updated.json"
         )
         settingOnceMockServiceServer(
             server,
             creditOverseaAPI,
-            "classpath:mock/shinhancard/card_transaction_expected_1_credit_oversea_updated.json"
+            "classpath:mock/shinhancard/transaction/card_transaction_expected_1_credit_oversea_updated.json"
         )
         settingOnceMockServiceServer(
             server,
             checkDomesticAPI,
-            "classpath:mock/shinhancard/card_transaction_expected_1_check_domestic_updated.json"
+            "classpath:mock/shinhancard/transaction/card_transaction_expected_1_check_domestic_updated.json"
         )
         settingOnceMockServiceServer(
             server,
             checkOverseaAPI,
-            "classpath:mock/shinhancard/card_transaction_expected_1_check_oversea_updated.json"
+            "classpath:mock/shinhancard/transaction/card_transaction_expected_1_check_oversea_updated.json"
         )
     }
 

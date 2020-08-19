@@ -52,7 +52,7 @@ class CardBillServiceImplTest {
             .andRespond(
                 MockRestResponseCreators.withStatus(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/card_shinhancard_bills_expected_p1.json"))
+                    .body(readText("classpath:mock/shinhancard/bill/card_shinhancard_bills_expected_p1.json"))
             )
 
         server.expect(ExpectedCount.once(), MockRestRequestMatchers.requestTo(api.endpoint))
@@ -60,7 +60,7 @@ class CardBillServiceImplTest {
             .andRespond(
                 MockRestResponseCreators.withStatus(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/card_shinhancard_bills_expected_p2.json"))
+                    .body(readText("classpath:mock/shinhancard/bill/card_shinhancard_bills_expected_p2.json"))
             )
 
         server.expect(ExpectedCount.once(), MockRestRequestMatchers.requestTo(api.endpoint))
@@ -68,7 +68,7 @@ class CardBillServiceImplTest {
             .andRespond(
                 MockRestResponseCreators.withStatus(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/card_shinhancard_bills_expected_p3.json"))
+                    .body(readText("classpath:mock/shinhancard/bill/card_shinhancard_bills_expected_p3.json"))
             )
     }
 

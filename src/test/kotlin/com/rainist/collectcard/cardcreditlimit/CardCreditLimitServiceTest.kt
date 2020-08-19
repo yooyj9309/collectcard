@@ -102,7 +102,7 @@ class CardCreditLimitServiceTest {
             .andRespond(
                 MockRestResponseCreators.withStatus(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/shinhancard/card_credit_limit_expected_1.json"))
+                    .body(readText("classpath:mock/shinhancard/creditlimit/card_credit_limit_expected_1.json"))
             )
 
         server.expect(ExpectedCount.once(), MockRestRequestMatchers.requestTo(creditLimitAPI.endpoint))
@@ -110,7 +110,7 @@ class CardCreditLimitServiceTest {
             .andRespond(
                 MockRestResponseCreators.withStatus(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/shinhancard/card_credit_limit_expected_2.json"))
+                    .body(readText("classpath:mock/shinhancard/creditlimit/card_credit_limit_expected_2.json"))
             )
     }
 
