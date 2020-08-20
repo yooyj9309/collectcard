@@ -33,22 +33,22 @@ class ExecutionResponseValidateService(private val apiLogRepository: ApiLogRepos
             .toMutableList()
 
         if (resultCodes.contains(ResultCode.EXTERNAL_SERVER_ERROR.name)) {
-            logger.error("Response validation exception. currently just logging : {} ", ResultCode.EXTERNAL_SERVER_ERROR.name)
+            logger.error("Result Code validation fail: {} ", ResultCode.EXTERNAL_SERVER_ERROR.name)
             return false
         }
 
         if (resultCodes.contains(ResultCode.INVALID_ACCESS_TOKEN.name)) {
-            logger.error("Response validation exception. currently just logging : {} ", ResultCode.INVALID_ACCESS_TOKEN.name)
+            logger.error("Result Code validation fail: {} ", ResultCode.INVALID_ACCESS_TOKEN.name)
             return false
         }
 
         if (resultCodes.contains(ResultCode.INVALID_USER.name)) {
-            logger.error("Response validation exception. currently just logging : {} ", ResultCode.INVALID_USER.name)
+            logger.error("Result Code validation fail: {} ", ResultCode.INVALID_USER.name)
             return false
         }
 
         if (resultCodes.contains(ResultCode.UNKNOWN.name)) {
-            logger.error("Response validation exception. currently just logging : {} ", ResultCode.UNKNOWN.name)
+            logger.error("Result Code validation fail: {} ", ResultCode.UNKNOWN.name)
             return false
         }
 
