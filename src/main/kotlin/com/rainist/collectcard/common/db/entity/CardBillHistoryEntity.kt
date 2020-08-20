@@ -35,6 +35,12 @@ data class CardBillHistoryEntity(
     var billNumber: String? = null,
 
     @Column(nullable = false)
+    var billType: String? = null,
+
+    @Column(nullable = false)
+    var cardType: String? = null,
+
+    @Column(nullable = false)
     var lastCheckAt: LocalDateTime? = null,
 
     var userName: String? = null,
@@ -51,10 +57,10 @@ data class CardBillHistoryEntity(
 
     var nextPaymentDay: String? = null,
 
-    @Column(nullable = false, precision = 17, scale = 4)
+    @Column(nullable = false)
     var billingAmount: BigDecimal? = null,
 
-    @Column(nullable = false, precision = 17, scale = 4)
+    @Column(nullable = false)
     var prepaidAmount: BigDecimal? = null,
 
     var paymentBankId: String? = null,

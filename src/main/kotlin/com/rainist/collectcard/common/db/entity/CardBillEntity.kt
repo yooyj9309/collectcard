@@ -63,8 +63,10 @@ data class CardBillEntity(
 
     var paymentAccountNumber: String? = null,
 
+    @Column(precision = 17, scale = 4)
     var totalPoint: BigDecimal? = null,
 
+    @Column(precision = 17, scale = 4)
     var expiringPoints: BigDecimal? = null,
 
     @CreatedDate

@@ -1,5 +1,6 @@
 package com.rainist.collectcard.cardbills
 
+// import com.rainist.collectcard.common.util.ExecutionResponseValidator
 import com.rainist.collect.common.execution.ExecutionRequest
 import com.rainist.collect.common.execution.ExecutionResponse
 import com.rainist.collect.executor.CollectExecutorService
@@ -14,14 +15,14 @@ import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
-import com.rainist.collectcard.common.db.entity.CardBillEntity
+import com.rainist.collectcard.common.db.repository.CardBillHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardBillRepository
 import com.rainist.collectcard.common.db.repository.CardBillTransactionRepository
 import com.rainist.collectcard.common.db.repository.CardPaymentScheduledRepository
 import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.OrganizationService
-// import com.rainist.collectcard.common.util.ExecutionResponseValidator
+import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import java.time.LocalDateTime
@@ -33,15 +34,14 @@ class CardBillServiceImpl(
     val headerService: HeaderService,
     val collectExecutorService: CollectExecutorService,
     val cardBillRepository: CardBillRepository,
+    val cardBillHistoryRepository: CardBillHistoryRepository,
     val cardBillTransactionRepository: CardBillTransactionRepository,
     val cardPaymentScheduledRepository: CardPaymentScheduledRepository,
-    val organizationService: OrganizationService
+    val organizationService: OrganizationService,
+    val userSyncStatusService: UserSyncStatusService
 ) : CardBillService {
 
-    companion object : Log {
-        // TODO 해당부분 추후 organization 에서 상수를 전부 관리하는 형태로 변경 ( bill, transaction)
-        const val DEFAULT_MAX_BILL_MONTH = 6L
-    }
+    companion object : Log
 
     @Transactional
     override fun listUserCardBills(executionContext: CollectExecutionContext, startAt: Long?): ListCardBillsResponse {
@@ -76,13 +76,12 @@ class CardBillServiceImpl(
 
         // 청구서 DB IO
         cardBillsResponse.dataBody?.cardBills?.forEach { cardBill ->
-            upsertCardBillAndTransactions(banksaladUserId, executionContext.organizationId, cardBill)
+            upsertCardBillAndTransactions(banksaladUserId, executionContext.organizationId, cardBill, now)
         }
 
         // 결제 예정 내역 DB IO
         cardBillExpectedResponse.dataBody?.cardBills?.map {
-            deleteAndInsertCardBillExpectedTransactions(banksaladUserId, executionContext.organizationId, it.transactions
-                ?: mutableListOf())
+            deleteAndInsertCardBillExpectedTransactions(banksaladUserId, executionContext.organizationId, it.transactions ?: mutableListOf(), now)
         }
 
         val bills = mutableListOf<CardBill>()
@@ -138,42 +137,65 @@ class CardBillServiceImpl(
         return cardBillExpectedExecutionResponse.response
     }
 
-    private fun upsertCardBillAndTransactions(banksaladUserId: Long, organizationId: String?, cardBill: CardBill) {
-        val newCardBillEntity = CardBillUtil.makeCardBillEntity(banksaladUserId, organizationId ?: "", cardBill)
+    private fun upsertCardBillAndTransactions(banksaladUserId: Long, organizationId: String?, cardBill: CardBill, now: LocalDateTime) {
+        val newCardBillEntity = CardBillUtil.makeCardBillEntity(banksaladUserId, organizationId ?: "", cardBill, now)
         val oldCardBillEntity = cardBillRepository.findByBanksaladUserIdAndCardCompanyIdAndBillNumberAndBillTypeAndCardType(
             banksaladUserId,
             organizationId ?: "",
             cardBill.billNumber ?: "",
             cardBill.billType ?: "",
             cardBill.cardType?.name ?: ""
-        ) ?: CardBillEntity()
+        )
 
+        // new
+        // insert bill, transactions, history
+        if (oldCardBillEntity == null) {
+            cardBillRepository.save(newCardBillEntity)
+            cardBill.transactions?.forEachIndexed { index, cardBillTransaction ->
+                CardBillUtil.makeCardBillTransactionEntity(
+                    banksaladUserId,
+                    organizationId ?: "",
+                    cardBill.billedYearMonth,
+                    index,
+                    cardBillTransaction,
+                    now
+                ).let { cardBillTransactionRepository.save(it) }
+            }
+            CardBillUtil.makeCardBillHistoryEntityFromCardBillHistory(newCardBillEntity).let {
+                cardBillHistoryRepository.save(it)
+            }
+            return
+        }
+
+        // no changes
         if (newCardBillEntity.equal(oldCardBillEntity)) {
             return
         }
 
-        // TEMP: bill table에 card type 추가 전까지는 update logic 태우지 않음
-        if (oldCardBillEntity != CardBillEntity()) {
-            return
-        }
-
-        val transactions = cardBillTransactionRepository.getAllByBilledYearMonthAndBanksaladUserIdAndCardCompanyCardIdAndBillNumber(
+        // bill updated
+        // delete transactions
+        cardBillTransactionRepository.findAllByBilledYearMonthAndBanksaladUserIdAndCardCompanyCardIdAndBillNumber(
             oldCardBillEntity.billedYearMonth ?: "",
             banksaladUserId,
             organizationId,
             cardBill.billNumber
-        )
-
-        // delete transactions
-        transactions?.forEach { transacitonEntity ->
+        )?.forEach { transacitonEntity ->
             transacitonEntity.isDeleted = true
             cardBillTransactionRepository.save(transacitonEntity)
         }
 
-        // insert new bill
-        cardBillRepository.save(newCardBillEntity)
-        // TODO: implement card bill history
-//        cardBillHistoryRepository.save(newCardBillEntity)
+        // update bill
+        val billEntity = newCardBillEntity.apply {
+            this.cardBillId = oldCardBillEntity.cardBillId
+            this.createdAt = oldCardBillEntity.createdAt
+            this.updatedAt = oldCardBillEntity.updatedAt
+        }
+        cardBillRepository.save(billEntity)
+
+        // insert history
+        CardBillUtil.makeCardBillHistoryEntityFromCardBillHistory(billEntity).let {
+            cardBillHistoryRepository.save(it)
+        }
 
         // insert new transactions
         cardBill.transactions?.forEachIndexed { index, cardBillTransaction ->
@@ -182,7 +204,8 @@ class CardBillServiceImpl(
                 organizationId ?: "",
                 cardBill.billedYearMonth,
                 index,
-                cardBillTransaction
+                cardBillTransaction,
+                now
             ).let { cardBillTransactionRepository.save(it) }
         }
     }
@@ -190,7 +213,8 @@ class CardBillServiceImpl(
     private fun deleteAndInsertCardBillExpectedTransactions(
         banksaladUserId: Long,
         organizationId: String?,
-        cardBillTransactionExpected: List<CardBillTransaction>
+        cardBillTransactionExpected: List<CardBillTransaction>,
+        now: LocalDateTime
     ) {
         cardPaymentScheduledRepository.deleteAllByBanksaladUserIdAndCardCompanyId(banksaladUserId, organizationId)
 
@@ -199,7 +223,8 @@ class CardBillServiceImpl(
                 banksaladUserId,
                 organizationId ?: "",
                 index,
-                cardBillTransaction
+                cardBillTransaction,
+                now
             ).let {
                 cardPaymentScheduledRepository.save(it)
             }

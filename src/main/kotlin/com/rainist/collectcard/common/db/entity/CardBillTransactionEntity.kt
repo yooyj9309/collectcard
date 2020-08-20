@@ -81,19 +81,24 @@ data class CardBillTransactionEntity(
 
     var installmentRound: Int? = null,
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 17, scale = 4)
     var netSalesAmount: BigDecimal? = null,
 
+    @Column(precision = 17, scale = 4)
     var serviceChargeAmount: BigDecimal? = null,
 
+    @Column(precision = 17, scale = 4)
     var taxAmount: BigDecimal? = null,
 
+    @Column(precision = 17, scale = 4)
     var paidPoints: BigDecimal? = null,
 
     var isPointPay: Boolean? = null,
 
+    @Column(precision = 17, scale = 4)
     var discountAmount: BigDecimal? = null,
 
+    @Column(precision = 17, scale = 4)
     var canceledAmount: BigDecimal? = null,
 
     @Column(nullable = false)
@@ -121,18 +126,24 @@ data class CardBillTransactionEntity(
 
     var billingRound: Int? = null,
 
+    @Column(precision = 17, scale = 4)
     var paidAmount: BigDecimal? = null,
 
+    @Column(precision = 17, scale = 4)
     var billedAmount: BigDecimal? = null,
 
+    @Column(precision = 17, scale = 4)
     var billedFee: BigDecimal? = null,
 
+    @Column(precision = 17, scale = 4)
     var remainingAmount: BigDecimal? = null,
 
     var isPaidFull: Boolean? = null,
 
+    @Column(precision = 17, scale = 4)
     var cashbackAmount: BigDecimal? = null,
 
+    @Column(precision = 17, scale = 4)
     var pointsRate: BigDecimal? = null,
 
     @Column(nullable = false)
