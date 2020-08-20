@@ -58,6 +58,8 @@ data class ApiLogEntity(
 
     var resultCode: String? = null,
 
+    var resultMessage: String? = null,
+
     var responseCode: String? = null,
 
     @Column(columnDefinition = "TEXT")

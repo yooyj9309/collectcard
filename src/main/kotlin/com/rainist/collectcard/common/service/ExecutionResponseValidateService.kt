@@ -29,7 +29,7 @@ class ExecutionResponseValidateService(private val apiLogRepository: ApiLogRepos
             DateTimeUtil.utcNowLocalDateTime().plusDays(1))
 
         val resultCodes =
-            apiLogEntities.map(ApiLogEntity::responseCode)
+            apiLogEntities.map(ApiLogEntity::resultCode)
             .toMutableList()
 
         if (resultCodes.contains(ResultCode.EXTERNAL_SERVER_ERROR.name)) {

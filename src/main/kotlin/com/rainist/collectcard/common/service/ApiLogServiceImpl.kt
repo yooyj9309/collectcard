@@ -77,7 +77,7 @@ class ApiLogServiceImpl(
             this.responseCode = apiLog.response?.responseCode
             // TODO jayden-lee resultCode java-banksalad Response 객체 프로퍼티에 추가해야함
             this.resultCode = resultCodeAndMessage.first
-
+            this.resultMessage = resultCodeAndMessage.second
             this.responseHeaderText = apiLog.response?.header
             this.responseBodyText = apiLog.response?.body
 
