@@ -20,7 +20,6 @@ import com.rainist.collectcard.common.service.ExecutionResponseValidateService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.common.service.UserSyncStatusService
-import com.rainist.collectcard.common.util.SyncStatus
 import com.rainist.common.log.Log
 import com.rainist.common.service.ValidationService
 import com.rainist.common.util.DateTimeUtil
@@ -54,7 +53,6 @@ class CardTransactionServiceImpl(
     lateinit var shinhancardOrganizationId: String
 
     @Transactional
-    @SyncStatus(transactionId = "cardTransactions")
     override fun listTransactions(executionContext: CollectExecutionContext, fromMs: Long?): ListTransactionsResponse {
         val now = DateTimeUtil.utcNowLocalDateTime()
         val banksaladUserId = executionContext.userId.toLong()
