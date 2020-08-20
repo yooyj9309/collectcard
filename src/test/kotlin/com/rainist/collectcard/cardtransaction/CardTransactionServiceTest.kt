@@ -8,9 +8,11 @@ import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponseData
 import com.rainist.collectcard.cardtransactions.dto.sortListTransactionsResponseByDesc
 import com.rainist.collectcard.cardtransactions.util.CardTransactionUtil
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
+import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.db.repository.CardTransactionRepository
 import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.service.HeaderService
+import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.common.util.DateTimeUtil
 import java.util.UUID
 import org.junit.Assert.assertEquals
@@ -47,6 +49,9 @@ class CardTransactionServiceTest {
     @Autowired
     lateinit var cardTransactionRepository: CardTransactionRepository
 
+    @Autowired
+    lateinit var userSyncStatusService: UserSyncStatusService
+
     @MockBean
     lateinit var headerService: HeaderService
 
@@ -55,11 +60,14 @@ class CardTransactionServiceTest {
         // 최초 내역 조회 (페이징)
         setupServerPaging()
         val executionContext = requestSetting()
-
-        val transactions = cardTransactionService.listTransactions(
-            executionContext,
+        userSyncStatusService.updateUserSyncStatus(
+            executionContext.userId.toLong(),
+            executionContext.organizationId,
+            Transaction.cardTransaction.name,
             DateTimeUtil.utcLocalDateTimeToEpochMilliSecond()
         )
+
+        val transactions = cardTransactionService.listTransactions(executionContext)
 
         val entitys = cardTransactionRepository.findAll()
 
@@ -71,12 +79,15 @@ class CardTransactionServiceTest {
     fun cardTransactionTest2() {
         // 기존 내역 조회 (기존과 동일한 내용을 조회했을때, 변경이 있는지 테스트)
         setupServerPaging()
-        val syncRequest = requestSetting()
-
-        val transactions = cardTransactionService.listTransactions(
-            syncRequest,
+        val executionContext = requestSetting()
+        userSyncStatusService.updateUserSyncStatus(
+            executionContext.userId.toLong(),
+            executionContext.organizationId,
+            Transaction.cardTransaction.name,
             DateTimeUtil.utcLocalDateTimeToEpochMilliSecond()
         )
+
+        val transactions = cardTransactionService.listTransactions(executionContext)
         val entitys = cardTransactionRepository.findAll()
         // transactions. size비교
         // entitys size비교
@@ -89,11 +100,14 @@ class CardTransactionServiceTest {
         // 추가 내역 조회 (기존 로직 + 추가 로직, 그리고 조회 결과가 전부 신규인경우 테스트)
         setupServer_updated()
         val executionContext = requestSetting()
-
-        val transactions = cardTransactionService.listTransactions(
-            executionContext,
+        userSyncStatusService.updateUserSyncStatus(
+            executionContext.userId.toLong(),
+            executionContext.organizationId,
+            Transaction.cardTransaction.name,
             DateTimeUtil.utcLocalDateTimeToEpochMilliSecond()
         )
+
+        val transactions = cardTransactionService.listTransactions(executionContext)
         val entitys = cardTransactionRepository.findAll()
 
         assertEquals(1, transactions.dataBody?.transactions?.size)

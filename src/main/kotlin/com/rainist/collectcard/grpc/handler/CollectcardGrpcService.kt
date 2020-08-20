@@ -103,10 +103,7 @@ class CollectcardGrpcService(
             )
             logger.warn(logMap)
 
-            cardTransactionService.listTransactions(
-                executionContext,
-                request.takeIf { request.hasFromMs() }?.fromMs?.value
-            ).toListCardsTransactionResponseProto()
+            cardTransactionService.listTransactions(executionContext).toListCardsTransactionResponseProto()
         }.onSuccess {
             responseObserver.onNext(it)
             responseObserver.onCompleted()

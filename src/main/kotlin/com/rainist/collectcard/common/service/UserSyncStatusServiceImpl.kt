@@ -21,14 +21,14 @@ class UserSyncStatusServiceImpl(
         banksaladUserId: Long,
         organizationId: String,
         transactionId: String
-    ): Long {
+    ): Long? {
         val userSyncStatusEntity = userSyncStatusRepository.findByBanksaladUserIdAndOrganizationIdAndTransactionId(
             banksaladUserId,
             organizationId,
             transactionId
         )
 
-        return userSyncStatusEntity?.lastCheckAt?.toInstant(ZoneOffset.UTC)?.toEpochMilli() ?: 0
+        return userSyncStatusEntity?.lastCheckAt?.toInstant(ZoneOffset.UTC)?.toEpochMilli()
     }
 
     override fun updateUserSyncStatus(

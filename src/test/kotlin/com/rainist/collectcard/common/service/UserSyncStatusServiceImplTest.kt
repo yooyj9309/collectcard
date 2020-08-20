@@ -77,7 +77,7 @@ internal class UserSyncStatusServiceImplTest {
 
         var lastCheckAtFromDB =
             userSyncStatusService.getUserSyncStatusLastCheckAt(banksaladUserId, organizationId, transactionId)
-        Assert.assertEquals(0, lastCheckAtFromDB)
+        Assert.assertEquals(null, lastCheckAtFromDB)
 
         var lastCheckAt = System.currentTimeMillis()
         userSyncStatusService.updateUserSyncStatus(banksaladUserId, organizationId, transactionId, lastCheckAt)

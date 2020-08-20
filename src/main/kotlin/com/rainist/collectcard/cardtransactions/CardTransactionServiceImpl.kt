@@ -53,7 +53,7 @@ class CardTransactionServiceImpl(
     lateinit var shinhancardOrganizationId: String
 
     @Transactional
-    override fun listTransactions(executionContext: CollectExecutionContext, fromMs: Long?): ListTransactionsResponse {
+    override fun listTransactions(executionContext: CollectExecutionContext): ListTransactionsResponse {
         val now = DateTimeUtil.utcNowLocalDateTime()
         val banksaladUserId = executionContext.userId.toLong()
 
@@ -64,12 +64,12 @@ class CardTransactionServiceImpl(
         val request = ListTransactionsRequest().apply {
             this.dataHeader = ListTransactionsRequestDataHeader()
             this.dataBody = ListTransactionsRequestDataBody().apply {
-                this.startAt = fromMs?.let {
+                this.startAt = userSyncStatusService.getUserSyncStatusLastCheckAt(banksaladUserId, executionContext.organizationId, Transaction.cardTransaction.name)
+                    ?.let {
                         val researchInterval = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).researchInterval
                         DateTimeUtil.epochMilliSecondToKSTLocalDateTime(it).minusDays(researchInterval.toLong())
                     }
                     ?.let { localDateTime ->
-
                         DateTimeUtil.localDateToString(LocalDate.of(localDateTime.year, localDateTime.month, localDateTime.dayOfMonth), "yyyyMMdd")
                     }
                     ?: kotlin.run {
