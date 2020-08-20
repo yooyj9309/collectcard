@@ -2,6 +2,7 @@ package com.rainist.collectcard.cardloans.dto
 
 import com.rainist.collectcard.common.enums.CardLoanRepaymentMethod
 import com.rainist.collectcard.common.enums.CardLoanStatus
+import com.rainist.collectcard.common.enums.ResultCode
 import com.rainist.common.annotation.validation.StringDateFormat
 import java.math.BigDecimal
 import org.springframework.format.annotation.NumberFormat
@@ -57,5 +58,13 @@ data class Loan(
     var principalAmount: BigDecimal? = null, // 상환액중 원금
 
     @NumberFormat(style = NumberFormat.Style.NUMBER)
-    var interestAmount: BigDecimal? = null // 상환액중 이자
+    var interestAmount: BigDecimal? = null, // 상환액중 이자
+
+    var dataHeader: LoanResponseDataHeader? = null
+)
+
+data class LoanResponseDataHeader(
+    var successCode: String? = null,
+    var resultCode: ResultCode? = null,
+    var resultMessage: String? = null
 )

@@ -8,6 +8,18 @@ let cardLoanRepaymentMethod = {
     "99": "UNKNOWN",  //  알수없음
 }
 
+let resultCodes = {
+    "": "UNKNOWN",
+    "0002": "EXTERNAL_SERVER_ERROR",
+    "0004": "OK",
+    "0031": "OK",
+    "0032": "OK", // TODO 현재 커넥트카드에서도 동일한 에러?? 가 발생하곤 있으나 데이터가 잘내려오는 상태, 확인인 필요하나 OK상태
+    "400": "INVALID_ACCESS_TOKEN",
+    "503": "EXTERNAL_SERVER_ERROR",
+    "0999": "EXTERNAL_SERVER_ERROR"
+}
+
+
 def parse_zfill_number_or_zero(s)
   let value = replace($s, "^0+", "")
   if(test($value, "^\\d+$"))
@@ -16,6 +28,10 @@ def parse_zfill_number_or_zero(s)
     0
 
 {
+    "dataHeader":{
+        "resultCode": get-key($resultCodes, .dataHeader.resultCode, "UNKNOWN"),
+        "resultMessage": .dataHeader.resultMessage
+    },
     "loanId": .dataBody.loanNo,
     "loanNumber": .dataBody.loanNo,                                 // 대출번호
     "loanAmount": .dataBody.loanAmt,                                // 대출금액
@@ -24,7 +40,7 @@ def parse_zfill_number_or_zero(s)
     "interestRate": parse_zfill_number_or_zero(.dataBody.interestRt) / 100,  // 이자율
     "repaymentMethod": get-key($cardLoanRepaymentMethod, .dataBody.repaymentMthd, "UNKNOWN"), // 상환방법
     "repaymentMethodOrigin": .dataBody.repaymentMthd,
-    "remainingAmount": .dataBody.loanBal,          // 대출잔액
+    "remainingAmount": .dataBody.loanBal          // 대출잔액
 
     //"": .dataBody.dfmMsCnt,                       // 거치개월수 (미사용)
     //"": .dataBody.dfmRt,                          // 거치이자율 (미사용)
