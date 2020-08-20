@@ -129,8 +129,7 @@ class CollectcardGrpcService(
 
         kotlin.runCatching {
             cardBillService.listUserCardBills(
-                executionContext,
-                request.takeIf { request.hasFromMs() }?.fromMs?.value
+                executionContext
             ).toListCardBillsResponseProto()
         }.onSuccess {
             logger.info("[사용자 청구서 조회 결과 success]")

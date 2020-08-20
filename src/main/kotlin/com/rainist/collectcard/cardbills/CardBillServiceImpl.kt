@@ -20,6 +20,7 @@ import com.rainist.collectcard.common.db.repository.CardBillRepository
 import com.rainist.collectcard.common.db.repository.CardBillTransactionRepository
 import com.rainist.collectcard.common.db.repository.CardPaymentScheduledRepository
 import com.rainist.collectcard.common.dto.CollectExecutionContext
+import com.rainist.collectcard.common.service.ExecutionResponseValidateService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.common.service.UserSyncStatusService
@@ -38,13 +39,14 @@ class CardBillServiceImpl(
     val cardBillTransactionRepository: CardBillTransactionRepository,
     val cardPaymentScheduledRepository: CardPaymentScheduledRepository,
     val organizationService: OrganizationService,
-    val userSyncStatusService: UserSyncStatusService
+    val userSyncStatusService: UserSyncStatusService,
+    val executionResponseValidateService: ExecutionResponseValidateService
 ) : CardBillService {
 
     companion object : Log
 
     @Transactional
-    override fun listUserCardBills(executionContext: CollectExecutionContext, startAt: Long?): ListCardBillsResponse {
+    override fun listUserCardBills(executionContext: CollectExecutionContext): ListCardBillsResponse {
         val now = DateTimeUtil.utcNowLocalDateTime()
         val banksaladUserId = executionContext.userId.toLong()
 
@@ -55,35 +57,14 @@ class CardBillServiceImpl(
         val request = ListCardBillsRequest().apply {
             dataBody = ListCardBillsRequestDataBody()
         }
-        /* set startAt */
-        val checkStartTime: LocalDateTime = startAt?.let {
-            DateTimeUtil.epochMilliSecondToKSTLocalDateTime(startAt)
-        } ?: kotlin.run {
-            val maxMonth = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).maxMonth
-            DateTimeUtil.kstNowLocalDateTime().minusMonths(maxMonth.toLong())
-        }
-
-        executionContext.setStartAt(checkStartTime)
-
-        // TODO 제거예정 diff확인용
-        logger.info("CARDBILL_TIME_INFO $checkStartTime $startAt $banksaladUserId ")
 
         // 청구서 execution
-        val cardBillsResponse = executeCardBill(executionContext, header, request)
+        val cardBillsResponse = executeCardBill(executionContext, header, request, now)
 
         // 결제 예정 내역 execution
-        val cardBillExpectedResponse = executeCardBillExpected(executionContext, header, request)
+        val cardBillExpectedResponse = executeCardBillExpected(executionContext, header, request, banksaladUserId, now)
 
-        // 청구서 DB IO
-        cardBillsResponse.dataBody?.cardBills?.forEach { cardBill ->
-            upsertCardBillAndTransactions(banksaladUserId, executionContext.organizationId, cardBill, now)
-        }
-
-        // 결제 예정 내역 DB IO
-        cardBillExpectedResponse.dataBody?.cardBills?.map {
-            deleteAndInsertCardBillExpectedTransactions(banksaladUserId, executionContext.organizationId, it.transactions ?: mutableListOf(), now)
-        }
-
+        // merge bill and bill expected
         val bills = mutableListOf<CardBill>()
         bills.addAll(cardBillExpectedResponse.dataBody?.cardBills ?: mutableListOf())
         bills.addAll(cardBillsResponse.dataBody?.cardBills ?: mutableListOf())
@@ -99,7 +80,22 @@ class CardBillServiceImpl(
         }
     }
 
-    private fun executeCardBill(executionContext: CollectExecutionContext, header: MutableMap<String, String?>, request: ListCardBillsRequest): ListCardBillsResponse {
+    private fun executeCardBill(executionContext: CollectExecutionContext, header: MutableMap<String, String?>, request: ListCardBillsRequest, now: LocalDateTime): ListCardBillsResponse {
+        /* set startAt */
+        val checkStartTime = userSyncStatusService.getUserSyncStatusLastCheckAt(
+            executionContext.userId.toLong(), executionContext.organizationId, Transaction.cardbills.name
+        )?.let { lastCheckAt ->
+            DateTimeUtil.epochMilliSecondToKSTLocalDateTime(lastCheckAt)
+        } ?: kotlin.run {
+            val maxMonth = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).maxMonth
+            DateTimeUtil.kstNowLocalDateTime().minusMonths(maxMonth.toLong())
+        }
+
+        executionContext.setStartAt(checkStartTime)
+
+        // TODO 제거예정 diff확인용
+        logger.info("CARDBILL_TIME_INFO $checkStartTime ${executionContext.userId} ")
+
         val cardBillsExecutionResponse: ExecutionResponse<ListCardBillsResponse> = collectExecutorService.execute(
             executionContext,
             Executions.valueOf(BusinessType.card, Organization.shinhancard, Transaction.cardbills),
@@ -109,15 +105,38 @@ class CardBillServiceImpl(
                 .build()
         )
 
-        /* check response result */
-//        ExecutionResponseValidator.validateResponseAndThrow(
-//            cardBillsExecutionResponse,
-//            cardBillsExecutionResponse.response.resultCodes
-//        )
+        // 청구서 DB IO
+        cardBillsExecutionResponse.response.dataBody?.cardBills?.forEach { cardBill ->
+            upsertCardBillAndTransactions(executionContext.userId.toLong(), executionContext.organizationId, cardBill, now)
+        }
+
+        if (executionResponseValidateService.validate(executionContext.executionRequestId, cardBillsExecutionResponse)) {
+            userSyncStatusService.updateUserSyncStatus(
+                executionContext.userId.toLong(),
+                executionContext.organizationId,
+                Transaction.cardbills.name,
+                DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now))
+        }
+
         return cardBillsExecutionResponse.response
     }
 
-    private fun executeCardBillExpected(executionContext: CollectExecutionContext, header: MutableMap<String, String?>, request: ListCardBillsRequest): ListCardBillsResponse {
+    private fun executeCardBillExpected(executionContext: CollectExecutionContext, header: MutableMap<String, String?>, request: ListCardBillsRequest, banksaladUserId: Long, now: LocalDateTime): ListCardBillsResponse {
+        /* set startAt */
+        val checkStartTime = userSyncStatusService.getUserSyncStatusLastCheckAt(
+            executionContext.userId.toLong(), executionContext.organizationId, Transaction.billTransactionExpected.name
+        )?.let { lastCheckAt ->
+            DateTimeUtil.epochMilliSecondToKSTLocalDateTime(lastCheckAt)
+        } ?: kotlin.run {
+            val maxMonth = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).maxMonth
+            DateTimeUtil.kstNowLocalDateTime().minusMonths(maxMonth.toLong())
+        }
+
+        executionContext.setStartAt(checkStartTime)
+
+        // TODO 제거예정 diff확인용
+        logger.info("CARDBILLEXPECTED_TIME_INFO $checkStartTime ${executionContext.userId} ")
+
         val cardBillExpectedExecutionResponse: ExecutionResponse<ListCardBillsResponse> =
             collectExecutorService.execute(
                 executionContext,
@@ -128,11 +147,18 @@ class CardBillServiceImpl(
                     .build()
             )
 
-        /* check response result */
-//        ExecutionResponseValidator.validateResponseAndThrow(
-//            cardBillExpectedExecutionResponse,
-//            cardBillExpectedExecutionResponse.response.resultCodes
-//        )
+        // 결제 예정 내역 DB IO
+        cardBillExpectedExecutionResponse.response.dataBody?.cardBills?.map {
+            deleteAndInsertCardBillExpectedTransactions(banksaladUserId, executionContext.organizationId, it.transactions ?: mutableListOf(), now)
+        }
+
+        if (executionResponseValidateService.validate(executionContext.executionRequestId, cardBillExpectedExecutionResponse)) {
+            userSyncStatusService.updateUserSyncStatus(
+                banksaladUserId,
+                executionContext.organizationId,
+                Transaction.billTransactionExpected.name,
+                DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now))
+        }
 
         return cardBillExpectedExecutionResponse.response
     }
