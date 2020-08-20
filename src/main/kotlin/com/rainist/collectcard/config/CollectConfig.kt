@@ -31,7 +31,7 @@ class CollectConfig(
         return objectMapper
     }
 
-    @Bean
+    @Bean(name = ["collect-thread"])
     fun threadPoolTaskExecutor(): Executor {
         val executor = ThreadPoolTaskExecutor()
         executor.setThreadNamePrefix("Async-Thread-Collect-")
