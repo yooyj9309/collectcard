@@ -55,8 +55,6 @@ class CollectcardGrpcService(
         request: CollectcardProto.ListCardsRequest,
         responseObserver: StreamObserver<CollectcardProto.ListCardsResponse>
     ) {
-        logger.debug("[사용자 카드 조회 시작 : {}]", request)
-
         /* Execution Context */
         val executionContext: CollectExecutionContext = CollectExecutionContext(
             executionRequestId = generateExecutioRequestId(),
@@ -67,13 +65,6 @@ class CollectcardGrpcService(
         kotlin.runCatching {
             cardService.listCards(executionContext).toListCardsResponseProto()
         }.onSuccess {
-            // TODO: remove debug logging
-            logger.warn("[사용자 카드 조회 결과 success]")
-
-            for (card in it.dataList) {
-                logger.warn("[사용자 카드 조회 결과 : {}]", card)
-            }
-
             responseObserver.onNext(it)
             responseObserver.onCompleted()
         }.onFailure {
@@ -118,8 +109,6 @@ class CollectcardGrpcService(
         request: CollectcardProto.ListCardBillsRequest,
         responseObserver: StreamObserver<CollectcardProto.ListCardBillsResponse>
     ) {
-        logger.debug("[사용자 청구서 조회 시작 : {}]", request)
-
         /* Execution Context */
         val executionContext: CollectExecutionContext = CollectExecutionContext(
             executionRequestId = generateExecutioRequestId(),
@@ -132,11 +121,6 @@ class CollectcardGrpcService(
                 executionContext
             ).toListCardBillsResponseProto()
         }.onSuccess {
-            logger.info("[사용자 청구서 조회 결과 success]")
-            for (card in it.dataList) {
-                logger.debug("[사용자 청구서 조회 결과 : {}]", card)
-            }
-
             responseObserver.onNext(it)
             responseObserver.onCompleted()
         }.onFailure {
@@ -150,8 +134,6 @@ class CollectcardGrpcService(
         request: CollectcardProto.ListCardLoansRequest,
         responseObserver: StreamObserver<CollectcardProto.ListCardLoansResponse>
     ) {
-        logger.debug("[사용자 대출 내역 조회 시작 : {}]", request)
-
         /* Execution Context */
         val executionContext: CollectExecutionContext = CollectExecutionContext(
             executionRequestId = generateExecutioRequestId(),
@@ -162,12 +144,6 @@ class CollectcardGrpcService(
         kotlin.runCatching {
             cardLoanService.listCardLoans(executionContext).toListCardLoansResponseProto()
         }.onSuccess {
-                logger.info("[사용자 대출내역 조회 결과 success]")
-                it.let {
-                    for (loan in it.dataList) {
-                        logger.info("[사용자 대출내역 조회 결과 : {}]", loan)
-                    }
-                }
                 responseObserver.onNext(it)
                 responseObserver.onCompleted()
         }.onFailure {
@@ -182,8 +158,6 @@ class CollectcardGrpcService(
         request: CollectcardProto.GetCreditLimitRequest,
         responseObserver: StreamObserver<CollectcardProto.GetCreditLimitResponse>
     ) {
-        logger.debug("[사용자 개인 한도 조회 시작 : {}]", request)
-
         /* Execution Context */
         val executionContext: CollectExecutionContext = CollectExecutionContext(
             executionRequestId = generateExecutioRequestId(),

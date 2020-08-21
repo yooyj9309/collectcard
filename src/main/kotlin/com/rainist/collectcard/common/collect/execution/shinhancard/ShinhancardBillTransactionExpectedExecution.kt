@@ -22,13 +22,6 @@ class ShinhancardBillTransactionExpectedExecution {
                 val prevCardBill = prev.dataBody?.cardBills ?: mutableListOf()
                 val nextCardBill = next.dataBody?.cardBills ?: mutableListOf()
                 prevCardBill.addAll(nextCardBill)
-                /* diff end */
-
-                /* 원본코드 */
-                next.dataBody?.cardBills?.addAll(
-                    0, prev.dataBody?.cardBills ?: mutableListOf()
-                )
-                /* 원본코드 */
 
                 prev.dataBody = ListCardBillsResponseDataBody(cardBills = prevCardBill, nextKey = next.dataBody?.nextKey)
                 prev
