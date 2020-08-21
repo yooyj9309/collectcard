@@ -44,3 +44,4 @@ grpc:
   enable-reflection: true
   enabled: true
   in-process-server-name: collect-server-process
+  shutdownGrace: 20

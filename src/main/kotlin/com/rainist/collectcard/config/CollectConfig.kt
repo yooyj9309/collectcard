@@ -40,7 +40,7 @@ class CollectConfig(
         executor.setQueueCapacity(1000)
         executor.keepAliveSeconds = 20
         executor.setWaitForTasksToCompleteOnShutdown(true)
-        executor.setAwaitTerminationSeconds(15)
+        executor.setAwaitTerminationSeconds(20)
         executor.initialize()
         return executor
     }
