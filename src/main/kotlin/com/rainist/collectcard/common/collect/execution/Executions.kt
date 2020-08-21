@@ -5,13 +5,12 @@ import com.rainist.collect.common.execution.ExecutionKey
 import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
-import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardBillTransactionExpected
-import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardBills
-import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardCards
-import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardCreditLimit
-import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardLoan
-import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardTransactions
-import com.rainist.collectcard.common.collect.execution.ShinhancardExecutions.Companion.cardShinhancardUserInfo
+import com.rainist.collectcard.common.collect.execution.shinhancard.ShinhancardBillExecution.Companion.cardShinhancardBills
+import com.rainist.collectcard.common.collect.execution.shinhancard.ShinhancardBillTransactionExpectedExecution.Companion.cardShinhancardBillTransactionExpected
+import com.rainist.collectcard.common.collect.execution.shinhancard.ShinhancardCardExecution.Companion.cardShinhancardCards
+import com.rainist.collectcard.common.collect.execution.shinhancard.ShinhancardCreditLimitExecution.Companion.cardShinhancardCreditLimit
+import com.rainist.collectcard.common.collect.execution.shinhancard.ShinhancardLoanExecution.Companion.cardShinhancardLoan
+import com.rainist.collectcard.common.collect.execution.shinhancard.ShinhancardTransactionExecution.Companion.cardShinhancardTransactions
 import com.rainist.collectcard.common.exception.CollectcardException
 
 class Executions() {
@@ -53,12 +52,12 @@ class Executions() {
                 .transaction(Transaction.cardbills.name)
                 .build() to cardShinhancardBills,
 
-            // 개인정보조회
-            ExecutionKey.builder()
-                .business(BusinessType.card.name)
-                .organization(Organization.shinhancard.name)
-                .transaction(Transaction.userInfo.name)
-                .build() to cardShinhancardUserInfo,
+//            // 개인정보조회
+//            ExecutionKey.builder()
+//                .business(BusinessType.card.name)
+//                .organization(Organization.shinhancard.name)
+//                .transaction(Transaction.userInfo.name)
+//                .build() to cardShinhancardUserInfo,
 
             // 대출정보조회
             ExecutionKey.builder()
