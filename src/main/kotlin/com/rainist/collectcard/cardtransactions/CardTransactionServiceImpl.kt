@@ -80,11 +80,7 @@ class CardTransactionServiceImpl(
             }
         }
 
-        val logMap = mapOf(
-            "banksaladUserId" to executionContext.userId,
-            "startAt" to (request.dataBody?.startAt ?: "startAtNull")
-        )
-        logger.warn(logMap)
+        logger.With("banksaladUserId", executionContext.userId).With("startAt", request.dataBody?.startAt ?: "startAtNull").Warn("")
 
         val executionResponses = getListTransactionsByDivision(executionContext, header, request)
 
@@ -161,10 +157,7 @@ class CardTransactionServiceImpl(
             ?.toMutableList()
             ?: mutableListOf()
 
-        val logMap = mapOf(
-            "searchDateList" to searchDateList
-        )
-        logger.warn(logMap)
+        logger.With("searchDateList", searchDateList).Warn("")
 
         return runBlocking(executor.asCoroutineDispatcher()) {
             // 조회 시간 분할
@@ -179,14 +172,6 @@ class CardTransactionServiceImpl(
                 }
             }
             .map {
-                logger.warn(
-                    mapOf(
-                        "startAt" to (it.dataBody?.startAt ?: "startAtNull"),
-                        "endAt" to (it.dataBody?.endAt ?: "endAtNull"),
-                        "banksaladUserId" to executionContext.userId
-                    )
-                )
-
                 async {
                     val executionResponse: ExecutionResponse<ListTransactionsResponse> =
                         collectExecutorService.execute(

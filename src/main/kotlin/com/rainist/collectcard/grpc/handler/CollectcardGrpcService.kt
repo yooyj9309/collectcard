@@ -11,6 +11,8 @@ import com.rainist.collectcard.cardcreditlimit.dto.toCreditLimitResponseProto
 import com.rainist.collectcard.cardloans.CardLoanService
 import com.rainist.collectcard.cardloans.dto.toListCardLoansResponseProto
 import com.rainist.collectcard.cardtransactions.CardTransactionService
+import com.rainist.collectcard.cardtransactions.CardTransactionServiceImpl.Companion.Warn
+import com.rainist.collectcard.cardtransactions.CardTransactionServiceImpl.Companion.With
 import com.rainist.collectcard.cardtransactions.dto.toListCardsTransactionResponseProto
 import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.exception.CollectcardServiceExceptionHandler
@@ -88,11 +90,10 @@ class CollectcardGrpcService(
         )
 
         kotlin.runCatching {
-            val logMap = mapOf(
-                "banksaladUserId" to request.userId,
-                "fromMs" to (request.takeIf { request.hasFromMs() }?.fromMs?.value ?: "fromMsNull")
-            )
-            logger.warn(logMap)
+            logger
+                .With("banksaladUserId", request.userId)
+                .With("fromMs", request.takeIf { request.hasFromMs() }?.fromMs?.value ?: "fromMsNull")
+                .Warn("")
 
             cardTransactionService.listTransactions(executionContext).toListCardsTransactionResponseProto()
         }.onSuccess {
