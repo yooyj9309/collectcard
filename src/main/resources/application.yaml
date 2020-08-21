@@ -27,9 +27,6 @@ management:
         host: localhost
         port: 8126
         publish-unchanged-meters: true
-    tags:
-      application: ${spring.application.name}
-      active: ${spring.profiles.active}
 
 connect-server:
   host: connect
