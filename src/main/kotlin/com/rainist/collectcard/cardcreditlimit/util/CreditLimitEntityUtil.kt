@@ -44,7 +44,6 @@ class CreditLimitEntityUtil {
                 this.cardCompanyId = sourceCreditLimitEntity.cardCompanyId
                 this.onetimePaymentLimitAmount = sourceCreditLimitEntity.onetimePaymentLimitAmount
                 this.creditCardLimitTotalAmount = sourceCreditLimitEntity.creditCardLimitTotalAmount
-                this.creditCardLimitTotalAmount = sourceCreditLimitEntity.creditCardLimitTotalAmount
                 this.creditCardLimitUsedAmount = sourceCreditLimitEntity.creditCardLimitUsedAmount
                 this.creditCardLimitRemainingAmount = sourceCreditLimitEntity.creditCardLimitRemainingAmount
                 this.cashAdvanceLimitTotalAmount = sourceCreditLimitEntity.cashAdvanceLimitTotalAmount
@@ -72,7 +71,7 @@ class CreditLimitEntityUtil {
             cardCompanyId: String?,
             creditLimit: CreditLimit?
         ): CreditLimitEntity {
-            // TODO 각 카드사별로 없는 값이 있을 경우 어떤 값을 추가할지에 대한 논의 필요 -> 우선 -1 값 적용
+
             return CreditLimitEntity().apply {
                 this.banksaladUserId = banksaladUserId
                 this.cardCompanyId = cardCompanyId
@@ -87,8 +86,8 @@ class CreditLimitEntityUtil {
                 this.overseaLimitUsedAmount = creditLimit?.overseaLimit?.usedAmount ?: BigDecimal(0)
                 this.overseaLimitRemainingAmount = creditLimit?.overseaLimit?.remainedAmount ?: BigDecimal(0)
                 this.loanLimitTotalAmount = creditLimit?.loanLimit?.totalLimitAmount ?: BigDecimal(0)
-                this.loanLimitRemainingAmount = creditLimit?.loanLimit?.usedAmount ?: BigDecimal(0)
-                this.loanLimitUsedAmount = creditLimit?.loanLimit?.remainedAmount ?: BigDecimal(0)
+                this.loanLimitRemainingAmount = creditLimit?.loanLimit?.remainedAmount ?: BigDecimal(0)
+                this.loanLimitUsedAmount = creditLimit?.loanLimit?.usedAmount ?: BigDecimal(0)
                 this.cardLoanLimitTotalAmount = creditLimit?.cardLoanLimit?.totalLimitAmount ?: BigDecimal(0)
                 this.cardLoanLimitUsedAmount = creditLimit?.cardLoanLimit?.usedAmount ?: BigDecimal(0)
                 this.cardLoanLimitRemainingAmount = creditLimit?.cardLoanLimit?.remainedAmount ?: BigDecimal(0)
