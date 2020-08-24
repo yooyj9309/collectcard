@@ -115,8 +115,9 @@ class ShinhancardBillExecution {
                 // 체크카드 월별 청구내역(SHC_HPG01226)
                 .exchange(ShinhancardApis.card_shinhancard_check_bills)
                 .to(ListCardBillsResponse::class.java)
-                .exceptionally { throwable: Throwable ->
+                .exceptionally { executionContext: ExecutionContext, throwable: Throwable ->
                     CollectExecutionExceptionHandler.handle(
+                        executionContext,
                         Organization.shinhancard.name,
                         "cardShinhancardBills",
                         ShinhancardApis.card_shinhancard_check_bills.id,
@@ -144,8 +145,9 @@ class ShinhancardBillExecution {
                         // 카드_[EXT] (체크) 월별청구내역조회(상세총괄) (SHC_HPG00537)
                         .exchange(ShinhancardApis.card_shinhancard_check_bill_transactions)
                         .to(ListBillTransactionsResponse::class.java)
-                        .exceptionally { throwable: Throwable ->
+                        .exceptionally { executionContext: ExecutionContext, throwable: Throwable ->
                             CollectExecutionExceptionHandler.handle(
+                                executionContext,
                                 Organization.shinhancard.name,
                                 "cardShinhancardBills",
                                 ShinhancardApis.card_shinhancard_check_bill_transactions.id,
@@ -167,8 +169,9 @@ class ShinhancardBillExecution {
                         // 신용카드 월별 청구내역(SHC_HPG00719)
                         .exchange(ShinhancardApis.card_shinhancard_credit_bills)
                         .to(ListCardBillsResponse::class.java)
-                        .exceptionally { throwable: Throwable ->
+                        .exceptionally { executionContext: ExecutionContext, throwable: Throwable ->
                             CollectExecutionExceptionHandler.handle(
+                                executionContext,
                                 Organization.shinhancard.name,
                                 "cardShinhancardBills",
                                 ShinhancardApis.card_shinhancard_credit_bills.id,
@@ -195,8 +198,9 @@ class ShinhancardBillExecution {
                                 // 카드_[EXT] (신용) 월별청구내역조회(상세총괄) (SHC_HPG00698)
                                 .exchange(ShinhancardApis.card_shinhancard_credit_bill_transactions)
                                 .to(ListBillTransactionsResponse::class.java)
-                                .exceptionally { throwable: Throwable ->
+                                .exceptionally { executionContext: ExecutionContext, throwable: Throwable ->
                                     CollectExecutionExceptionHandler.handle(
+                                        executionContext,
                                         Organization.shinhancard.name,
                                         "cardShinhancardBills",
                                         ShinhancardApis.card_shinhancard_credit_bill_transactions.id,

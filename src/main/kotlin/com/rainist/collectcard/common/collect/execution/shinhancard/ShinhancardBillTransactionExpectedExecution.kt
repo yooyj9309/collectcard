@@ -2,6 +2,7 @@ package com.rainist.collectcard.common.collect.execution.shinhancard
 
 import com.rainist.collect.common.api.Pagination
 import com.rainist.collect.common.execution.Execution
+import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.cardbills.dto.CardBill
 import com.rainist.collectcard.cardbills.dto.ListBillTransactionsResponse
 import com.rainist.collectcard.cardbills.dto.ListBillTransactionsResponseDataBody
@@ -90,8 +91,9 @@ class ShinhancardBillTransactionExpectedExecution {
                 // 카드_[EXT] 결제예정금액총괄 SHC_HPG01096_EXT
                 .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected)
                 .to(ListCardBillsResponse::class.java)
-                .exceptionally { throwable: Throwable ->
+                .exceptionally { executionContext: ExecutionContext, throwable: Throwable ->
                     CollectExecutionExceptionHandler.handle(
+                        executionContext,
                         Organization.shinhancard.name,
                         "cardShinhancardBillTransactionExpected",
                         ShinhancardApis.card_shinhancard_list_user_card_bills_expected.id,
@@ -113,8 +115,9 @@ class ShinhancardBillTransactionExpectedExecution {
                     Execution.create()
                         .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_lump_sum)
                         .to(ListBillTransactionsResponse::class.java)
-                        .exceptionally { throwable: Throwable ->
+                        .exceptionally { executionContext: ExecutionContext, throwable: Throwable ->
                             CollectExecutionExceptionHandler.handle(
+                                executionContext,
                                 Organization.shinhancard.name,
                                 "cardShinhancardBillTransactionExpected",
                                 ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_lump_sum.id,
@@ -135,8 +138,9 @@ class ShinhancardBillTransactionExpectedExecution {
                         // 카드_[EXT] 결제예정금액총괄 SHC_HPG01096_EXT
                         .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected)
                         .to(ListCardBillsResponse::class.java)
-                        .exceptionally { throwable: Throwable ->
+                        .exceptionally { executionContext: ExecutionContext, throwable: Throwable ->
                             CollectExecutionExceptionHandler.handle(
+                                executionContext,
                                 Organization.shinhancard.name,
                                 "cardShinhancardBillTransactionExpected",
                                 ShinhancardApis.card_shinhancard_list_user_card_bills_expected.id,
@@ -158,8 +162,9 @@ class ShinhancardBillTransactionExpectedExecution {
                             Execution.create()
                                 .exchange(ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_installment)
                                 .to(ListBillTransactionsResponse::class.java)
-                                .exceptionally { throwable: Throwable ->
+                                .exceptionally { executionContext: ExecutionContext, throwable: Throwable ->
                                     CollectExecutionExceptionHandler.handle(
+                                        executionContext,
                                         Organization.shinhancard.name,
                                         "cardShinhancardBillTransactionExpected",
                                         ShinhancardApis.card_shinhancard_list_user_card_bills_expected_detail_installment.id,

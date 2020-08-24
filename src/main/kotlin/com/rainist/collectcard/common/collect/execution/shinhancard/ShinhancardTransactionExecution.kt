@@ -2,6 +2,7 @@ package com.rainist.collectcard.common.collect.execution.shinhancard
 
 import com.rainist.collect.common.api.Pagination
 import com.rainist.collect.common.execution.Execution
+import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponse
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponseDataBody
 import com.rainist.collectcard.common.collect.api.Organization
@@ -31,8 +32,9 @@ class ShinhancardTransactionExecution {
                 // 신용 국내사용내역조회-일시불/할부 SHC_HPG00428
                 .exchange(ShinhancardApis.card_shinhancard_credit_domestic_transactions)
                 .to(ListTransactionsResponse::class.java)
-                .exceptionally { throwable: Throwable ->
+                .exceptionally { executionContext: ExecutionContext, throwable: Throwable ->
                     CollectExecutionExceptionHandler.handle(
+                        executionContext,
                         Organization.shinhancard.name,
                         "cardShinhancardTransactions",
                         ShinhancardApis.card_shinhancard_credit_domestic_transactions.id,
@@ -51,8 +53,9 @@ class ShinhancardTransactionExecution {
                     Execution.create()
                         .exchange(ShinhancardApis.card_shinhancard_credit_oversea_transactions)
                         .to(ListTransactionsResponse::class.java)
-                        .exceptionally { throwable: Throwable ->
+                        .exceptionally { executionContext: ExecutionContext, throwable: Throwable ->
                             CollectExecutionExceptionHandler.handle(
+                                executionContext,
                                 Organization.shinhancard.name,
                                 "cardShinhancardTransactions",
                                 ShinhancardApis.card_shinhancard_credit_oversea_transactions.id,
@@ -72,8 +75,9 @@ class ShinhancardTransactionExecution {
                     Execution.create()
                         .exchange(ShinhancardApis.card_shinhancard_check_domestic_transactions)
                         .to(ListTransactionsResponse::class.java)
-                        .exceptionally { throwable: Throwable ->
+                        .exceptionally { executionContext: ExecutionContext, throwable: Throwable ->
                             CollectExecutionExceptionHandler.handle(
+                                executionContext,
                                 Organization.shinhancard.name,
                                 "cardShinhancardTransactions",
                                 ShinhancardApis.card_shinhancard_check_domestic_transactions.id,
@@ -94,8 +98,9 @@ class ShinhancardTransactionExecution {
                     Execution.create()
                         .exchange(ShinhancardApis.card_shinhancard_check_oversea_transactions)
                         .to(ListTransactionsResponse::class.java)
-                        .exceptionally { throwable: Throwable ->
+                        .exceptionally { executionContext: ExecutionContext, throwable: Throwable ->
                             CollectExecutionExceptionHandler.handle(
+                                executionContext,
                                 Organization.shinhancard.name,
                                 "cardShinhancardTransactions",
                                 ShinhancardApis.card_shinhancard_check_oversea_transactions.id,

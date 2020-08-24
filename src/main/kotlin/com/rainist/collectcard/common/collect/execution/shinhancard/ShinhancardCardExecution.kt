@@ -2,6 +2,7 @@ package com.rainist.collectcard.common.collect.execution.shinhancard
 
 import com.rainist.collect.common.api.Pagination
 import com.rainist.collect.common.execution.Execution
+import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.card.dto.ListCardsResponse
 import com.rainist.collectcard.card.dto.ListCardsResponseDataBody
 import com.rainist.collectcard.common.collect.api.Organization
@@ -31,8 +32,9 @@ class ShinhancardCardExecution {
             Execution.create()
                 .exchange(ShinhancardApis.card_shinhancard_cards)
                 .to(ListCardsResponse::class.java)
-                .exceptionally { throwable: Throwable ->
+                .exceptionally { executionContext: ExecutionContext, throwable: Throwable ->
                     CollectExecutionExceptionHandler.handle(
+                        executionContext,
                         Organization.shinhancard.name,
                         "cardShinhancardCards",
                         ShinhancardApis.card_shinhancard_cards.id,

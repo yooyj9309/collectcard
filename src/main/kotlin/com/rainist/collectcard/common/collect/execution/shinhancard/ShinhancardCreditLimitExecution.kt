@@ -1,6 +1,7 @@
 package com.rainist.collectcard.common.collect.execution.shinhancard
 
 import com.rainist.collect.common.execution.Execution
+import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.cardcreditlimit.dto.CreditLimitResponse
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
@@ -15,8 +16,9 @@ class ShinhancardCreditLimitExecution {
             Execution.create()
                 .exchange(ShinhancardApis.card_shinhancard_credit_limit)
                 .to(CreditLimitResponse::class.java)
-                .exceptionally { throwable: Throwable ->
+                .exceptionally { executionContext: ExecutionContext, throwable: Throwable ->
                     CollectExecutionExceptionHandler.handle(
+                        executionContext,
                         Organization.shinhancard.name,
                         "cardShinhancardCreditLimit",
                         ShinhancardApis.card_shinhancard_credit_limit.id,

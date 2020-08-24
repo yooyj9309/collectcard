@@ -2,6 +2,7 @@ package com.rainist.collectcard.common.collect.execution.shinhancard
 
 import com.rainist.collect.common.api.Pagination
 import com.rainist.collect.common.execution.Execution
+import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collectcard.cardloans.dto.ListLoansResponse
 import com.rainist.collectcard.cardloans.dto.ListLoansResponseDataBody
 import com.rainist.collectcard.cardloans.dto.Loan
@@ -46,8 +47,9 @@ class ShinhancardLoanExecution {
             Execution.create()
                 .exchange(ShinhancardApis.card_shinhancard_loan_info)
                 .to(ListLoansResponse::class.java)
-                .exceptionally { throwable: Throwable ->
+                .exceptionally { executionContext: ExecutionContext, throwable: Throwable ->
                     CollectExecutionExceptionHandler.handle(
+                        executionContext,
                         Organization.shinhancard.name,
                         "cardShinhancardLoan",
                         ShinhancardApis.card_shinhancard_loan_info.id,
@@ -69,8 +71,9 @@ class ShinhancardLoanExecution {
                     Execution.create()
                         .exchange(ShinhancardApis.card_shinhancard_loan_detail)
                         .to(Loan::class.java)
-                        .exceptionally { throwable: Throwable ->
+                        .exceptionally { executionContext: ExecutionContext, throwable: Throwable ->
                             CollectExecutionExceptionHandler.handle(
+                                executionContext,
                                 Organization.shinhancard.name,
                                 "cardShinhancardLoan",
                                 ShinhancardApis.card_shinhancard_loan_detail.id,
