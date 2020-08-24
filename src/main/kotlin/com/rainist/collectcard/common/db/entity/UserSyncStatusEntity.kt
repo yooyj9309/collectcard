@@ -33,6 +33,9 @@ data class UserSyncStatusEntity(
     @Column(nullable = false)
     var lastCheckAt: LocalDateTime? = null,
 
+    @Column(nullable = false, columnDefinition = "BIT", length = 1)
+    var isDeleted: Boolean? = false,
+
     @CreatedDate
     var createdAt: LocalDateTime = DateTimeUtil.utcNowLocalDateTime(),
 

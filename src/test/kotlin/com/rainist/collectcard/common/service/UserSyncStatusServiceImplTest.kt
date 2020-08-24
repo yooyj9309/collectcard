@@ -31,10 +31,11 @@ internal class UserSyncStatusServiceImplTest {
 
         userSyncStatusService.updateUserSyncStatus(banksaladUserId, organizationId, transactionId, lastCheckAt)
 
-        var userSyncStatusEntity = userSyncStatusRepository.findByBanksaladUserIdAndOrganizationIdAndTransactionId(
+        var userSyncStatusEntity = userSyncStatusRepository.findByBanksaladUserIdAndOrganizationIdAndTransactionIdAndIsDeleted(
             banksaladUserId,
             organizationId,
-            transactionId
+            transactionId,
+            false
         )
 
         Assert.assertEquals(lastCheckAt, userSyncStatusEntity?.lastCheckAt?.toInstant(ZoneOffset.UTC)?.toEpochMilli())
@@ -49,10 +50,11 @@ internal class UserSyncStatusServiceImplTest {
         val lastCheckAt = System.currentTimeMillis()
         userSyncStatusService.updateUserSyncStatus(banksaladUserId, organizationId, transactionId, lastCheckAt)
 
-        var userSyncStatusEntity = userSyncStatusRepository.findByBanksaladUserIdAndOrganizationIdAndTransactionId(
+        var userSyncStatusEntity = userSyncStatusRepository.findByBanksaladUserIdAndOrganizationIdAndTransactionIdAndIsDeleted(
             banksaladUserId,
             organizationId,
-            transactionId
+            transactionId,
+            false
         )
 
         Assert.assertEquals(lastCheckAt, userSyncStatusEntity?.lastCheckAt?.toInstant(ZoneOffset.UTC)?.toEpochMilli())
@@ -60,10 +62,11 @@ internal class UserSyncStatusServiceImplTest {
         val lastCheckAt2 = System.currentTimeMillis() + 1000
         userSyncStatusService.updateUserSyncStatus(banksaladUserId, organizationId, transactionId, lastCheckAt2)
 
-        userSyncStatusEntity = userSyncStatusRepository.findByBanksaladUserIdAndOrganizationIdAndTransactionId(
+        userSyncStatusEntity = userSyncStatusRepository.findByBanksaladUserIdAndOrganizationIdAndTransactionIdAndIsDeleted(
             banksaladUserId,
             organizationId,
-            transactionId
+            transactionId,
+            false
         )
 
         Assert.assertEquals(lastCheckAt2, userSyncStatusEntity?.lastCheckAt?.toInstant(ZoneOffset.UTC)?.toEpochMilli())
