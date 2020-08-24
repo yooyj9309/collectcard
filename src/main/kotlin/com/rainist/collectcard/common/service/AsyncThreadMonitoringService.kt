@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit
 import javax.annotation.PostConstruct
 import kotlin.concurrent.timer
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.stereotype.Service
 
@@ -22,12 +21,6 @@ class AsyncThreadMonitoringService(
         const val ASYNC_THREAD_ACTIVE_COUNT = "async.thread.active.count"
     }
 
-    @Value("\${spring.profiles.active}")
-    lateinit var activeName: String
-
-    @Value("\${spring.application.name}")
-    lateinit var applicationName: String
-
     @PostConstruct
     fun init() {
         val threadList = mutableListOf(
@@ -38,7 +31,6 @@ class AsyncThreadMonitoringService(
         threadList.forEach { threadPool ->
             ThreadMonitoringTask(
                 threadPool,
-                "$activeName.$applicationName",
                 TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS),
                 meterRegistry
             ).start()
@@ -48,7 +40,6 @@ class AsyncThreadMonitoringService(
 
 class ThreadMonitoringTask(
     private val threadPool: ThreadPoolTaskExecutor,
-    private val measurement: String,
     private val interval: Long,
     private val meterRegistry: MeterRegistry
 ) {
@@ -59,8 +50,8 @@ class ThreadMonitoringTask(
         timer(period = interval) {
             val queueSize = threadPool.threadPoolExecutor.queue.size.toDouble()
             val activeCount = threadPool.activeCount.toDouble()
-            meterRegistry.counter("$measurement.${AsyncThreadMonitoringService.ASYNC_THREAD_ACTIVE_COUNT}", tags).increment(activeCount)
-            meterRegistry.counter("$measurement.${AsyncThreadMonitoringService.ASYNC_THREAD_QUEUE_SIZE}", tags).increment(queueSize)
+            meterRegistry.counter(AsyncThreadMonitoringService.ASYNC_THREAD_ACTIVE_COUNT, tags).increment(activeCount)
+            meterRegistry.counter(AsyncThreadMonitoringService.ASYNC_THREAD_QUEUE_SIZE, tags).increment(queueSize)
         }
     }
 }

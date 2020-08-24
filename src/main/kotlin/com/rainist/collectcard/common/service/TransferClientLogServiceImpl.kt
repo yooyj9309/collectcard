@@ -4,7 +4,6 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import java.net.URI
 import java.util.concurrent.TimeUnit
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 
@@ -21,19 +20,13 @@ class TransferClientLogServiceImpl(
         const val TRANSFER_ALL_TIMING = "transfer.all.timing"
     }
 
-    @Value("\${spring.profiles.active}")
-    lateinit var activeName: String
-
-    @Value("\${spring.application.name}")
-    lateinit var applicationName: String
-
     override fun loggingTimeoutCount(uri: URI) {
         val tags = Tags
             .of("url", uri.toString())
             .and("url_host", uri.host)
             .and("url_path", uri.path)
 
-        registry.counter("$activeName.$applicationName.$TRANSFER_ALL_TIMEOUT", tags).increment()
+        registry.counter(TRANSFER_ALL_TIMEOUT, tags).increment()
     }
 
     override fun loggingFailureCount(uri: URI, httpStatus: HttpStatus) {
@@ -43,7 +36,7 @@ class TransferClientLogServiceImpl(
             .and("url_host", uri.host)
             .and("url_path", uri.path)
 
-        registry.counter("$activeName.$applicationName.$TRANSFER_ALL_FAILURE", tags).increment()
+        registry.counter(TRANSFER_ALL_FAILURE, tags).increment()
     }
 
     override fun loggingUnknownErrorCount(uri: URI) {
@@ -52,7 +45,7 @@ class TransferClientLogServiceImpl(
             .and("url_host", uri.host)
             .and("url_path", uri.path)
 
-        registry.counter("$activeName.$applicationName.$TRANSFER_ALL_UNKNOWN", tags).increment()
+        registry.counter(TRANSFER_ALL_UNKNOWN, tags).increment()
     }
 
     override fun loggingSuccessCount(uri: URI, httpStatus: HttpStatus) {
@@ -62,7 +55,7 @@ class TransferClientLogServiceImpl(
             .and("url_host", uri.host)
             .and("url_path", uri.path)
 
-        registry.counter("$activeName.$applicationName.$TRANSFER_ALL_SUCCESS", tags).increment()
+        registry.counter(TRANSFER_ALL_SUCCESS, tags).increment()
     }
 
     override fun loggingTiming(uri: URI, totalTimeMillis: Long) {
@@ -71,6 +64,6 @@ class TransferClientLogServiceImpl(
             .and("url_host", uri.host)
             .and("url_path", uri.path)
 
-        registry.timer("$activeName.$applicationName.$TRANSFER_ALL_TIMING", tags).record(totalTimeMillis, TimeUnit.MILLISECONDS)
+        registry.timer(TRANSFER_ALL_TIMING, tags).record(totalTimeMillis, TimeUnit.MILLISECONDS)
     }
 }

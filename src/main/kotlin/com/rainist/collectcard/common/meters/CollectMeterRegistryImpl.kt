@@ -3,7 +3,6 @@ package com.rainist.collectcard.common.meters
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tags
 import javax.annotation.PostConstruct
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 private const val TAG_ORGANIZATION_ID = "organizationId"
@@ -20,21 +19,15 @@ private const val COLLECT_EXECUTION_API_RESULT_CODE_COUNT = "collect.execution.a
 
 @Service
 class CollectMeterRegistryImpl(private val meterRegistry: MeterRegistry) : CollectMeterRegistry {
-    @Value("\${spring.profiles.active}")
-    lateinit var activeName: String
-
-    @Value("\${spring.application.name}")
-    lateinit var applicationName: String
-
     private var executionErrorCountName: String? = null
     private var serviceErrorCountName: String? = null
     private var executionApiResultCodeCountName: String? = null
 
     @PostConstruct
     fun init() {
-        executionErrorCountName = "$activeName.$applicationName.$COLLECT_EXECUTION_ERROR_COUNT"
-        serviceErrorCountName = "$activeName.$applicationName.$COLLECT_SERVICE_ERROR_COUNT"
-        executionApiResultCodeCountName = "$activeName.$applicationName.$COLLECT_EXECUTION_API_RESULT_CODE_COUNT"
+        executionErrorCountName = COLLECT_EXECUTION_ERROR_COUNT
+        serviceErrorCountName = COLLECT_SERVICE_ERROR_COUNT
+        executionApiResultCodeCountName = COLLECT_EXECUTION_API_RESULT_CODE_COUNT
     }
 
     override fun registerExecutionErrorCount(organizationId: String, executionId: String, apiId: String) {
