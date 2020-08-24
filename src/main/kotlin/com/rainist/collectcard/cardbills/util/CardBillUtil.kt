@@ -89,6 +89,8 @@ class CardBillUtil {
             return CardPaymentScheduledEntity().apply {
                 this.banksaladUserId = banksaladUserId
                 this.cardCompanyId = organizationId
+                this.billNumber = scheduledPayment.billNumber
+                this.billType = scheduledPayment.billType
                 this.paymentScheduledTransactionNo = indexNo
                 this.cardCompanyCardId = scheduledPayment.cardCompanyCardId ?: ""
                 this.cardName = scheduledPayment.cardName

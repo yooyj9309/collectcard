@@ -28,6 +28,12 @@ data class CardPaymentScheduledEntity(
     var cardCompanyId: String? = null,
 
     @Column(nullable = false)
+    var billNumber: String? = null,
+
+    @Column(nullable = false)
+    var billType: String? = null,
+
+    @Column(nullable = false)
     var paymentScheduledTransactionNo: Int? = null,
 
     @Column(nullable = false)
