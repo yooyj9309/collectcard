@@ -13,12 +13,6 @@ interface UserSyncStatusRepository : JpaRepository<UserSyncStatusEntity, Long> {
         isDeleted: Boolean
     ): UserSyncStatusEntity?
 
-    fun findByBanksaladUserIdAndOrganizationIdAndTransactionId(
-        banksaladUserId: Long,
-        organizationId: String,
-        transactionId: String
-    ): UserSyncStatusEntity?
-
     fun findByBanksaladUserIdAndOrganizationIdAndIsDeleted(
         banksaladUserId: Long,
         organizationId: String,

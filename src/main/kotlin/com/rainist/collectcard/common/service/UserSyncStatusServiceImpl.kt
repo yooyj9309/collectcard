@@ -46,20 +46,20 @@ class UserSyncStatusServiceImpl(
         lastCheckAt: Long
     ) {
         /* user_sync_status 조회 없으면 생성 */
-        var userSyncStatusEntity = userSyncStatusRepository.findByBanksaladUserIdAndOrganizationIdAndTransactionId(
+        var userSyncStatusEntity = userSyncStatusRepository.findByBanksaladUserIdAndOrganizationIdAndTransactionIdAndIsDeleted(
             banksaladUserId,
             organizationId,
-            transactionId
+            transactionId,
+            false
         ) ?: UserSyncStatusEntity().apply {
             this.banksaladUserId = banksaladUserId
             this.organizationId = organizationId
             this.transactionId = transactionId
+            this.isDeleted = false
         }
 
         /* last_check_at 업데이트 */
         userSyncStatusEntity.lastCheckAt = LocalDateTime.ofInstant(Instant.ofEpochMilli(lastCheckAt), ZoneId.of(ZONE_ID_UTC))
-        userSyncStatusEntity.isDeleted = false
-
         userSyncStatusRepository.save(userSyncStatusEntity)
     }
 
