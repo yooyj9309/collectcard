@@ -1,5 +1,6 @@
 package com.rainist.collectcard.common.service
 
+import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collect.common.execution.ExecutionResponse
 import com.rainist.collectcard.common.db.entity.ApiLogEntity
 import com.rainist.collectcard.common.db.repository.ApiLogRepository
@@ -14,54 +15,79 @@ class ExecutionResponseValidateService(private val apiLogRepository: ApiLogRepos
     companion object : Log
 
     fun validate(
-        executionRequestId: String,
+        executionContext: ExecutionContext,
         executionResponse: ExecutionResponse<*>
     ): Boolean {
 
+        var iaResultCodesOk = true
+
         if (executionResponse.isExceptionOccurred) {
-            logger.error("Response validation exception. exception was occured while execution")
-            return false
+            logError(executionContext.userId, executionContext.organizationId, executionContext.executionRequestId,
+                "Response validation exception. exception was occured while execution")
+            iaResultCodesOk = false
         }
 
         val apiLogEntities: List<ApiLogEntity> = apiLogRepository.findByExecutionRequestIdAndCreatedAtBetween(
-            executionRequestId,
+            executionContext.executionRequestId,
             DateTimeUtil.utcNowLocalDateTime().minusDays(1),
             DateTimeUtil.utcNowLocalDateTime().plusDays(1))
 
         val resultCodes =
             apiLogEntities.map(ApiLogEntity::resultCode)
-            .toMutableList()
+                .toMutableList()
 
         if (resultCodes.contains(ResultCode.EXTERNAL_SERVER_ERROR.name)) {
-            logger.error("Result Code validation fail: {} ", ResultCode.EXTERNAL_SERVER_ERROR.name)
-            return false
+            logError(executionContext.userId, executionContext.organizationId, executionContext.executionRequestId,
+                "Result Code validation fail: " + ResultCode.EXTERNAL_SERVER_ERROR.name)
+            iaResultCodesOk = false
         }
 
         if (resultCodes.contains(ResultCode.INVALID_ACCESS_TOKEN.name)) {
-            logger.error("Result Code validation fail: {} ", ResultCode.INVALID_ACCESS_TOKEN.name)
-            return false
+            logError(executionContext.userId, executionContext.organizationId, executionContext.executionRequestId,
+                "Result Code validation fail: " + ResultCode.INVALID_ACCESS_TOKEN.name)
+            iaResultCodesOk = false
         }
 
         if (resultCodes.contains(ResultCode.INVALID_USER.name)) {
-            logger.error("Result Code validation fail: {} ", ResultCode.INVALID_USER.name)
-            return false
+            logError(executionContext.userId, executionContext.organizationId, executionContext.executionRequestId,
+                "Result Code validation fail: " + ResultCode.INVALID_USER.name)
+            iaResultCodesOk = false
         }
 
         if (resultCodes.contains(ResultCode.UNKNOWN.name)) {
-            logger.error("Result Code validation fail: {} ", ResultCode.UNKNOWN.name)
-            return false
+            logError(executionContext.userId, executionContext.organizationId, executionContext.executionRequestId,
+                "Result Code validation fail: " + ResultCode.UNKNOWN.name)
+            iaResultCodesOk = false
         }
 
-        return true
+        return iaResultCodesOk
+    }
+
+    private fun logError(banksaladUserId: String, organizationId: String, executionRequestId: String, message: String) {
+        // write error log
+        logger
+            .With("banksaladUserId", banksaladUserId)
+            .With("organizationId", organizationId)
+            .With("executionRequestId", executionRequestId)
+            .Error("[COLLECT][Service] " +
+                    "banksaladUserId: {}\n" +
+                    "organizationId: {}\n" +
+                    "executionRequestId: {}\n" +
+                    "message: {}",
+                banksaladUserId,
+                organizationId,
+                executionRequestId,
+                message
+            )
     }
 
     fun validate(
-        executionRequestId: String,
+        executionContext: ExecutionContext,
         executionResponse: List<ExecutionResponse<*>>
     ): Boolean {
 
         val falseCount = executionResponse.map {
-            validate(executionRequestId, it)
+            validate(executionContext, it)
         }
         .filter {
             it == false

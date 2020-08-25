@@ -110,7 +110,7 @@ class CardBillServiceImpl(
             upsertCardBillAndTransactions(executionContext.userId.toLong(), executionContext.organizationId, cardBill, now)
         }
 
-        if (executionResponseValidateService.validate(executionContext.executionRequestId, cardBillsExecutionResponse)) {
+        if (executionResponseValidateService.validate(executionContext, cardBillsExecutionResponse)) {
             userSyncStatusService.updateUserSyncStatus(
                 executionContext.userId.toLong(),
                 executionContext.organizationId,
@@ -152,7 +152,7 @@ class CardBillServiceImpl(
             deleteAndInsertCardBillExpectedTransactions(banksaladUserId, executionContext.organizationId, it.transactions ?: mutableListOf(), now)
         }
 
-        if (executionResponseValidateService.validate(executionContext.executionRequestId, cardBillExpectedExecutionResponse)) {
+        if (executionResponseValidateService.validate(executionContext, cardBillExpectedExecutionResponse)) {
             userSyncStatusService.updateUserSyncStatus(
                 banksaladUserId,
                 executionContext.organizationId,

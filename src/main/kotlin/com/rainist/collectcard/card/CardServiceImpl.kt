@@ -80,7 +80,7 @@ class CardServiceImpl(
         }
 
         /* check response result */
-        if (executionResponseValidateService.validate(executionContext.executionRequestId, executionResponse)) {
+        if (executionResponseValidateService.validate(executionContext, executionResponse)) {
             userSyncStatusService.updateUserSyncStatus(
                 banksaladUserId,
                 executionContext.organizationId,

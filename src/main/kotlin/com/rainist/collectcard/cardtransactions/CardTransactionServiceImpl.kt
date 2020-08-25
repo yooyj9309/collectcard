@@ -124,7 +124,7 @@ class CardTransactionServiceImpl(
             }
         }
 
-        if (executionResponseValidateService.validate(executionContext.executionRequestId, executionResponses)) {
+        if (executionResponseValidateService.validate(executionContext, executionResponses)) {
                 userSyncStatusService.updateUserSyncStatus(
                 banksaladUserId,
                 executionContext.organizationId,
