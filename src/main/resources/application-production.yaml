@@ -17,12 +17,10 @@ spring:
     username: collectcard_was
     password: ${PRODUCTION_COLLECTCARD_DB_PASSWORD}
     hikari:
-      idle-timeout: 300000
-      minimum-idle: 10
-      maximum-pool-size: 30
+      maximum-pool-size: 70
       connection-timeout: 5000
       validation-timeout: 4000
-      max-lifetime: 1800000
+      max-lifetime: 600000
 
 logging:
    level:
