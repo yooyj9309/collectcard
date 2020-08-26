@@ -91,12 +91,12 @@ data class CardLoanHistoryEntity(
     var updatedAt: LocalDateTime? = null
 )
 
-fun CardLoanHistoryEntity.makeCardLoanHistoryEntity(cardLoanEntity: CardLoanEntity): CardLoanHistoryEntity {
+fun CardLoanHistoryEntity.makeCardLoanHistoryEntity(cardLoanEntity: CardLoanEntity, now: LocalDateTime): CardLoanHistoryEntity {
     this.cardLoanId = cardLoanEntity.cardLoanId
     this.banksaladUserId = cardLoanEntity.banksaladUserId
     this.cardCompanyId = cardLoanEntity.cardCompanyId
     this.cardCompanyLoanId = cardLoanEntity.cardCompanyLoanId
-    this.lastCheckAt = cardLoanEntity.lastCheckAt
+    this.lastCheckAt = now
     this.loanName = cardLoanEntity.loanName
     this.paymentBankId = cardLoanEntity.paymentBankId
     this.expirationDay = cardLoanEntity.expirationDay

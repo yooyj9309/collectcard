@@ -44,7 +44,6 @@ class CardLoanServiceImpl(
         val now = DateTimeUtil.utcNowLocalDateTime()
 
         /* request header */
-        val lastCheckAt = DateTimeUtil.getLocalDateTime()
         val header = headerService.makeHeader(executionContext.userId, executionContext.organizationId)
 
         /* request body */
@@ -87,7 +86,7 @@ class CardLoanServiceImpl(
 
                     // history insert
                     if (true == saveEntity.updatedAt?.isAfter(prevUpdatedAt)) {
-                        cardLoanHistoryRepository.save(CardLoanHistoryEntity().makeCardLoanHistoryEntity(saveEntity))
+                        cardLoanHistoryRepository.save(CardLoanHistoryEntity().makeCardLoanHistoryEntity(saveEntity, now))
                     }
 
                     saveEntity.lastCheckAt = now
@@ -96,14 +95,14 @@ class CardLoanServiceImpl(
                 ?: kotlin.run {
                     // only insert
                     val loanEntity = CardLoanEntity().makeCardLoanEntity(
-                        lastCheckAt,
+                        now,
                         banksaladUserId,
                         executionContext.organizationId,
                         loan
                     )
 
                     cardLoanRepository.save(loanEntity).let { cardLoanEntity ->
-                        val history = CardLoanHistoryEntity().makeCardLoanHistoryEntity(cardLoanEntity)
+                        val history = CardLoanHistoryEntity().makeCardLoanHistoryEntity(cardLoanEntity, now)
                         cardLoanHistoryRepository.save(history)
                     }
                 }
