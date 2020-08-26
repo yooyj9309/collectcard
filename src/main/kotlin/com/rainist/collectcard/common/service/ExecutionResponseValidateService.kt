@@ -23,7 +23,7 @@ class ExecutionResponseValidateService(private val apiLogRepository: ApiLogRepos
 
         if (executionResponse.isExceptionOccurred) {
             logError(executionContext.userId, executionContext.organizationId, executionContext.executionRequestId,
-                "Response validation exception. exception was occured while execution")
+                "Exception was occured while execution")
             iaResultCodesOk = false
         }
 
@@ -38,25 +38,25 @@ class ExecutionResponseValidateService(private val apiLogRepository: ApiLogRepos
 
         if (resultCodes.contains(ResultCode.EXTERNAL_SERVER_ERROR.name)) {
             logError(executionContext.userId, executionContext.organizationId, executionContext.executionRequestId,
-                "Result Code validation fail: " + ResultCode.EXTERNAL_SERVER_ERROR.name)
+                ResultCode.EXTERNAL_SERVER_ERROR.name)
             iaResultCodesOk = false
         }
 
         if (resultCodes.contains(ResultCode.INVALID_ACCESS_TOKEN.name)) {
             logError(executionContext.userId, executionContext.organizationId, executionContext.executionRequestId,
-                "Result Code validation fail: " + ResultCode.INVALID_ACCESS_TOKEN.name)
+                ResultCode.INVALID_ACCESS_TOKEN.name)
             iaResultCodesOk = false
         }
 
         if (resultCodes.contains(ResultCode.INVALID_USER.name)) {
             logError(executionContext.userId, executionContext.organizationId, executionContext.executionRequestId,
-                "Result Code validation fail: " + ResultCode.INVALID_USER.name)
+                ResultCode.INVALID_USER.name)
             iaResultCodesOk = false
         }
 
         if (resultCodes.contains(ResultCode.UNKNOWN.name)) {
             logError(executionContext.userId, executionContext.organizationId, executionContext.executionRequestId,
-                "Result Code validation fail: " + ResultCode.UNKNOWN.name)
+                ResultCode.UNKNOWN.name)
             iaResultCodesOk = false
         }
 
@@ -69,9 +69,8 @@ class ExecutionResponseValidateService(private val apiLogRepository: ApiLogRepos
             .With("banksaladUserId", banksaladUserId)
             .With("organizationId", organizationId)
             .With("executionRequestId", executionRequestId)
-            .Error("[COLLECT][Service] organizationId: {}, message: {}",
-                organizationId,
-                message
+            .Error("[COLLECT][Service] Result validation fail: " + message +
+                    "\norganizationId: " + organizationId
             )
     }
 
