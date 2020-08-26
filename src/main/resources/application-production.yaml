@@ -21,6 +21,8 @@ spring:
       connection-timeout: 5000
       validation-timeout: 4000
       max-lifetime: 600000
+      minimum-idle: 60
+      idle-timeout: 540000
 
 logging:
    level:
