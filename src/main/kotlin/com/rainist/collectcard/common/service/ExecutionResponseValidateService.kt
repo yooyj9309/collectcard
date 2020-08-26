@@ -69,14 +69,8 @@ class ExecutionResponseValidateService(private val apiLogRepository: ApiLogRepos
             .With("banksaladUserId", banksaladUserId)
             .With("organizationId", organizationId)
             .With("executionRequestId", executionRequestId)
-            .Error("[COLLECT][Service] " +
-                    "banksaladUserId: {}\n" +
-                    "organizationId: {}\n" +
-                    "executionRequestId: {}\n" +
-                    "message: {}",
-                banksaladUserId,
+            .Error("[COLLECT][Service] organizationId: {}, message: {}",
                 organizationId,
-                executionRequestId,
                 message
             )
     }

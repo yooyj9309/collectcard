@@ -29,8 +29,8 @@ class ValidationEventListener : ValidationListener {
     companion object : Log
 
     override fun callBack(`object`: Any?, validationMsg: String) {
-        logger.error("Validation Error EventListener Msg {} , {}", `object` ?: "", validationMsg)
-        logger.withFieldError("Validation Error EventListener Object", `object` ?: "")
-        logger.withFieldError("Validation Error EventListener Msg", validationMsg)
+        logger
+            .With("ValidationError", validationMsg)
+            .Error("Validation Error EventListener Msg {}", validationMsg)
     }
 }

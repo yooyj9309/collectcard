@@ -63,8 +63,7 @@ data class CardTransaction(
 
     var canceledAmount: BigDecimal? = null, //  20. 취소금액
 
-    @field:NotEmpty
-    var approvalNumber: String? = null, //  21. 승인번호
+    var approvalNumber: String? = null, //  21. 승인번호 ( 무승인 존재 )
 
     @field:StringDateFormat(pattern = "yyyyMMdd")
     var approvalDay: String? = null, //  22. 승인일자
