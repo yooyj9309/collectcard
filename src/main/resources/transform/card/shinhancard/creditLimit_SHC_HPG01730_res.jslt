@@ -3,6 +3,7 @@ let resultCodes = {
     "0004": "OK",
     "503": "EXTERNAL_SERVER_ERROR",
     "0002": "EXTERNAL_SERVER_ERROR",
+    "0013": "EXTERNAL_SERVER_ERROR",
     "9999": "EXTERNAL_SERVER_ERROR"
 }
 
