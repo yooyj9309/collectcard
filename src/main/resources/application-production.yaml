@@ -13,7 +13,7 @@ spring:
       ddl-auto: validate
   datasource:
     url: jdbc:mysql://prod-collectcard-cluster.cluster-cejbmksulyv2.ap-northeast-2.rds.amazonaws.com:3306/collectcard?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: org.mariadb.jdbc.Driver
     username: collectcard_was
     password: ${PRODUCTION_COLLECTCARD_DB_PASSWORD}
     hikari:
@@ -23,6 +23,7 @@ spring:
       max-lifetime: 600000
       minimum-idle: 60
       idle-timeout: 540000
+    type: com.zaxxer.hikari.HikariDataSource
 
 logging:
    level:

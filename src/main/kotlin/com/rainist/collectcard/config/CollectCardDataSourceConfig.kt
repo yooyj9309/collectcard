@@ -1,3 +1,4 @@
+/*
 package com.rainist.collectcard.config
 
 import com.zaxxer.hikari.HikariDataSource
@@ -67,3 +68,4 @@ class CollectCardDataSourceConfig {
         return props
     }
 }
+*/
