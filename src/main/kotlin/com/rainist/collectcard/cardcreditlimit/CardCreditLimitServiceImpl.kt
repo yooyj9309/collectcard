@@ -6,8 +6,9 @@ import com.rainist.collect.executor.CollectExecutorService
 import com.rainist.collectcard.cardcreditlimit.dto.CardCreditLimitRequestDataBody
 import com.rainist.collectcard.cardcreditlimit.dto.CardCreditLimitRequestDataHeader
 import com.rainist.collectcard.cardcreditlimit.dto.CreditLimitRequest
-import com.rainist.collectcard.cardcreditlimit.dto.CreditLimitResponse
+import com.rainist.collectcard.cardcreditlimit.dto.CreditLimitResponse as CreditLimitResponse
 import com.rainist.collectcard.cardcreditlimit.util.CreditLimitEntityUtil
+import com.rainist.collectcard.cardcreditlimit.validation.CreditLimitResponseValidator
 import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
@@ -16,11 +17,11 @@ import com.rainist.collectcard.common.db.entity.CreditLimitEntity
 import com.rainist.collectcard.common.db.repository.CreditLimitHistoryRepository
 import com.rainist.collectcard.common.db.repository.CreditLimitRepository
 import com.rainist.collectcard.common.dto.CollectExecutionContext
-import com.rainist.collectcard.common.exception.CollectcardException
 import com.rainist.collectcard.common.service.ExecutionResponseValidateService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.common.log.Log
+import com.rainist.common.model.ObjectOf
 import com.rainist.common.util.DateTimeUtil
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -32,7 +33,8 @@ class CardCreditLimitServiceImpl(
     val executionResponseValidateService: ExecutionResponseValidateService,
     val collectExecutorService: CollectExecutorService,
     val creditLimitRepository: CreditLimitRepository,
-    val creditLimitHistoryRepository: CreditLimitHistoryRepository
+    val creditLimitHistoryRepository: CreditLimitHistoryRepository,
+    val creditLimitResponseValidator: CreditLimitResponseValidator
 ) : CardCreditLimitService {
 
     companion object : Log
@@ -61,33 +63,30 @@ class CardCreditLimitServiceImpl(
                 .build()
         )
 
-        // validate
-        // TODO : DataBody 가 null이면 throw 하는 이유 파악
-        if (executionResponse.response?.dataBody == null || executionResponse.response?.dataBody?.creditLimitInfo == null)
-            throw CollectcardException("DataBody is null")
+        // validate and db insert
+        if (creditLimitResponseValidator.isValid(ObjectOf(executionResponse.response))) {
+            var creditLimitEntity = creditLimitRepository.findCreditLimitEntitiesByBanksaladUserIdAndCardCompanyId(
+                banksaladUserId,
+                executionContext.organizationId
+            ) ?: CreditLimitEntity()
 
-        // db insert
-        var creditLimitEntity = creditLimitRepository.findCreditLimitEntitiesByBanksaladUserIdAndCardCompanyId(
-            banksaladUserId,
-            executionContext.organizationId
-        ) ?: CreditLimitEntity()
-
-        val resEntity = CreditLimitEntityUtil.makeCreditLimitEntity(
-            now,
-            banksaladUserId,
-            executionContext.organizationId,
-            executionResponse.response?.dataBody?.creditLimitInfo
-        )
-
-        if (CreditLimitEntityUtil.isUpdated(creditLimitEntity, resEntity)) {
-            // update
-            CreditLimitEntityUtil.copyCreditLimitEntity(now, resEntity, creditLimitEntity)
-            creditLimitEntity = creditLimitRepository.save(creditLimitEntity)
-            creditLimitHistoryRepository.save(
-                CreditLimitEntityUtil.makeCreditLimitHistoryEntity(creditLimitEntity)
+            val resEntity = CreditLimitEntityUtil.makeCreditLimitEntity(
+                now,
+                banksaladUserId,
+                executionContext.organizationId,
+                executionResponse.response?.dataBody?.creditLimitInfo
             )
-        } else {
-            creditLimitEntity.lastCheckAt = now
+
+            if (CreditLimitEntityUtil.isUpdated(creditLimitEntity, resEntity)) {
+                // update
+                CreditLimitEntityUtil.copyCreditLimitEntity(now, resEntity, creditLimitEntity)
+                creditLimitEntity = creditLimitRepository.save(creditLimitEntity)
+                creditLimitHistoryRepository.save(
+                    CreditLimitEntityUtil.makeCreditLimitHistoryEntity(creditLimitEntity)
+                )
+            } else {
+                creditLimitEntity.lastCheckAt = now
+            }
         }
 
         /* check response result */
@@ -100,6 +99,6 @@ class CardCreditLimitServiceImpl(
         }
 
         // return
-        return executionResponse.response
+        return executionResponse.response ?: CreditLimitResponse()
     }
 }

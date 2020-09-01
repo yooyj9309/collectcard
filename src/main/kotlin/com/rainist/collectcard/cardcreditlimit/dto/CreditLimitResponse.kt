@@ -1,12 +1,11 @@
 package com.rainist.collectcard.cardcreditlimit.dto
 
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
-import com.rainist.collectcard.card.CardsException
 import com.rainist.collectcard.common.enums.ResultCode
 
 data class CreditLimitResponse(
-    var dataHeader: CreditLimitResponseDataHeader?,
-    var dataBody: CreditLimitResponseDataBody?
+    var dataHeader: CreditLimitResponseDataHeader? = null,
+    var dataBody: CreditLimitResponseDataBody? = null
 )
 
 data class CreditLimitResponseDataHeader(
@@ -57,7 +56,7 @@ fun CreditLimitResponse.toCreditLimitResponseProto(): CollectcardProto.GetCredit
 
         return getCreditLimitResponseBuilder.build()
     }
-    ?: throw CardsException("DataBody data is null, resultCode : ${dataHeader?.resultCode}, resultMessage : ${dataHeader?.resultMessage}")
+    ?: return CollectcardProto.GetCreditLimitResponse.newBuilder().build()
 }
 
 private fun makeLimitStatusProtoResponse(limit: Limit?): CollectcardProto.LimitStatus {

@@ -46,4 +46,8 @@ data class Limit(
             BigDecimal.ZERO == (remainedAmount ?: BigDecimal.ZERO) &&
             BigDecimal.ZERO == (usedAmount ?: BigDecimal.ZERO)
     }
+
+    fun allDataIsNull(): Boolean {
+        return (totalLimitAmount == null) && (remainedAmount == null) && (usedAmount == null)
+    }
 }

@@ -75,25 +75,25 @@ class CreditLimitEntityUtil {
             return CreditLimitEntity().apply {
                 this.banksaladUserId = banksaladUserId
                 this.cardCompanyId = cardCompanyId
-                this.onetimePaymentLimitAmount = creditLimit?.onetimePaymentLimit?.totalLimitAmount ?: BigDecimal(0)
-                this.creditCardLimitTotalAmount = creditLimit?.creditCardLimit?.totalLimitAmount ?: BigDecimal(0)
-                this.creditCardLimitUsedAmount = creditLimit?.creditCardLimit?.usedAmount ?: BigDecimal(0)
-                this.creditCardLimitRemainingAmount = creditLimit?.creditCardLimit?.remainedAmount ?: BigDecimal(0)
-                this.cashAdvanceLimitTotalAmount = creditLimit?.cashServiceLimit?.totalLimitAmount ?: BigDecimal(0)
-                this.cashAdvanceLimitUsedAmount = creditLimit?.cashServiceLimit?.usedAmount ?: BigDecimal(0)
-                this.cashAdvanceLimitRemainingAmount = creditLimit?.cashServiceLimit?.remainedAmount ?: BigDecimal(0)
-                this.overseaLimitTotalAmount = creditLimit?.overseaLimit?.totalLimitAmount ?: BigDecimal(0)
-                this.overseaLimitUsedAmount = creditLimit?.overseaLimit?.usedAmount ?: BigDecimal(0)
-                this.overseaLimitRemainingAmount = creditLimit?.overseaLimit?.remainedAmount ?: BigDecimal(0)
-                this.loanLimitTotalAmount = creditLimit?.loanLimit?.totalLimitAmount ?: BigDecimal(0)
-                this.loanLimitRemainingAmount = creditLimit?.loanLimit?.remainedAmount ?: BigDecimal(0)
-                this.loanLimitUsedAmount = creditLimit?.loanLimit?.usedAmount ?: BigDecimal(0)
-                this.cardLoanLimitTotalAmount = creditLimit?.cardLoanLimit?.totalLimitAmount ?: BigDecimal(0)
-                this.cardLoanLimitUsedAmount = creditLimit?.cardLoanLimit?.usedAmount ?: BigDecimal(0)
-                this.cardLoanLimitRemainingAmount = creditLimit?.cardLoanLimit?.remainedAmount ?: BigDecimal(0)
-                this.debitCardTotalAmount = creditLimit?.debitCardLimit?.totalLimitAmount ?: BigDecimal(0)
-                this.debitCardUsedAmount = creditLimit?.debitCardLimit?.usedAmount ?: BigDecimal(0)
-                this.debitCardRemainingAmount = creditLimit?.debitCardLimit?.remainedAmount ?: BigDecimal(0)
+                this.onetimePaymentLimitAmount = getNonNullBigDecimal(creditLimit?.onetimePaymentLimit?.totalLimitAmount)
+                this.creditCardLimitTotalAmount = getNonNullBigDecimal(creditLimit?.creditCardLimit?.totalLimitAmount)
+                this.creditCardLimitUsedAmount = getNonNullBigDecimal(creditLimit?.creditCardLimit?.usedAmount)
+                this.creditCardLimitRemainingAmount = getNonNullBigDecimal(creditLimit?.creditCardLimit?.remainedAmount)
+                this.cashAdvanceLimitTotalAmount = getNonNullBigDecimal(creditLimit?.cashServiceLimit?.totalLimitAmount)
+                this.cashAdvanceLimitUsedAmount = getNonNullBigDecimal(creditLimit?.cashServiceLimit?.usedAmount)
+                this.cashAdvanceLimitRemainingAmount = getNonNullBigDecimal(creditLimit?.cashServiceLimit?.remainedAmount)
+                this.overseaLimitTotalAmount = getNonNullBigDecimal(creditLimit?.overseaLimit?.totalLimitAmount)
+                this.overseaLimitUsedAmount = getNonNullBigDecimal(creditLimit?.overseaLimit?.usedAmount)
+                this.overseaLimitRemainingAmount = getNonNullBigDecimal(creditLimit?.overseaLimit?.remainedAmount)
+                this.loanLimitTotalAmount = getNonNullBigDecimal(creditLimit?.loanLimit?.totalLimitAmount)
+                this.loanLimitRemainingAmount = getNonNullBigDecimal(creditLimit?.loanLimit?.remainedAmount)
+                this.loanLimitUsedAmount = getNonNullBigDecimal(creditLimit?.loanLimit?.usedAmount)
+                this.cardLoanLimitTotalAmount = getNonNullBigDecimal(creditLimit?.cardLoanLimit?.totalLimitAmount)
+                this.cardLoanLimitUsedAmount = getNonNullBigDecimal(creditLimit?.cardLoanLimit?.usedAmount)
+                this.cardLoanLimitRemainingAmount = getNonNullBigDecimal(creditLimit?.cardLoanLimit?.remainedAmount)
+                this.debitCardTotalAmount = getNonNullBigDecimal(creditLimit?.debitCardLimit?.totalLimitAmount)
+                this.debitCardUsedAmount = getNonNullBigDecimal(creditLimit?.debitCardLimit?.usedAmount)
+                this.debitCardRemainingAmount = getNonNullBigDecimal(creditLimit?.debitCardLimit?.remainedAmount)
                 this.lastCheckAt = lastCheckAt
             }
         }
@@ -124,6 +124,10 @@ class CreditLimitEntityUtil {
                 this.debitCardUsedAmount = creditLimitEntity.debitCardUsedAmount
                 this.debitCardRemainingAmount = creditLimitEntity.debitCardRemainingAmount
             }
+        }
+
+        private fun getNonNullBigDecimal(value: BigDecimal?): BigDecimal {
+            return value?.setScale(4) ?: BigDecimal(0).setScale(4)
         }
     }
 }

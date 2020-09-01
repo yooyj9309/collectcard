@@ -1,0 +1,26 @@
+{
+  "dataHeader":{
+    "successCode":"0",
+    "resultCode":"0013",
+    "reqKey":null,
+    "resultMessage":"한도조회 시 오류가 발생하였습니다. 문제가 지속될시에는 고객센터(☎1544-7000) 으로 연락하시기 바랍니다."
+  },
+  "dataBody":{
+    "csavRmnAmt":"",
+    "installmentRmnAmt":"",
+    "pbfTotalAmt":"",
+    "inLumpUseAmt":"",
+    "uTotAmt":"",
+    "rAllAmt":"",
+    "xTotAmt":"",
+    "rCashAmt":"",
+    "pbfRestAmt":"",
+    "inLumpRmnAmt":"",
+    "rInsAmt":"",
+    "installmentUseAmt":"",
+    "resCd":"0013",
+    "rTotAmt":"",
+    "pbfUsedAmt":"",
+    "csavUseAmt":""
+  }
+}

@@ -1,5 +1,7 @@
 package com.rainist.collectcard.cardcreditlimit
 
+import com.rainist.collect.common.api.Api
+import com.rainist.collectcard.cardcreditlimit.dto.toCreditLimitResponseProto
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
 import com.rainist.collectcard.common.db.repository.CreditLimitHistoryRepository
 import com.rainist.collectcard.common.db.repository.CreditLimitRepository
@@ -48,8 +50,6 @@ class CardCreditLimitServiceTest {
 
     @Test
     fun cardCreditLimitTest() {
-        setupServer()
-
         val executionContext: CollectExecutionContext = CollectExecutionContext(
             executionRequestId = UUID.randomUUID().toString(),
             organizationId = "shinhancard",
@@ -57,14 +57,12 @@ class CardCreditLimitServiceTest {
             startAt = DateTimeUtil.utcNowLocalDateTime()
         )
 
-        given(headerService.makeHeader(executionContext.userId, executionContext.organizationId))
-            .willReturn(
-                mutableMapOf(
-                    "contentType" to MediaType.APPLICATION_JSON_VALUE,
-                    "authorization" to "Bearer 123",
-                    "clientId" to "596d66692c4069c168b57c59"
-                )
-            )
+        setserver(
+            MockRestServiceServer.bindTo(commonRestTemplate).ignoreExpectOrder(true).build(),
+            ShinhancardApis.card_shinhancard_credit_limit,
+            "classpath:mock/shinhancard/creditlimit/card_credit_limit_expected_1.json",
+            executionContext
+        )
 
         val creditLimit = cardCreditLimitService.cardCreditLimit(executionContext)
         Assert.assertEquals(
@@ -79,6 +77,12 @@ class CardCreditLimitServiceTest {
         Assert.assertEquals(listCreditLimitHistoryEntity.size, 1)
         Assert.assertEquals(listCreditLimitEntity[0].onetimePaymentLimitAmount, BigDecimal("10000000.00"))
 
+        setserver(
+            MockRestServiceServer.bindTo(commonRestTemplate).ignoreExpectOrder(true).build(),
+            ShinhancardApis.card_shinhancard_credit_limit,
+            "classpath:mock/shinhancard/creditlimit/card_credit_limit_expected_2.json",
+            executionContext
+        )
         val creditLimit2 = cardCreditLimitService.cardCreditLimit(executionContext)
         Assert.assertEquals(
             creditLimit2.dataBody?.creditLimitInfo?.onetimePaymentLimit?.totalLimitAmount,
@@ -93,24 +97,42 @@ class CardCreditLimitServiceTest {
         Assert.assertEquals(listCreditLimitEntity[0].onetimePaymentLimitAmount, BigDecimal("7100000.00"))
     }
 
-    fun setupServer() {
-        val creditLimitAPI = ShinhancardApis.card_shinhancard_credit_limit
-        val server = MockRestServiceServer.bindTo(commonRestTemplate).ignoreExpectOrder(true).build()
+    @Test
+    fun cardCreditLimitTest_0013() {
+        val executionContext: CollectExecutionContext = CollectExecutionContext(
+            executionRequestId = UUID.randomUUID().toString(),
+            organizationId = "shinhancard",
+            userId = "2",
+            startAt = DateTimeUtil.utcNowLocalDateTime()
+        )
 
-        server.expect(ExpectedCount.once(), MockRestRequestMatchers.requestTo(creditLimitAPI.endpoint))
-            .andExpect(MockRestRequestMatchers.method(HttpMethod.valueOf(creditLimitAPI.method.name)))
-            .andRespond(
-                MockRestResponseCreators.withStatus(HttpStatus.OK)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/shinhancard/creditlimit/card_credit_limit_expected_1.json"))
+        setserver(
+            MockRestServiceServer.bindTo(commonRestTemplate).ignoreExpectOrder(true).build(),
+            ShinhancardApis.card_shinhancard_credit_limit,
+            "classpath:mock/shinhancard/creditlimit/card_credit_limit_expected_3.json",
+            executionContext
+        )
+
+        val creditLimit = cardCreditLimitService.cardCreditLimit(executionContext).toCreditLimitResponseProto()
+        Assert.assertEquals(com.github.rainist.idl.apis.v1.collectcard.CollectcardProto.CreditLimit.getDefaultInstance(), creditLimit.data)
+    }
+
+    fun setserver(server: MockRestServiceServer, api: Api, filePath: String, executionContext: CollectExecutionContext) {
+        given(headerService.makeHeader(executionContext.userId, executionContext.organizationId))
+            .willReturn(
+                mutableMapOf(
+                    "contentType" to MediaType.APPLICATION_JSON_VALUE,
+                    "authorization" to "Bearer 123",
+                    "clientId" to "596d66692c4069c168b57c59"
+                )
             )
 
-        server.expect(ExpectedCount.once(), MockRestRequestMatchers.requestTo(creditLimitAPI.endpoint))
-            .andExpect(MockRestRequestMatchers.method(HttpMethod.valueOf(creditLimitAPI.method.name)))
+        server.expect(ExpectedCount.once(), MockRestRequestMatchers.requestTo(api.endpoint))
+            .andExpect(MockRestRequestMatchers.method(HttpMethod.valueOf(api.method.name)))
             .andRespond(
                 MockRestResponseCreators.withStatus(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/shinhancard/creditlimit/card_credit_limit_expected_2.json"))
+                    .body(readText(filePath))
             )
     }
 
