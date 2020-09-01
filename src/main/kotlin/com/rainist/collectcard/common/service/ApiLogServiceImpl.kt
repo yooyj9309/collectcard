@@ -99,8 +99,7 @@ class ApiLogServiceImpl(
     }
 
     fun parseResultCodeAndMessage(json: String?): Pair<String, String> {
-        return json.let {
-
+        return if (! json.isNullOrBlank()) {
             val resultCode = try {
                 JsonPath.parse(json).read("\$.dataHeader.resultCode", String::class.java)
             } catch (e: PathNotFoundException) {
@@ -114,6 +113,8 @@ class ApiLogServiceImpl(
             }
 
             Pair(resultCode, resultMessage)
+        } else {
+            Pair("", "")
         }
     }
 }
