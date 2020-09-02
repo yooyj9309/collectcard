@@ -126,7 +126,7 @@ class CardLoanServiceImpl(
         }
 
         return ListLoansResponse().apply {
-            this.dataBody = executionResponse.response.dataBody
+            this.dataBody = executionResponse.response?.dataBody
         }
     }
 }

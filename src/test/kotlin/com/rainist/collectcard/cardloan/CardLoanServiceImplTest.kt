@@ -1,5 +1,6 @@
 package com.rainist.collectcard.cardloan
 
+import com.rainist.collect.common.api.Api
 import com.rainist.collectcard.cardloans.CardLoanService
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
 import com.rainist.collectcard.common.db.repository.CardLoanHistoryRepository
@@ -24,7 +25,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.client.ExpectedCount
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers
-import org.springframework.test.web.client.match.MockRestRequestMatchers.content
 import org.springframework.test.web.client.response.MockRestResponseCreators
 import org.springframework.util.ResourceUtils
 import org.springframework.web.client.RestTemplate
@@ -55,13 +55,24 @@ class CardLoanServiceImplTest {
      */
     @Test
     fun cardLoanTest() {
-        setupServer()
-
-        val executionContext = requestSetting()
+        val server = MockRestServiceServer.bindTo(commonRestTemplate).ignoreExpectOrder(true).build()
+        setserver(
+            server,
+            ShinhancardApis.card_shinhancard_loan_info,
+            "classpath:mock/shinhancard/loan/card_loan_expected_1.json"
+        )
+        setserver(
+            server,
+            ShinhancardApis.card_shinhancard_loan_detail,
+            "classpath:mock/shinhancard/loan/card_loan_expected_1_detail_1.json",
+            "classpath:mock/shinhancard/loan/card_loan_expected_1_detail_2.json"
+        )
+        val banksaladUserId = "1"
+        val executionContext = requestSetting(banksaladUserId)
 
         val loans = cardLoanService.listCardLoans(executionContext)
-        val listLoan = cardLoanRepository.findAll()
-        val listLoanHistory = cardLoanHistoryRepository.findAll()
+        val listLoan = cardLoanRepository.findAll().filter { it.banksaladUserId == banksaladUserId.toLong() }
+        val listLoanHistory = cardLoanHistoryRepository.findAll().filter { it.banksaladUserId == banksaladUserId.toLong() }
         assertEquals(loans.dataBody?.loans?.size, 2)
         assertEquals(loans.dataBody?.loans?.get(0)?.loanName, "스피드론플러스")
         assertEquals(loans.dataBody?.loans?.get(0)?.loanAmount, BigDecimal(3000000))
@@ -79,13 +90,24 @@ class CardLoanServiceImplTest {
      */
     @Test
     fun cardLoanTest2() {
-        setupServer()
-
-        val syncRequest = requestSetting()
+        val server = MockRestServiceServer.bindTo(commonRestTemplate).ignoreExpectOrder(true).build()
+        setserver(
+            server,
+            ShinhancardApis.card_shinhancard_loan_info,
+            "classpath:mock/shinhancard/loan/card_loan_expected_1.json"
+        )
+        setserver(
+            server,
+            ShinhancardApis.card_shinhancard_loan_detail,
+            "classpath:mock/shinhancard/loan/card_loan_expected_1_detail_1.json",
+            "classpath:mock/shinhancard/loan/card_loan_expected_1_detail_2.json"
+        )
+        val banksaladUserId = "1"
+        val syncRequest = requestSetting(banksaladUserId)
 
         val loans = cardLoanService.listCardLoans(syncRequest)
-        val listLoan = cardLoanRepository.findAll()
-        val listLoanHistory = cardLoanHistoryRepository.findAll()
+        val listLoan = cardLoanRepository.findAll().filter { it.banksaladUserId == banksaladUserId.toLong() }
+        val listLoanHistory = cardLoanHistoryRepository.findAll().filter { it.banksaladUserId == banksaladUserId.toLong() }
 
         // 단순 재조회 , history가 쌓이면 안됀다.
         assertEquals(listLoan.size, 2)
@@ -99,13 +121,26 @@ class CardLoanServiceImplTest {
      */
     @Test
     fun cardLoanTest3() {
-        setupServerPaging()
-
-        val syncRequest = requestSetting()
+        val server = MockRestServiceServer.bindTo(commonRestTemplate).ignoreExpectOrder(true).build()
+        setserver(
+            server,
+            ShinhancardApis.card_shinhancard_loan_info,
+            "classpath:mock/shinhancard/loan/card_loan_expected_2_p1.json",
+            "classpath:mock/shinhancard/loan/card_loan_expected_2_p2.json"
+        )
+        setserver(
+            server,
+            ShinhancardApis.card_shinhancard_loan_detail,
+            "classpath:mock/shinhancard/loan/card_loan_expected_2_detail_1.json",
+            "classpath:mock/shinhancard/loan/card_loan_expected_2_detail_2.json",
+            "classpath:mock/shinhancard/loan/card_loan_expected_2_detail_3.json"
+        )
+        val banksaladUserId = "1"
+        val syncRequest = requestSetting(banksaladUserId)
 
         val loans = cardLoanService.listCardLoans(syncRequest)
-        val listLoan = cardLoanRepository.findAll()
-        val listLoanHistory = cardLoanHistoryRepository.findAll()
+        val listLoan = cardLoanRepository.findAll().filter { it.banksaladUserId == banksaladUserId.toLong() }
+        val listLoanHistory = cardLoanHistoryRepository.findAll().filter { it.banksaladUserId == banksaladUserId.toLong() }
 
         // 대출 한개 추가, 한개 변경. == history 2개 추가. 대출 1개 추가.
         assertEquals(listLoan.size, 3)
@@ -113,97 +148,84 @@ class CardLoanServiceImplTest {
         assertEquals(loans.dataBody?.loans?.get(1)?.remainingAmount, BigDecimal("4000000"))
     }
 
-    fun setupServer() {
-        val loanInfoAPI = ShinhancardApis.card_shinhancard_loan_info
-        val loanDetailAPI = ShinhancardApis.card_shinhancard_loan_detail
+    // 1depth에서 에러가 난 경우
+    @Test
+    fun cardLoanTest4_exceptionResponse() {
         val server = MockRestServiceServer.bindTo(commonRestTemplate).ignoreExpectOrder(true).build()
+        setserver(
+            server,
+            ShinhancardApis.card_shinhancard_loan_info,
+            "classpath:mock/shinhancard/loan/card_loan_503_error.json"
+        )
+        setserver(
+            server,
+            ShinhancardApis.card_shinhancard_loan_detail,
+            "classpath:mock/shinhancard/loan/card_loan_expected_1_detail_1.json",
+            "classpath:mock/shinhancard/loan/card_loan_expected_1_detail_2.json"
+        )
+        val banksaladUserId = "3"
 
-        server.expect(ExpectedCount.once(), MockRestRequestMatchers.requestTo(loanInfoAPI.endpoint))
-            .andExpect(MockRestRequestMatchers.method(HttpMethod.valueOf(loanInfoAPI.method.name)))
-            .andRespond(
-                MockRestResponseCreators.withStatus(HttpStatus.OK)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/shinhancard/loan/card_loan_expected_1.json"))
-            )
+        val syncRequest = requestSetting(banksaladUserId)
 
-        server.expect(ExpectedCount.once(), MockRestRequestMatchers.requestTo(loanDetailAPI.endpoint))
-            .andExpect(MockRestRequestMatchers.method(HttpMethod.valueOf(loanDetailAPI.method.name)))
-            .andExpect(content().string("{\"dataBody\":{\"loanNo\":\"0005\",\"cardLoanGbn\":\"1\"},\"dataHeader\":{\"EMPTY\":\"\"}}"))
-            .andRespond(
-                MockRestResponseCreators.withStatus(HttpStatus.OK)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/shinhancard/loan/card_loan_expected_1_detail_1.json"))
-            )
+        val loans = cardLoanService.listCardLoans(syncRequest)
+        val listLoan = cardLoanRepository.findAll().filter { it.banksaladUserId == banksaladUserId.toLong() }
+        val listLoanHistory = cardLoanHistoryRepository.findAll().filter { it.banksaladUserId == banksaladUserId.toLong() }
 
-        server.expect(ExpectedCount.once(), MockRestRequestMatchers.requestTo(loanDetailAPI.endpoint))
-            .andExpect(MockRestRequestMatchers.method(HttpMethod.valueOf(loanDetailAPI.method.name)))
-            .andExpect(content().string("{\"dataBody\":{\"loanNo\":\"0004\",\"cardLoanGbn\":\"1\"},\"dataHeader\":{\"EMPTY\":\"\"}}"))
-            .andRespond(
-                MockRestResponseCreators.withStatus(HttpStatus.OK)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/shinhancard/loan/card_loan_expected_1_detail_2.json"))
-            )
+        // 1depth 호출 에러. -> 전체 에러
+        assertEquals(0, listLoan.size)
+        assertEquals(0, listLoanHistory.size)
     }
 
-    fun setupServerPaging() {
-        val loanInfoAPI = ShinhancardApis.card_shinhancard_loan_info
-        val loanDetailAPI = ShinhancardApis.card_shinhancard_loan_detail
+    // 2depth 내용중 한개가 에러가 난 경우
+    @Test
+    fun cardLoanTest5_then_exceptionResponse() {
         val server = MockRestServiceServer.bindTo(commonRestTemplate).ignoreExpectOrder(true).build()
+        setserver(
+            server,
+            ShinhancardApis.card_shinhancard_loan_info,
+            "classpath:mock/shinhancard/loan/card_loan_expected_1.json"
+        )
+        setserver(
+            server,
+            ShinhancardApis.card_shinhancard_loan_detail,
+            "classpath:mock/shinhancard/loan/card_loan_expected_1_detail_1.json",
+            "classpath:mock/shinhancard/loan/card_loan_503_error.json"
+        )
+        val banksaladUserId = "2"
 
-        server.expect(ExpectedCount.once(), MockRestRequestMatchers.requestTo(loanInfoAPI.endpoint))
-            .andExpect(MockRestRequestMatchers.method(HttpMethod.valueOf(loanInfoAPI.method.name)))
-            .andRespond(
-                MockRestResponseCreators.withStatus(HttpStatus.OK)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/shinhancard/loan/card_loan_expected_2_p1.json"))
-            )
+        val syncRequest = requestSetting(banksaladUserId)
 
-        server.expect(ExpectedCount.once(), MockRestRequestMatchers.requestTo(loanInfoAPI.endpoint))
-            .andExpect(MockRestRequestMatchers.method(HttpMethod.valueOf(loanInfoAPI.method.name)))
-            .andRespond(
-                MockRestResponseCreators.withStatus(HttpStatus.OK)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/shinhancard/loan/card_loan_expected_2_p2.json"))
-            )
+        val loans = cardLoanService.listCardLoans(syncRequest)
+        val listLoan = cardLoanRepository.findAll().filter { it.banksaladUserId == banksaladUserId.toLong() }
+        val listLoanHistory = cardLoanHistoryRepository.findAll().filter { it.banksaladUserId == banksaladUserId.toLong() }
 
-        server.expect(ExpectedCount.once(), MockRestRequestMatchers.requestTo(loanDetailAPI.endpoint))
-            .andExpect(MockRestRequestMatchers.method(HttpMethod.valueOf(loanDetailAPI.method.name)))
-            .andExpect(content().string("{\"dataBody\":{\"loanNo\":\"0005\",\"cardLoanGbn\":\"1\"},\"dataHeader\":{\"EMPTY\":\"\"}}"))
-            .andRespond(
-                MockRestResponseCreators.withStatus(HttpStatus.OK)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/shinhancard/loan/card_loan_expected_2_detail_1.json"))
-            )
+        // 2depth 한개 에러
+        assertEquals(1, listLoan.size)
+        assertEquals(1, listLoanHistory.size)
+        assertEquals(BigDecimal("3000000"), loans.dataBody?.loans?.get(0)?.remainingAmount)
+    }
 
-        server.expect(ExpectedCount.once(), MockRestRequestMatchers.requestTo(loanDetailAPI.endpoint))
-            .andExpect(MockRestRequestMatchers.method(HttpMethod.valueOf(loanDetailAPI.method.name)))
-            .andExpect(content().string("{\"dataBody\":{\"loanNo\":\"0004\",\"cardLoanGbn\":\"1\"},\"dataHeader\":{\"EMPTY\":\"\"}}"))
-            .andRespond(
-                MockRestResponseCreators.withStatus(HttpStatus.OK)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/shinhancard/loan/card_loan_expected_2_detail_2.json"))
-            )
-
-        server.expect(ExpectedCount.once(), MockRestRequestMatchers.requestTo(loanDetailAPI.endpoint))
-            .andExpect(MockRestRequestMatchers.method(HttpMethod.valueOf(loanDetailAPI.method.name)))
-            .andExpect(content().string("{\"dataBody\":{\"loanNo\":\"0006\",\"cardLoanGbn\":\"1\"},\"dataHeader\":{\"EMPTY\":\"\"}}"))
-            .andRespond(
-                MockRestResponseCreators.withStatus(HttpStatus.OK)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(readText("classpath:mock/shinhancard/loan/card_loan_expected_2_detail_3.json"))
-            )
+    fun setserver(server: MockRestServiceServer, api: Api, vararg filePathList: String) {
+        filePathList.forEach {
+            server.expect(ExpectedCount.once(), MockRestRequestMatchers.requestTo(api.endpoint))
+                .andExpect(MockRestRequestMatchers.method(HttpMethod.valueOf(api.method.name)))
+                .andRespond(
+                    MockRestResponseCreators.withStatus(HttpStatus.OK)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(readText(it))
+                )
+        }
     }
 
     private fun readText(fileInClassPath: String): String {
         return ResourceUtils.getFile(fileInClassPath).readText(Charsets.UTF_8)
     }
 
-    private fun requestSetting(): CollectExecutionContext {
-
+    private fun requestSetting(banksaladUserId: String): CollectExecutionContext {
         val executionContext: CollectExecutionContext = CollectExecutionContext(
             executionRequestId = UUID.randomUUID().toString(),
             organizationId = "shinhancard",
-            userId = "1",
+            userId = banksaladUserId,
             startAt = DateTimeUtil.utcNowLocalDateTime()
         )
 

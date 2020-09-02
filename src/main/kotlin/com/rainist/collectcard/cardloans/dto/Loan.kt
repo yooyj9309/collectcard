@@ -3,11 +3,14 @@ package com.rainist.collectcard.cardloans.dto
 import com.rainist.collectcard.common.enums.CardLoanRepaymentMethod
 import com.rainist.collectcard.common.enums.CardLoanStatus
 import com.rainist.collectcard.common.enums.ResultCode
+import com.rainist.common.annotation.validation.StringDateFormat
 import java.math.BigDecimal
 import javax.validation.constraints.NotEmpty
+import org.springframework.format.annotation.NumberFormat
 
 data class Loan(
 
+    @field:NotEmpty
     var loanId: String? = null, // 대출 id
 
     @field:NotEmpty
@@ -15,7 +18,7 @@ data class Loan(
 
     var loanName: String? = null, // 상품명
 
-    // @NumberFormat(style = NumberFormat.Style.NUMBER)
+    @field:NumberFormat(style = NumberFormat.Style.NUMBER)
     var loanAmount: BigDecimal? = null, // 대출금액
 
     // @NumberFormat(style = NumberFormat.Style.NUMBER)
@@ -28,7 +31,7 @@ data class Loan(
     // @field:StringDateFormat("yyyyMMdd")
     var issuedDay: String? = null, // 신규일 (개설일)
 
-    // @field:StringDateFormat("yyyyMMdd")
+    @field:StringDateFormat("yyyyMMdd")
     var expirationDay: String? = null, // 만기일
 
     var loanStatus: CardLoanStatus = CardLoanStatus.CardLOAN_STATUS_UNKNOWN, // 상태 (미납, 완납)

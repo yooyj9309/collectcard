@@ -109,7 +109,7 @@ fun CardLoanEntity.makeCardLoanEntity(
     this.lastCheckAt = lastCheckAt ?: DateTimeUtil.utcNowLocalDateTime()
     this.loanName = loan.loanName ?: ""
     this.paymentBankId = loan.paymentBankId
-    this.expirationDay = loan.expirationDay
+    this.expirationDay = loan.expirationDay ?: ""
     this.loanStatus = loan.loanStatus.name
     this.loanStatusOrigin = loan.loanStatusOrigin
     this.paymentAccountNumber = loan.paymentAccountNumber

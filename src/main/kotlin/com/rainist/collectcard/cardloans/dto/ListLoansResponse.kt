@@ -3,9 +3,7 @@ package com.rainist.collectcard.cardloans.dto
 import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
 import com.google.protobuf.StringValue
 import com.rainist.collectcard.common.enums.ResultCode
-import com.rainist.common.exception.ValidationException
 import com.rainist.common.util.DateTimeUtil
-import org.apache.commons.lang3.StringUtils
 
 data class ListLoansResponse(
     var resultCodes: MutableList<ResultCode> = mutableListOf(),
@@ -33,15 +31,15 @@ fun ListLoansResponse.toListCardLoansResponseProto(): CollectcardProto.ListCardL
             loanBuilder.name = loan.loanName
             loanBuilder.currency = "KRW"
 
-            loan.loanAmount?.let { loanBuilder.principal = loan.loanAmount?.toInt() ?: throw ValidationException("대출 금액이 없습니다") }
-            loan.remainingAmount?.let { loanBuilder.latestBalance = loan.remainingAmount?.toInt() ?: throw ValidationException("대출 잔액이 없습니다") }
-            loan.interestRate?.let { loanBuilder.interestRate = loan.interestRate?.toDouble() ?: throw ValidationException("이자율이 없습니다") }
+            loan.loanAmount?.let { loanBuilder.principal = it.toInt() }
+            loan.remainingAmount?.let { loanBuilder.latestBalance = it.toInt() }
+            loan.interestRate?.let { loanBuilder.interestRate = it.toDouble() }
 
-            if (!StringUtils.isEmpty(loan.issuedDay)) {
+            if (!loan.issuedDay.isNullOrBlank()) {
                 val issuedDate = DateTimeUtil.stringToLocalDate(loan.issuedDay!!, "yyyyMMdd")
                 loanBuilder.createdAt = StringValue.of(DateTimeUtil.localDateToString(issuedDate, "yyyy-MM-dd"))
             }
-            if (!StringUtils.isEmpty(loan.expirationDay)) {
+            if (!loan.expirationDay.isNullOrBlank()) {
                 val expiredDate = DateTimeUtil.stringToLocalDate(loan.expirationDay!!, "yyyyMMdd")
                 loanBuilder.expiredAt = StringValue.of(DateTimeUtil.localDateToString(expiredDate, "yyyy-MM-dd"))
             }
