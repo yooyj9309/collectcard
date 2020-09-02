@@ -22,6 +22,7 @@ import com.rainist.collectcard.common.service.ExecutionResponseValidateService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.common.log.Log
+import com.rainist.common.service.ValidationService
 import com.rainist.common.util.DateTimeUtil
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -33,7 +34,8 @@ class CardLoanServiceImpl(
     val executionResponseValidateService: ExecutionResponseValidateService,
     val collectExecutorService: CollectExecutorService,
     val cardLoanRepository: CardLoanRepository,
-    val cardLoanHistoryRepository: CardLoanHistoryRepository
+    val cardLoanHistoryRepository: CardLoanHistoryRepository,
+    val validationService: ValidationService
 ) : CardLoanService {
 
     companion object : Log
@@ -62,8 +64,14 @@ class CardLoanServiceImpl(
                 .build()
         )
 
+        val loans = executionResponse.response?.dataBody?.loans
+            ?.mapNotNull { validationService.validateOrNull(it) }
+            ?.toMutableList()
+
+        executionResponse.response?.dataBody?.loans = loans
+
         /* db insert */
-        executionResponse.response?.dataBody?.loans?.filter { it.loanId != null }?.forEach { loan ->
+        executionResponse.response?.dataBody?.loans?.forEach { loan ->
             loan.loanId?.let {
                 cardLoanRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyLoanId(
                     banksaladUserId,
