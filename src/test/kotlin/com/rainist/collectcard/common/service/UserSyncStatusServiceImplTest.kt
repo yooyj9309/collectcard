@@ -1,6 +1,7 @@
 package com.rainist.collectcard.common.service
 
 import com.rainist.collectcard.common.db.repository.UserSyncStatusRepository
+import com.rainist.collectcard.common.dto.CollectExecutionContext
 import java.time.ZoneOffset
 import org.junit.Assert
 import org.junit.jupiter.api.DisplayName
@@ -88,5 +89,42 @@ internal class UserSyncStatusServiceImplTest {
         lastCheckAtFromDB =
             userSyncStatusService.getUserSyncStatusLastCheckAt(banksaladUserId, organizationId, transactionId)
         Assert.assertEquals(lastCheckAt, lastCheckAtFromDB)
+    }
+
+    @Test
+    fun updateUserSyncStatus_updateByUserIdAndCompanyId() {
+        val banksaladUserId = 4.toLong()
+        val organizationId = "shinhancard"
+        val organizationId_kb = "kbcard"
+        val executionContext = CollectExecutionContext("", banksaladUserId.toString(), organizationId_kb)
+
+        userSyncStatusService.updateUserSyncStatus(banksaladUserId, organizationId, "cards", System.currentTimeMillis())
+        userSyncStatusService.updateUserSyncStatus(banksaladUserId, organizationId_kb, "cards", System.currentTimeMillis())
+
+        var userSyncStatus = userSyncStatusRepository.findAll().filter { it.banksaladUserId == banksaladUserId && it.isDeleted == false }
+        Assert.assertEquals(2, userSyncStatus.size)
+
+        userSyncStatusService.updateDeleteFlagByUserIdAndCompanyId(executionContext)
+
+        userSyncStatus = userSyncStatusRepository.findAll().filter { it.banksaladUserId == banksaladUserId && it.isDeleted == false }
+        Assert.assertEquals(1, userSyncStatus.size)
+        Assert.assertEquals(organizationId, userSyncStatus[0].organizationId)
+    }
+
+    @Test
+    fun updateUserSyncStatus_updateByUserId() {
+        val banksaladUserId = 5.toLong()
+        val organizationId = "shinhancard"
+        val organizationId_kb = "kbcard"
+
+        userSyncStatusService.updateUserSyncStatus(banksaladUserId, organizationId, "cards", System.currentTimeMillis())
+        userSyncStatusService.updateUserSyncStatus(banksaladUserId, organizationId_kb, "cards", System.currentTimeMillis())
+
+        var userSyncStatus = userSyncStatusRepository.findAll().filter { it.banksaladUserId == banksaladUserId && it.isDeleted == false }
+        Assert.assertEquals(2, userSyncStatus.size)
+
+        userSyncStatusService.updateDeleteFlagByUserId(banksaladUserId)
+        userSyncStatus = userSyncStatusRepository.findAll().filter { it.banksaladUserId == banksaladUserId && it.isDeleted == false }
+        Assert.assertEquals(0, userSyncStatus.size)
     }
 }

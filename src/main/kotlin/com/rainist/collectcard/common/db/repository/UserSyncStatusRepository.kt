@@ -25,14 +25,14 @@ interface UserSyncStatusRepository : JpaRepository<UserSyncStatusEntity, Long> {
     ): List<UserSyncStatusEntity>?
 
     @Modifying(clearAutomatically = true)
-    @Query("update UserSyncStatusEntity t set t.isDeleted = true where t.banksaladUserId = ?1 and t.organizationId = ?2")
+    @Query("update UserSyncStatusEntity t set t.isDeleted = true where t.banksaladUserId = ?1 and t.organizationId = ?2 and t.isDeleted = false")
     fun updateIsDeletedByBanksaladUserIdAndOrganizationId(
         banksaladUserId: Long,
         organizationId: String
     )
 
     @Modifying(clearAutomatically = true)
-    @Query("update UserSyncStatusEntity t set t.isDeleted = true where t.banksaladUserId = ?1")
+    @Query("update UserSyncStatusEntity t set t.isDeleted = true where t.banksaladUserId = ?1 and t.isDeleted = false")
     fun updateIsDeletedByBanksaladUserId(
         banksaladUserId: Long
     )
