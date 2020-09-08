@@ -20,9 +20,7 @@ spring:
       maximum-pool-size: 20
       connection-timeout: 5000
       validation-timeout: 4000
-      max-lifetime: 60000
-      minimum-idle: 10
-      idle-timeout: 54000
+      max-lifetime: 600000
     type: com.zaxxer.hikari.HikariDataSource
 
 logging:
