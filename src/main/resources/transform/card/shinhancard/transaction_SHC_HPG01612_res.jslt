@@ -35,7 +35,7 @@ let CardTransactionType = {
                 "storeName" : .retlname,                                                // 가맹점명
                 "paymentDay": .stldate,                                                 // 결제예정일자
                 "storeNumber": .retlno,                                                 // 가맹점번호
-                "canceledAmount": if(number(replace(.aprvamt, ",", "")) > 0) "0" else string(-1 * number(replace(.aprvamt, ",", ""))),  // 부분취소 금액
+                "canceledAmount": if(number(replace(.aprvamt, ",", "")) > 0) "0" else string(-1 * number(replace(.aprvamt, ",", ""))),  // 취소 금액
                 "storeCategory" : .ryCd,                                                // 업종코드명
                 "currencyCode" : .engcrcycd,                                            // 통화코드
                 "transactionCountry" : .nation,                                         // 사용국가

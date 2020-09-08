@@ -43,7 +43,7 @@ let CardType = {
                 "storeName" : .retlname,                                                // 가맹점명
                 "paymentDay": .settlday,                                                // 결제일자
                 "storeNumber": .retlno,                                                 // 가맹점번호
-                "canceledAmount": if(.status == "" or .status == "1") "0" else .aprvamt,// 부분취소 금액
+                "canceledAmount": if(.status == "" or .status == "1") "0" else .aprvamt,// 취소 금액
                 "storeCategory" : .ryCd,                                                // 업종코드명
                 "cardType" : "DEBIT",
                 "currencyCode" : "KRW",

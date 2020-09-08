@@ -14,6 +14,7 @@ import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.common.util.DateTimeUtil
+import java.math.BigDecimal
 import java.util.UUID
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -27,11 +28,13 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.test.annotation.Rollback
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.client.ExpectedCount
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers
 import org.springframework.test.web.client.response.MockRestResponseCreators
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.ResourceUtils
 import org.springframework.web.client.RestTemplate
 
@@ -158,6 +161,47 @@ class CardTransactionServiceTest {
         assertEquals(sourceEntity.isInstallmentPayment, targetEntity?.isInstallmentPayment)
     }
 
+    @Test
+    @DisplayName("카드 취소 내역 테스트")
+    @Transactional
+    @Rollback
+    fun cancelTransactionTest() {
+        setupServerCancelAmount()
+
+        val executionContext = requestSetting()
+        userSyncStatusService.updateUserSyncStatus(
+            executionContext.userId.toLong(),
+            executionContext.organizationId,
+            Transaction.cardTransaction.name,
+            DateTimeUtil.utcLocalDateTimeToEpochMilliSecond()
+        )
+
+        val transactions = cardTransactionService.listTransactions(executionContext)
+        val entities = cardTransactionRepository.findAll()
+
+        assertEquals(9, transactions.dataBody?.transactions?.size)
+        assertEquals(9, entities.size)
+
+        entities.forEach {
+            assertNotNull(it.amount)
+        }
+
+        val cancelEntity = cardTransactionRepository
+            .findByApprovalYearMonthAndBanksaladUserIdAndAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
+                "202009",
+                1,
+                "shinhancard",
+                "",
+                "46835685",
+                "20200904",
+                "203315"
+            )
+
+        assertNotNull(cancelEntity)
+        assertNotNull(cancelEntity?.canceledAmount)
+        assertEquals(cancelEntity?.canceledAmount?.setScale(4), BigDecimal.valueOf(12800).setScale(4))
+    }
+
     fun setupServerPaging() {
         val creditDomesticAPI = ShinhancardApis.card_shinhancard_credit_domestic_transactions
         val creditOverseaAPI = ShinhancardApis.card_shinhancard_credit_oversea_transactions
@@ -236,6 +280,17 @@ class CardTransactionServiceTest {
             server,
             checkOverseaAPI,
             "classpath:mock/shinhancard/transaction/card_transaction_expected_1_check_oversea_updated.json"
+        )
+    }
+
+    private fun setupServerCancelAmount() {
+        val creditDomesticAPI = ShinhancardApis.card_shinhancard_credit_domestic_transactions
+        val server = MockRestServiceServer.bindTo(commonRestTemplate).ignoreExpectOrder(true).build()
+
+        settingOnceMockServiceServer(
+            server,
+            creditDomesticAPI,
+            "classpath:mock/shinhancard/transaction/card_transaction_expected_cancelamount_1_credit_domestic_p1.json"
         )
     }
 

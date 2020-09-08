@@ -19,6 +19,12 @@ class CardTransactionUtil {
                 this.cardName = cardTransaction.cardName
                 this.cardNumber = cardTransaction.cardNumber?.replace("-", "")?.trim()
                 this.cardNumberMask = cardTransaction.cardNumberMask
+                this.amount = cardTransaction.amount
+                this.canceledAmount = cardTransaction.canceledAmount
+                this.partialCanceledAmount = cardTransaction.partialCanceledAmount
+                this.tax = cardTransaction.tax
+                this.serviceChargeAmount = cardTransaction.serviceChargeAmount
+                this.netSalesAmount = cardTransaction.netSalesAmount
                 this.businessLicenseNumber = cardTransaction.businessLicenseNumber
                 this.storeName = cardTransaction.storeName
                 this.storeNumber = cardTransaction.storeNumber

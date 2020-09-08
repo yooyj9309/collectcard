@@ -1,5 +1,6 @@
 package com.rainist.collectcard.common.db.entity
 
+import java.math.BigDecimal
 import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -46,6 +47,18 @@ data class CardTransactionEntity(
     var cardNumber: String? = null,
 
     var cardNumberMask: String? = null,
+
+    var amount: BigDecimal? = null, // 매출액 ( 거래금액 )
+
+    var canceledAmount: BigDecimal? = null, // 취소금액
+
+    var partialCanceledAmount: BigDecimal? = null, // 부분취소금액
+
+    var tax: BigDecimal? = null, // 부가세
+
+    var serviceChargeAmount: BigDecimal? = null, // 봉사료
+
+    var netSalesAmount: BigDecimal? = null, // 순매출액
 
     var businessLicenseNumber: String? = null,
 
