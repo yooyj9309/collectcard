@@ -29,7 +29,7 @@ let CardTransactionType = {
                 "approvalTime" : if(size(.aprvtime) >= 14) .aprvtime[ 8 : 14] else "",  // 승인시간 HHmmss
                 "cardCompanyCardId" : "",
                 "approvalNumber": .aprvno,                                              // 승인번호
-                "amount": replace(.aprvamt, ",", ""),                                   // 승인금액
+                "amount": if(number(replace(.aprvamt, ",", "")) > 0) string(number(replace(.aprvamt, ",", ""))) else string(-1 * number(replace(.aprvamt, ",", ""))), // 승인금액
                 "cardNumber": .cardno,                                                  // 카드번호
                 "cardNumberMask" : .cardno,                                             // 카드넘버마스크
                 "storeName" : .retlname,                                                // 가맹점명
