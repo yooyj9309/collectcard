@@ -28,7 +28,7 @@ let CardType = {
             {
                 "approvalDay" : if(size(.apvDt) >= 14) .apvDt[ 0 : 8 ] else "",   // 승인일자 yyyyMMdd
                 "approvalTime" : if(size(.apvDt) >= 14) .apvDt[ 8 : 14 ] else "", // 승인시간 HHmmss
-                "cardCompanyCardId" : ".crdN",
+                "cardCompanyCardId" : "",
                 "approvalNumber": .apvN,                                          // 승인번호
                 "amount": replace(.apva, ",", ""),                                // 승인금액
                 "cardNumber": .crdN,                                              // 카드번호
