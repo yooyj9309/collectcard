@@ -39,6 +39,7 @@ class ShinhancardLoanExecution {
                 master.expirationDay = detail.expirationDay
                 master.interestRate = detail.interestRate
                 master.repaymentMethod = detail.repaymentMethod
+                master.repaymentMethodOrigin = detail.repaymentMethodOrigin
                 master.remainingAmount = detail.remainingAmount
             }
 
