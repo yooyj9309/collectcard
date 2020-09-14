@@ -1,0 +1,74 @@
+{
+  "dataHeader":{
+    "successCode":"0",
+    "resultCode":"0010",
+    "reqKey":null,
+    "resultMessage":"다음 조회건이 존재 합니다."
+  },
+  "dataBody":{
+    "nxtQyKey":"20200813;20200814;0069K0G612571",
+    "grp001":[
+      {
+        "crdPdNm":"아시아나 Air 1.5",
+        "feeBll":"000000000000000",
+        "pntChk":"",
+        "mchtNm":"구글페이먼트코리아",
+        "pointRate":"00000",
+        "fullPaymentFlag":"N",
+        "prnTxn":"000000000008690",
+        "crdN":"5155-****-****-8753",
+        "prnBll":"000000000008690",
+        "date":"20200813"
+      },
+      {
+        "crdPdNm":"아시아나 Air 1.5",
+        "feeBll":"000000000000000",
+        "pntChk":"",
+        "mchtNm":"SSG.COM",
+        "pointRate":"00010",
+        "fullPaymentFlag":"A",
+        "prnTxn":"000000000228780",
+        "crdN":"5155-****-****-8753",
+        "prnBll":"000000000217341",
+        "date":"20200820"
+      },
+      {
+        "crdPdNm":"아시아나 Air 1.5",
+        "feeBll":"000000000000000",
+        "pntChk":"",
+        "mchtNm":"한우왕",
+        "pointRate":"00000",
+        "fullPaymentFlag":"N",
+        "prnTxn":"000000000006000",
+        "crdN":"5155-****-****-8753",
+        "prnBll":"000000000006000",
+        "date":"20200826"
+      },
+      {
+        "crdPdNm":"아시아나 Air 1.5",
+        "feeBll":"000000000000000",
+        "pntChk":"",
+        "mchtNm":"과자점 진심",
+        "pointRate":"00000",
+        "fullPaymentFlag":"N",
+        "prnTxn":"000000000005500",
+        "crdN":"5155-****-****-8753",
+        "prnBll":"000000000005500",
+        "date":"20200826"
+      },
+      {
+        "crdPdNm":"아시아나 Air 1.5",
+        "feeBll":"000000000000000",
+        "pntChk":"",
+        "mchtNm":"(주)우아한형제들",
+        "pointRate":"00000",
+        "fullPaymentFlag":"N",
+        "prnTxn":"000000000039900",
+        "crdN":"5155-****-****-8753",
+        "prnBll":"000000000039900",
+        "date":"20200829"
+      }
+    ],
+    "resCd":"0004"
+  }
+}
