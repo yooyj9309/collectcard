@@ -111,7 +111,7 @@ class MockExecutions {
                 .to(Loan::class.java)
                 .build()
 
-        // 신용 한도조회
+        // 신용 한도조회 (SHC_HPG01730)
         val shinhancardCreditLimit =
             Execution.create()
                 .exchange(ShinhancardApis.card_shinhancard_credit_limit)
