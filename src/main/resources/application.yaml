@@ -29,8 +29,7 @@ management:
         publish-unchanged-meters: true
 
 connect-server:
-  host: connect
-  port: 8080
+  target: dns:///connect-headless:18081
 
 shinhancard:
   clientId: ${DEVELOPMENT_SHINHANCARD_CLIENT_ID}

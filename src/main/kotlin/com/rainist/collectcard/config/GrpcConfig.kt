@@ -18,18 +18,16 @@ import org.springframework.context.annotation.DependsOn
 @Configuration
 @DependsOn("nettyPidSetting")
 class GrpcConfig(
-    @Value("\${connect-server.host}")
-    private var connectHost: String,
-    @Value("\${connect-server.port}")
-    private var connectPort: Int
+    @Value("\${connect-server.target}")
+    private var connectTarget: String
 ) {
 
     companion object : Log
 
     @Bean
     fun connectChannel(): ManagedChannel {
-        logger.withFieldInfo(Pair("connect channel", "host : $connectHost, port : $connectPort"))
-        return ManagedChannelBuilder.forAddress(connectHost, connectPort)
+        return ManagedChannelBuilder.forTarget(connectTarget)
+            .defaultLoadBalancingPolicy("round_robin")
             .usePlaintext()
             .build()
     }
