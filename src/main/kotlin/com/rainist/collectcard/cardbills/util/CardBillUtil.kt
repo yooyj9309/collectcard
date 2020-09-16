@@ -67,7 +67,7 @@ class CardBillUtil {
                 this.approvalNumber = cardBillTransaction.approvalNumber ?: ""
                 this.approvalDay = cardBillTransaction.approvalDay ?: ""
                 this.approvalTime = cardBillTransaction.approvalTime ?: ""
-                this.pointsToEarn = cardBillTransaction.pointsToEarn
+                this.pointsToEarn = cardBillTransaction.pointsToEarn?.setScale(4)
                 this.isOverseaUse = cardBillTransaction.isOverseaUse ?: false
                 this.paymentDay = cardBillTransaction.paymentDay ?: ""
                 this.storeCategory = cardBillTransaction.storeCategory
@@ -117,7 +117,7 @@ class CardBillUtil {
                 this.approvalNumber = scheduledPayment.approvalNumber ?: ""
                 this.approvalDay = scheduledPayment.approvalDay ?: ""
                 this.approvalTime = scheduledPayment.approvalTime ?: ""
-                this.pointsToEarn = scheduledPayment.pointsToEarn
+                this.pointsToEarn = scheduledPayment.pointsToEarn?.setScale(4)
                 this.isOverseaUse = scheduledPayment.isOverseaUse ?: false
                 this.paymentDay = scheduledPayment.paymentDay
                 this.storeCategory = scheduledPayment.storeCategory
@@ -130,7 +130,7 @@ class CardBillUtil {
                 this.remainingAmount = scheduledPayment.remainingAmount?.setScale(4)
                 this.isPaidFull = scheduledPayment.isPaidFull
                 this.cashbackAmount = scheduledPayment.cashback?.setScale(4)
-                this.pointsRate = scheduledPayment.pointsRate
+                this.pointsRate = scheduledPayment.pointsRate?.setScale(4)
                 this.lastCheckAt = now
             }
         }

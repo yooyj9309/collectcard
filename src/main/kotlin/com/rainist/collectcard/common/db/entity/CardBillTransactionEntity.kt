@@ -110,6 +110,7 @@ data class CardBillTransactionEntity(
     @Column(nullable = false)
     var approvalTime: String? = null,
 
+    @Column(precision = 17, scale = 4)
     var pointsToEarn: BigDecimal? = null,
 
     @Column(nullable = false)
