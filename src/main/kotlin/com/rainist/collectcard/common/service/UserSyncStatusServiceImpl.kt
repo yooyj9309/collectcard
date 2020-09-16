@@ -74,7 +74,7 @@ class UserSyncStatusServiceImpl(
         lastCheckAt: Long,
         isAllResponseOK: Boolean
     ) {
-        val checkAt = if (isAllResponseOK) { lastCheckAt } else { 0 }
+        val checkAt = if (isAllResponseOK) { lastCheckAt } else { 1000 }
         UserSyncStatusEntity().apply {
             this.banksaladUserId = banksaladUserId
             this.organizationId = organizationId

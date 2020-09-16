@@ -145,6 +145,6 @@ internal class UserSyncStatusServiceImplTest {
             false
         )
 
-        Assert.assertEquals(0L, userSyncStatusEntity?.lastCheckAt?.toInstant(ZoneOffset.UTC)?.toEpochMilli())
+        Assert.assertEquals(1000L, userSyncStatusEntity?.lastCheckAt?.toInstant(ZoneOffset.UTC)?.toEpochMilli())
     }
 }
