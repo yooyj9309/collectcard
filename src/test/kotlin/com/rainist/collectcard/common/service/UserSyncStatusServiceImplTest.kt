@@ -23,16 +23,16 @@ internal class UserSyncStatusServiceImplTest {
     lateinit var userSyncStatusService: UserSyncStatusService
 
     @Test
-    fun updateUserSyncStatus_insert_transaction() {
+    fun upsertUserSyncStatus_insert_transaction() {
         val banksaladUserId = 1.toLong()
         val organizationId = "shinhancard"
         val transactionId = "cards"
 
         val lastCheckAt = System.currentTimeMillis()
 
-        userSyncStatusService.updateUserSyncStatus(banksaladUserId, organizationId, transactionId, lastCheckAt)
+        userSyncStatusService.upsertUserSyncStatus(banksaladUserId, organizationId, transactionId, lastCheckAt, true)
 
-        var userSyncStatusEntity = userSyncStatusRepository.findByBanksaladUserIdAndOrganizationIdAndTransactionIdAndIsDeleted(
+        val userSyncStatusEntity = userSyncStatusRepository.findByBanksaladUserIdAndOrganizationIdAndTransactionIdAndIsDeleted(
             banksaladUserId,
             organizationId,
             transactionId,
@@ -43,13 +43,13 @@ internal class UserSyncStatusServiceImplTest {
     }
 
     @Test
-    fun updateUserSyncStatus_update_transaction() {
+    fun upsertUserSyncStatus_update_transaction() {
         val banksaladUserId = 2.toLong()
         val organizationId = "shinhancard"
         val transactionId = "cards"
 
         val lastCheckAt = System.currentTimeMillis()
-        userSyncStatusService.updateUserSyncStatus(banksaladUserId, organizationId, transactionId, lastCheckAt)
+        userSyncStatusService.upsertUserSyncStatus(banksaladUserId, organizationId, transactionId, lastCheckAt, true)
 
         var userSyncStatusEntity = userSyncStatusRepository.findByBanksaladUserIdAndOrganizationIdAndTransactionIdAndIsDeleted(
             banksaladUserId,
@@ -61,7 +61,7 @@ internal class UserSyncStatusServiceImplTest {
         Assert.assertEquals(lastCheckAt, userSyncStatusEntity?.lastCheckAt?.toInstant(ZoneOffset.UTC)?.toEpochMilli())
 
         val lastCheckAt2 = System.currentTimeMillis() + 1000
-        userSyncStatusService.updateUserSyncStatus(banksaladUserId, organizationId, transactionId, lastCheckAt2)
+        userSyncStatusService.upsertUserSyncStatus(banksaladUserId, organizationId, transactionId, lastCheckAt2, true)
 
         userSyncStatusEntity = userSyncStatusRepository.findByBanksaladUserIdAndOrganizationIdAndTransactionIdAndIsDeleted(
             banksaladUserId,
@@ -83,8 +83,8 @@ internal class UserSyncStatusServiceImplTest {
             userSyncStatusService.getUserSyncStatusLastCheckAt(banksaladUserId, organizationId, transactionId)
         Assert.assertEquals(null, lastCheckAtFromDB)
 
-        var lastCheckAt = System.currentTimeMillis()
-        userSyncStatusService.updateUserSyncStatus(banksaladUserId, organizationId, transactionId, lastCheckAt)
+        val lastCheckAt = System.currentTimeMillis()
+        userSyncStatusService.upsertUserSyncStatus(banksaladUserId, organizationId, transactionId, lastCheckAt, true)
 
         lastCheckAtFromDB =
             userSyncStatusService.getUserSyncStatusLastCheckAt(banksaladUserId, organizationId, transactionId)
@@ -92,14 +92,14 @@ internal class UserSyncStatusServiceImplTest {
     }
 
     @Test
-    fun updateUserSyncStatus_updateByUserIdAndCompanyId() {
+    fun upsertUserSyncStatus_updateByUserIdAndCompanyId() {
         val banksaladUserId = 4.toLong()
         val organizationId = "shinhancard"
         val organizationId_kb = "kbcard"
         val executionContext = CollectExecutionContext("", banksaladUserId.toString(), organizationId_kb)
 
-        userSyncStatusService.updateUserSyncStatus(banksaladUserId, organizationId, "cards", System.currentTimeMillis())
-        userSyncStatusService.updateUserSyncStatus(banksaladUserId, organizationId_kb, "cards", System.currentTimeMillis())
+        userSyncStatusService.upsertUserSyncStatus(banksaladUserId, organizationId, "cards", System.currentTimeMillis(), true)
+        userSyncStatusService.upsertUserSyncStatus(banksaladUserId, organizationId_kb, "cards", System.currentTimeMillis(), true)
 
         var userSyncStatus = userSyncStatusRepository.findAll().filter { it.banksaladUserId == banksaladUserId && it.isDeleted == false }
         Assert.assertEquals(2, userSyncStatus.size)
@@ -112,13 +112,13 @@ internal class UserSyncStatusServiceImplTest {
     }
 
     @Test
-    fun updateUserSyncStatus_updateByUserId() {
+    fun upsertUserSyncStatus_updateByUserId() {
         val banksaladUserId = 5.toLong()
         val organizationId = "shinhancard"
         val organizationId_kb = "kbcard"
 
-        userSyncStatusService.updateUserSyncStatus(banksaladUserId, organizationId, "cards", System.currentTimeMillis())
-        userSyncStatusService.updateUserSyncStatus(banksaladUserId, organizationId_kb, "cards", System.currentTimeMillis())
+        userSyncStatusService.upsertUserSyncStatus(banksaladUserId, organizationId, "cards", System.currentTimeMillis(), true)
+        userSyncStatusService.upsertUserSyncStatus(banksaladUserId, organizationId_kb, "cards", System.currentTimeMillis(), true)
 
         var userSyncStatus = userSyncStatusRepository.findAll().filter { it.banksaladUserId == banksaladUserId && it.isDeleted == false }
         Assert.assertEquals(2, userSyncStatus.size)
@@ -126,5 +126,25 @@ internal class UserSyncStatusServiceImplTest {
         userSyncStatusService.updateDeleteFlagByUserId(banksaladUserId)
         userSyncStatus = userSyncStatusRepository.findAll().filter { it.banksaladUserId == banksaladUserId && it.isDeleted == false }
         Assert.assertEquals(0, userSyncStatus.size)
+    }
+
+    @Test
+    fun upsertUserSyncStatus_hasNotOKResponse() {
+        val banksaladUserId = 1.toLong()
+        val organizationId = "shinhancard"
+        val transactionId = "cards"
+
+        val lastCheckAt = System.currentTimeMillis()
+
+        userSyncStatusService.upsertUserSyncStatus(banksaladUserId, organizationId, transactionId, lastCheckAt, false)
+
+        val userSyncStatusEntity = userSyncStatusRepository.findByBanksaladUserIdAndOrganizationIdAndTransactionIdAndIsDeleted(
+            banksaladUserId,
+            organizationId,
+            transactionId,
+            false
+        )
+
+        Assert.assertEquals(0L, userSyncStatusEntity?.lastCheckAt?.toInstant(ZoneOffset.UTC)?.toEpochMilli())
     }
 }

@@ -116,14 +116,13 @@ class CardLoanServiceImpl(
                 }
         }
 
-        /* check response result */
-        if (executionResponseValidateService.validate(executionContext, executionResponse)) {
-            userSyncStatusService.updateUserSyncStatus(
-                banksaladUserId,
-                executionContext.organizationId,
-                Transaction.loan.name,
-                DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now))
-        }
+        userSyncStatusService.upsertUserSyncStatus(
+            banksaladUserId,
+            executionContext.organizationId,
+            Transaction.loan.name,
+            DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now),
+            executionResponseValidateService.validate(executionContext, executionResponse)
+        )
 
         return ListLoansResponse().apply {
             this.dataBody = executionResponse.response?.dataBody

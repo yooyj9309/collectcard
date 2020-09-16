@@ -39,28 +39,49 @@ class UserSyncStatusServiceImpl(
         return userSyncStatusEntity?.lastCheckAt?.toInstant(ZoneOffset.UTC)?.toEpochMilli()
     }
 
-    override fun updateUserSyncStatus(
+    override fun upsertUserSyncStatus(
         banksaladUserId: Long,
         organizationId: String,
         transactionId: String,
-        lastCheckAt: Long
+        lastCheckAt: Long,
+        isAllResponseOK: Boolean
     ) {
         /* user_sync_status 조회 없으면 생성 */
-        var userSyncStatusEntity = userSyncStatusRepository.findByBanksaladUserIdAndOrganizationIdAndTransactionIdAndIsDeleted(
+        val userSyncStatusEntity = userSyncStatusRepository.findByBanksaladUserIdAndOrganizationIdAndTransactionIdAndIsDeleted(
             banksaladUserId,
             organizationId,
             transactionId,
             false
-        ) ?: UserSyncStatusEntity().apply {
+        )
+        if (userSyncStatusEntity == null) {
+            insertUserSyncStatus(
+                banksaladUserId, organizationId, transactionId, lastCheckAt, isAllResponseOK
+            )
+            return
+        }
+
+        if (isAllResponseOK) {
+            userSyncStatusEntity.apply {
+                this.lastCheckAt = LocalDateTime.ofInstant(Instant.ofEpochMilli(lastCheckAt), ZoneId.of(ZONE_ID_UTC))
+            }.let { userSyncStatusRepository.save(it) }
+        }
+    }
+
+    private fun insertUserSyncStatus(
+        banksaladUserId: Long,
+        organizationId: String,
+        transactionId: String,
+        lastCheckAt: Long,
+        isAllResponseOK: Boolean
+    ) {
+        val checkAt = if (isAllResponseOK) { lastCheckAt } else { 0 }
+        UserSyncStatusEntity().apply {
             this.banksaladUserId = banksaladUserId
             this.organizationId = organizationId
             this.transactionId = transactionId
+            this.lastCheckAt = LocalDateTime.ofInstant(Instant.ofEpochMilli(checkAt), ZoneId.of(ZONE_ID_UTC))
             this.isDeleted = false
-        }
-
-        /* last_check_at 업데이트 */
-        userSyncStatusEntity.lastCheckAt = LocalDateTime.ofInstant(Instant.ofEpochMilli(lastCheckAt), ZoneId.of(ZONE_ID_UTC))
-        userSyncStatusRepository.save(userSyncStatusEntity)
+        }.let { userSyncStatusRepository.save(it) }
     }
 
     override fun getUserSyncStatus(executionContext: CollectExecutionContext): UserSyncStatusResponse {

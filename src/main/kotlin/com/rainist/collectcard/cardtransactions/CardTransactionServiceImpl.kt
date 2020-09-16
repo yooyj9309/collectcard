@@ -80,13 +80,14 @@ class CardTransactionServiceImpl(
             }
         }
 
-        logger.With("banksaladUserId", executionContext.userId).With("startAt", request.dataBody?.startAt ?: "startAtNull").Warn("")
+        logger.With("banksaladUserId", executionContext.userId).With("startAt", request.dataBody?.startAt
+            ?: "startAtNull").Warn("")
 
         val executionResponses = getListTransactionsByDivision(executionContext, header, request)
 
         val transactions = executionResponses.flatMap {
-                it.response?.dataBody?.transactions ?: mutableListOf()
-            }
+            it.response?.dataBody?.transactions ?: mutableListOf()
+        }
             .filter {
                 it.cardNumber?.length ?: 0 > 0 // 신한카드 처럼 list 갯수 맞추기 위해 공백으로 넣은 쓰레기 데이터 제거
             }
@@ -124,13 +125,13 @@ class CardTransactionServiceImpl(
             }
         }
 
-        if (executionResponseValidateService.validate(executionContext, executionResponses)) {
-                userSyncStatusService.updateUserSyncStatus(
-                banksaladUserId,
-                executionContext.organizationId,
-                Transaction.cardTransaction.name,
-                DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now))
-        }
+        userSyncStatusService.upsertUserSyncStatus(
+            banksaladUserId,
+            executionContext.organizationId,
+            Transaction.cardTransaction.name,
+            DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now),
+            executionResponseValidateService.validate(executionContext, executionResponses)
+        )
 
         return ListTransactionsResponse().apply {
             this.dataBody = ListTransactionsResponseDataBody().apply {
@@ -146,8 +147,8 @@ class CardTransactionServiceImpl(
     ): List<ExecutionResponse<ListTransactionsResponse>> {
 
         val searchDateList = let {
-                validationService.validateOrThrows(request.dataBody)
-            }
+            validationService.validateOrThrows(request.dataBody)
+        }
             ?.let { dataBody ->
                 val startDate = DateTimeUtil.stringToLocalDate(dataBody.startAt, "yyyyMMdd")
                 val endDate = DateTimeUtil.stringToLocalDate(dataBody.endAt, "yyyyMMdd")
@@ -171,25 +172,25 @@ class CardTransactionServiceImpl(
                     }
                 }
             }
-            .map {
-                async {
-                    val executionResponse: ExecutionResponse<ListTransactionsResponse> =
-                        collectExecutorService.execute(
-                            executionContext,
-                            Executions.valueOf(
-                                BusinessType.card,
-                                Organization.shinhancard,
-                                Transaction.cardTransaction
-                            ),
-                            ExecutionRequest.builder<ListTransactionsRequest>()
-                                .headers(header)
-                                .request(it)
-                                .build()
-                        )
+                .map {
+                    async {
+                        val executionResponse: ExecutionResponse<ListTransactionsResponse> =
+                            collectExecutorService.execute(
+                                executionContext,
+                                Executions.valueOf(
+                                    BusinessType.card,
+                                    Organization.shinhancard,
+                                    Transaction.cardTransaction
+                                ),
+                                ExecutionRequest.builder<ListTransactionsRequest>()
+                                    .headers(header)
+                                    .request(it)
+                                    .build()
+                            )
 
-                    executionResponse
+                        executionResponse
+                    }
                 }
-            }
         }.let {
             it.map { deferred ->
                 deferred.getCompleted()

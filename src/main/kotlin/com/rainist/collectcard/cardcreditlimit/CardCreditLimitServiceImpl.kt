@@ -6,7 +6,7 @@ import com.rainist.collect.executor.CollectExecutorService
 import com.rainist.collectcard.cardcreditlimit.dto.CardCreditLimitRequestDataBody
 import com.rainist.collectcard.cardcreditlimit.dto.CardCreditLimitRequestDataHeader
 import com.rainist.collectcard.cardcreditlimit.dto.CreditLimitRequest
-import com.rainist.collectcard.cardcreditlimit.dto.CreditLimitResponse as CreditLimitResponse
+import com.rainist.collectcard.cardcreditlimit.dto.CreditLimitResponse
 import com.rainist.collectcard.cardcreditlimit.util.CreditLimitEntityUtil
 import com.rainist.collectcard.cardcreditlimit.validation.CreditLimitResponseValidator
 import com.rainist.collectcard.common.collect.api.BusinessType
@@ -89,14 +89,13 @@ class CardCreditLimitServiceImpl(
             }
         }
 
-        /* check response result */
-        if (executionResponseValidateService.validate(executionContext, executionResponse)) {
-            userSyncStatusService.updateUserSyncStatus(
-                banksaladUserId,
-                executionContext.organizationId,
-                Transaction.creditLimit.name,
-                DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now))
-        }
+        userSyncStatusService.upsertUserSyncStatus(
+            banksaladUserId,
+            executionContext.organizationId,
+            Transaction.creditLimit.name,
+            DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now),
+            executionResponseValidateService.validate(executionContext, executionResponse)
+        )
 
         // return
         return executionResponse.response ?: CreditLimitResponse()

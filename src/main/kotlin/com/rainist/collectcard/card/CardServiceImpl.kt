@@ -36,6 +36,7 @@ class CardServiceImpl(
 ) : CardService {
 
     companion object : Log
+
     val cardMapper = Mappers.getMapper(CardMapper::class.java)
 
     override fun listCards(executionContext: CollectExecutionContext): ListCardsResponse {
@@ -79,14 +80,13 @@ class CardServiceImpl(
             upsertCardAndCardHistory(executionContext.userId.toLong(), card, now)
         }
 
-        /* check response result */
-        if (executionResponseValidateService.validate(executionContext, executionResponse)) {
-            userSyncStatusService.updateUserSyncStatus(
-                banksaladUserId,
-                executionContext.organizationId,
-                Transaction.cards.name,
-                DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now))
-        }
+        userSyncStatusService.upsertUserSyncStatus(
+            banksaladUserId,
+            executionContext.organizationId,
+            Transaction.cards.name,
+            DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now),
+            executionResponseValidateService.validate(executionContext, executionResponse)
+        )
 
         logger.info("CardService.listCards end: executionContext: {}", executionContext)
         return executionResponse.response

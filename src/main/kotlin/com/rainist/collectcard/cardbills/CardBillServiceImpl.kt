@@ -110,13 +110,13 @@ class CardBillServiceImpl(
             upsertCardBillAndTransactions(executionContext.userId.toLong(), executionContext.organizationId, cardBill, now)
         }
 
-        if (executionResponseValidateService.validate(executionContext, cardBillsExecutionResponse)) {
-            userSyncStatusService.updateUserSyncStatus(
-                executionContext.userId.toLong(),
-                executionContext.organizationId,
-                Transaction.cardbills.name,
-                DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now))
-        }
+        userSyncStatusService.upsertUserSyncStatus(
+            executionContext.userId.toLong(),
+            executionContext.organizationId,
+            Transaction.cardbills.name,
+            DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now),
+            executionResponseValidateService.validate(executionContext, cardBillsExecutionResponse)
+        )
 
         return cardBillsExecutionResponse.response
     }
@@ -149,16 +149,17 @@ class CardBillServiceImpl(
 
         // 결제 예정 내역 DB IO
         cardBillExpectedExecutionResponse.response.dataBody?.cardBills?.map {
-            deleteAndInsertCardBillExpectedTransactions(banksaladUserId, executionContext.organizationId, it.transactions ?: mutableListOf(), now)
+            deleteAndInsertCardBillExpectedTransactions(banksaladUserId, executionContext.organizationId, it.transactions
+                ?: mutableListOf(), now)
         }
 
-        if (executionResponseValidateService.validate(executionContext, cardBillExpectedExecutionResponse)) {
-            userSyncStatusService.updateUserSyncStatus(
-                banksaladUserId,
-                executionContext.organizationId,
-                Transaction.billTransactionExpected.name,
-                DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now))
-        }
+        userSyncStatusService.upsertUserSyncStatus(
+            banksaladUserId,
+            executionContext.organizationId,
+            Transaction.billTransactionExpected.name,
+            DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now),
+            executionResponseValidateService.validate(executionContext, cardBillExpectedExecutionResponse)
+        )
 
         return cardBillExpectedExecutionResponse.response
     }

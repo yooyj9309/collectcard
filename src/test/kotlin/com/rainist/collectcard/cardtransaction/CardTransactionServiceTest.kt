@@ -63,11 +63,12 @@ class CardTransactionServiceTest {
         // 최초 내역 조회 (페이징)
         setupServerPaging()
         val executionContext = requestSetting()
-        userSyncStatusService.updateUserSyncStatus(
+        userSyncStatusService.upsertUserSyncStatus(
             executionContext.userId.toLong(),
             executionContext.organizationId,
             Transaction.cardTransaction.name,
-            DateTimeUtil.utcLocalDateTimeToEpochMilliSecond()
+            DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(),
+            true
         )
 
         val transactions = cardTransactionService.listTransactions(executionContext)
@@ -83,11 +84,12 @@ class CardTransactionServiceTest {
         // 기존 내역 조회 (기존과 동일한 내용을 조회했을때, 변경이 있는지 테스트)
         setupServerPaging()
         val executionContext = requestSetting()
-        userSyncStatusService.updateUserSyncStatus(
+        userSyncStatusService.upsertUserSyncStatus(
             executionContext.userId.toLong(),
             executionContext.organizationId,
             Transaction.cardTransaction.name,
-            DateTimeUtil.utcLocalDateTimeToEpochMilliSecond()
+            DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(),
+            true
         )
 
         val transactions = cardTransactionService.listTransactions(executionContext)
@@ -103,11 +105,12 @@ class CardTransactionServiceTest {
         // 추가 내역 조회 (기존 로직 + 추가 로직, 그리고 조회 결과가 전부 신규인경우 테스트)
         setupServer_updated()
         val executionContext = requestSetting()
-        userSyncStatusService.updateUserSyncStatus(
+        userSyncStatusService.upsertUserSyncStatus(
             executionContext.userId.toLong(),
             executionContext.organizationId,
             Transaction.cardTransaction.name,
-            DateTimeUtil.utcLocalDateTimeToEpochMilliSecond()
+            DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(),
+            true
         )
 
         val transactions = cardTransactionService.listTransactions(executionContext)
@@ -169,11 +172,12 @@ class CardTransactionServiceTest {
         setupServerCancelAmount()
 
         val executionContext = requestSetting()
-        userSyncStatusService.updateUserSyncStatus(
+        userSyncStatusService.upsertUserSyncStatus(
             executionContext.userId.toLong(),
             executionContext.organizationId,
             Transaction.cardTransaction.name,
-            DateTimeUtil.utcLocalDateTimeToEpochMilliSecond()
+            DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(),
+            true
         )
 
         val transactions = cardTransactionService.listTransactions(executionContext)
