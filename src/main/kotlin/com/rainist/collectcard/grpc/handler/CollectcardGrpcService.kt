@@ -85,7 +85,6 @@ class CollectcardGrpcService(
         request: CollectcardProto.ListCardTransactionsRequest,
         responseObserver: StreamObserver<CollectcardProto.ListCardTransactionsResponse>
     ) {
-
         /* Execution Context */
         val executionContext: CollectExecutionContext = CollectExecutionContext(
             executionRequestId = generateExecutioRequestId(),
@@ -104,7 +103,6 @@ class CollectcardGrpcService(
             responseObserver.onNext(it)
             responseObserver.onCompleted()
         }.onFailure {
-//            logger.error("[사용자 카드 내역 조회 에러 : {}]", it.localizedMessage, it)
             CollectcardServiceExceptionHandler.handle(executionContext, "listCardTransactions", "사용자카드내역조회", it)
             responseObserver.onException(it)
         }

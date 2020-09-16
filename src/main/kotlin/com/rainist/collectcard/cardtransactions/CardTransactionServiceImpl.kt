@@ -50,7 +50,7 @@ class CardTransactionServiceImpl(
     companion object : Log
 
     @Value("\${shinhancard.organizationId}")
-    lateinit var shinhancardOrganizationId: String
+    private lateinit var shinhancardOrganizationId: String
 
     @Transactional
     override fun listTransactions(executionContext: CollectExecutionContext): ListTransactionsResponse {
@@ -64,18 +64,7 @@ class CardTransactionServiceImpl(
         val request = ListTransactionsRequest().apply {
             this.dataHeader = ListTransactionsRequestDataHeader()
             this.dataBody = ListTransactionsRequestDataBody().apply {
-                this.startAt = userSyncStatusService.getUserSyncStatusLastCheckAt(banksaladUserId, executionContext.organizationId, Transaction.cardTransaction.name)
-                    ?.let {
-                        val researchInterval = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).researchInterval
-                        DateTimeUtil.epochMilliSecondToKSTLocalDateTime(it).minusDays(researchInterval.toLong())
-                    }
-                    ?.let { localDateTime ->
-                        DateTimeUtil.localDateToString(LocalDate.of(localDateTime.year, localDateTime.month, localDateTime.dayOfMonth), "yyyyMMdd")
-                    }
-                    ?: kotlin.run {
-                        val maxMonth = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).maxMonth
-                        DateTimeUtil.localDateToString(DateTimeUtil.kstNowLocalDate().minusMonths(maxMonth.toLong()), "yyyyMMdd")
-                    }
+                this.startAt = getStartAt(executionContext)
                 this.endAt = DateTimeUtil.kstNowLocalDateString("yyyyMMdd")
             }
         }
@@ -146,18 +135,7 @@ class CardTransactionServiceImpl(
         request: ListTransactionsRequest
     ): List<ExecutionResponse<ListTransactionsResponse>> {
 
-        val searchDateList = let {
-            validationService.validateOrThrows(request.dataBody)
-        }
-            ?.let { dataBody ->
-                val startDate = DateTimeUtil.stringToLocalDate(dataBody.startAt, "yyyyMMdd")
-                val endDate = DateTimeUtil.stringToLocalDate(dataBody.endAt, "yyyyMMdd")
-                val division = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).division
-                DateTimeUtil.splitLocalDateRangeByMonth(startDate, endDate, division)
-            }
-            ?.toMutableList()
-            ?: mutableListOf()
-
+        val searchDateList = getSearchDateList(executionContext, request)
         logger.With("searchDateList", searchDateList).Warn("")
 
         return runBlocking(executor.asCoroutineDispatcher()) {
@@ -196,5 +174,47 @@ class CardTransactionServiceImpl(
                 deferred.getCompleted()
             }
         }
+    }
+
+    /**
+     * 거래내역 Async 범위 일자 생성
+     * @param 2020.01.01 ~ 2020.12.01
+     * @return [ [2020.01.01~2020.03.31],[2020.04.01~2020.08.31],[2020.09.01~2020.12.31] ]
+     */
+    fun getSearchDateList(executionContext: ExecutionContext, request: ListTransactionsRequest): MutableList<DateTimeUtil.LocalDateRange> {
+
+        return request.let { request ->
+            validationService.validateOrThrows(request.dataBody)
+        }
+        ?.let { dataBody ->
+            val startDate = DateTimeUtil.stringToLocalDate(dataBody.startAt, "yyyyMMdd")
+            val endDate = DateTimeUtil.stringToLocalDate(dataBody.endAt, "yyyyMMdd")
+            val division = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).division
+
+            DateTimeUtil.splitLocalDateRangeByMonth(startDate, endDate, division)
+        }
+        ?.toMutableList()
+        ?: mutableListOf()
+    }
+
+    /**
+     * 거래내역 조회 일자 생성
+     * Execution Context 에 조회 날짜가 있는 경우 researchInterval 을 사용
+     * 없는 경우 각 금융사별 MAX Month 로 생성
+     * @return yyyyMMdd (year month day)
+     */
+    fun getStartAt(executionContext: CollectExecutionContext): String {
+        return userSyncStatusService.getUserSyncStatusLastCheckAt(executionContext.userId.toLong(), executionContext.organizationId, Transaction.cardTransaction.name)
+            ?.let {
+                val researchInterval = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).researchInterval
+                DateTimeUtil.epochMilliSecondToKSTLocalDateTime(it).minusDays(researchInterval.toLong())
+            }
+            ?.let { localDateTime ->
+                DateTimeUtil.localDateToString(LocalDate.of(localDateTime.year, localDateTime.month, localDateTime.dayOfMonth), "yyyyMMdd")
+            }
+            ?: kotlin.run {
+                val maxMonth = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).maxMonth
+                DateTimeUtil.localDateToString(DateTimeUtil.kstNowLocalDate().minusMonths(maxMonth.toLong()), "yyyyMMdd")
+            }
     }
 }

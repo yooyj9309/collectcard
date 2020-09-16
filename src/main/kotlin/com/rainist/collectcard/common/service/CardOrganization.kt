@@ -14,8 +14,8 @@ data class CardOrganization(
     var researchInterval: Int = DEFAULT_RESEARCH_INTERVAL
 ) {
     companion object {
-        var DEFAULT_MAX_MONTH = 12
-        var DEFAULT_DIVISION = 3
-        var DEFAULT_RESEARCH_INTERVAL = 3
+        var DEFAULT_MAX_MONTH = 12 // 초기 조회 최대 범위
+        var DEFAULT_DIVISION = 3 // Async 분할 수
+        var DEFAULT_RESEARCH_INTERVAL = 3 // 재검색 일자
     }
 }
