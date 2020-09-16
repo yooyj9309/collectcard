@@ -126,3 +126,39 @@ tasks.jacocoTestReport {
         html.isEnabled = true
     }
 }
+
+
+tasks.withType<JacocoCoverageVerification> {
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.map {
+            fileTree(it).apply {
+                val excludes = mutableListOf(
+                    "com/google/**"
+                    ,"com/github/**"
+                    ,"**/*Companion*"
+                    ,"**/*Exception"
+                )
+                exclude(excludes)
+            }
+        }))
+    }
+
+
+}
+
+tasks.withType<JacocoReport> {
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.map {
+            fileTree(it).apply {
+                val excludes = mutableListOf(
+                    "com/google/**"
+                    ,"com/github/**"
+                    ,"**/*Companion*"
+                    ,"**/*Exception"
+                )
+                exclude(excludes)
+            }
+        }))
+    }
+
+}
