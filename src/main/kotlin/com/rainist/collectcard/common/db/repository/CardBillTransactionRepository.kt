@@ -4,10 +4,11 @@ import com.rainist.collectcard.common.db.entity.CardBillTransactionEntity
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface CardBillTransactionRepository : JpaRepository<CardBillTransactionEntity, Long> {
-    fun findAllByBilledYearMonthAndBanksaladUserIdAndCardCompanyCardIdAndBillNumber(
+    fun findAllByBilledYearMonthAndBanksaladUserIdAndCardCompanyIdAndBillNumberAndIsDeleted(
         billedYearMonth: String,
         banksaladUserId: Long?,
         cardCompanyId: String?,
-        billNumber: String?
+        billNumber: String?,
+        isDeleted: Boolean
     ): List<CardBillTransactionEntity>?
 }

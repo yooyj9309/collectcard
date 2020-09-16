@@ -198,15 +198,19 @@ class CardBillServiceImpl(
 
         // bill updated
         // delete transactions
-        cardBillTransactionRepository.findAllByBilledYearMonthAndBanksaladUserIdAndCardCompanyCardIdAndBillNumber(
+        // TODO 슬로우쿼리를 타는 부분으로, 쿼리 생성전까지 주석처리
+        /*
+        cardBillTransactionRepository.findAllByBilledYearMonthAndBanksaladUserIdAndCardCompanyIdAndBillNumberAndIsDeleted(
             oldCardBillEntity.billedYearMonth ?: "",
             banksaladUserId,
             organizationId,
-            cardBill.billNumber
+            cardBill.billNumber,
+            false
         )?.forEach { transacitonEntity ->
             transacitonEntity.isDeleted = true
             cardBillTransactionRepository.save(transacitonEntity)
         }
+         */
 
         // update bill
         val billEntity = newCardBillEntity.apply {
