@@ -134,9 +134,6 @@ class CardBillServiceImpl(
 
         executionContext.setStartAt(checkStartTime)
 
-        // TODO 제거예정 diff확인용
-        logger.info("CARDBILLEXPECTED_TIME_INFO $checkStartTime ${executionContext.userId} ")
-
         val cardBillExpectedExecutionResponse: ExecutionResponse<ListCardBillsResponse> =
             collectExecutorService.execute(
                 executionContext,

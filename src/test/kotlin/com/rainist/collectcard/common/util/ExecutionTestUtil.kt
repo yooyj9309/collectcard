@@ -8,6 +8,7 @@ import com.rainist.collect.common.execution.ExecutionResponse
 import com.rainist.collect.executor.CollectExecutorService
 import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.common.util.DateTimeUtil
+import java.time.LocalDateTime
 import java.util.UUID
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
@@ -46,6 +47,15 @@ class ExecutionTestUtil {
                 organizationId = organizationId,
                 userId = banksaladUserId,
                 startAt = DateTimeUtil.utcNowLocalDateTime()
+            )
+        }
+
+        fun getExecutionContext(banksaladUserId: String, organizationId: String, localDateTime: LocalDateTime?): ExecutionContext {
+            return CollectExecutionContext(
+                executionRequestId = UUID.randomUUID().toString(),
+                organizationId = organizationId,
+                userId = banksaladUserId,
+                startAt = localDateTime ?: DateTimeUtil.utcNowLocalDateTime()
             )
         }
 
