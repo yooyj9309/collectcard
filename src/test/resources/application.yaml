@@ -24,7 +24,8 @@ host:
     shinhancard: https://devopenapi.shinhancard.com:8443
 
 connect-server:
-  target: dns:///connect-headless:18081
+  host: localhost
+  port: 6565
 
 shinhancard:
   organizationId: shinhancard
