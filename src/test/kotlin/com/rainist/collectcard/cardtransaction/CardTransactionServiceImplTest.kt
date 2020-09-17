@@ -41,7 +41,7 @@ class CardTransactionServiceImplTest {
     fun startAtTest() {
         val researchInterval = 3L
         val userId = DateTimeUtil.kstLocalDateTimeToEpochMilliSecond().toString()
-        val lastLocalDate = DateTimeUtil.stringToLocalDate("20200303", "yyyyMMdd")
+        val lastLocalDate = DateTimeUtil.stringToLocalDate("20200915", "yyyyMMdd")
         val lastCheckAt = DateTimeUtil.utcLocalDateToEpochMilliSecond(lastLocalDate)
 
         // given

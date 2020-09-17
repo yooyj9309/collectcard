@@ -82,14 +82,16 @@ class CardBillServiceImpl(
 
     private fun executeCardBill(executionContext: CollectExecutionContext, header: MutableMap<String, String?>, request: ListCardBillsRequest, now: LocalDateTime): ListCardBillsResponse {
         /* set startAt */
+        val maxMonth = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).maxMonth
+        val defaultCheckStartTime = DateTimeUtil.kstNowLocalDateTime().minusMonths(maxMonth.toLong())
+
         val checkStartTime = userSyncStatusService.getUserSyncStatusLastCheckAt(
             executionContext.userId.toLong(), executionContext.organizationId, Transaction.cardbills.name
         )?.let { lastCheckAt ->
             DateTimeUtil.epochMilliSecondToKSTLocalDateTime(lastCheckAt)
-        } ?: kotlin.run {
-            val maxMonth = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).maxMonth
-            DateTimeUtil.kstNowLocalDateTime().minusMonths(maxMonth.toLong())
-        }
+        }?.takeIf {
+            defaultCheckStartTime.isBefore(it)
+        } ?: defaultCheckStartTime
 
         executionContext.setStartAt(checkStartTime)
 
@@ -123,14 +125,16 @@ class CardBillServiceImpl(
 
     private fun executeCardBillExpected(executionContext: CollectExecutionContext, header: MutableMap<String, String?>, request: ListCardBillsRequest, banksaladUserId: Long, now: LocalDateTime): ListCardBillsResponse {
         /* set startAt */
+        val maxMonth = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).maxMonth
+        val defaultCheckStartTime = DateTimeUtil.kstNowLocalDateTime().minusMonths(maxMonth.toLong())
+
         val checkStartTime = userSyncStatusService.getUserSyncStatusLastCheckAt(
             executionContext.userId.toLong(), executionContext.organizationId, Transaction.billTransactionExpected.name
         )?.let { lastCheckAt ->
             DateTimeUtil.epochMilliSecondToKSTLocalDateTime(lastCheckAt)
-        } ?: kotlin.run {
-            val maxMonth = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).maxMonth
-            DateTimeUtil.kstNowLocalDateTime().minusMonths(maxMonth.toLong())
-        }
+        }?.takeIf {
+            defaultCheckStartTime.isBefore(it)
+        } ?: defaultCheckStartTime
 
         executionContext.setStartAt(checkStartTime)
 

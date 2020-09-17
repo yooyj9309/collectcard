@@ -23,7 +23,6 @@ import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.common.log.Log
 import com.rainist.common.service.ValidationService
 import com.rainist.common.util.DateTimeUtil
-import java.time.LocalDate
 import java.util.concurrent.Executor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -204,17 +203,18 @@ class CardTransactionServiceImpl(
      * @return yyyyMMdd (year month day)
      */
     fun getStartAt(executionContext: CollectExecutionContext): String {
-        return userSyncStatusService.getUserSyncStatusLastCheckAt(executionContext.userId.toLong(), executionContext.organizationId, Transaction.cardTransaction.name)
-            ?.let {
-                val researchInterval = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).researchInterval
-                DateTimeUtil.epochMilliSecondToKSTLocalDateTime(it).minusDays(researchInterval.toLong())
-            }
-            ?.let { localDateTime ->
-                DateTimeUtil.localDateToString(LocalDate.of(localDateTime.year, localDateTime.month, localDateTime.dayOfMonth), "yyyyMMdd")
-            }
-            ?: kotlin.run {
-                val maxMonth = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).maxMonth
-                DateTimeUtil.localDateToString(DateTimeUtil.kstNowLocalDate().minusMonths(maxMonth.toLong()), "yyyyMMdd")
-            }
+        val maxMonth = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).maxMonth
+        val defaultCheckStartTime = DateTimeUtil.kstNowLocalDateTime().minusMonths(maxMonth.toLong())
+
+        val checkStartTime = userSyncStatusService.getUserSyncStatusLastCheckAt(
+            executionContext.userId.toLong(), executionContext.organizationId, Transaction.cardTransaction.name
+        )?.let { lastCheckAt ->
+            val researchInterval = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).researchInterval
+            DateTimeUtil.epochMilliSecondToKSTLocalDateTime(lastCheckAt).minusDays(researchInterval.toLong())
+        }?.takeIf {
+            defaultCheckStartTime.isBefore(it)
+        } ?: defaultCheckStartTime
+
+        return DateTimeUtil.localDatetimeToString(checkStartTime, "yyyyMMdd")
     }
 }
