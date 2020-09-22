@@ -42,7 +42,7 @@ val json_path_version = "2.4.0"
 
 dependencies {
     implementation("com.rainist:kotlin-banksalad:1.0.21.RELEASE")
-    implementation("com.banksalad:idl:ac698d8.20200922.RELEASE")
+    implementation("com.banksalad:idl:20200922.cd21a9b.RELEASE")
 
     // collect
     implementation("com.rainist:collect:1.1.29.RELEASE")
@@ -101,6 +101,10 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    maxHeapSize = "4G"
+    reports {
+        html.isEnabled = true
+    }
 }
 
 tasks.withType<KotlinCompile> {
@@ -132,6 +136,7 @@ tasks.withType<JacocoCoverageVerification> {
                     ,"com/github/**"
                     ,"**/*Companion*"
                     ,"**/*Exception"
+                    ,"**/*Exception.class"
                 )
                 exclude(excludes)
             }
@@ -150,6 +155,7 @@ tasks.withType<JacocoReport> {
                     ,"com/github/**"
                     ,"**/*Companion*"
                     ,"**/*Exception"
+                    ,"**/*Exception.class"
                 )
                 exclude(excludes)
             }

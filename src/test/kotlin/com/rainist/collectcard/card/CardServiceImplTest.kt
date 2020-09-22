@@ -24,19 +24,19 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import org.springframework.test.annotation.DirtiesContext
+import org.springframework.test.annotation.Rollback
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.client.ExpectedCount
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.ResourceUtils
 import org.springframework.web.client.RestTemplate
 
 @ExtendWith(SpringExtension::class)
 @SpringBootTest()
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @DisplayName("보유카드조회")
 class CardServiceImplTest {
 
@@ -52,16 +52,18 @@ class CardServiceImplTest {
     @MockBean
     lateinit var headerService: HeaderService
 
-    val executionContext: CollectExecutionContext = CollectExecutionContext(
-        executionRequestId = UUID.randomUUID().toString(),
-        organizationId = "shinhancard",
-        userId = "1",
-        startAt = DateTimeUtil.utcNowLocalDateTime()
-    )
-
     @Test
+    @Rollback
+    @Transactional
     fun listCard_success() {
         setupServer(listOf("mock/shinhancard/card/card_shinhancard_cards.json"))
+
+        val executionContext: CollectExecutionContext = CollectExecutionContext(
+            executionRequestId = UUID.randomUUID().toString(),
+            organizationId = "shinhancard",
+            userId = DateTimeUtil.kstLocalDateTimeToEpochMilliSecond().toString(),
+            startAt = DateTimeUtil.utcNowLocalDateTime()
+        )
 
         given(headerService.makeHeader(executionContext.userId, executionContext.organizationId))
             .willReturn(
@@ -108,8 +110,8 @@ class CardServiceImplTest {
         assertThat(
             firstEntity, `is`(
                 CardEntity(
-                    cardId = 1,
-                    banksaladUserId = 1,
+                    cardId = firstEntity.cardId,
+                    banksaladUserId = executionContext.userId.toLong(),
                     cardCompanyId = "shinhancard",
                     cardCompanyCardId = "9523*********8721",
                     lastCheckAt = now,
@@ -131,12 +133,21 @@ class CardServiceImplTest {
     }
 
     @Test
+    @Rollback
+    @Transactional
     fun listCard_pagination() {
         setupServer(
             listOf(
                 "mock/shinhancard/card/card_shinhancard_cards_paging_1.json",
                 "mock/shinhancard/card/card_shinhancard_cards_paging_2.json"
             )
+        )
+
+        val executionContext: CollectExecutionContext = CollectExecutionContext(
+            executionRequestId = UUID.randomUUID().toString(),
+            organizationId = "shinhancard",
+            userId = DateTimeUtil.kstLocalDateTimeToEpochMilliSecond().toString(),
+            startAt = DateTimeUtil.utcNowLocalDateTime()
         )
 
         given(headerService.makeHeader(executionContext.userId, executionContext.organizationId))
@@ -186,8 +197,8 @@ class CardServiceImplTest {
         assertThat(
             firstEntity, `is`(
                 CardEntity(
-                    cardId = 1,
-                    banksaladUserId = 1,
+                    cardId = firstEntity.cardId,
+                    banksaladUserId = executionContext.userId.toLong(),
                     cardCompanyId = "shinhancard",
                     cardCompanyCardId = "9523*********8721",
                     lastCheckAt = now,
@@ -209,8 +220,17 @@ class CardServiceImplTest {
     }
 
     @Test
+    @Rollback
+    @Transactional
     fun listCard_updated() {
         setupServer(listOf("mock/shinhancard/card/card_shinhancard_cards_update.json"))
+
+        val executionContext: CollectExecutionContext = CollectExecutionContext(
+            executionRequestId = UUID.randomUUID().toString(),
+            organizationId = "shinhancard",
+            userId = DateTimeUtil.kstLocalDateTimeToEpochMilliSecond().toString(),
+            startAt = DateTimeUtil.utcNowLocalDateTime()
+        )
 
         given(headerService.makeHeader(executionContext.userId, executionContext.organizationId))
             .willReturn(
@@ -225,7 +245,7 @@ class CardServiceImplTest {
         cardRepository.save(
             CardEntity(
                 cardId = 1,
-                banksaladUserId = 1,
+                banksaladUserId = executionContext.userId.toLong(),
                 cardCompanyId = "shinhancard",
                 cardCompanyCardId = "9523*********8721",
                 lastCheckAt = now,
@@ -280,8 +300,8 @@ class CardServiceImplTest {
         assertThat(
             firstEntity, `is`(
                 CardEntity(
-                    cardId = 1,
-                    banksaladUserId = 1,
+                    cardId = firstEntity.cardId,
+                    banksaladUserId = executionContext.userId.toLong(),
                     cardCompanyId = "shinhancard",
                     cardCompanyCardId = "9523*********8721",
                     lastCheckAt = now,

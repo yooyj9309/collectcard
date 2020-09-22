@@ -11,11 +11,8 @@ import java.time.LocalDateTime
 import org.junit.Assert
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mapstruct.factory.Mappers
-import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@ExtendWith(SpringExtension::class)
 @DisplayName("CardMapper 테스트")
 class CardMapperTest {
 
