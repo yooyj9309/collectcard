@@ -1,7 +1,7 @@
 package com.rainist.collectcard.config
 
-import com.github.rainist.idl.apis.external.v1.connect.ConnectGrpc
-import com.github.rainist.idl.apis.external.v1.result.ErrorProto
+import com.github.banksalad.idl.apis.external.v1.connect.ConnectGrpc
+import com.github.banksalad.idl.apis.external.v1.result.ErrorProto
 import com.google.protobuf.StringValue
 import com.google.rpc.Status
 import com.rainist.collectcard.common.exception.GrpcException

@@ -1,6 +1,6 @@
 package com.rainist.collectcard.common.dto
 
-import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
+import com.github.banksalad.idl.apis.v1.collectcard.CollectcardProto
 import com.google.protobuf.Int64Value
 
 data class UserSyncStatusResponse(

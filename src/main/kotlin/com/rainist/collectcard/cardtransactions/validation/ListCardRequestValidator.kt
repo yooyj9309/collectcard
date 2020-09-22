@@ -1,6 +1,6 @@
 package com.rainist.collectcard.cardtransactions.validation
 
-import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
+import com.github.banksalad.idl.apis.v1.collectcard.CollectcardProto
 import com.rainist.common.exception.ValidationException
 import com.rainist.common.model.ObjectOf
 import com.rainist.common.validator.ValidatorIfs

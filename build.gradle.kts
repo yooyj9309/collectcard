@@ -15,17 +15,11 @@ group = "com.rainist"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
-sourceSets {
-    main {
-        java.srcDir("${projectDir}/idl/gen/java")
-    }
-}
-
 repositories {
     mavenCentral()
     maven {
         name = "GitHubPackages"
-        url = uri("https://maven.pkg.github.com/rainist/kotlin-banksalad")
+        url = uri("https://maven.pkg.github.com/banksalad/kotlin-banksalad")
         credentials {
             username = System.getenv("GH_USERNAME")
             password = System.getenv("GH_DAAS_PACKAGES_TOKEN")
@@ -33,7 +27,7 @@ repositories {
     }
     maven {
         name = "GitHubPackages"
-        url = uri("https://maven.pkg.github.com/rainist/java-banksalad")
+        url = uri("https://maven.pkg.github.com/banksalad/idl")
         credentials {
             username = System.getenv("GH_USERNAME")
             password = System.getenv("GH_DAAS_PACKAGES_TOKEN")
@@ -48,6 +42,7 @@ val json_path_version = "2.4.0"
 
 dependencies {
     implementation("com.rainist:kotlin-banksalad:1.0.21.RELEASE")
+    implementation("com.banksalad:idl:ac698d8.20200922.RELEASE")
 
     // collect
     implementation("com.rainist:collect:1.1.29.RELEASE")

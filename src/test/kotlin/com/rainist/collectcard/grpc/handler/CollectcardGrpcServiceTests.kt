@@ -1,6 +1,6 @@
 package com.rainist.collectcard.grpc.handler
 
-import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
+import com.github.banksalad.idl.apis.v1.collectcard.CollectcardProto
 import io.grpc.internal.testing.StreamRecorder
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test

@@ -1,6 +1,6 @@
 package com.rainist.collectcard.cardcreditlimit.dto
 
-import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
+import com.github.banksalad.idl.apis.v1.collectcard.CollectcardProto
 import com.rainist.collectcard.common.enums.ResultCode
 
 data class CreditLimitResponse(

@@ -1,6 +1,6 @@
 package com.rainist.collectcard.cardloans.dto
 
-import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
+import com.github.banksalad.idl.apis.v1.collectcard.CollectcardProto
 import com.google.protobuf.StringValue
 import com.rainist.collectcard.common.enums.ResultCode
 import com.rainist.common.util.DateTimeUtil

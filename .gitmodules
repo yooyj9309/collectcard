@@ -1,4 +1,0 @@
-[submodule "idl"]
-	path = idl
-	url = https://github.com/Rainist/idl.git
-	branch = master

@@ -1,6 +1,6 @@
 package com.rainist.collectcard.cardtransactions.dto
 
-import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
+import com.github.banksalad.idl.apis.v1.collectcard.CollectcardProto
 import com.google.protobuf.DoubleValue
 import com.google.protobuf.Int32Value
 import com.google.protobuf.StringValue

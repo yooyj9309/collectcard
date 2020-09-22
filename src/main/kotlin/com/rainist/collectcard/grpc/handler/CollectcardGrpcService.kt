@@ -1,7 +1,7 @@
 package com.rainist.collectcard.grpc.handler
 
-import com.github.rainist.idl.apis.v1.collectcard.CollectcardGrpc
-import com.github.rainist.idl.apis.v1.collectcard.CollectcardProto
+import com.github.banksalad.idl.apis.v1.collectcard.CollectcardGrpc
+import com.github.banksalad.idl.apis.v1.collectcard.CollectcardProto
 import com.rainist.collectcard.card.CardService
 import com.rainist.collectcard.card.dto.toListCardsResponseProto
 import com.rainist.collectcard.cardbills.CardBillService

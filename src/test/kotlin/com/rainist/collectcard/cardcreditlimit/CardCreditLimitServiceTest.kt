@@ -114,7 +114,7 @@ class CardCreditLimitServiceTest {
         )
 
         val creditLimit = cardCreditLimitService.cardCreditLimit(executionContext).toCreditLimitResponseProto()
-        Assert.assertEquals(com.github.rainist.idl.apis.v1.collectcard.CollectcardProto.CreditLimit.getDefaultInstance(), creditLimit.data)
+        Assert.assertEquals(com.github.banksalad.idl.apis.v1.collectcard.CollectcardProto.CreditLimit.getDefaultInstance(), creditLimit.data)
     }
 
     fun setserver(server: MockRestServiceServer, api: Api, filePath: String, executionContext: CollectExecutionContext) {
