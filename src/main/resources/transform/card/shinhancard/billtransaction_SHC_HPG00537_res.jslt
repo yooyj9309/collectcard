@@ -26,8 +26,8 @@ let resultCodes = {
                     "amount": .capital,
                     "billedAmount" : .capital,
                     "billedFee": .commission,
-                    "cardNumber": .class,
-                    "cardNumberMasked": .class,
+                    "cardNumber": replace(.class, "[^0-9]", ""),
+                    "cardNumberMasked": replace(.class, "[^0-9]", ""),
                     "cardType" : "DEBIT",
                     "storeName": .joinnm,
                     "discountAmount": .dcntamt

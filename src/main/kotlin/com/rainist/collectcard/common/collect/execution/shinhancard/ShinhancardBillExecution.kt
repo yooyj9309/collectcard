@@ -14,7 +14,6 @@ import com.rainist.collectcard.common.exception.CollectExecutionExceptionHandler
 import com.rainist.common.util.DateTimeUtil
 import java.util.function.BiConsumer
 import java.util.function.BinaryOperator
-import java.util.regex.Pattern
 
 class ShinhancardBillExecution {
 
@@ -90,20 +89,6 @@ class ShinhancardBillExecution {
 
                 // transactions 없는 리스트 제거
                 prevCardBills = prevCardBills.filter { it.transactions != null }.toMutableList()
-
-                // cardNumber 한글 제거 처리 진행
-                val patterns = Pattern.compile("[0-9]*\$")
-                prevCardBills.forEach { cardBill ->
-                    cardBill.transactions?.forEach { cardBillTransaction ->
-                        cardBillTransaction.cardNumber?.let { cardNumber ->
-                            val matcher = patterns.matcher(cardNumber)
-                            if (matcher.find()) {
-                                cardBillTransaction.cardNumber = matcher.group(0)
-                            }
-                        }
-                    }
-                }
-                /* diff end */
 
                 prev.dataBody = ListCardBillsResponseDataBody(cardBills = prevCardBills, nextKey = next.dataBody?.nextKey)
                 prev

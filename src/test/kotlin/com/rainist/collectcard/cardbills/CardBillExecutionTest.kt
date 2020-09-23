@@ -118,8 +118,8 @@ class CardBillExecutionTest {
         val transactions = res.response?.dataBody?.billTransactions ?: mutableListOf()
         assertEquals(transactions.size, 5)
         assertThat(transactions[0]).isEqualToComparingFieldByField(CardBillTransaction().apply {
-            this.cardNumber = "체크28" // 한글 제거는 Execution merge function에서 진행
-            this.cardNumberMasked = "체크28"
+            this.cardNumber = "28"
+            this.cardNumberMasked = "28"
             this.storeName = "(주)티몬"
             this.cardType = CardType.DEBIT
             this.discountAmount = BigDecimal("0")

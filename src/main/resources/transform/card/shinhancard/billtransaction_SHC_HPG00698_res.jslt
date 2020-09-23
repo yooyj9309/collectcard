@@ -43,8 +43,8 @@ def parse_zfil_number(s)
                 {
                     let isInstallment = _isInstallment(parse_zfil_number(.dvdMnth))
                     let isInstallmentCancel= _isInstallmentCancel(parse_zfil_number(.dvdMnth) , parse_zfil_number(.rcpMnt))
-                    "cardNumber": .useCrdC[size(.useCrdC) - 3 : size(.useCrdC)],
-                    "cardNumberMasked": .useCrdC[size(.useCrdC) - 3 : size(.useCrdC)],
+                    "cardNumber": replace(.useCrdC[size(.useCrdC) - 3 : size(.useCrdC)], "[^0-9]", ""),
+                    "cardNumberMasked": replace(.useCrdC[size(.useCrdC) - 3 : size(.useCrdC)], "[^0-9]", ""),
                     "approvalDay" : .useD,
                     "storeName": .useMchtNm,
                     "isInstallmentPayment": if($isInstallment == true and $isInstallmentCancel == false) true else false,
