@@ -27,17 +27,4 @@ class HeaderService(
             CALIENT_ID to organization.clientId
         )
     }
-
-    @Deprecated("deprecated")
-    fun makeHeader(banksaladUserId: String, cardOrganization: CardOrganization): MutableMap<String, String?> {
-
-        val accessToken =
-            connectClient.getAccessToken(banksaladUserId, cardOrganization.organizationObjectId)?.accessToken
-
-        return mutableMapOf(
-            CONTENT_TYPE to MediaType.APPLICATION_JSON_VALUE,
-            AUTHORIZATION to "Bearer $accessToken",
-            CALIENT_ID to cardOrganization.clientId
-        )
-    }
 }
