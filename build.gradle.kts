@@ -41,7 +41,7 @@ val camel_version = "3.2.0"
 val json_path_version = "2.4.0"
 
 dependencies {
-    implementation("com.rainist:kotlin-banksalad:1.0.21.RELEASE")
+    implementation("com.rainist:kotlin-banksalad:1.0.22.RELEASE")
     implementation("com.banksalad:idl:20200922.cd21a9b.RELEASE")
 
     // collect

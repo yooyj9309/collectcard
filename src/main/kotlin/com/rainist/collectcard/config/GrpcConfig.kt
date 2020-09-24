@@ -5,11 +5,13 @@ import com.github.banksalad.idl.apis.external.v1.result.ErrorProto
 import com.google.protobuf.StringValue
 import com.google.rpc.Status
 import com.rainist.collectcard.common.exception.GrpcException
+import com.rainist.common.interceptor.StatsUnaryClientInterceptor
 import com.rainist.common.log.Log
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
 import io.grpc.protobuf.StatusProto
 import io.grpc.stub.StreamObserver
+import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -21,16 +23,25 @@ class GrpcConfig(
     @Value("\${connect-server.host}")
     private var connectHost: String,
     @Value("\${connect-server.port}")
-    private var connectPort: Int
+    private var connectPort: Int,
+    val meterRegistry: MeterRegistry
 ) {
 
     companion object : Log
 
+    @Value("\${spring.application.name}")
+    lateinit var applicationName: String
+
     @Bean
     fun connectChannel(): ManagedChannel {
-        logger.withFieldInfo(Pair("connect channel", "host : $connectHost, port : $connectPort"))
+        logger
+            .With("connect channel Host", connectHost)
+            .With("port", connectPort)
+            .Info("")
+
         return ManagedChannelBuilder.forAddress(connectHost, connectPort)
             .usePlaintext()
+            .intercept(StatsUnaryClientInterceptor(meterRegistry, applicationName))
             .build()
     }
 
