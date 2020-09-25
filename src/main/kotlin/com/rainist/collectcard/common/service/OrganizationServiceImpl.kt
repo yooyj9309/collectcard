@@ -10,13 +10,13 @@ import org.springframework.stereotype.Service
 class OrganizationServiceImpl : OrganizationService {
 
     @Value("\${shinhancard.clientId}")
-    lateinit var shinhancardClientId: String
+    private lateinit var shinhancardClientId: String
 
     @Value("\${shinhancard.organizationId}")
-    lateinit var shinhancardOrganizationId: String
+    private lateinit var shinhancardOrganizationId: String
 
     @Value("\${shinhancard.objectId}")
-    lateinit var shinhancardObjectId: String
+    private lateinit var shinhancardObjectId: String
 
     private val organizationsByOrganizationId = LinkedHashMap<String, CardOrganization>()
     private val organizationsByOrganizationObjectId = LinkedHashMap<String, CardOrganization>()
