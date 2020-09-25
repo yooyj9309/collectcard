@@ -3,16 +3,15 @@ package com.rainist.collectcard.grpc.client
 import com.github.banksalad.idl.apis.external.v1.connect.ConnectGrpc
 import com.github.banksalad.idl.apis.external.v1.connect.ConnectProto
 import com.rainist.common.log.Log
-import io.grpc.ManagedChannel
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 
 @Service
 class ConnectClient(
-    @Qualifier("connectChannel")
-    val connectChannel: ManagedChannel
+    @Qualifier("connectStub")
+    val connectStub: ConnectGrpc.ConnectBlockingStub
 ) {
-    companion object : Log
+    private companion object : Log
 
     fun refreshToken(banksaladUserId: String?, organizationObjectid: String?): ConnectProto.RefreshTokenResponse? {
         return kotlin.runCatching {
@@ -22,11 +21,11 @@ class ConnectClient(
                 .setOrganizationObjectid(organizationObjectid)
                 .build()
                 .run {
-                    ConnectGrpc.newBlockingStub(connectChannel).refreshToken(this)
+                    connectStub.refreshToken(this)
                 }
         }
         .onFailure {
-            logger.withFieldError("refreshTokenError", it.localizedMessage, it)
+            logger.With("refreshTokenError", it.localizedMessage).error("", it)
         }
         .getOrThrow()
     }
@@ -40,11 +39,11 @@ class ConnectClient(
                 .setOrganizationObjectid(organizationObjectid)
                 .build()
                 .run {
-                    ConnectGrpc.newBlockingStub(connectChannel).issueToken(this)
+                    connectStub.issueToken(this)
                 }
         }
         .onFailure {
-            logger.withFieldError("issueTokenError", it.localizedMessage, it)
+            logger.With("issueTokenError", it.localizedMessage).error("", it)
         }
         .getOrThrow()
     }
@@ -57,11 +56,11 @@ class ConnectClient(
                 .setOrganizationObjectid(organizationObjectid)
                 .build()
                 .run {
-                    ConnectGrpc.newBlockingStub(connectChannel).getAccessToken(this)
+                    connectStub.getAccessToken(this)
                 }
         }
         .onFailure {
-            logger.withFieldError("issueTokenError", it.localizedMessage, it)
+            logger.With("getAccessTokenError", it.localizedMessage).error("", it)
         }
         .getOrThrow()
     }

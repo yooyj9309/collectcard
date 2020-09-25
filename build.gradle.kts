@@ -97,6 +97,8 @@ dependencies {
     implementation("org.mapstruct:mapstruct:1.3.0.Final")
     kapt("org.mapstruct:mapstruct-processor:1.3.0.Final")
     kaptTest("org.mapstruct:mapstruct-processor:1.3.0.Final")
+
+    testImplementation ("org.mockito:mockito-inline:2.13.0")
 }
 
 tasks.withType<Test> {

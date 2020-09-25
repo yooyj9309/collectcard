@@ -3,7 +3,7 @@ package com.rainist.collectcard.common.dto
 import com.rainist.collect.common.execution.ExecutionContext
 import java.time.LocalDateTime
 
-class CollectExecutionContext(
+data class CollectExecutionContext(
     private var executionRequestId: String,
     private var userId: String,
     private var organizationId: String,

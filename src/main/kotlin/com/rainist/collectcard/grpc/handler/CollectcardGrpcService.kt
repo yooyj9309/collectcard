@@ -11,8 +11,6 @@ import com.rainist.collectcard.cardcreditlimit.dto.toCreditLimitResponseProto
 import com.rainist.collectcard.cardloans.CardLoanService
 import com.rainist.collectcard.cardloans.dto.toListCardLoansResponseProto
 import com.rainist.collectcard.cardtransactions.CardTransactionService
-import com.rainist.collectcard.cardtransactions.CardTransactionServiceImpl.Companion.Warn
-import com.rainist.collectcard.cardtransactions.CardTransactionServiceImpl.Companion.With
 import com.rainist.collectcard.cardtransactions.dto.toListCardsTransactionResponseProto
 import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.dto.toSyncStatusResponseProto
@@ -20,11 +18,11 @@ import com.rainist.collectcard.common.exception.CollectcardServiceExceptionHandl
 import com.rainist.collectcard.common.exception.HealthCheckException
 import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.common.service.UserSyncStatusService
+import com.rainist.collectcard.common.service.UuidService
 import com.rainist.collectcard.config.onException
 import com.rainist.common.interceptor.StatsUnaryServerInterceptor
 import com.rainist.common.log.Log
 import io.grpc.stub.StreamObserver
-import java.util.UUID
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.apache.commons.lang3.StringUtils
 import org.lognet.springboot.grpc.GRpcService
@@ -37,7 +35,8 @@ class CollectcardGrpcService(
     val cardLoanService: CardLoanService,
     val cardBillService: CardBillService,
     val cardCreditLimitService: CardCreditLimitService,
-    var userSyncStatusService: UserSyncStatusService
+    val userSyncStatusService: UserSyncStatusService,
+    val uuidService: UuidService
 ) : CollectcardGrpc.CollectcardImplBase() {
 
     companion object : Log
@@ -62,9 +61,9 @@ class CollectcardGrpcService(
         responseObserver: StreamObserver<CollectcardProto.ListCardsResponse>
     ) {
         /* Execution Context */
-        val executionContext: CollectExecutionContext = CollectExecutionContext(
-            executionRequestId = generateExecutioRequestId(),
-            organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
+        val executionContext = CollectExecutionContext(
+            executionRequestId = uuidService.generateExecutionRequestId(),
+            organizationId = organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: "",
             userId = request.userId
         )
 
@@ -74,7 +73,6 @@ class CollectcardGrpcService(
             responseObserver.onNext(it)
             responseObserver.onCompleted()
         }.onFailure {
-//            logger.error("[사용자 카드 조회 에러 : {}]", it.localizedMessage, it)
             CollectcardServiceExceptionHandler.handle(executionContext, "listCards", "사용자카드조회", it)
             responseObserver.onError(it)
         }
@@ -87,7 +85,7 @@ class CollectcardGrpcService(
     ) {
         /* Execution Context */
         val executionContext: CollectExecutionContext = CollectExecutionContext(
-            executionRequestId = generateExecutioRequestId(),
+            executionRequestId = uuidService.generateExecutionRequestId(),
             organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
             userId = request.userId
         )
@@ -114,7 +112,7 @@ class CollectcardGrpcService(
     ) {
         /* Execution Context */
         val executionContext: CollectExecutionContext = CollectExecutionContext(
-            executionRequestId = generateExecutioRequestId(),
+            executionRequestId = uuidService.generateExecutionRequestId(),
             organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
             userId = request.userId
         )
@@ -139,7 +137,7 @@ class CollectcardGrpcService(
     ) {
         /* Execution Context */
         val executionContext: CollectExecutionContext = CollectExecutionContext(
-            executionRequestId = generateExecutioRequestId(),
+            executionRequestId = uuidService.generateExecutionRequestId(),
             organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
             userId = request.userId
         )
@@ -163,7 +161,7 @@ class CollectcardGrpcService(
     ) {
         /* Execution Context */
         val executionContext: CollectExecutionContext = CollectExecutionContext(
-            executionRequestId = generateExecutioRequestId(),
+            executionRequestId = uuidService.generateExecutionRequestId(),
             organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
             userId = request.userId
         )
@@ -186,13 +184,13 @@ class CollectcardGrpcService(
     ) {
         val executionContext = if (StringUtils.isEmpty(request.companyId.value)) {
             CollectExecutionContext(
-                executionRequestId = generateExecutioRequestId(),
+                executionRequestId = uuidService.generateExecutionRequestId(),
                 organizationId = "",
                 userId = request.userId
             )
         } else {
             CollectExecutionContext(
-                executionRequestId = generateExecutioRequestId(),
+                executionRequestId = uuidService.generateExecutionRequestId(),
                 organizationId = organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: "",
                 userId = request.userId
             )
@@ -214,7 +212,7 @@ class CollectcardGrpcService(
         responseObserver: StreamObserver<CollectcardProto.DeleteSyncStatusResponse>
     ) {
         val executionContext = CollectExecutionContext(
-            executionRequestId = generateExecutioRequestId(),
+            executionRequestId = uuidService.generateExecutionRequestId(),
             organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
             userId = request.userId
         )
@@ -243,9 +241,5 @@ class CollectcardGrpcService(
             // CollectcardServiceExceptionHandler.handle(executionContext, "getSyncStatus", "유저데이터초기화", it)
             responseObserver.onError(it)
         }
-    }
-
-    private fun generateExecutioRequestId(): String {
-        return UUID.randomUUID().toString()
     }
 }
