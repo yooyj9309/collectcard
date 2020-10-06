@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service
 
 @Service
 class UserInfoServiceImpl(
-    val headerService: HeaderService,
-    val organizationService: OrganizationService,
-    val validationService: ValidationService,
-    val collectExecutorService: CollectExecutorService
+    private val headerService: HeaderService,
+    private val organizationService: OrganizationService,
+    private val validationService: ValidationService,
+    private val collectExecutorService: CollectExecutorService
 ) : UserInfoService {
 
     override fun getUserInfo(userInfoRequest: UserInfoRequest): UserInfoResponse? {
