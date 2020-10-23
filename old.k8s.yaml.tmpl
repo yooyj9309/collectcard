@@ -40,18 +40,6 @@
   {{ $namespace = join (slice $env $sub_env_id) "-" }}
 {{ end }}
 
-{{ $legacy_rds_cidr := "172.16.0.0/20" }}
-{{ $mysql_cidr_a := "10.121.3.192/28" }}
-{{ $mysql_cidr_b := "10.121.3.208/28" }}
-{{ $mysql_cidr_c := "10.121.3.224/28" }}
-
-{{ if eq $env "production" }}
-  {{ $mysql_cidr_a = "10.131.3.192/28" }}
-  {{ $mysql_cidr_b = "10.131.3.208/28" }}
-  {{ $mysql_cidr_c = "10.131.3.224/28" }}
-{{ end }}
-
-
 ---
 kind: ConfigMap
 apiVersion: v1
@@ -146,7 +134,7 @@ data:
 
 ---
 kind: Deployment
-apiVersion: apps/v1
+apiVersion: extensions/v1beta1
 metadata:
   name: {{ $service_name }}
   namespace: {{ $namespace }}
@@ -315,6 +303,13 @@ spec:
             privileged: false
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
+      {{ if eq $env "production" }}
+      tolerations:
+        - effect: NoSchedule
+          key: dedicated
+          operator: Equal
+          value: jvm
+      {{ end }}
       dnsPolicy: ClusterFirst
       dnsConfig:
         options:
@@ -337,13 +332,11 @@ apiVersion: autoscaling/v1
 metadata:
   name: {{ $service_name }}
   namespace: {{ $namespace }}
-  labels:
-    app: {{ $service_name }}
 spec:
   scaleTargetRef:
     kind: Deployment
     name: {{ $service_name }}
-    apiVersion: apps/v1
+    apiVersion: extensions/v1beta1
 {{ if eq $env "production" }}
   minReplicas: 3
   maxReplicas: 5
@@ -376,51 +369,23 @@ spec:
   type: ClusterIP
   sessionAffinity: None
 
+{{ if and (eq $env "development") (eq $sub_env_id "local") }}
 ---
-apiVersion: policy/v1beta1
-kind: PodDisruptionBudget
+kind: Ingress
+apiVersion: extensions/v1beta1
 metadata:
   name: {{ $service_name }}
   namespace: {{ $namespace }}
-  labels:
-    app: {{ $service_name }}
 spec:
-  maxUnavailable: 1
-  selector:
-    matchLabels:
-      app: {{ $service_name }}
-
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: {{ $service_name }}
-  namespace: {{ $namespace }}
-  labels:
-    app: {{ $service_name }}
-spec:
-  podSelector:
-    matchLabels:
-      app: {{ $service_name }}
-  policyTypes:
-  - Egress
-  egress:
-  - to:
-    - podSelector:
-        matchLabels:
-          app: connect
-    ports:
-    - protocol: TCP
-      port: 8080
-  - to:
-    - ipBlock:
-        cidr: {{ $mysql_cidr_a }}
-    - ipBlock:
-        cidr: {{ $mysql_cidr_b }}
-    - ipBlock:
-        cidr: {{ $mysql_cidr_c }}
-    - ipBlock:
-        cidr: {{ $legacy_rds_cidr }}
-    ports:
-    - protocol: TCP
-      port: 3306
+  rules:
+    - host: {{ $service_name }}.
+        {{- if not (has $no_sub_env_id_envs $env) -}}
+        {{ $sub_env_id }}.{{ $env }}.
+        {{- end -}}
+        banksalad.com
+      http:
+        paths:
+          - backend:
+              serviceName: {{ $service_name }}
+              servicePort: 80
+{{ end }}

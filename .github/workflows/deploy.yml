@@ -4,9 +4,10 @@ on:
   - deployment
 
 jobs:
-  deploy:
-    name: Deploy
+  deploy-to-old-k8s:
+    name: Deploy to old k8s
     runs-on: ubuntu-20.04
+    if: github.event.deployment.environment == 'production' || github.event.deployment.environment == 'development' || github.event.deployment.environment == 'staging'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -34,7 +35,135 @@ jobs:
           make seoul USER=${{ secrets.GH_USERNAME }}
           kubectl config use-context banksalad-seoul-cluster
 
-      - name: Deploy
+      - name: Deploy to old k8s development
+        if: github.event.deployment.environment == 'development' || github.event.deployment.environment == 'staging'
+        run: |
+          cat old.k8s.yaml.tmpl | \
+          docker run --rm -i \
+          -e ENV \
+          -e SUB_ENV_ID \
+          -e IMAGE_TAG=$GITHUB_SHA \
+          -e DEVELOPMENT_COLLECTCARD_DB_PASSWORD \
+          -e DEVELOPMENT_SHINHANCARD_CLIENT_ID \
+          -e PRODUCTION_COLLECTCARD_DB_PASSWORD \
+          -e PRODUCTION_SHINHANCARD_CLIENT_ID \
+          \
+          hairyhenderson/gomplate:v3.5.0-slim -f - | \
+          kubectl apply -f -
+        env:
+          ENV: development
+          SUB_ENV_ID: development
+          DEVELOPMENT_COLLECTCARD_DB_PASSWORD: ${{ secrets.DEVELOPMENT_COLLECTCARD_DB_PASSWORD }}
+          DEVELOPMENT_SHINHANCARD_CLIENT_ID: ${{ secrets.DEVELOPMENT_SHINHANCARD_CLIENT_ID }}
+          PRODUCTION_COLLECTCARD_DB_PASSWORD: ${{ secrets.PRODUCTION_COLLECTCARD_DB_PASSWORD }}
+          PRODUCTION_SHINHANCARD_CLIENT_ID: ${{ secrets.PRODUCTION_SHINHANCARD_CLIENT_ID }}
+
+      - name: Deploy to old k8s production
+        if: github.event.deployment.environment == 'production'
+        run: |
+          cat old.k8s.yaml.tmpl | \
+          docker run --rm -i \
+          -e ENV \
+          -e SUB_ENV_ID \
+          -e IMAGE_TAG=$GITHUB_SHA \
+          -e DEVELOPMENT_COLLECTCARD_DB_PASSWORD \
+          -e DEVELOPMENT_SHINHANCARD_CLIENT_ID \
+          -e PRODUCTION_COLLECTCARD_DB_PASSWORD \
+          -e PRODUCTION_SHINHANCARD_CLIENT_ID \
+          \
+          hairyhenderson/gomplate:v3.5.0-slim -f - | \
+          kubectl apply -f -
+        env:
+          ENV: ${{ github.event.deployment.environment }}
+          SUB_ENV_ID: ${{ github.event.deployment.environment }}
+          IMAGE_TAG: ${{ github.sha }}
+          DEVELOPMENT_COLLECTCARD_DB_PASSWORD: ${{ secrets.DEVELOPMENT_COLLECTCARD_DB_PASSWORD }}
+          DEVELOPMENT_SHINHANCARD_CLIENT_ID: ${{ secrets.DEVELOPMENT_SHINHANCARD_CLIENT_ID }}
+          PRODUCTION_COLLECTCARD_DB_PASSWORD: ${{ secrets.PRODUCTION_COLLECTCARD_DB_PASSWORD }}
+          PRODUCTION_SHINHANCARD_CLIENT_ID: ${{ secrets.PRODUCTION_SHINHANCARD_CLIENT_ID }}
+
+      - name: Set deployment status to success
+        if: always()
+        uses: ./.github/actions/github-deploy-status
+        with:
+          state: '${{ job.status }}'
+          description: 'deployment ${{ job.status }}'
+        env:
+          GITHUB_DEPLOY_EVENT_URL: ${{ github.event.deployment.statuses_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+  deploy:
+    runs-on: [self-hosted, default]
+    if: github.event.deployment.environment == 'production' || github.event.deployment.environment == 'development' || github.event.deployment.environment == 'staging'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 50
+      - name: Checkout actions
+        uses: actions/checkout@v2
+        with:
+          repository: banksalad/actions
+          token: ${{ secrets.GH_ACCESS_TOKEN }}
+          path: .github/actions/
+
+      - name: Set deployment status to in_progress
+        uses: ./.github/actions/github-deploy-status
+        with:
+          state: 'in_progress'
+          description: 'deployment started'
+        env:
+          GITHUB_DEPLOY_EVENT_URL: ${{ github.event.deployment.statuses_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v1
+        with:
+          version: v1.19.2
+
+      - name: Setup kubernetes environment
+        if: github.event.deployment.environment == 'development' || github.event.deployment.environment == 'staging'
+        uses: azure/k8s-set-context@v1
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.K8S_KUBE_CONFIG }}
+          context: staging
+
+      - name: Setup kubernetes environment
+        if: github.event.deployment.environment == 'production'
+        uses: azure/k8s-set-context@v1
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.K8S_KUBE_CONFIG }}
+          context: ${{ github.event.deployment.environment }}
+
+      - name: Deploy to k8s
+        if: github.event.deployment.environment == 'development' || github.event.deployment.environment == 'staging'
+        run: |
+          cat k8s.yaml.tmpl | \
+          docker run --rm -i \
+          -e ENV \
+          -e SUB_ENV_ID \
+          -e IMAGE_TAG=$GITHUB_SHA \
+          -e DEVELOPMENT_COLLECTCARD_DB_PASSWORD \
+          -e DEVELOPMENT_SHINHANCARD_CLIENT_ID \
+          -e PRODUCTION_COLLECTCARD_DB_PASSWORD \
+          -e PRODUCTION_SHINHANCARD_CLIENT_ID \
+          \
+          hairyhenderson/gomplate:v3.5.0-slim -f - | \
+          kubectl apply -f -
+        env:
+          ENV: staging
+          SUB_ENV_ID: staging
+          IMAGE_TAG: ${{ github.sha }}
+          DEVELOPMENT_COLLECTCARD_DB_PASSWORD: ${{ secrets.DEVELOPMENT_COLLECTCARD_DB_PASSWORD }}
+          DEVELOPMENT_SHINHANCARD_CLIENT_ID: ${{ secrets.DEVELOPMENT_SHINHANCARD_CLIENT_ID }}
+          PRODUCTION_COLLECTCARD_DB_PASSWORD: ${{ secrets.PRODUCTION_COLLECTCARD_DB_PASSWORD }}
+          PRODUCTION_SHINHANCARD_CLIENT_ID: ${{ secrets.PRODUCTION_SHINHANCARD_CLIENT_ID }}
+
+      - name: Deploy to k8s
+        if: github.event.deployment.environment == 'production'
         run: |
           cat k8s.yaml.tmpl | \
           docker run --rm -i \
@@ -51,12 +180,13 @@ jobs:
         env:
           ENV: ${{ github.event.deployment.environment }}
           SUB_ENV_ID: ${{ github.event.deployment.environment }}
+          IMAGE_TAG: ${{ github.sha }}
           DEVELOPMENT_COLLECTCARD_DB_PASSWORD: ${{ secrets.DEVELOPMENT_COLLECTCARD_DB_PASSWORD }}
           DEVELOPMENT_SHINHANCARD_CLIENT_ID: ${{ secrets.DEVELOPMENT_SHINHANCARD_CLIENT_ID }}
           PRODUCTION_COLLECTCARD_DB_PASSWORD: ${{ secrets.PRODUCTION_COLLECTCARD_DB_PASSWORD }}
           PRODUCTION_SHINHANCARD_CLIENT_ID: ${{ secrets.PRODUCTION_SHINHANCARD_CLIENT_ID }}
 
-      - name: Set deployment status to success
+      - name: Set deployment status
         if: always()
         uses: ./.github/actions/github-deploy-status
         with:
