@@ -75,11 +75,7 @@ data:
       omit_hostname = false
 
     [[outputs.influxdb]]
-      urls = ["http://observability-influxdb
-        {{- if eq $env $sub_env_id -}}
-          .production
-        {{- end -}}
-      :8086"]
+      urls = ["http://influxdb-service.{{ $namespace }}.banksalad.in:8086"]
       database = "observability-telegraf"
 
     [[inputs.statsd]]
