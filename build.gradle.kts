@@ -139,6 +139,8 @@ tasks.withType<JacocoCoverageVerification> {
                     ,"**/*Companion*"
                     ,"**/*Exception"
                     ,"**/*Exception.class"
+                    ,"**/config/**"
+                    ,"**/CollectcardApplication**"
                 )
                 exclude(excludes)
             }
@@ -158,6 +160,8 @@ tasks.withType<JacocoReport> {
                     ,"**/*Companion*"
                     ,"**/*Exception"
                     ,"**/*Exception.class"
+                    ,"**/config/**"
+                    ,"**/CollectcardApplication**"
                 )
                 exclude(excludes)
             }
