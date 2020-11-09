@@ -175,10 +175,10 @@ spec:
               protocol: UDP
           resources:
             limits:
-              memory: 512Mi
+              memory: 256Mi
             requests:
-              cpu: 500m
-              memory: 128Mi
+              cpu: 100m
+              memory: 64Mi
           volumeMounts:
             - name: telegraf-conf
               mountPath: "/etc/telegraf"
@@ -192,11 +192,10 @@ spec:
               protocol: UDP
           resources:
             limits:
-              cpu: 1
-              memory: 500Mi
+              memory: 256Mi
             requests:
-              cpu: 500m
-              memory: 300Mi
+              cpu: 100m
+              memory: 64Mi
           volumeMounts:
             - name: {{ $service_name }}-telegraf-conf
               mountPath: "/etc/telegraf"
@@ -229,10 +228,10 @@ spec:
               value: "{{ $sidecar_normalized_path_regexps }}"
           resources:
             limits:
-              memory: 2Gi
+              memory: 256Mi
             requests:
-              cpu: 250m
-              memory: 512Mi
+              cpu: 200m
+              memory: 64Mi
           terminationMessagePath: "/dev/termination-log"
           terminationMessagePolicy: File
           imagePullPolicy: IfNotPresent
@@ -264,7 +263,7 @@ spec:
             limits:
               memory: 8Gi
             requests:
-              cpu: 250m
+              cpu:300m
               memory: 4Gi
           terminationMessagePath: "/dev/termination-log"
           terminationMessagePolicy: File
@@ -281,7 +280,6 @@ spec:
               value: "{{ $service_http_port }}"
           resources:
             limits:
-              cpu: 200m
               memory: 100Mi
             requests:
               cpu: 20m
