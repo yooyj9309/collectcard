@@ -12,7 +12,7 @@ spring:
     hibernate:
       ddl-auto: validate
   datasource:
-    url: jdbc:mysql://dev-barista-cluster.cluster-cejbmksulyv2.ap-northeast-2.rds.amazonaws.com:3306/collectcard?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://collectcard-cluster.cluster-ciy3wcu0axct.ap-northeast-2.rds.amazonaws.com:3306/collectcard?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
     driver-class-name: org.mariadb.jdbc.Driver
     username: collectcard_was
     password: ${DEVELOPMENT_COLLECTCARD_DB_PASSWORD}
