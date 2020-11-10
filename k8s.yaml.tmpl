@@ -20,11 +20,11 @@
 
 {{ $namespace := $env }}
 
-{{ $development_collectcard_db_password := getenv "DEVELOPMENT_COLLECTCARD_DB_PASSWORD" }}
-{{ $development_shinhancard_client_id := getenv "DEVELOPMENT_SHINHANCARD_CLIENT_ID" }}
+{{ $development_collectcard_db_password := getenv "DEVELOPMENT_COLLECTCARD_DB_PASSWORD" "" }}
+{{ $development_shinhancard_client_id := getenv "DEVELOPMENT_SHINHANCARD_CLIENT_ID" "" }}
 
-{{ $production_collectcard_db_password := getenv "PRODUCTION_COLLECTCARD_DB_PASSWORD" }}
-{{ $production_shinhancard_client_id := getenv "PRODUCTION_SHINHANCARD_CLIENT_ID" }}
+{{ $production_collectcard_db_password := getenv "PRODUCTION_COLLECTCARD_DB_PASSWORD" "" }}
+{{ $production_shinhancard_client_id := getenv "PRODUCTION_SHINHANCARD_CLIENT_ID" "" }}
 
 
 # ^/health$

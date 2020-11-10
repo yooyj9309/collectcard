@@ -55,8 +55,6 @@ jobs:
           SUB_ENV_ID: development
           DEVELOPMENT_COLLECTCARD_DB_PASSWORD: ${{ secrets.DEVELOPMENT_COLLECTCARD_DB_PASSWORD }}
           DEVELOPMENT_SHINHANCARD_CLIENT_ID: ${{ secrets.DEVELOPMENT_SHINHANCARD_CLIENT_ID }}
-          PRODUCTION_COLLECTCARD_DB_PASSWORD: ${{ secrets.PRODUCTION_COLLECTCARD_DB_PASSWORD }}
-          PRODUCTION_SHINHANCARD_CLIENT_ID: ${{ secrets.PRODUCTION_SHINHANCARD_CLIENT_ID }}
 
       - name: Deploy to old k8s production
         if: github.event.deployment.environment == 'production'
@@ -77,8 +75,6 @@ jobs:
           ENV: ${{ github.event.deployment.environment }}
           SUB_ENV_ID: ${{ github.event.deployment.environment }}
           IMAGE_TAG: ${{ github.sha }}
-          DEVELOPMENT_COLLECTCARD_DB_PASSWORD: ${{ secrets.DEVELOPMENT_COLLECTCARD_DB_PASSWORD }}
-          DEVELOPMENT_SHINHANCARD_CLIENT_ID: ${{ secrets.DEVELOPMENT_SHINHANCARD_CLIENT_ID }}
           PRODUCTION_COLLECTCARD_DB_PASSWORD: ${{ secrets.PRODUCTION_COLLECTCARD_DB_PASSWORD }}
           PRODUCTION_SHINHANCARD_CLIENT_ID: ${{ secrets.PRODUCTION_SHINHANCARD_CLIENT_ID }}
 
@@ -159,8 +155,6 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
           DEVELOPMENT_COLLECTCARD_DB_PASSWORD: ${{ secrets.DEVELOPMENT_COLLECTCARD_DB_PASSWORD }}
           DEVELOPMENT_SHINHANCARD_CLIENT_ID: ${{ secrets.DEVELOPMENT_SHINHANCARD_CLIENT_ID }}
-          PRODUCTION_COLLECTCARD_DB_PASSWORD: ${{ secrets.PRODUCTION_COLLECTCARD_DB_PASSWORD }}
-          PRODUCTION_SHINHANCARD_CLIENT_ID: ${{ secrets.PRODUCTION_SHINHANCARD_CLIENT_ID }}
 
       - name: Deploy to k8s
         if: github.event.deployment.environment == 'production'
@@ -181,8 +175,6 @@ jobs:
           ENV: ${{ github.event.deployment.environment }}
           SUB_ENV_ID: ${{ github.event.deployment.environment }}
           IMAGE_TAG: ${{ github.sha }}
-          DEVELOPMENT_COLLECTCARD_DB_PASSWORD: ${{ secrets.DEVELOPMENT_COLLECTCARD_DB_PASSWORD }}
-          DEVELOPMENT_SHINHANCARD_CLIENT_ID: ${{ secrets.DEVELOPMENT_SHINHANCARD_CLIENT_ID }}
           PRODUCTION_COLLECTCARD_DB_PASSWORD: ${{ secrets.PRODUCTION_COLLECTCARD_DB_PASSWORD }}
           PRODUCTION_SHINHANCARD_CLIENT_ID: ${{ secrets.PRODUCTION_SHINHANCARD_CLIENT_ID }}
 
