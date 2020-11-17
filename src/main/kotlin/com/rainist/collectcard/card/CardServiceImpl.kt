@@ -19,10 +19,12 @@ import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.service.ExecutionResponseValidateService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.UserSyncStatusService
+import com.rainist.collectcard.common.util.CustomStringUtil
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import java.time.LocalDateTime
 import org.mapstruct.factory.Mappers
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 @Service
@@ -32,7 +34,8 @@ class CardServiceImpl(
     val executionResponseValidateService: ExecutionResponseValidateService,
     val collectExecutorService: CollectExecutorService,
     val cardRepository: CardRepository,
-    val cardHistoryRepository: CardHistoryRepository
+    val cardHistoryRepository: CardHistoryRepository,
+    @Value("\${shinhancard.organizationId}") private var shinhancardOrganizationId: String
 ) : CardService {
 
     companion object : Log
@@ -98,13 +101,28 @@ class CardServiceImpl(
             banksaladUserId,
             card.cardCompanyId ?: "",
             card.cardCompanyCardId ?: ""
-        )
-            ?.let { cardEntity ->
-                updateCardEntity(cardEntity, card, now)
+        )?.let { cardEntity ->
+            updateCardEntity(cardEntity, card, now)
+        } ?: kotlin.run {
+            when (card.cardCompanyId) {
+                // 신한카드의 경우 예외 처리. // 마스킹 정책 이슈로 인한 예외처리 추가.
+                shinhancardOrganizationId -> updateShinhancardDataByMaskedCardNumber(banksaladUserId, card, now)
+                else -> insertCardEntity(card, banksaladUserId, now)
             }
-            ?: kotlin.run {
-                insertCardEntity(card, banksaladUserId, now)
-            }
+        }
+    }
+
+    // 신한카드 대응 코드
+    private fun updateShinhancardDataByMaskedCardNumber(banksaladUserId: Long, card: Card, now: LocalDateTime) {
+        cardRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardId(
+            banksaladUserId,
+            card.cardCompanyId ?: "",
+            CustomStringUtil.replaceNumberToMask(card.cardCompanyCardId)
+        )?.let { cardEntity ->
+            updateCardEntity(cardEntity, card, now)
+        } ?: kotlin.run {
+            insertCardEntity(card, banksaladUserId, now)
+        }
     }
 
     /* 기존 카드 */

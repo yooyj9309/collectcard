@@ -1,0 +1,31 @@
+{
+  "dataHeader": {
+    "reqKey": null,
+    "resultCode": "0004",
+    "successCode": "0",
+    "resultMessage": "성공적으로 조회 되었습니다."
+  },
+  "dataBody": {
+    "resCd": "0004",
+    "clnHgNm": "홍길동",
+    "nxtQyKey": "",
+    "grp001": [
+      {
+        "cardno": "6152-****-*****-2234",
+        "cardname": "야나두",
+        "cardbrand": "1",
+        "cardgubun": "1",
+        "enccardno": "adef60140af3364e3fb43a4e7bdc3b0b0976aa1c",
+        "trafficyn": "Y"
+      },
+      {
+        "cardno": "8397-****-*****-4033",
+        "cardname": "CJ ONE (체크)신한은행",
+        "cardbrand": "1",
+        "cardgubun": "5",
+        "enccardno": "d43cea7a94dd10e2172c9c97b25e78df09de28b2",
+        "trafficyn": "Y"
+      }
+    ]
+  }
+}

@@ -14,9 +14,11 @@ import java.time.LocalDateTime
 import java.util.UUID
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.Is.`is`
+import org.junit.Assert.assertEquals
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.BDDMockito
 import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -320,6 +322,50 @@ class CardServiceImplTest {
                 )
             )
         )
+    }
+
+    @Test
+    @Rollback
+    @Transactional
+    fun shinhancardMaskedCardNumberUpdate() {
+        setupServer(listOf("mock/shinhancard/card/card_shinhancard_masked_8th.json", "mock/shinhancard/card/card_shinhancard_masked_6th.json"))
+        val banksaladUserId = "1"
+
+        val executionContext: CollectExecutionContext = requestSetting(banksaladUserId)
+
+        var response = cardService.listCards(executionContext)
+        var cardEntities = cardRepository.findAll()
+        // db count 1.
+        // db에 들어간 값이 마스킹 번호 일치 여부
+        assertEquals(2, cardEntities.size)
+        assertEquals("6152*********2234", cardEntities[0].cardNumberMask)
+
+        // db count 1.
+        // 업데이트 진행여부확인
+        // db cardNumber masked 6th
+        response = cardService.listCards(executionContext)
+        cardEntities = cardRepository.findAll()
+        assertEquals(2, cardEntities.size)
+        assertEquals("615266*******2234", cardEntities[0].cardNumberMask)
+    }
+
+    private fun requestSetting(banksaladUserId: String): CollectExecutionContext {
+        val executionContext: CollectExecutionContext = CollectExecutionContext(
+            executionRequestId = UUID.randomUUID().toString(),
+            organizationId = "shinhancard",
+            userId = banksaladUserId,
+            startAt = DateTimeUtil.utcNowLocalDateTime()
+        )
+
+        BDDMockito.given(headerService.makeHeader(executionContext.userId, executionContext.organizationId))
+            .willReturn(
+                mutableMapOf(
+                    "contentType" to MediaType.APPLICATION_JSON_VALUE,
+                    "authorization" to "Bearer 123",
+                    "clientId" to "596d66692c4069c168b57c59"
+                )
+            )
+        return executionContext
     }
 
     private fun setupServer(mockResponseFileNames: List<String>) {
