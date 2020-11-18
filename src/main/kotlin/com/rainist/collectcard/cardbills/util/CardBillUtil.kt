@@ -5,6 +5,7 @@ import com.rainist.collectcard.cardbills.dto.CardBillTransaction
 import com.rainist.collectcard.common.db.entity.CardBillEntity
 import com.rainist.collectcard.common.db.entity.CardBillHistoryEntity
 import com.rainist.collectcard.common.db.entity.CardBillTransactionEntity
+import com.rainist.collectcard.common.db.entity.CardBillTransactionHistoryEntity
 import com.rainist.collectcard.common.db.entity.CardPaymentScheduledEntity
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -156,6 +157,58 @@ class CardBillUtil {
                 this.paymentAccountNumber = cardBill.paymentAccountNumber
                 this.totalPoint = cardBill.totalPoint?.setScale(4)
                 this.expiringPoints = cardBill.expiringPoints?.setScale(4)
+            }
+        }
+
+        fun makeCardBillTransactionHistoryEntity(entity: CardBillTransactionEntity): CardBillTransactionHistoryEntity {
+            return CardBillTransactionHistoryEntity().apply {
+                this.cardBillTransactionId = entity.cardBillTransactionId
+                this.billedYearMonth = entity.billedYearMonth
+                this.banksaladUserId = entity.banksaladUserId
+                this.cardCompanyId = entity.cardCompanyId
+                this.billNumber = entity.billNumber
+                this.billType = entity.billType
+                this.cardBillTransactionNo = entity.cardBillTransactionNo
+                this.cardCompanyCardId = entity.cardCompanyCardId
+                this.cardName = entity.cardName
+                this.cardNumber = entity.cardNumber
+                this.cardNumberMask = entity.cardNumberMask
+                this.businessLicenseNumber = entity.businessLicenseNumber
+                this.storeName = entity.storeName
+                this.storeNumber = entity.storeNumber
+                this.cardType = entity.cardType
+                this.cardTypeOrigin = entity.cardTypeOrigin
+                this.cardTransactionType = entity.cardTransactionType
+                this.cardTransactionTypeOrigin = entity.cardTransactionTypeOrigin
+                this.currencyCode = entity.currencyCode
+                this.isInstallmentPayment = entity.isInstallmentPayment
+                this.installment = entity.installment
+                this.installmentRound = entity.installmentRound
+                this.netSalesAmount = entity.netSalesAmount
+                this.serviceChargeAmount = entity.serviceChargeAmount
+                this.taxAmount = entity.taxAmount
+                this.paidPoints = entity.paidPoints
+                this.isPointPay = entity.isPointPay
+                this.discountAmount = entity.discountAmount
+                this.canceledAmount = entity.canceledAmount
+                this.approvalNumber = entity.approvalNumber
+                this.approvalDay = entity.approvalDay
+                this.approvalTime = entity.approvalTime
+                this.pointsToEarn = entity.pointsToEarn
+                this.isOverseaUse = entity.isOverseaUse
+                this.paymentDay = entity.paymentDay
+                this.storeCategory = entity.storeCategory
+                this.storeCategoryOrigin = entity.storeCategoryOrigin
+                this.transactionCountry = entity.transactionCountry
+                this.billingRound = entity.billingRound
+                this.paidAmount = entity.paidAmount
+                this.billedAmount = entity.billedAmount
+                this.billedFee = entity.billedFee
+                this.remainingAmount = entity.remainingAmount
+                this.isPaidFull = entity.isPaidFull
+                this.cashbackAmount = entity.cashbackAmount
+                this.pointsRate = entity.pointsRate
+                this.lastCheckAt = entity.lastCheckAt
             }
         }
     }

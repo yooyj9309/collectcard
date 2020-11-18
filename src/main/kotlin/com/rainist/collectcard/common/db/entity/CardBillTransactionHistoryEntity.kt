@@ -144,13 +144,9 @@ data class CardBillTransactionHistoryEntity(
     @Column(nullable = false)
     var lastCheckAt: LocalDateTime? = null,
 
-    @Column(nullable = false)
-    var isDeleted: Boolean? = false,
-
     @CreatedDate
     var createdAt: LocalDateTime? = null,
 
     @LastModifiedDate
     var updatedAt: LocalDateTime? = null
-
 )

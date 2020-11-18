@@ -148,9 +148,6 @@ data class CardBillTransactionEntity(
     var pointsRate: BigDecimal? = null,
 
     @Column(nullable = false)
-    var isDeleted: Boolean? = false,
-
-    @Column(nullable = false)
     var lastCheckAt: LocalDateTime? = null,
 
     @CreatedDate

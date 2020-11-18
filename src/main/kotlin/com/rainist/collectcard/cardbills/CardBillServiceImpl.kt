@@ -17,6 +17,7 @@ import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.db.repository.CardBillHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardBillRepository
+import com.rainist.collectcard.common.db.repository.CardBillTransactionHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardBillTransactionRepository
 import com.rainist.collectcard.common.db.repository.CardPaymentScheduledRepository
 import com.rainist.collectcard.common.dto.CollectExecutionContext
@@ -37,6 +38,7 @@ class CardBillServiceImpl(
     val cardBillRepository: CardBillRepository,
     val cardBillHistoryRepository: CardBillHistoryRepository,
     val cardBillTransactionRepository: CardBillTransactionRepository,
+    val cardBillTransactionHistoryRepository: CardBillTransactionHistoryRepository,
     val cardPaymentScheduledRepository: CardPaymentScheduledRepository,
     val organizationService: OrganizationService,
     val userSyncStatusService: UserSyncStatusService,
@@ -187,7 +189,10 @@ class CardBillServiceImpl(
                     index,
                     cardBillTransaction,
                     now
-                ).let { cardBillTransactionRepository.save(it) }
+                ).let {
+                    val entity = cardBillTransactionRepository.save(it)
+                    cardBillTransactionHistoryRepository.save(CardBillUtil.makeCardBillTransactionHistoryEntity(entity))
+                }
             }
             CardBillUtil.makeCardBillHistoryEntityFromCardBillHistory(newCardBillEntity).let {
                 cardBillHistoryRepository.save(it)
@@ -202,19 +207,14 @@ class CardBillServiceImpl(
 
         // bill updated
         // delete transactions
-        // TODO 슬로우쿼리를 타는 부분으로, 쿼리 생성전까지 주석처리
-        /*
-        cardBillTransactionRepository.findAllByBilledYearMonthAndBanksaladUserIdAndCardCompanyIdAndBillNumberAndIsDeleted(
+        cardBillTransactionRepository.findAllByBilledYearMonthAndBanksaladUserIdAndCardCompanyIdAndBillNumber(
             oldCardBillEntity.billedYearMonth ?: "",
             banksaladUserId,
             organizationId,
-            cardBill.billNumber,
-            false
+            cardBill.billNumber
         )?.forEach { transacitonEntity ->
-            transacitonEntity.isDeleted = true
-            cardBillTransactionRepository.save(transacitonEntity)
+            cardBillTransactionRepository.delete(transacitonEntity)
         }
-         */
 
         // update bill
         val billEntity = newCardBillEntity.apply {
@@ -238,7 +238,10 @@ class CardBillServiceImpl(
                 index,
                 cardBillTransaction,
                 now
-            ).let { cardBillTransactionRepository.save(it) }
+            ).let {
+                val entity = cardBillTransactionRepository.save(it)
+                cardBillTransactionHistoryRepository.save(CardBillUtil.makeCardBillTransactionHistoryEntity(entity))
+            }
         }
     }
 

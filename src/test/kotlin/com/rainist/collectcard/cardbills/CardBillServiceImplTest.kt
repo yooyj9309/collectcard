@@ -136,10 +136,7 @@ class CardBillServiceImplTest {
         assertEquals(2, billEntities.size) // 청구서 : 2개
         assertEquals(3, billHistoryEntities.size) // 청구서 히스토리 : 3개  // 신용 bill 업데이트
 
-        // TODO 추후에 db 인덱스 적용 및 서비스 코드 주석해제시 해당부분 적
-        // assertEquals(15, billTransactionEntites.size) // transaction : 15 // 삭제된 내역 5개
-        // assertEquals(10, billTransactionEntites.filter { it.isDeleted == false }.size) // 현재 오픈된 내용 10개
-        assertEquals(15, billTransactionEntites.filter { it.isDeleted == false }.size) // 인덱스 적용전 현재 오픈된 내용 15개 (중복적용)
+        assertEquals(10, billTransactionEntites.size) // 인덱스 적용전 현재 오픈된 내용 15개 (중복적용)
         assertEquals(12, cardPaymentScheduledEntities.size) // 결제예정금액 : 12개
     }
 
