@@ -34,11 +34,11 @@ class ApiLogServiceImpl(
                 this.httpMethod = apiLog.api.method.name
                 this.organizationApiId = apiLog.api.name
 
-                this.requestHeaderText = apiLog.request?.header ?: ""
-                this.requestBodyText = apiLog.request?.body ?: ""
+                this.requestHeader = apiLog.request?.header ?: ""
+                this.requestBody = apiLog.request?.body ?: ""
 
-                this.transformedRequestHeaderText = apiLog.request?.transformedHeader ?: ""
-                this.transformedRequestBodyText = apiLog.request?.transformedBody ?: ""
+                this.transformedRequestHeader = apiLog.request?.transformedHeader ?: ""
+                this.transformedRequestBody = apiLog.request?.transformedBody ?: ""
 
                 this.requestDatetime = LocalDateTime.now(ZoneId.of(ZONE_ID_UTC))
             }
@@ -64,11 +64,11 @@ class ApiLogServiceImpl(
                 this.organizationApiId = apiLog.api.name
 
                 this.apiRequestId = ""
-                this.requestHeaderText = ""
-                this.requestBodyText = ""
+                this.requestHeader = ""
+                this.requestBody = ""
 
-                this.transformedRequestHeaderText = ""
-                this.transformedRequestBodyText = ""
+                this.transformedRequestHeader = ""
+                this.transformedRequestBody = ""
 
                 this.requestDatetime = LocalDateTime.now(ZoneId.of(ZONE_ID_UTC))
             }
@@ -78,11 +78,11 @@ class ApiLogServiceImpl(
             // TODO jayden-lee resultCode java-banksalad Response 객체 프로퍼티에 추가해야함
             this.resultCode = resultCodeAndMessage.first
             this.resultMessage = resultCodeAndMessage.second
-            this.responseHeaderText = apiLog.response?.header
-            this.responseBodyText = apiLog.response?.body
+            this.responseHeader = apiLog.response?.header
+            this.responseBody = apiLog.response?.body
 
-            this.transformedResponseHeaderText = apiLog.response?.transformedHeader
-            this.transformedResponseBodyText = apiLog.response?.transformedBody
+            this.transformedResponseHeader = apiLog.response?.transformedHeader
+            this.transformedResponseBody = apiLog.response?.transformedBody
 
             this.responseDatetime = LocalDateTime.now(ZoneId.of(ZONE_ID_UTC))
         }

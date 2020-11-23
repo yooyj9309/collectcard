@@ -1,9 +1,11 @@
 package com.rainist.collectcard.common.db.entity
 
+import com.rainist.collectcard.common.converter.CardBillTransactionEncryptConverter
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import javax.annotation.Nullable
 import javax.persistence.Column
+import javax.persistence.Convert
 import javax.persistence.Entity
 import javax.persistence.EntityListeners
 import javax.persistence.GeneratedValue
@@ -45,8 +47,12 @@ data class CardBillTransactionEntity(
 
     var cardName: String? = null,
 
+    @Convert(converter = CardBillTransactionEncryptConverter::class)
+    @Column(nullable = true, name = "cardNumberEncrypted")
     var cardNumber: String? = null,
 
+    @Convert(converter = CardBillTransactionEncryptConverter::class)
+    @Column(nullable = true, name = "cardNumberMaskEncrypted")
     var cardNumberMask: String? = null,
 
     @Nullable

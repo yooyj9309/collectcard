@@ -32,6 +32,9 @@ connect-server:
   host: connect
   port: 8080
 
+cipher-server:
+  uri: dns:///cipher-headless:18081
+
 shinhancard:
   clientId: ${DEVELOPMENT_SHINHANCARD_CLIENT_ID}
   organizationObjectid: 596d66692c4069c168b57c59
@@ -42,3 +45,10 @@ grpc:
   enabled: true
   in-process-server-name: collect-server-process
   shutdownGrace: 20
+
+aws:
+  region: ap-northeast-2
+  iam:
+    collectcard:
+      access-key: ${PRODUCTION_AWS_IAM_COLLECTCARD_ACCESS_KEY}
+      access-token: ${PRODUCTION_AWS_IAM_COLLECTCARD_ACCESS_TOKEN}

@@ -46,10 +46,10 @@ class ApiLogServiceImplTest {
         var apiLogEntities = findApiLogEntities(executionRequestId)
 
         assertEquals(1, apiLogEntities.size)
-        assertEquals("", apiLogEntities[0].requestHeaderText)
-        assertEquals("", apiLogEntities[0].requestBodyText)
-        assertEquals("", apiLogEntities[0].transformedRequestHeaderText)
-        assertEquals("", apiLogEntities[0].transformedRequestBodyText)
+        assertEquals("", apiLogEntities[0].requestHeader)
+        assertEquals("", apiLogEntities[0].requestBody)
+        assertEquals("", apiLogEntities[0].transformedRequestHeader)
+        assertEquals("", apiLogEntities[0].transformedRequestBody)
 
         // Requsst 데이터가 없는경우.
         executionRequestId = "ad359761-db06-4d0e-bde6-eb70aec6ae97"
@@ -62,10 +62,10 @@ class ApiLogServiceImplTest {
         apiLogEntities = findApiLogEntities(executionRequestId)
 
         assertEquals(1, apiLogEntities.size)
-        assertEquals("", apiLogEntities[0].requestHeaderText)
-        assertEquals("", apiLogEntities[0].requestBodyText)
-        assertEquals("", apiLogEntities[0].transformedRequestHeaderText)
-        assertEquals("", apiLogEntities[0].transformedRequestBodyText)
+        assertEquals("", apiLogEntities[0].requestHeader)
+        assertEquals("", apiLogEntities[0].requestBody)
+        assertEquals("", apiLogEntities[0].transformedRequestHeader)
+        assertEquals("", apiLogEntities[0].transformedRequestBody)
     }
 
     @Test
@@ -90,10 +90,10 @@ class ApiLogServiceImplTest {
         val apiLogEntities = findApiLogEntities(executionRequestId)
 
         assertEquals(1, apiLogEntities.size)
-        assertEquals("header", apiLogEntities[0].requestHeaderText)
-        assertEquals("body", apiLogEntities[0].requestBodyText)
-        assertEquals("transformedHeader", apiLogEntities[0].transformedRequestHeaderText)
-        assertEquals("transformedBody", apiLogEntities[0].transformedRequestBodyText)
+        assertEquals("header", apiLogEntities[0].requestHeader)
+        assertEquals("body", apiLogEntities[0].requestBody)
+        assertEquals("transformedHeader", apiLogEntities[0].transformedRequestHeader)
+        assertEquals("transformedBody", apiLogEntities[0].transformedRequestBody)
     }
 
     @Test
@@ -110,14 +110,14 @@ class ApiLogServiceImplTest {
 
         var apiLogEntities = findApiLogEntities(executionRequestId)
         assertEquals(1, apiLogEntities.size)
-        assertEquals("", apiLogEntities[0].requestHeaderText)
-        assertEquals("", apiLogEntities[0].requestBodyText)
-        assertEquals("", apiLogEntities[0].transformedRequestHeaderText)
-        assertEquals("", apiLogEntities[0].transformedRequestBodyText)
-        assertEquals(null, apiLogEntities[0].responseBodyText)
-        assertEquals(null, apiLogEntities[0].responseHeaderText)
-        assertEquals(null, apiLogEntities[0].transformedResponseBodyText)
-        assertEquals(null, apiLogEntities[0].transformedResponseHeaderText)
+        assertEquals("", apiLogEntities[0].requestHeader)
+        assertEquals("", apiLogEntities[0].requestBody)
+        assertEquals("", apiLogEntities[0].transformedRequestHeader)
+        assertEquals("", apiLogEntities[0].transformedRequestBody)
+        assertEquals(null, apiLogEntities[0].responseBody)
+        assertEquals(null, apiLogEntities[0].responseHeader)
+        assertEquals(null, apiLogEntities[0].transformedResponseBody)
+        assertEquals(null, apiLogEntities[0].transformedResponseHeader)
     }
 
     @Test
@@ -141,14 +141,14 @@ class ApiLogServiceImplTest {
         apiLogService.logResponse(executionRequestId, organizationId, banksaladUserId, apiLog)
         val apiLogEntities = findApiLogEntities(executionRequestId)
         assertEquals(1, apiLogEntities.size)
-        assertEquals("", apiLogEntities[0].requestHeaderText)
-        assertEquals("", apiLogEntities[0].requestBodyText)
-        assertEquals("", apiLogEntities[0].transformedRequestHeaderText)
-        assertEquals("", apiLogEntities[0].transformedRequestBodyText)
-        assertEquals("body", apiLogEntities[0].responseBodyText)
-        assertEquals("header", apiLogEntities[0].responseHeaderText)
-        assertEquals("transformedBody", apiLogEntities[0].transformedResponseBodyText)
-        assertEquals("transformedHeader", apiLogEntities[0].transformedResponseHeaderText)
+        assertEquals("", apiLogEntities[0].requestHeader)
+        assertEquals("", apiLogEntities[0].requestBody)
+        assertEquals("", apiLogEntities[0].transformedRequestHeader)
+        assertEquals("", apiLogEntities[0].transformedRequestBody)
+        assertEquals("body", apiLogEntities[0].responseBody)
+        assertEquals("header", apiLogEntities[0].responseHeader)
+        assertEquals("transformedBody", apiLogEntities[0].transformedResponseBody)
+        assertEquals("transformedHeader", apiLogEntities[0].transformedResponseHeader)
     }
 
     @Test

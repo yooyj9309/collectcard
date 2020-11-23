@@ -2,6 +2,7 @@ package com.rainist.collectcard.card
 
 import com.rainist.collectcard.card.dto.Card
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
+import com.rainist.collectcard.common.crypto.HashUtil
 import com.rainist.collectcard.common.db.entity.CardEntity
 import com.rainist.collectcard.common.db.repository.CardRepository
 import com.rainist.collectcard.common.dto.CollectExecutionContext
@@ -83,7 +84,8 @@ class CardServiceImplTest {
         assertThat(
             response.dataBody?.cards?.first(), `is`(Card().apply {
                 cardCompanyId = "shinhancard"
-                cardCompanyCardId = "9523*********8721"
+                cardCompanyCardId = HashUtil.sha256("9523*********8721")
+                cardCompanyCardIdOrigin = "9523*********8721"
                 cardOwnerName = "홍길동"
                 cardOwnerType = CardOwnerType.SELF
                 cardOwnerTypeOrigin = "1"
@@ -115,7 +117,8 @@ class CardServiceImplTest {
                     cardId = firstEntity.cardId,
                     banksaladUserId = executionContext.userId.toLong(),
                     cardCompanyId = "shinhancard",
-                    cardCompanyCardId = "9523*********8721",
+                    cardCompanyCardId = HashUtil.sha256("9523*********8721"),
+                    cardCompanyCardIdOrigin = "9523*********8721",
                     lastCheckAt = now,
                     cardOwnerName = "홍길동",
                     cardOwnerType = "SELF",
@@ -169,7 +172,8 @@ class CardServiceImplTest {
         assertThat(
             response.dataBody?.cards?.first(), `is`(Card().apply {
                 cardCompanyId = "shinhancard"
-                cardCompanyCardId = "9523*********8721"
+                cardCompanyCardId = HashUtil.sha256("9523*********8721")
+                cardCompanyCardIdOrigin = "9523*********8721"
                 cardOwnerName = "홍길동"
                 cardOwnerType = CardOwnerType.SELF
                 cardOwnerTypeOrigin = "1"
@@ -202,7 +206,8 @@ class CardServiceImplTest {
                     cardId = firstEntity.cardId,
                     banksaladUserId = executionContext.userId.toLong(),
                     cardCompanyId = "shinhancard",
-                    cardCompanyCardId = "9523*********8721",
+                    cardCompanyCardId = HashUtil.sha256("9523*********8721"),
+                    cardCompanyCardIdOrigin = "9523*********8721",
                     lastCheckAt = now,
                     cardOwnerName = "홍길동",
                     cardOwnerType = "SELF",
@@ -249,7 +254,8 @@ class CardServiceImplTest {
                 cardId = 1,
                 banksaladUserId = executionContext.userId.toLong(),
                 cardCompanyId = "shinhancard",
-                cardCompanyCardId = "9523*********8721",
+                cardCompanyCardId = HashUtil.sha256("9523*********8721"),
+                cardCompanyCardIdOrigin = "9523*********8721",
                 lastCheckAt = now,
                 cardOwnerName = "홍길동",
                 cardOwnerType = "SELF",
@@ -274,7 +280,8 @@ class CardServiceImplTest {
         assertThat(
             response.dataBody?.cards?.first(), `is`(Card().apply {
                 cardCompanyId = "shinhancard"
-                cardCompanyCardId = "9523*********8721"
+                cardCompanyCardId = HashUtil.sha256("9523*********8721")
+                cardCompanyCardIdOrigin = "9523*********8721"
                 cardOwnerName = "홍길동"
                 cardOwnerType = CardOwnerType.SELF
                 cardOwnerTypeOrigin = "5"
@@ -305,7 +312,8 @@ class CardServiceImplTest {
                     cardId = firstEntity.cardId,
                     banksaladUserId = executionContext.userId.toLong(),
                     cardCompanyId = "shinhancard",
-                    cardCompanyCardId = "9523*********8721",
+                    cardCompanyCardId = HashUtil.sha256("9523*********8721"),
+                    cardCompanyCardIdOrigin = "9523*********8721",
                     lastCheckAt = now,
                     cardOwnerName = "홍길동",
                     cardOwnerType = "SELF",

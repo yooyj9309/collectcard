@@ -39,10 +39,18 @@ val grpc_spring_boot_version = "3.5.2"
 val http_client_version = "4.5.11"
 val camel_version = "3.2.0"
 val json_path_version = "2.4.0"
+val idl_version = "20201103.f1b6801.RELEASE"
+val aws_sdk_version = "2.14.21"
+
+dependencyManagement {
+    imports {
+        mavenBom("software.amazon.awssdk:bom:${aws_sdk_version}")
+    }
+}
 
 dependencies {
     implementation("com.rainist:kotlin-banksalad:1.0.22.RELEASE")
-    implementation("com.banksalad:idl:20200922.cd21a9b.RELEASE")
+    implementation("com.banksalad:idl:${idl_version}")
 
     // collect
     implementation("com.rainist:collect:1.1.29.RELEASE")
@@ -97,6 +105,9 @@ dependencies {
     implementation("org.mapstruct:mapstruct:1.3.0.Final")
     kapt("org.mapstruct:mapstruct-processor:1.3.0.Final")
     kaptTest("org.mapstruct:mapstruct-processor:1.3.0.Final")
+
+    // aws
+    implementation("software.amazon.awssdk:kms:2.14.21")
 
     testImplementation ("org.mockito:mockito-inline:2.13.0")
 }

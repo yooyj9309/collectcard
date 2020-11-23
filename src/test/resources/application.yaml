@@ -27,6 +27,11 @@ connect-server:
   host: localhost
   port: 6565
 
+cipher-server:
+  uri: localhost:9999
+  host: localhost
+  port: 6566
+
 shinhancard:
   organizationId: shinhancard
   objectId: 596d66692c4069c168b57c59
@@ -38,3 +43,22 @@ server:
 
 grpc:
   port: 0
+
+aws:
+  region: ap-northeast-2
+  iam:
+    collectcard:
+      access-key: ${STAGING_AWS_IAM_COLLECTCARD_ACCESS_KEY}
+      access-token: ${STAGING_AWS_IAM_COLLECTCARD_ACCESS_TOKEN}
+
+
+
+cipher:
+  iv:
+    api_log: AMJSyQFazQJY0flR
+    card: GX0MTaNWVPh6FqL9
+    card_bill: bVorUVGi7zpvolHX
+    card_bill_transaction: fTnx1SpdnOgE1mBa
+    card_loan: qaEr6muUh+0ytBrw
+    card_payment_scheduled: mltdWbc2u7akgbGF
+    card_transaction: IJ3A8ccSaR2mCJL/

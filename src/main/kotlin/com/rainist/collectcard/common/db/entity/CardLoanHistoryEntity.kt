@@ -1,8 +1,10 @@
 package com.rainist.collectcard.common.db.entity
 
+import com.rainist.collectcard.common.converter.CardLoanEncryptConverter
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import javax.persistence.Column
+import javax.persistence.Convert
 import javax.persistence.Entity
 import javax.persistence.EntityListeners
 import javax.persistence.GeneratedValue
@@ -42,6 +44,8 @@ data class CardLoanHistoryEntity(
 
     var paymentBankId: String? = null,
 
+    @Convert(converter = CardLoanEncryptConverter::class)
+    @Column(nullable = true, name = "paymentAccountNumberEncrypted")
     var paymentAccountNumber: String? = null,
 
     @Column(nullable = false)
@@ -69,6 +73,8 @@ data class CardLoanHistoryEntity(
 
     var fullyPaidDay: String? = null,
 
+    @Convert(converter = CardLoanEncryptConverter::class)
+    @Column(nullable = true, name = "cardNumberEncrypted")
     var cardNumber: String? = null,
 
     var principalAmount: BigDecimal? = null,

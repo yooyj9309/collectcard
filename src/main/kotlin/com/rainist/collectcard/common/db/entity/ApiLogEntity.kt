@@ -1,7 +1,9 @@
 package com.rainist.collectcard.common.db.entity
 
+import com.rainist.collectcard.common.converter.ApiLogEncryptConverter
 import java.time.LocalDateTime
 import javax.persistence.Column
+import javax.persistence.Convert
 import javax.persistence.Entity
 import javax.persistence.EntityListeners
 import javax.persistence.GeneratedValue
@@ -44,17 +46,21 @@ data class ApiLogEntity(
     @Column(nullable = false)
     var httpMethod: String? = null,
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    var requestHeaderText: String? = null,
+    @Convert(converter = ApiLogEncryptConverter::class)
+    @Column(nullable = false, columnDefinition = "MEDIUMTEXT", name = "requestHeaderEncrypted")
+    var requestHeader: String? = null,
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    var requestBodyText: String? = null,
+    @Convert(converter = ApiLogEncryptConverter::class)
+    @Column(nullable = false, columnDefinition = "MEDIUMTEXT", name = "requestBodyEncrypted")
+    var requestBody: String? = null,
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    var transformedRequestHeaderText: String? = null,
+    @Convert(converter = ApiLogEncryptConverter::class)
+    @Column(nullable = false, columnDefinition = "MEDIUMTEXT", name = "transformedRequestHeaderEncrypted")
+    var transformedRequestHeader: String? = null,
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    var transformedRequestBodyText: String? = null,
+    @Convert(converter = ApiLogEncryptConverter::class)
+    @Column(nullable = false, columnDefinition = "MEDIUMTEXT", name = "transformedRequestBodyEncrypted")
+    var transformedRequestBody: String? = null,
 
     var resultCode: String? = null,
 
@@ -62,17 +68,21 @@ data class ApiLogEntity(
 
     var responseCode: String? = null,
 
-    @Column(columnDefinition = "TEXT")
-    var responseHeaderText: String? = null,
+    @Convert(converter = ApiLogEncryptConverter::class)
+    @Column(columnDefinition = "MEDIUMTEXT", name = "responseHeaderEncrypted")
+    var responseHeader: String? = null,
 
-    @Column(columnDefinition = "TEXT")
-    var responseBodyText: String? = null,
+    @Convert(converter = ApiLogEncryptConverter::class)
+    @Column(columnDefinition = "MEDIUMTEXT", name = "responseBodyEncrypted")
+    var responseBody: String? = null,
 
-    @Column(columnDefinition = "TEXT")
-    var transformedResponseHeaderText: String? = null,
+    @Convert(converter = ApiLogEncryptConverter::class)
+    @Column(columnDefinition = "MEDIUMTEXT", name = "transformedResponseHeaderEncrypted")
+    var transformedResponseHeader: String? = null,
 
-    @Column(columnDefinition = "TEXT")
-    var transformedResponseBodyText: String? = null,
+    @Convert(converter = ApiLogEncryptConverter::class)
+    @Column(columnDefinition = "MEDIUMTEXT", name = "transformedResponseBodyEncrypted")
+    var transformedResponseBody: String? = null,
 
     @Column(nullable = false)
     var requestDatetime: LocalDateTime? = null,

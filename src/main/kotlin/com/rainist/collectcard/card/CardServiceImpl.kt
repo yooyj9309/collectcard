@@ -12,6 +12,7 @@ import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
+import com.rainist.collectcard.common.crypto.HashUtil
 import com.rainist.collectcard.common.db.entity.CardEntity
 import com.rainist.collectcard.common.db.repository.CardHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardRepository
@@ -80,7 +81,10 @@ class CardServiceImpl(
 
         /* Save to DB and return */
         listCardsResponse?.dataBody?.cards?.forEach { card ->
-            upsertCardAndCardHistory(executionContext.userId.toLong(), card, now)
+            when (card.cardCompanyId) {
+                shinhancardOrganizationId -> updateShinhancardDataByMaskedCardNumber(executionContext.userId.toLong(), card, now)
+                else -> upsertCardAndCardHistory(executionContext.userId.toLong(), card, now)
+            }
         }
 
         userSyncStatusService.upsertUserSyncStatus(
@@ -104,22 +108,34 @@ class CardServiceImpl(
         )?.let { cardEntity ->
             updateCardEntity(cardEntity, card, now)
         } ?: kotlin.run {
-            when (card.cardCompanyId) {
-                // 신한카드의 경우 예외 처리. // 마스킹 정책 이슈로 인한 예외처리 추가.
-                shinhancardOrganizationId -> updateShinhancardDataByMaskedCardNumber(banksaladUserId, card, now)
-                else -> insertCardEntity(card, banksaladUserId, now)
-            }
+            insertCardEntity(card, banksaladUserId, now)
         }
     }
 
     // 신한카드 대응 코드
     private fun updateShinhancardDataByMaskedCardNumber(banksaladUserId: Long, card: Card, now: LocalDateTime) {
-        cardRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardId(
+        var cardEntity = cardRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardId(
             banksaladUserId,
             card.cardCompanyId ?: "",
-            CustomStringUtil.replaceNumberToMask(card.cardCompanyCardId)
-        )?.let { cardEntity ->
-            updateCardEntity(cardEntity, card, now)
+            HashUtil.sha256(card.cardCompanyCardId ?: "") ?: ""
+        )
+
+        if (cardEntity == null) {
+            cardEntity = cardRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardId(
+                banksaladUserId,
+                card.cardCompanyId ?: "",
+                HashUtil.sha256(CustomStringUtil.replaceNumberToMask(card.cardCompanyCardId)) ?: ""
+            )
+        }
+
+        // TODO Column 삭제시 삭제 //
+        card.cardCompanyCardIdOrigin = card.cardCompanyCardId
+        // TODO Column 삭제시 삭제 //
+
+        card.cardCompanyCardId = HashUtil.sha256(card.cardCompanyCardId ?: "")
+
+        cardEntity?.let { it ->
+            updateCardEntity(it, card, now)
         } ?: kotlin.run {
             insertCardEntity(card, banksaladUserId, now)
         }

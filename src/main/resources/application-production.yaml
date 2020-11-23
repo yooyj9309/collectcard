@@ -35,3 +35,20 @@ shinhancard:
   objectId: 5880ec0575c8e8fbdc00aced
   host: https://openapi.shinhancard.com:8443
   clientId: ${PRODUCTION_SHINHANCARD_CLIENT_ID}
+
+cipher:
+  iv:
+    api_log: JO1/nc1T/JcN1IUZ
+    card: zX5gg+i0+0UQXNkY
+    card_bill: sJ+LSK4LgI1EgQ8Y
+    card_bill_transaction: ce6sByWd1352K0WB
+    card_loan: 8MMjf/dQOLJUfALa
+    card_payment_scheduled: SAb3UHd1u8EXad8H
+    card_transaction: VJYyG4WMmo50Lsno
+
+aws:
+  region: ap-northeast-2
+  iam:
+    collectcard:
+      access-key: ${PRODUCTION_AWS_IAM_COLLECTCARD_ACCESS_KEY}
+      access-token: ${PRODUCTION_AWS_IAM_COLLECTCARD_ACCESS_TOKEN}

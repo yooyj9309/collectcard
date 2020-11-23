@@ -1,4 +1,4 @@
-package com.rainist.collectcard.config
+package com.rainist.collectcard.config.grpc
 
 import com.github.banksalad.idl.apis.external.v1.connect.ConnectGrpc
 import com.github.banksalad.idl.apis.external.v1.result.ErrorProto
@@ -27,18 +27,15 @@ class GrpcConfig(
     val meterRegistry: MeterRegistry
 ) {
 
-    companion object : Log
+    companion object : Log {
+        const val CLIENT_LOAD_BALANCING_POLICY_ROUND_ROBIN = "round_robin"
+    }
 
     @Value("\${spring.application.name}")
     lateinit var applicationName: String
 
     @Bean
     fun connectChannel(): ManagedChannel {
-        logger
-            .With("connect channel Host", connectHost)
-            .With("port", connectPort)
-            .Info("")
-
         return ManagedChannelBuilder.forAddress(connectHost, connectPort)
             .usePlaintext()
             .intercept(StatsUnaryClientInterceptor(meterRegistry, applicationName))

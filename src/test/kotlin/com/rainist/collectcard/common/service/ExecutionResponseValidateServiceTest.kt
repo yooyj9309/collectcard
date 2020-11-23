@@ -125,14 +125,14 @@ class ExecutionResponseValidateServiceTest {
             this.requestUrl = ""
             this.httpMethod = ""
             this.httpMethod = ""
-            this.requestBodyText = ""
-            this.requestHeaderText = ""
-            this.transformedRequestHeaderText = ""
-            this.transformedRequestBodyText = ""
-            this.responseHeaderText = ""
-            this.responseBodyText = ""
-            this.transformedResponseHeaderText = ""
-            this.transformedResponseBodyText = ""
+            this.requestBody = ""
+            this.requestHeader = ""
+            this.transformedRequestHeader = ""
+            this.transformedRequestBody = ""
+            this.responseHeader = ""
+            this.responseBody = ""
+            this.transformedResponseHeader = ""
+            this.transformedResponseBody = ""
             this.requestDatetime = LocalDateTime.now()
             this.resultCode = resultCode
         })

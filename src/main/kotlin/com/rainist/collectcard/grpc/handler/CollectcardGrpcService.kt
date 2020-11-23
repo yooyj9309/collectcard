@@ -19,7 +19,7 @@ import com.rainist.collectcard.common.exception.HealthCheckException
 import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.collectcard.common.service.UuidService
-import com.rainist.collectcard.config.onException
+import com.rainist.collectcard.config.grpc.onException
 import com.rainist.common.interceptor.StatsUnaryServerInterceptor
 import com.rainist.common.log.Log
 import io.grpc.stub.StreamObserver

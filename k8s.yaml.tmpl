@@ -22,9 +22,17 @@
 
 {{ $development_collectcard_db_password := getenv "DEVELOPMENT_COLLECTCARD_DB_PASSWORD" "" }}
 {{ $development_shinhancard_client_id := getenv "DEVELOPMENT_SHINHANCARD_CLIENT_ID" "" }}
+{{ $development_aws_iam_collectcard_access_key := getenv "DEVELOPMENT_AWS_IAM_COLLECTCARD_ACCESS_KEY" "" }}
+{{ $development_aws_iam_collectcard_access_token := getenv "DEVELOPMENT_AWS_IAM_COLLECTCARD_ACCESS_TOKEN" "" }}
+
 
 {{ $production_collectcard_db_password := getenv "PRODUCTION_COLLECTCARD_DB_PASSWORD" "" }}
 {{ $production_shinhancard_client_id := getenv "PRODUCTION_SHINHANCARD_CLIENT_ID" "" }}
+{{ $production_aws_iam_collectcard_access_key := getenv "PRODUCTION_AWS_IAM_COLLECTCARD_ACCESS_KEY" "" }}
+{{ $production_aws_iam_collectcard_access_token := getenv "PRODUCTION_AWS_IAM_COLLECTCARD_ACCESS_TOKEN" "" }}
+
+{{ $staging_aws_iam_collectcard_access_key := getenv "STAGING_AWS_IAM_COLLECTCARD_ACCESS_KEY" "" }}
+{{ $staging_aws_iam_collectcard_access_token := getenv "STAGING_AWS_IAM_COLLECTCARD_ACCESS_TOKEN" "" }}
 
 
 # ^/health$
@@ -259,6 +267,18 @@ spec:
               value: {{ $production_collectcard_db_password }}
             - name: PRODUCTION_SHINHANCARD_CLIENT_ID
               value: {{ $production_shinhancard_client_id }}
+            - name: DEVELOPMENT_AWS_IAM_COLLECTCARD_ACCESS_KEY
+              value: {{ $development_aws_iam_collectcard_access_key }}
+            - name: DEVELOPMENT_AWS_IAM_COLLECTCARD_ACCESS_TOKEN
+              value: {{ $development_aws_iam_collectcard_access_token }}
+            - name: STAGING_AWS_IAM_COLLECTCARD_ACCESS_KEY
+              value: {{ $staging_aws_iam_collectcard_access_key }}
+            - name: STAGING_AWS_IAM_COLLECTCARD_ACCESS_TOKEN
+              value: {{ $staging_aws_iam_collectcard_access_token }}
+            - name: PRODUCTION_AWS_IAM_COLLECTCARD_ACCESS_KEY
+              value: {{ $production_aws_iam_collectcard_access_key }}
+            - name: PRODUCTION_AWS_IAM_COLLECTCARD_ACCESS_TOKEN
+              value: {{ $production_aws_iam_collectcard_access_token }}
           resources:
             limits:
               memory: 8Gi
