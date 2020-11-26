@@ -18,8 +18,7 @@ data class Card(
     // TODO : add IDL
     // 카드사 카드 아이디
     var cardCompanyCardId: String? = null,
-    // 카드사 카드 아이디 원본 TODO 2020.11.26일 이후 컬럼 삭제
-    var cardCompanyCardIdOrigin: String? = null,
+
     // 카드 소유주 이름 (e.g. 김뱅샐)
     var cardOwnerName: String? = null,
     // 카드 소유자 구분

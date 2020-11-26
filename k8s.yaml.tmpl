@@ -419,9 +419,14 @@ spec:
     - podSelector:
         matchLabels:
           app: connect
+    - podSelector:
+        matchLabels:
+          app: cipher
     ports:
     - protocol: TCP
       port: 8080
+    - protocol: TCP
+      port: 18081
   - to:
     - ipBlock:
         cidr: {{ $mysql_cidr_a }}

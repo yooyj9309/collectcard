@@ -48,11 +48,11 @@ data class CardBillTransactionEntity(
     var cardName: String? = null,
 
     @Convert(converter = CardBillTransactionEncryptConverter::class)
-    @Column(nullable = true, name = "cardNumberEncrypted")
+    @Column(nullable = true, name = "card_number_encrypted")
     var cardNumber: String? = null,
 
     @Convert(converter = CardBillTransactionEncryptConverter::class)
-    @Column(nullable = true, name = "cardNumberMaskEncrypted")
+    @Column(nullable = true, name = "card_number_mask_encrypted")
     var cardNumberMask: String? = null,
 
     @Nullable

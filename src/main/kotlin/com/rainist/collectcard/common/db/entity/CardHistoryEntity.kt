@@ -34,14 +34,10 @@ data class CardHistoryEntity(
     @Column(nullable = false)
     var cardCompanyCardId: String? = null,
 
-    // 카드사 카드 아이디 원본 TODO 2020.11.26일 이후 컬럼 삭제
-    @Column(nullable = true)
-    var cardCompanyCardIdOrigin: String? = null,
-
     var lastCheckAt: LocalDateTime? = null,
 
     @Convert(converter = CardEncryptConverter::class)
-    @Column(nullable = false, name = "cardOwnerNameEncrypted")
+    @Column(nullable = false, name = "card_owner_name_encrypted")
     var cardOwnerName: String? = null,
 
     @Column(nullable = false)
@@ -56,11 +52,11 @@ data class CardHistoryEntity(
     var internationalBrandName: String? = null,
 
     @Convert(converter = CardEncryptConverter::class)
-    @Column(nullable = false, name = "cardNumberEncrypted")
+    @Column(nullable = false, name = "card_number_encrypted")
     var cardNumber: String? = null,
 
     @Convert(converter = CardEncryptConverter::class)
-    @Column(nullable = true, name = "cardNumberMaskEncrypted")
+    @Column(nullable = true, name = "card_number_mask_encrypted")
     var cardNumberMask: String? = null,
 
     var cardType: String? = null,
@@ -84,7 +80,7 @@ data class CardHistoryEntity(
     var paymentBankId: String? = null,
 
     @Convert(converter = CardEncryptConverter::class)
-    @Column(nullable = true, name = "paymentAccountNumberEncrypted")
+    @Column(nullable = true, name = "payment_account_number_encrypted")
     var paymentAccountNumber: String? = null,
 
     @Column(columnDefinition = "BIT", length = 1)

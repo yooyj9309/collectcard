@@ -128,10 +128,6 @@ class CardServiceImpl(
             )
         }
 
-        // TODO Column 삭제시 삭제 //
-        card.cardCompanyCardIdOrigin = card.cardCompanyCardId
-        // TODO Column 삭제시 삭제 //
-
         card.cardCompanyCardId = HashUtil.sha256(card.cardCompanyCardId ?: "")
 
         cardEntity?.let { it ->

@@ -45,7 +45,7 @@ data class CardLoanHistoryEntity(
     var paymentBankId: String? = null,
 
     @Convert(converter = CardLoanEncryptConverter::class)
-    @Column(nullable = true, name = "paymentAccountNumberEncrypted")
+    @Column(nullable = true, name = "payment_account_number_encrypted")
     var paymentAccountNumber: String? = null,
 
     @Column(nullable = false)
@@ -74,7 +74,7 @@ data class CardLoanHistoryEntity(
     var fullyPaidDay: String? = null,
 
     @Convert(converter = CardLoanEncryptConverter::class)
-    @Column(nullable = true, name = "cardNumberEncrypted")
+    @Column(nullable = true, name = "card_number_encrypted")
     var cardNumber: String? = null,
 
     var principalAmount: BigDecimal? = null,

@@ -85,7 +85,6 @@ class CardServiceImplTest {
             response.dataBody?.cards?.first(), `is`(Card().apply {
                 cardCompanyId = "shinhancard"
                 cardCompanyCardId = HashUtil.sha256("9523*********8721")
-                cardCompanyCardIdOrigin = "9523*********8721"
                 cardOwnerName = "홍길동"
                 cardOwnerType = CardOwnerType.SELF
                 cardOwnerTypeOrigin = "1"
@@ -118,7 +117,6 @@ class CardServiceImplTest {
                     banksaladUserId = executionContext.userId.toLong(),
                     cardCompanyId = "shinhancard",
                     cardCompanyCardId = HashUtil.sha256("9523*********8721"),
-                    cardCompanyCardIdOrigin = "9523*********8721",
                     lastCheckAt = now,
                     cardOwnerName = "홍길동",
                     cardOwnerType = "SELF",
@@ -173,7 +171,6 @@ class CardServiceImplTest {
             response.dataBody?.cards?.first(), `is`(Card().apply {
                 cardCompanyId = "shinhancard"
                 cardCompanyCardId = HashUtil.sha256("9523*********8721")
-                cardCompanyCardIdOrigin = "9523*********8721"
                 cardOwnerName = "홍길동"
                 cardOwnerType = CardOwnerType.SELF
                 cardOwnerTypeOrigin = "1"
@@ -207,7 +204,6 @@ class CardServiceImplTest {
                     banksaladUserId = executionContext.userId.toLong(),
                     cardCompanyId = "shinhancard",
                     cardCompanyCardId = HashUtil.sha256("9523*********8721"),
-                    cardCompanyCardIdOrigin = "9523*********8721",
                     lastCheckAt = now,
                     cardOwnerName = "홍길동",
                     cardOwnerType = "SELF",
@@ -255,7 +251,6 @@ class CardServiceImplTest {
                 banksaladUserId = executionContext.userId.toLong(),
                 cardCompanyId = "shinhancard",
                 cardCompanyCardId = HashUtil.sha256("9523*********8721"),
-                cardCompanyCardIdOrigin = "9523*********8721",
                 lastCheckAt = now,
                 cardOwnerName = "홍길동",
                 cardOwnerType = "SELF",
@@ -281,7 +276,6 @@ class CardServiceImplTest {
             response.dataBody?.cards?.first(), `is`(Card().apply {
                 cardCompanyId = "shinhancard"
                 cardCompanyCardId = HashUtil.sha256("9523*********8721")
-                cardCompanyCardIdOrigin = "9523*********8721"
                 cardOwnerName = "홍길동"
                 cardOwnerType = CardOwnerType.SELF
                 cardOwnerTypeOrigin = "5"
@@ -313,7 +307,6 @@ class CardServiceImplTest {
                     banksaladUserId = executionContext.userId.toLong(),
                     cardCompanyId = "shinhancard",
                     cardCompanyCardId = HashUtil.sha256("9523*********8721"),
-                    cardCompanyCardIdOrigin = "9523*********8721",
                     lastCheckAt = now,
                     cardOwnerName = "홍길동",
                     cardOwnerType = "SELF",

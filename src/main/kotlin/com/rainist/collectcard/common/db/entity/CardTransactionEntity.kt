@@ -46,11 +46,11 @@ data class CardTransactionEntity(
     var cardName: String? = null,
 
     @Convert(converter = CardTransactionEncryptConverter::class)
-    @Column(nullable = false, name = "cardNumberEncrypted")
+    @Column(nullable = false, name = "card_number_encrypted")
     var cardNumber: String? = null,
 
     @Convert(converter = CardTransactionEncryptConverter::class)
-    @Column(nullable = true, name = "cardNumberMaskEncrypted")
+    @Column(nullable = true, name = "card_number_mask_encrypted")
     var cardNumberMask: String? = null,
 
     var amount: BigDecimal? = null, // 매출액 ( 거래금액 )

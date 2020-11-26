@@ -18,7 +18,7 @@ import org.springframework.http.converter.StringHttpMessageConverter
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.web.client.RestTemplate
 
-@Profile(value = ["local", "development", "test"])
+@Profile(value = ["local", "development", "staging", "test"])
 @Configuration
 class DevelopRestTemplateConfig {
     private val connectTimoutMs = TimeUnit.MILLISECONDS.convert(5, TimeUnit.SECONDS)

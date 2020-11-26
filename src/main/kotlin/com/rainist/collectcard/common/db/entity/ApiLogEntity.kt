@@ -47,19 +47,19 @@ data class ApiLogEntity(
     var httpMethod: String? = null,
 
     @Convert(converter = ApiLogEncryptConverter::class)
-    @Column(nullable = false, columnDefinition = "MEDIUMTEXT", name = "requestHeaderEncrypted")
+    @Column(nullable = false, columnDefinition = "MEDIUMTEXT", name = "request_header_encrypted")
     var requestHeader: String? = null,
 
     @Convert(converter = ApiLogEncryptConverter::class)
-    @Column(nullable = false, columnDefinition = "MEDIUMTEXT", name = "requestBodyEncrypted")
+    @Column(nullable = false, columnDefinition = "MEDIUMTEXT", name = "request_body_encrypted")
     var requestBody: String? = null,
 
     @Convert(converter = ApiLogEncryptConverter::class)
-    @Column(nullable = false, columnDefinition = "MEDIUMTEXT", name = "transformedRequestHeaderEncrypted")
+    @Column(nullable = false, columnDefinition = "MEDIUMTEXT", name = "transformed_request_header_encrypted")
     var transformedRequestHeader: String? = null,
 
     @Convert(converter = ApiLogEncryptConverter::class)
-    @Column(nullable = false, columnDefinition = "MEDIUMTEXT", name = "transformedRequestBodyEncrypted")
+    @Column(nullable = false, columnDefinition = "MEDIUMTEXT", name = "transformed_request_body_encrypted")
     var transformedRequestBody: String? = null,
 
     var resultCode: String? = null,
@@ -69,19 +69,19 @@ data class ApiLogEntity(
     var responseCode: String? = null,
 
     @Convert(converter = ApiLogEncryptConverter::class)
-    @Column(columnDefinition = "MEDIUMTEXT", name = "responseHeaderEncrypted")
+    @Column(columnDefinition = "MEDIUMTEXT", name = "response_header_encrypted")
     var responseHeader: String? = null,
 
     @Convert(converter = ApiLogEncryptConverter::class)
-    @Column(columnDefinition = "MEDIUMTEXT", name = "responseBodyEncrypted")
+    @Column(columnDefinition = "MEDIUMTEXT", name = "response_body_encrypted")
     var responseBody: String? = null,
 
     @Convert(converter = ApiLogEncryptConverter::class)
-    @Column(columnDefinition = "MEDIUMTEXT", name = "transformedResponseHeaderEncrypted")
+    @Column(columnDefinition = "MEDIUMTEXT", name = "transformed_response_header_encrypted")
     var transformedResponseHeader: String? = null,
 
     @Convert(converter = ApiLogEncryptConverter::class)
-    @Column(columnDefinition = "MEDIUMTEXT", name = "transformedResponseBodyEncrypted")
+    @Column(columnDefinition = "MEDIUMTEXT", name = "transformed_response_body_encrypted")
     var transformedResponseBody: String? = null,
 
     @Column(nullable = false)

@@ -46,7 +46,7 @@ data class CardBillHistoryEntity(
     var lastCheckAt: LocalDateTime? = null,
 
     @Convert(converter = CardBillEncryptConverter::class)
-    @Column(nullable = true, name = "userNameEncrypted")
+    @Column(nullable = true, name = "user_name_encrypted")
     var userName: String? = null,
 
     var userGrade: String? = null,
@@ -70,7 +70,7 @@ data class CardBillHistoryEntity(
     var paymentBankId: String? = null,
 
     @Convert(converter = CardBillEncryptConverter::class)
-    @Column(nullable = true, name = "paymentAccountNumberEncrypted")
+    @Column(nullable = true, name = "payment_account_number_encrypted")
     var paymentAccountNumber: String? = null,
 
     @Column(precision = 17, scale = 4)
