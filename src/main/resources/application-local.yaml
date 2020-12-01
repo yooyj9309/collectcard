@@ -43,6 +43,10 @@ cipher-server:
   host: localhost
   port: 9999
 
+connect-server:
+  host: connect
+  port: 9998
+
 cipher:
   iv:
     api_log: AMJSyQFazQJY0flR
