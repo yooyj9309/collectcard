@@ -125,7 +125,8 @@ class CardBillExecutionTest {
             this.discountAmount = BigDecimal("0")
             this.amount = BigDecimal("74500")
             this.approvalDay = "20200702"
-            this.billedAmount = BigDecimal("74500")
+            this.paidAmount = BigDecimal("74500")
+            this.billedAmount = BigDecimal("0")
             this.billedFee = BigDecimal("0")
         })
     }
@@ -255,6 +256,9 @@ class CardBillExecutionTest {
         assertEquals(2, bills.size)
         assertEquals(5, bills[0].transactions?.size)
         assertEquals(1, bills[1].transactions?.size)
+
+        // 체크카드 청구금액은 0원으로 계산
+        assertEquals(BigDecimal("0"), bills[0].billingAmount)
 
         assertThat(bills[1]).isEqualToIgnoringGivenFields(CardBill().apply {
             this.billNumber = "202008140002"

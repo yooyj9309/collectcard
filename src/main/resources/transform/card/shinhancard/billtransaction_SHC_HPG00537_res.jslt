@@ -24,7 +24,8 @@ let resultCodes = {
                 {
                     "approvalDay" : .comm,
                     "amount": .capital,
-                    "billedAmount" : .capital,
+                    "billedAmount" : .billamt,
+                    "paidAmount":.payfamt,
                     "billedFee": .commission,
                     "cardNumber": replace(.class, "[^0-9]", ""),
                     "cardNumberMasked": replace(.class, "[^0-9]", ""),

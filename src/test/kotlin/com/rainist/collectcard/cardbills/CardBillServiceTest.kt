@@ -13,6 +13,7 @@ import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.collectcard.common.util.ExecutionTestUtil
 import com.rainist.common.util.DateTimeUtil
+import java.math.BigDecimal
 import java.time.LocalDateTime
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DisplayName
@@ -106,6 +107,10 @@ class CardBillServiceTest {
         assertEquals(2, billHistoryEntities.size) // 청구서 : 2개
         assertEquals(10, billTransactionEntites.size) // transaction : 10
         assertEquals(12, cardPaymentScheduledEntities.size) // 결제예정금액 : 12개
+
+        // 체크카드 이용내역 적재 테스트
+        assertEquals(BigDecimal("74500.0000"), billTransactionEntites[0].paidAmount)
+        assertEquals(BigDecimal("0.0000"), billEntities[0].billingAmount)
 
         val protoRes = res.toListCardBillsResponseProto()
         assertEquals("2020-09-14", protoRes.getData(0).dueDate)
