@@ -25,9 +25,11 @@ import com.rainist.collectcard.common.service.ExecutionResponseValidateService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.common.service.UserSyncStatusService
+import com.rainist.collectcard.common.util.CustomStringUtil
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import java.time.LocalDateTime
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -42,7 +44,8 @@ class CardBillServiceImpl(
     val cardPaymentScheduledRepository: CardPaymentScheduledRepository,
     val organizationService: OrganizationService,
     val userSyncStatusService: UserSyncStatusService,
-    val executionResponseValidateService: ExecutionResponseValidateService
+    val executionResponseValidateService: ExecutionResponseValidateService,
+    @Value("\${shinhancard.organizationId}") private var shinhancardOrganizationId: String
 ) : CardBillService {
 
     companion object : Log
@@ -51,9 +54,9 @@ class CardBillServiceImpl(
     override fun listUserCardBills(executionContext: CollectExecutionContext): ListCardBillsResponse {
         val now = DateTimeUtil.utcNowLocalDateTime()
         val banksaladUserId = executionContext.userId.toLong()
-
+        val organizationId = executionContext.organizationId
         /* request header */
-        val header = headerService.makeHeader(executionContext.userId, executionContext.organizationId)
+        val header = headerService.makeHeader(banksaladUserId.toString(), organizationId)
 
         /* request body */
         val request = ListCardBillsRequest().apply {
@@ -76,6 +79,9 @@ class CardBillServiceImpl(
         bills.forEach { bill ->
             bill.transactions?.sortByDescending { transaction -> transaction.approvalDay }
         }
+
+        // 신한카드 카드번호 masking 작업 진행.
+        postProgress(organizationId, bills)
 
         return cardBillsResponse.apply {
             this.dataBody = ListCardBillsResponseDataBody().apply { this.cardBills = bills }
@@ -263,6 +269,20 @@ class CardBillServiceImpl(
             ).let {
                 cardPaymentScheduledRepository.save(it)
             }
+        }
+    }
+
+    fun postProgress(organizationId: String, bills: MutableList<CardBill>) {
+        when (organizationId) {
+            shinhancardOrganizationId -> {
+                bills.map { cardBill ->
+                    cardBill.transactions?.map { cardBillTransaction ->
+                        cardBillTransaction.cardNumber = CustomStringUtil.replaceNumberToMask(cardBillTransaction.cardNumber)
+                        cardBillTransaction.cardNumberMasked = CustomStringUtil.replaceNumberToMask(cardBillTransaction.cardNumberMasked)
+                    }
+                }
+            }
+            else -> {}
         }
     }
 }

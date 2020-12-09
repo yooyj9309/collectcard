@@ -48,9 +48,10 @@ class CardServiceImpl(
 
         val now = DateTimeUtil.utcNowLocalDateTime()
         val banksaladUserId = executionContext.userId.toLong()
+        val organizationId = executionContext.organizationId
 
         /* header */
-        val header = headerService.makeHeader(executionContext.userId, executionContext.organizationId)
+        val header = headerService.makeHeader(executionContext.userId, organizationId)
 
         /* request body */
         val listCardsRequest = ListCardsRequest().apply {
@@ -94,6 +95,9 @@ class CardServiceImpl(
             DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now),
             executionResponseValidateService.validate(executionContext, executionResponse)
         )
+
+        // 신한카드 카드번호 masking 작업 진행.
+        postProgress(organizationId, listCardsResponse)
 
         logger.info("CardService.listCards end: executionContext: {}", executionContext)
         return executionResponse.response
@@ -164,5 +168,16 @@ class CardServiceImpl(
         val cardHistoryEntity =
             cardMapper.toCardHistoryEntity(cardEntity) // modelMapper.map(cardEntity, CardHistoryEntity::class.java)
         cardHistoryRepository.save(cardHistoryEntity)
+    }
+
+    fun postProgress(organizationId: String, listCardsResponse: ListCardsResponse?) {
+        when (organizationId) {
+            shinhancardOrganizationId -> {
+                listCardsResponse?.dataBody?.cards?.map { card ->
+                    card.cardNumber = CustomStringUtil.replaceNumberToMask(card.cardNumber)
+                }
+            }
+            else -> {}
+        }
     }
 }

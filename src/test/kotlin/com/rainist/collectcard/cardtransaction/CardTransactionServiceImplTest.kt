@@ -1,7 +1,7 @@
-
 package com.rainist.collectcard.cardtransaction
 
 import com.rainist.collectcard.cardtransactions.CardTransactionServiceImpl
+import com.rainist.collectcard.cardtransactions.dto.CardTransaction
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsRequest
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsRequestDataBody
 import com.rainist.collectcard.common.collect.api.Transaction
@@ -11,6 +11,7 @@ import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.common.exception.ValidationException
 import com.rainist.common.util.DateTimeUtil
 import java.util.UUID
+import org.junit.Assert
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -129,6 +130,28 @@ class CardTransactionServiceImplTest {
 
         Assertions.assertNotNull(exception)
         Assertions.assertEquals(exception.javaClass, ValidationException::class.java)
+    }
+
+    @Test
+    fun testPostProgressWithShinhancardOrganization() {
+        val organizationId = "shinhancard"
+        val transactions = mutableListOf<CardTransaction>()
+        transactions.add(CardTransaction().apply { cardNumber = "123456******6789" })
+        transactions.add(CardTransaction().apply { cardNumber = "123" })
+        cardTransactionServiceImpl.postProgress(organizationId, transactions)
+        Assert.assertEquals("1234********6789", transactions[0].cardNumber)
+        Assert.assertEquals("123", transactions[1].cardNumber)
+    }
+
+    @Test
+    fun testPostProgressWithDefault() {
+        val organizationId = "default"
+        val transactions = mutableListOf<CardTransaction>()
+        transactions.add(CardTransaction().apply { cardNumber = "123456******6789" })
+        transactions.add(CardTransaction().apply { cardNumber = "123" })
+        cardTransactionServiceImpl.postProgress(organizationId, transactions)
+        Assert.assertEquals("123456******6789", transactions[0].cardNumber)
+        Assert.assertEquals("123", transactions[1].cardNumber)
     }
 
     private fun requestSetting(banksaladUserId: String?): CollectExecutionContext {

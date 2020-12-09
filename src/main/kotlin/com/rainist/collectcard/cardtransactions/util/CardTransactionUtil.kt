@@ -17,7 +17,7 @@ class CardTransactionUtil {
                 this.approvalDay = cardTransaction.approvalDay
                 this.approvalTime = cardTransaction.approvalTime
                 this.cardName = cardTransaction.cardName
-                this.cardNumber = cardTransaction.cardNumber?.replace("-", "")?.trim()
+                this.cardNumber = cardTransaction.cardNumber
                 this.cardNumberMask = cardTransaction.cardNumberMask
                 this.amount = cardTransaction.amount
                 this.canceledAmount = cardTransaction.canceledAmount

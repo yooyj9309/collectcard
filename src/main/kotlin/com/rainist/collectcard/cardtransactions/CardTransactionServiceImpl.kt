@@ -4,6 +4,7 @@ import com.rainist.collect.common.execution.ExecutionContext
 import com.rainist.collect.common.execution.ExecutionRequest
 import com.rainist.collect.common.execution.ExecutionResponse
 import com.rainist.collect.executor.CollectExecutorService
+import com.rainist.collectcard.cardtransactions.dto.CardTransaction
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsRequest
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsRequestDataBody
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsRequestDataHeader
@@ -20,6 +21,7 @@ import com.rainist.collectcard.common.service.ExecutionResponseValidateService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.common.service.UserSyncStatusService
+import com.rainist.collectcard.common.util.CustomStringUtil
 import com.rainist.common.log.Log
 import com.rainist.common.service.ValidationService
 import com.rainist.common.util.DateTimeUtil
@@ -43,19 +45,17 @@ class CardTransactionServiceImpl(
     val validationService: ValidationService,
     val cardTransactionRepository: CardTransactionRepository,
     val organizationService: OrganizationService,
-    @Qualifier("async-thread") val executor: Executor
+    @Qualifier("async-thread") val executor: Executor,
+    @Value("\${shinhancard.organizationId}") val shinhancardOrganizationId: String
 ) : CardTransactionService {
 
     companion object : Log
-
-    @Value("\${shinhancard.organizationId}")
-    private lateinit var shinhancardOrganizationId: String
 
     @Transactional
     override fun listTransactions(executionContext: CollectExecutionContext): ListTransactionsResponse {
         val now = DateTimeUtil.utcNowLocalDateTime()
         val banksaladUserId = executionContext.userId.toLong()
-
+        val organizationId = executionContext.organizationId
         /* request header */
         val header = headerService.makeHeader(executionContext.userId, executionContext.organizationId)
 
@@ -83,6 +83,13 @@ class CardTransactionServiceImpl(
                 validationService.validateOrNull(it)
             }
             .toMutableList()
+
+        /* convert type and format if necessary */
+        transactions?.map { transaction ->
+            transaction.apply {
+                this.cardNumber = this.cardNumber?.replace("-", "")?.trim()
+            }
+        }
 
         // db insert
         transactions.forEach { cardTransaction ->
@@ -120,6 +127,9 @@ class CardTransactionServiceImpl(
             DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(now),
             executionResponseValidateService.validate(executionContext, executionResponses)
         )
+
+        // 신한카드 카드번호 masking 작업 진행.
+        postProgress(organizationId, transactions)
 
         return ListTransactionsResponse().apply {
             this.dataBody = ListTransactionsResponseDataBody().apply {
@@ -216,5 +226,16 @@ class CardTransactionServiceImpl(
         } ?: defaultCheckStartTime
 
         return DateTimeUtil.localDatetimeToString(checkStartTime, "yyyyMMdd")
+    }
+
+    fun postProgress(organizationId: String, transactions: MutableList<CardTransaction>) {
+        when (organizationId) {
+            shinhancardOrganizationId -> {
+                transactions.map { transaction ->
+                    transaction.cardNumber = CustomStringUtil.replaceNumberToMask(transaction.cardNumber)
+                }
+            }
+            else -> {}
+        }
     }
 }

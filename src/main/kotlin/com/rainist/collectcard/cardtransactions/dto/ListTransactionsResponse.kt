@@ -33,7 +33,7 @@ fun ListTransactionsResponse.toListCardsTransactionResponseProto(): CollectcardP
 
     return kotlin.runCatching {
 
-        let {
+        let { it ->
             // TODO Diff 종료후 삭제
             it.sortListTransactionsResponseByDesc()
 
@@ -67,7 +67,7 @@ fun ListTransactionsResponse.toListCardsTransactionResponseProto(): CollectcardP
                 val cardSummaryBuilder = CollectcardProto.CardSummary.newBuilder()
 
                 // 카드번호
-                transaction.cardNumber?.let { cardSummaryBuilder.number = it.replace("-", "").trim() }
+                transaction.cardNumber?.let { cardSummaryBuilder.number = it }
 
                 // 카드이름
                 transaction.cardName?.let { cardSummaryBuilder.name = StringValue.of(it) }
@@ -103,17 +103,17 @@ fun ListTransactionsResponse.toListCardsTransactionResponseProto(): CollectcardP
                 // 카드내역 end
                 cardTransactionBuilder.build()
             }
-            ?.toMutableList()
-            ?: mutableListOf()
+                ?.toMutableList()
+                ?: mutableListOf()
         }
-        .let {
-            CollectcardProto.ListCardTransactionsResponse
-                .newBuilder()
-                .addAllData(it)
-                .build()
-        }
+            .let {
+                CollectcardProto.ListCardTransactionsResponse
+                    .newBuilder()
+                    .addAllData(it)
+                    .build()
+            }
     }
-    .getOrThrow()
+        .getOrThrow()
 }
 
 // TODO Diff 끝나면 없애기
