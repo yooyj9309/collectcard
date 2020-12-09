@@ -36,13 +36,13 @@
 
 
 # ^/health$
-# ^/v1/collectcard/users/{user_id}/cards$
-# ^/v1/collectcard/users/{user_id}/card-bills$
-# ^/v1/collectcard/users/{user_id}/card-loans$
-# ^/v1/collectcard/users/{user_id}/card-transactions$
-# ^/v1/collectcard/users/{user_id}/credit-limits$
+# ^/v1/collectcard/users/.*/cards$
+# ^/v1/collectcard/users/.*/card-bills$
+# ^/v1/collectcard/users/.*/card-loans$
+# ^/v1/collectcard/users/.*/card-transactions$
+# ^/v1/collectcard/users/.*/credit-limits$
 
-{{ $sidecar_normalized_path_regexps := "^/health$,^/v1/collectcard/users/{user_id}/cards$,^/v1/collectcard/users/{user_id}/card-bills$,^/v1/collectcard/users/{user_id}/card-loans$,^/v1/collectcard/users/{user_id}/card-transactions$,^/v1/collectcard/users/{user_id}/credit-limits$" }}
+{{ $sidecar_normalized_path_regexps := "^/health$,^/v1/collectcard/users/.*/cards$,^/v1/collectcard/users/.*/card-bills$,^/v1/collectcard/users/.*/card-loans$,^/v1/collectcard/users/.*/card-transactions$,^/v1/collectcard/users/.*/credit-limits$" }}
 
 {{ if ne $env $sub_env_id }}
   {{ $namespace = join (slice $env $sub_env_id) "-" }}
