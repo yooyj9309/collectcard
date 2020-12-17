@@ -120,7 +120,7 @@ jobs:
             -d @- <<EOF
           {
               "ref": "master",
-              "environment": "development",
+              "environment": "staging",
               "required_contexts": [],
               "auto_merge": false
           }
