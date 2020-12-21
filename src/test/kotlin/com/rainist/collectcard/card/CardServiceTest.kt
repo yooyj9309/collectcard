@@ -77,7 +77,7 @@ class CardServiceTest {
                 )
             )
 
-        val response = cardService.listCards(executionContext)
+        val response = cardService.listCards(executionContext, DateTimeUtil.utcNowLocalDateTime())
 
         assertThat(response.dataHeader?.resultCode, `is`(ResultCode.OK))
         assertThat(response.dataBody?.cards?.size, `is`(4))
@@ -162,7 +162,7 @@ class CardServiceTest {
                 )
             )
 
-        val response = cardService.listCards(executionContext)
+        val response = cardService.listCards(executionContext, DateTimeUtil.utcNowLocalDateTime())
 
         assertThat(response.dataHeader?.resultCode, `is`(ResultCode.OK))
         assertThat(response.dataBody?.cards?.size, `is`(19))
@@ -267,7 +267,7 @@ class CardServiceTest {
             )
         )
 
-        val response = cardService.listCards(executionContext)
+        val response = cardService.listCards(executionContext, DateTimeUtil.utcNowLocalDateTime())
 
         assertThat(response.dataHeader?.resultCode, `is`(ResultCode.OK))
         assertThat(response.dataBody?.cards?.size, `is`(1))
@@ -334,7 +334,7 @@ class CardServiceTest {
 
         val executionContext: CollectExecutionContext = requestSetting(banksaladUserId)
 
-        var response = cardService.listCards(executionContext)
+        var response = cardService.listCards(executionContext, DateTimeUtil.utcNowLocalDateTime())
         var cardEntities = cardRepository.findAll()
         // db count 1.
         // db에 들어간 값이 마스킹 번호 일치 여부
@@ -344,7 +344,7 @@ class CardServiceTest {
         // db count 1.
         // 업데이트 진행여부확인
         // db cardNumber masked 6th
-        response = cardService.listCards(executionContext)
+        response = cardService.listCards(executionContext, DateTimeUtil.utcNowLocalDateTime())
         cardEntities = cardRepository.findAll()
         assertEquals(2, cardEntities.size)
         assertEquals("615266*******2234", cardEntities[0].cardNumberMask)

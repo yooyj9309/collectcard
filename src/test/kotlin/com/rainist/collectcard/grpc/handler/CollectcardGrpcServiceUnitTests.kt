@@ -36,6 +36,7 @@ import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponseData
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponseDataHeader
 import com.rainist.collectcard.cardtransactions.dto.toListCardsTransactionResponseProto
 import com.rainist.collectcard.common.dto.CollectExecutionContext
+import com.rainist.collectcard.common.dto.NowUtcLocalDatetime
 import com.rainist.collectcard.common.dto.SyncStatusResponse
 import com.rainist.collectcard.common.dto.UserSyncStatusResponse
 import com.rainist.collectcard.common.dto.toSyncStatusResponseProto
@@ -45,7 +46,9 @@ import com.rainist.collectcard.common.enums.CardType
 import com.rainist.collectcard.common.enums.ResultCode
 import com.rainist.collectcard.common.exception.CollectcardServiceExceptionHandler
 import com.rainist.collectcard.common.meters.CollectMeterRegistry
+import com.rainist.collectcard.common.publish.banksalad.CardPublishService
 import com.rainist.collectcard.common.service.CardOrganization
+import com.rainist.collectcard.common.service.LocalDatetimeService
 import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.collectcard.common.service.UuidService
@@ -99,10 +102,16 @@ internal class CollectcardGrpcServiceUnitTests {
     lateinit var uuidService: UuidService
 
     @MockBean
+    lateinit var localDatetimeService: LocalDatetimeService
+
+    @MockBean
     lateinit var meterRegistry: MeterRegistry
 
     @MockBean
     lateinit var collectMeterRegistry: CollectMeterRegistry
+
+    @MockBean
+    lateinit var cardPublishService: CardPublishService
 
     val executionContext = CollectExecutionContext(
         executionRequestId = "UUID",
@@ -148,7 +157,7 @@ internal class CollectcardGrpcServiceUnitTests {
     fun listCardsUnitTest() {
         // given
         val responseObserver: StreamRecorder<CollectcardProto.ListCardsResponse> = StreamRecorder.create()
-
+        val nowLocalDateTime = NowUtcLocalDatetime()
         val request = CollectcardProto
             .ListCardsRequest
             .newBuilder()
@@ -180,7 +189,8 @@ internal class CollectcardGrpcServiceUnitTests {
                 resultMessage = ""
             )
         )
-        given(cardService.listCards(executionContext)).willReturn(response)
+        given(localDatetimeService.generateNowLocalDatetime()).willReturn(nowLocalDateTime)
+        given(cardService.listCards(executionContext, nowLocalDateTime.now)).willReturn(response)
 
         // when
         collectcardGrpcService.listCards(request, responseObserver)

@@ -13,9 +13,12 @@ import com.rainist.collectcard.cardloans.dto.toListCardLoansResponseProto
 import com.rainist.collectcard.cardtransactions.CardTransactionService
 import com.rainist.collectcard.cardtransactions.dto.toListCardsTransactionResponseProto
 import com.rainist.collectcard.common.dto.CollectExecutionContext
+import com.rainist.collectcard.common.dto.CollectShadowingResponse
 import com.rainist.collectcard.common.dto.toSyncStatusResponseProto
 import com.rainist.collectcard.common.exception.CollectcardServiceExceptionHandler
 import com.rainist.collectcard.common.exception.HealthCheckException
+import com.rainist.collectcard.common.publish.banksalad.CardPublishService
+import com.rainist.collectcard.common.service.LocalDatetimeService
 import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.collectcard.common.service.UuidService
@@ -23,7 +26,11 @@ import com.rainist.collectcard.config.grpc.onException
 import com.rainist.common.interceptor.StatsUnaryServerInterceptor
 import com.rainist.common.log.Log
 import io.grpc.stub.StreamObserver
+import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.Tags
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.apache.commons.lang3.StringUtils
 import org.lognet.springboot.grpc.GRpcService
 
@@ -36,7 +43,10 @@ class CollectcardGrpcService(
     val cardBillService: CardBillService,
     val cardCreditLimitService: CardCreditLimitService,
     val userSyncStatusService: UserSyncStatusService,
-    val uuidService: UuidService
+    val uuidService: UuidService,
+    val cardPublishService: CardPublishService,
+    val meterRegistry: MeterRegistry,
+    val localDatetimeService: LocalDatetimeService
 ) : CollectcardGrpc.CollectcardImplBase() {
 
     companion object : Log
@@ -61,6 +71,9 @@ class CollectcardGrpcService(
         responseObserver: StreamObserver<CollectcardProto.ListCardsResponse>
     ) {
         /* Execution Context */
+        // 괴랄하게 LocalDatetime을 가져오는 이유는 TestCode에서 mocking문제로 인하여 다음과같이 가져오도록 수정하였습니다.
+        val now = localDatetimeService.generateNowLocalDatetime().now
+
         val executionContext = CollectExecutionContext(
             executionRequestId = uuidService.generateExecutionRequestId(),
             organizationId = organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: "",
@@ -68,7 +81,20 @@ class CollectcardGrpcService(
         )
 
         kotlin.runCatching {
-            cardService.listCards(executionContext).toListCardsResponseProto()
+            val listCardResponse = cardService.listCards(executionContext, now)
+            GlobalScope.launch {
+                val res: CollectShadowingResponse = cardPublishService.shadowing(
+                    executionContext.userId.toLong(),
+                    executionContext.organizationId,
+                    now,
+                    executionContext.executionRequestId,
+                    listCardResponse
+                )
+
+                shadowingLogging(res)
+            }
+
+            listCardResponse.toListCardsResponseProto()
         }.onSuccess {
             responseObserver.onNext(it)
             responseObserver.onCompleted()
@@ -241,5 +267,18 @@ class CollectcardGrpcService(
             // CollectcardServiceExceptionHandler.handle(executionContext, "getSyncStatus", "유저데이터초기화", it)
             responseObserver.onError(it)
         }
+    }
+
+    private fun shadowingLogging(res: CollectShadowingResponse) {
+        logger.With("shadowing_target", res.executionName)
+            .With("banksalad_user_id", res.banksaladUserId)
+            .With("organization_id", res.organizationId)
+            .With("last_check_at", res.lastCheckAt)
+            .With("execution_request_id", res.executionRequestId)
+            .With("is_diff", res.isDiff)
+            .Info()
+
+        val tags = Tags.of("execution_name", res.executionName).and("is_diff", res.isDiff.toString())
+        meterRegistry.counter("shadowing.all", tags).increment()
     }
 }

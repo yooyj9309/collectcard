@@ -43,10 +43,9 @@ class CardServiceImpl(
 
     val cardMapper = Mappers.getMapper(CardMapper::class.java)
 
-    override fun listCards(executionContext: CollectExecutionContext): ListCardsResponse {
+    override fun listCards(executionContext: CollectExecutionContext, now: LocalDateTime): ListCardsResponse {
         logger.info("CardService.listCards start: executionContext: {}", executionContext)
 
-        val now = DateTimeUtil.utcNowLocalDateTime()
         val banksaladUserId = executionContext.userId.toLong()
         val organizationId = executionContext.organizationId
 
