@@ -14,7 +14,7 @@ spring:
   datasource:
     url: jdbc:mysql://collectcard-cluster.cluster-ciy3wcu0axct.ap-northeast-2.rds.amazonaws.com:3306/collectcard?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
     driver-class-name: org.mariadb.jdbc.Driver
-    username: collectcard_was
+    username: developer
     password: ${DEVELOPMENT_COLLECTCARD_DB_PASSWORD}
     hikari:
       maximum-pool-size: 30
@@ -44,7 +44,7 @@ cipher-server:
   port: 9999
 
 connect-server:
-  host: connect
+  host: localhost
   port: 9998
 
 cipher:

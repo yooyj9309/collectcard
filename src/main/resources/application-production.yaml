@@ -24,11 +24,11 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
 
 logging:
-   level:
-     com.zaxxer.hikari.HikariConfig: INFO
-     com.zaxxer.hikari: INFO
-     org.hibernate.SQL: INFO
-     org.hibernate.type.descriptor.sql.BasicBinder: INFO
+  level:
+    com.zaxxer.hikari.HikariConfig: INFO
+    com.zaxxer.hikari: INFO
+    org.hibernate.SQL: INFO
+    org.hibernate.type.descriptor.sql.BasicBinder: INFO
 
 shinhancard:
   organizationId: shinhancard
