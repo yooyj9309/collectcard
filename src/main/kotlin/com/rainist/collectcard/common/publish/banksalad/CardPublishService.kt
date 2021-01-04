@@ -1,11 +1,10 @@
 package com.rainist.collectcard.common.publish.banksalad
 
+import com.rainist.collectcard.card.dto.Card
 import com.rainist.collectcard.card.dto.ListCardsResponse
 import com.rainist.collectcard.card.mapper.CardMapper
 import com.rainist.collectcard.common.db.repository.CardRepository
 import com.rainist.collectcard.common.dto.CollectShadowingResponse
-import com.rainist.common.log.Log
-import io.micrometer.core.instrument.MeterRegistry
 import java.time.LocalDateTime
 import org.apache.commons.lang3.builder.EqualsBuilder
 import org.mapstruct.factory.Mappers
@@ -13,11 +12,14 @@ import org.springframework.stereotype.Service
 
 @Service
 class CardPublishService(
-    val cardRepository: CardRepository,
-    val meterRegistry: MeterRegistry
+    val cardRepository: CardRepository
 ) {
 
-    private companion object : Log
+    // TODO [FLOW] 해당부분을 제외하고 Diff 비교, 추후 필수로 제거필요.
+    val CARD_SHADOWING_EXCLUDE_EQUALS_FIELD = mutableListOf(
+        Card::cardId.name,
+        Card::trafficSupported.name
+    )
 
     val cardMapper = Mappers.getMapper(CardMapper::class.java)
 
@@ -33,7 +35,7 @@ class CardPublishService(
         }.sortedWith(compareBy({ it.cardName }, { it.cardNumber }))
 
         val oldCards = oldResponse.dataBody?.cards?.sortedWith(compareBy({ it.cardName }, { it.cardNumber })) ?: mutableListOf()
-        val isShadowingDiff = EqualsBuilder.reflectionEquals(cards, oldCards)
+        val isShadowingDiff = unequals(cards, oldCards)
 
         return CollectShadowingResponse(
             banksaladUserId = banksaladUserId,
@@ -45,5 +47,17 @@ class CardPublishService(
             oldList = oldCards,
             dbList = cards
         )
+    }
+
+    private fun unequals(cards: List<Card>, oldCards: List<Card>): Boolean {
+        if (cards.size != oldCards.size)
+            return true
+
+        for (i in cards.indices) {
+            if (!EqualsBuilder.reflectionEquals(cards[i], oldCards[i], CARD_SHADOWING_EXCLUDE_EQUALS_FIELD)) {
+                return true
+            }
+        }
+        return false
     }
 }

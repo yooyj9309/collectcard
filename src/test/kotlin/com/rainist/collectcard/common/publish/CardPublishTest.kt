@@ -84,32 +84,30 @@ class CardPublishTest {
 
         for (i in 0 until listSize) {
             val isDiffObject = listOf(
-                oldCards[i].cardCompanyId != cards[i].cardCompanyId,
-                oldCards[i].cardCompanyCardId != cards[i].cardCompanyCardId,
-                oldCards[i].cardOwnerName != cards[i].cardOwnerName,
-                oldCards[i].cardOwnerType != cards[i].cardOwnerType,
-                oldCards[i].cardOwnerTypeOrigin != cards[i].cardOwnerTypeOrigin,
-                oldCards[i].cardName != cards[i].cardName,
-                oldCards[i].cardBrandName != cards[i].cardBrandName,
-                oldCards[i].internationalBrandName != cards[i].internationalBrandName,
-                oldCards[i].cardNumber != cards[i].cardNumber,
-                oldCards[i].cardNumberMask != cards[i].cardNumberMask,
-                oldCards[i].cardType != cards[i].cardType,
-                oldCards[i].cardTypeOrigin != cards[i].cardTypeOrigin,
-                oldCards[i].issuedDay != cards[i].issuedDay,
-                oldCards[i].expiresDay != cards[i].expiresDay,
-                oldCards[i].cardStatus != cards[i].cardStatus,
-                oldCards[i].cardStatusOrigin != cards[i].cardStatusOrigin,
-                oldCards[i].lastUseDay != cards[i].lastUseDay,
-                oldCards[i].lastUseTime != cards[i].lastUseTime,
-                oldCards[i].annualFee != cards[i].annualFee,
-                oldCards[i].paymentBankId != cards[i].paymentBankId,
-                oldCards[i].paymentAccountNumber != cards[i].paymentAccountNumber,
-                oldCards[i].isBusinessCard != cards[i].isBusinessCard
+                oldCards[i].cardCompanyId == cards[i].cardCompanyId,
+                oldCards[i].cardCompanyCardId == cards[i].cardCompanyCardId,
+                oldCards[i].cardOwnerName == cards[i].cardOwnerName,
+                oldCards[i].cardOwnerType == cards[i].cardOwnerType,
+                oldCards[i].cardOwnerTypeOrigin == cards[i].cardOwnerTypeOrigin,
+                oldCards[i].cardName == cards[i].cardName,
+                oldCards[i].cardBrandName == cards[i].cardBrandName,
+                oldCards[i].internationalBrandName == cards[i].internationalBrandName,
+                oldCards[i].cardNumber == cards[i].cardNumber,
+                oldCards[i].cardNumberMask == cards[i].cardNumberMask,
+                oldCards[i].cardType == cards[i].cardType,
+                oldCards[i].cardTypeOrigin == cards[i].cardTypeOrigin,
+                oldCards[i].issuedDay == cards[i].issuedDay,
+                oldCards[i].expiresDay == cards[i].expiresDay,
+                oldCards[i].cardStatus == cards[i].cardStatus,
+                oldCards[i].cardStatusOrigin == cards[i].cardStatusOrigin,
+                oldCards[i].lastUseDay == cards[i].lastUseDay,
+                oldCards[i].lastUseTime == cards[i].lastUseTime,
+                oldCards[i].annualFee == cards[i].annualFee,
+                oldCards[i].paymentBankId == cards[i].paymentBankId,
+                oldCards[i].paymentAccountNumber == cards[i].paymentAccountNumber,
+                oldCards[i].isBusinessCard == cards[i].isBusinessCard
             ).all { it }
-            // if(oldCards[i].isBusinessCard != cards[i].isBusinessCard) isDiff = true
-
-            assertEquals(false, isDiffObject)
+            assertEquals(true, isDiffObject)
         }
     }
 }
