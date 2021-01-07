@@ -35,6 +35,16 @@ connect-server:
 cipher-server:
   uri: dns:///cipher-headless:18081
 
+card-server:
+  uri: dns:///card-headless:18081
+
+loan-server:
+  uri: dns:///loan-headless:18081
+
+accountbook-server:
+  uri: dns:///accountbook-headless:18081
+
+
 shinhancard:
   clientId: ${DEVELOPMENT_SHINHANCARD_CLIENT_ID}
   organizationObjectid: 596d66692c4069c168b57c59

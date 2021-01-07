@@ -27,11 +27,6 @@ connect-server:
   host: localhost
   port: 6565
 
-cipher-server:
-  uri: localhost:9999
-  host: localhost
-  port: 6566
-
 shinhancard:
   organizationId: shinhancard
   objectId: 596d66692c4069c168b57c59

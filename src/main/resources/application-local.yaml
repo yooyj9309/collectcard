@@ -47,6 +47,21 @@ connect-server:
   host: localhost
   port: 9998
 
+card-server:
+  uri: localhost:9997
+  host: localhost
+  port: 9997
+
+loan-server:
+  uri: localhost:9996
+  host: localhost
+  port: 9996
+
+accountbook-server:
+  uri: localhost:9995
+  host: localhost
+  port: 9995
+
 cipher:
   iv:
     api_log: AMJSyQFazQJY0flR

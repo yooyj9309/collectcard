@@ -1,7 +1,6 @@
 package com.rainist.collectcard.config.grpc
 
-import com.github.banksalad.idl.apis.v1.cipher.CipherGrpc
-import com.github.banksalad.idl.apis.v1.cipher.CipherGrpc.CipherBlockingStub
+import com.github.banksalad.idl.apis.v1.accountbook.AccountbookGrpc
 import com.rainist.common.interceptor.StatsUnaryClientInterceptor
 import com.rainist.common.log.Log
 import io.grpc.ManagedChannel
@@ -17,15 +16,16 @@ import org.springframework.context.annotation.Profile
 @Configuration
 @DependsOn("nettyPidSetting")
 @Profile("local")
-class LocalCipherClientConfig(
+class LocalAccountBookClientConfig(
 
-    @Value("\${cipher-server.host}")
-    private var cipherHost: String,
+    @Value("\${accountbook-server.host}")
+    private var accountBookHost: String,
 
-    @Value("\${cipher-server.port}")
-    private var cipherPort: Int,
+    @Value("\${accountbook-server.port}")
+    private var accountBookPort: Int,
 
     val meterRegistry: MeterRegistry
+
 ) {
 
     companion object : Log
@@ -34,15 +34,15 @@ class LocalCipherClientConfig(
     lateinit var applicationName: String
 
     @Bean
-    fun cipherChannel(): ManagedChannel {
-        return ManagedChannelBuilder.forAddress(cipherHost, cipherPort)
+    fun accountBookChannel(): ManagedChannel {
+        return ManagedChannelBuilder.forAddress(accountBookHost, accountBookPort)
             .usePlaintext()
             .intercept(StatsUnaryClientInterceptor(meterRegistry, applicationName))
             .build()
     }
 
     @Bean
-    fun cipherBlockingStub(@Qualifier("cipherChannel") cipherChannel: ManagedChannel): CipherBlockingStub {
-        return CipherGrpc.newBlockingStub(cipherChannel)
+    fun accountBookBlockingStub(@Qualifier("accountBookChannel") accountBookChannel: ManagedChannel): AccountbookGrpc.AccountbookBlockingStub {
+        return AccountbookGrpc.newBlockingStub(accountBookChannel)
     }
 }

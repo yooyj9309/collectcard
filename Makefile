@@ -9,6 +9,9 @@ port-forward-prod:
 port-forward-stg:
 	kubectl port-forward -n staging deployment/cipher 9999:18081 &
 	kubectl port-forward -n staging deployment/connect 9998:18081 &
+	kubectl port-forward -n staging deployment/card 9997:18081 &
+	kubectl port-forward -n staging deployment/loan 9996:18081 &
+	kubectl port-forward -n staging deployment/accountbook 9995:18081 &
 
 .PHONY: kill-port-forward
 kill-port-forward:
