@@ -24,6 +24,7 @@ import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.common.log.Log
 import com.rainist.common.service.ValidationService
 import com.rainist.common.util.DateTimeUtil
+import java.time.LocalDateTime
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -41,9 +42,8 @@ class CardLoanServiceImpl(
     companion object : Log
 
     @Transactional
-    override fun listCardLoans(executionContext: CollectExecutionContext): ListLoansResponse {
+    override fun listCardLoans(executionContext: CollectExecutionContext, now: LocalDateTime): ListLoansResponse {
         val banksaladUserId = executionContext.userId.toLong()
-        val now = DateTimeUtil.utcNowLocalDateTime()
 
         /* request header */
         val header = headerService.makeHeader(executionContext.userId, executionContext.organizationId)

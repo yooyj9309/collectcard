@@ -17,6 +17,7 @@ import com.rainist.collectcard.common.dto.CollectShadowingResponse
 import com.rainist.collectcard.common.dto.toSyncStatusResponseProto
 import com.rainist.collectcard.common.exception.CollectcardServiceExceptionHandler
 import com.rainist.collectcard.common.exception.HealthCheckException
+import com.rainist.collectcard.common.publish.banksalad.CardLoanPublishService
 import com.rainist.collectcard.common.publish.banksalad.CardPublishService
 import com.rainist.collectcard.common.service.LocalDatetimeService
 import com.rainist.collectcard.common.service.OrganizationService
@@ -45,6 +46,7 @@ class CollectcardGrpcService(
     val userSyncStatusService: UserSyncStatusService,
     val uuidService: UuidService,
     val cardPublishService: CardPublishService,
+    val cardLoanPublishService: CardLoanPublishService,
     val meterRegistry: MeterRegistry,
     val localDatetimeService: LocalDatetimeService
 ) : CollectcardGrpc.CollectcardImplBase() {
@@ -161,6 +163,8 @@ class CollectcardGrpcService(
         request: CollectcardProto.ListCardLoansRequest,
         responseObserver: StreamObserver<CollectcardProto.ListCardLoansResponse>
     ) {
+        val now = localDatetimeService.generateNowLocalDatetime().now
+
         /* Execution Context */
         val executionContext: CollectExecutionContext = CollectExecutionContext(
             executionRequestId = uuidService.generateExecutionRequestId(),
@@ -169,7 +173,19 @@ class CollectcardGrpcService(
         )
 
         kotlin.runCatching {
-            cardLoanService.listCardLoans(executionContext).toListCardLoansResponseProto()
+            val listLoanResponse = cardLoanService.listCardLoans(executionContext, now)
+
+            GlobalScope.launch {
+                val res: CollectShadowingResponse = cardLoanPublishService.shadowing(
+                    executionContext.userId.toLong(),
+                    executionContext.organizationId,
+                    now,
+                    executionContext.executionRequestId,
+                    listLoanResponse
+                )
+                shadowingLogging(res)
+            }
+            listLoanResponse.toListCardLoansResponseProto()
         }.onSuccess {
                 responseObserver.onNext(it)
                 responseObserver.onCompleted()

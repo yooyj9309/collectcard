@@ -49,6 +49,7 @@ class CardLoanServiceImplTest {
     @MockBean
     lateinit var headerService: HeaderService
 
+    val now = DateTimeUtil.utcNowLocalDateTime()
     /**
      * 최초 두 개의 항목조회
      * cardloan 2개, history 2개
@@ -70,7 +71,7 @@ class CardLoanServiceImplTest {
         val banksaladUserId = "1"
         val executionContext = requestSetting(banksaladUserId)
 
-        val loans = cardLoanService.listCardLoans(executionContext)
+        val loans = cardLoanService.listCardLoans(executionContext, now)
         val listLoan = cardLoanRepository.findAll().filter { it.banksaladUserId == banksaladUserId.toLong() }
         val listLoanHistory = cardLoanHistoryRepository.findAll().filter { it.banksaladUserId == banksaladUserId.toLong() }
         assertEquals(loans.dataBody?.loans?.size, 2)
@@ -105,7 +106,7 @@ class CardLoanServiceImplTest {
         val banksaladUserId = "1"
         val syncRequest = requestSetting(banksaladUserId)
 
-        val loans = cardLoanService.listCardLoans(syncRequest)
+        val loans = cardLoanService.listCardLoans(syncRequest, now)
         val listLoan = cardLoanRepository.findAll().filter { it.banksaladUserId == banksaladUserId.toLong() }
         val listLoanHistory = cardLoanHistoryRepository.findAll().filter { it.banksaladUserId == banksaladUserId.toLong() }
 
@@ -138,7 +139,7 @@ class CardLoanServiceImplTest {
         val banksaladUserId = "1"
         val syncRequest = requestSetting(banksaladUserId)
 
-        val loans = cardLoanService.listCardLoans(syncRequest)
+        val loans = cardLoanService.listCardLoans(syncRequest, now)
         val listLoan = cardLoanRepository.findAll().filter { it.banksaladUserId == banksaladUserId.toLong() }
         val listLoanHistory = cardLoanHistoryRepository.findAll().filter { it.banksaladUserId == banksaladUserId.toLong() }
 
@@ -167,7 +168,7 @@ class CardLoanServiceImplTest {
 
         val syncRequest = requestSetting(banksaladUserId)
 
-        val loans = cardLoanService.listCardLoans(syncRequest)
+        val loans = cardLoanService.listCardLoans(syncRequest, now)
         val listLoan = cardLoanRepository.findAll().filter { it.banksaladUserId == banksaladUserId.toLong() }
         val listLoanHistory = cardLoanHistoryRepository.findAll().filter { it.banksaladUserId == banksaladUserId.toLong() }
 
@@ -195,7 +196,7 @@ class CardLoanServiceImplTest {
 
         val syncRequest = requestSetting(banksaladUserId)
 
-        val loans = cardLoanService.listCardLoans(syncRequest)
+        val loans = cardLoanService.listCardLoans(syncRequest, now)
         val listLoan = cardLoanRepository.findAll().filter { it.banksaladUserId == banksaladUserId.toLong() }
         val listLoanHistory = cardLoanHistoryRepository.findAll().filter { it.banksaladUserId == banksaladUserId.toLong() }
 

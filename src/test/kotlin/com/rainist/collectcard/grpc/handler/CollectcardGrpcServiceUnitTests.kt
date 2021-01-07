@@ -46,6 +46,7 @@ import com.rainist.collectcard.common.enums.CardType
 import com.rainist.collectcard.common.enums.ResultCode
 import com.rainist.collectcard.common.exception.CollectcardServiceExceptionHandler
 import com.rainist.collectcard.common.meters.CollectMeterRegistry
+import com.rainist.collectcard.common.publish.banksalad.CardLoanPublishService
 import com.rainist.collectcard.common.publish.banksalad.CardPublishService
 import com.rainist.collectcard.common.service.CardOrganization
 import com.rainist.collectcard.common.service.LocalDatetimeService
@@ -112,6 +113,9 @@ internal class CollectcardGrpcServiceUnitTests {
 
     @MockBean
     lateinit var cardPublishService: CardPublishService
+
+    @MockBean
+    lateinit var cardLoanPublishService: CardLoanPublishService
 
     val executionContext = CollectExecutionContext(
         executionRequestId = "UUID",
@@ -315,7 +319,7 @@ internal class CollectcardGrpcServiceUnitTests {
 
         // given
         val responseObserver: StreamRecorder<CollectcardProto.ListCardLoansResponse> = StreamRecorder.create()
-
+        val nowLocalDateTime = NowUtcLocalDatetime()
         responseObserver.values
 
         val request = CollectcardProto.ListCardLoansRequest
@@ -350,8 +354,8 @@ internal class CollectcardGrpcServiceUnitTests {
                 })
             )
         )
-
-        given(cardLoanService.listCardLoans(executionContext)).willReturn(response)
+        given(localDatetimeService.generateNowLocalDatetime()).willReturn(nowLocalDateTime)
+        given(cardLoanService.listCardLoans(executionContext, nowLocalDateTime.now)).willReturn(response)
 
         // when
         collectcardGrpcService.listCardLoans(request, responseObserver)
