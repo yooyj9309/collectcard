@@ -28,12 +28,17 @@ class CardTransactionUtil {
                 this.businessLicenseNumber = cardTransaction.businessLicenseNumber
                 this.storeName = cardTransaction.storeName
                 this.storeNumber = cardTransaction.storeNumber
+                this.storeCategory = cardTransaction.storeCategory
                 this.cardType = cardTransaction.cardType.name
                 this.cardTypeOrigin = cardTransaction.cardTypeOrigin
                 this.cardTransactionType = cardTransaction.cardTransactionType.name
                 this.cardTransactionTypeOrigin = cardTransaction.cardTransactionTypeOrigin
                 this.currencyCode = cardTransaction.currencyCode ?: "KRW"
+                this.transactionCountry = cardTransaction.transactionCountry
                 this.isInstallmentPayment = cardTransaction.isInstallmentPayment ?: false
+                this.installment = cardTransaction.installment
+                this.paymentDay = cardTransaction.paymentDay
+                this.isOverseaUse = cardTransaction.isOverseaUse ?: false
             }
         }
 

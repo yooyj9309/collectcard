@@ -71,6 +71,8 @@ data class CardTransactionEntity(
 
     var storeNumber: String? = null,
 
+    var storeCategory: String? = null,
+
     var cardType: String? = null,
 
     var cardTypeOrigin: String? = null,
@@ -82,8 +84,17 @@ data class CardTransactionEntity(
 
     var currencyCode: String? = null,
 
+    var transactionCountry: String? = null,
+
     @Column(nullable = false, columnDefinition = "BIT", length = 1)
     var isInstallmentPayment: Boolean? = false,
+
+    var installment: Int? = null,
+
+    var paymentDay: String? = null,
+
+    @Column(nullable = false, columnDefinition = "BIT", length = 1)
+    var isOverseaUse: Boolean? = false,
 
     @CreatedDate
     var createdAt: LocalDateTime? = null,

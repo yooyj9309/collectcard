@@ -44,7 +44,8 @@ let CardTransactionType = {
                 "cardTransactionType": get-key($CardTransactionType, .status, "CARD_TRANSACTION_TYPE_UNKNOWN"),  // 상태
                 "cardTransactionTypeOrigin" : .status,
                 "cardType" : "CREDIT",
-                "currencyCode" : "KRW"
+                "currencyCode" : "KRW",
+                "isOverseaUse" : false
                 //"이용구분" : .ueC // TODO 예상국 내부에서는 쓰지 않으나 모든 데이터를 수집하기 위하여 표준에 적용
             }
         ],

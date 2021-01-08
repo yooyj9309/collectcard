@@ -79,6 +79,7 @@ class CardTransactionExecutionTest {
             this.approvalDay = "20200709"
             this.approvalTime = "131320"
             this.paymentDay = "20200725"
+            this.isOverseaUse = false
         })
     }
 
@@ -147,6 +148,7 @@ class CardTransactionExecutionTest {
             this.approvalDay = "20190923"
             this.approvalTime = "122825"
             this.paymentDay = "20191010"
+            this.isOverseaUse = false
         })
     }
 

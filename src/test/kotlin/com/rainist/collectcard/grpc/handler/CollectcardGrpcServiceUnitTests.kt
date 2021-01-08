@@ -48,6 +48,7 @@ import com.rainist.collectcard.common.exception.CollectcardServiceExceptionHandl
 import com.rainist.collectcard.common.meters.CollectMeterRegistry
 import com.rainist.collectcard.common.publish.banksalad.CardLoanPublishService
 import com.rainist.collectcard.common.publish.banksalad.CardPublishService
+import com.rainist.collectcard.common.publish.banksalad.CardTransactionPublishService
 import com.rainist.collectcard.common.service.CardOrganization
 import com.rainist.collectcard.common.service.LocalDatetimeService
 import com.rainist.collectcard.common.service.OrganizationService
@@ -113,6 +114,9 @@ internal class CollectcardGrpcServiceUnitTests {
 
     @MockBean
     lateinit var cardPublishService: CardPublishService
+
+    @MockBean
+    lateinit var cardTransactionPublishService: CardTransactionPublishService
 
     @MockBean
     lateinit var cardLoanPublishService: CardLoanPublishService
@@ -213,7 +217,7 @@ internal class CollectcardGrpcServiceUnitTests {
 
         // given
         val responseObserver: StreamRecorder<CollectcardProto.ListCardTransactionsResponse> = StreamRecorder.create()
-
+        val nowLocalDateTime = NowUtcLocalDatetime()
         val request = CollectcardProto.ListCardTransactionsRequest
             .newBuilder()
             .setCardId(StringValue.of("card"))
@@ -252,8 +256,8 @@ internal class CollectcardGrpcServiceUnitTests {
                 })
             )
         )
-
-        given(cardTransactionService.listTransactions(executionContext)).willReturn(response)
+        given(localDatetimeService.generateNowLocalDatetime()).willReturn(nowLocalDateTime)
+        given(cardTransactionService.listTransactions(executionContext, nowLocalDateTime.now)).willReturn(response)
 
         // when
         collectcardGrpcService.listCardTransactions(request, responseObserver)

@@ -19,6 +19,7 @@ import com.rainist.collectcard.common.exception.CollectcardServiceExceptionHandl
 import com.rainist.collectcard.common.exception.HealthCheckException
 import com.rainist.collectcard.common.publish.banksalad.CardLoanPublishService
 import com.rainist.collectcard.common.publish.banksalad.CardPublishService
+import com.rainist.collectcard.common.publish.banksalad.CardTransactionPublishService
 import com.rainist.collectcard.common.service.LocalDatetimeService
 import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.common.service.UserSyncStatusService
@@ -46,6 +47,7 @@ class CollectcardGrpcService(
     val userSyncStatusService: UserSyncStatusService,
     val uuidService: UuidService,
     val cardPublishService: CardPublishService,
+    val cardTransactionPublishService: CardTransactionPublishService,
     val cardLoanPublishService: CardLoanPublishService,
     val meterRegistry: MeterRegistry,
     val localDatetimeService: LocalDatetimeService
@@ -92,7 +94,6 @@ class CollectcardGrpcService(
                     executionContext.executionRequestId,
                     listCardResponse
                 )
-
                 shadowingLogging(res)
             }
 
@@ -111,6 +112,7 @@ class CollectcardGrpcService(
         request: CollectcardProto.ListCardTransactionsRequest,
         responseObserver: StreamObserver<CollectcardProto.ListCardTransactionsResponse>
     ) {
+        val now = localDatetimeService.generateNowLocalDatetime().now
         /* Execution Context */
         val executionContext: CollectExecutionContext = CollectExecutionContext(
             executionRequestId = uuidService.generateExecutionRequestId(),
@@ -124,7 +126,20 @@ class CollectcardGrpcService(
                 .With("fromMs", request.takeIf { request.hasFromMs() }?.fromMs?.value ?: "fromMsNull")
                 .Warn("")
 
-            cardTransactionService.listTransactions(executionContext).toListCardsTransactionResponseProto()
+            val listTransactionResponse = cardTransactionService.listTransactions(executionContext, now)
+
+            GlobalScope.launch {
+                val res: CollectShadowingResponse = cardTransactionPublishService.shadowing(
+                    executionContext.userId.toLong(),
+                    executionContext.organizationId,
+                    now,
+                    executionContext.executionRequestId,
+                    listTransactionResponse
+                )
+                shadowingLogging(res)
+            }
+
+            listTransactionResponse.toListCardsTransactionResponseProto()
         }.onSuccess {
             responseObserver.onNext(it)
             responseObserver.onCompleted()

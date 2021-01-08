@@ -25,6 +25,7 @@ import com.rainist.collectcard.common.util.CustomStringUtil
 import com.rainist.common.log.Log
 import com.rainist.common.service.ValidationService
 import com.rainist.common.util.DateTimeUtil
+import java.time.LocalDateTime
 import java.util.concurrent.Executor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -52,8 +53,7 @@ class CardTransactionServiceImpl(
     companion object : Log
 
     @Transactional
-    override fun listTransactions(executionContext: CollectExecutionContext): ListTransactionsResponse {
-        val now = DateTimeUtil.utcNowLocalDateTime()
+    override fun listTransactions(executionContext: CollectExecutionContext, now: LocalDateTime): ListTransactionsResponse {
         val banksaladUserId = executionContext.userId.toLong()
         val organizationId = executionContext.organizationId
         /* request header */
