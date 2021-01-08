@@ -5,6 +5,7 @@ import com.rainist.collectcard.card.dto.ListCardsResponse
 import com.rainist.collectcard.card.mapper.CardMapper
 import com.rainist.collectcard.common.db.repository.CardRepository
 import com.rainist.collectcard.common.dto.CollectShadowingResponse
+import com.rainist.collectcard.common.util.CustomStringUtil
 import java.time.LocalDateTime
 import org.apache.commons.lang3.builder.EqualsBuilder
 import org.mapstruct.factory.Mappers
@@ -30,7 +31,9 @@ class CardPublishService(
         val cards = cardRepository.findAllByBanksaladUserIdAndCardCompanyIdAndLastCheckAt(
             banksaladUserId, organizationId, lastCheckAt
         ).map {
-            cardMapper.toCardDto(it)
+            var card = cardMapper.toCardDto(it)
+            card.cardNumber = CustomStringUtil.replaceNumberToMask(card.cardNumber)
+            card
         }.sortedWith(compareBy({ it.cardName }, { it.cardNumber }))
 
         val oldCards = oldResponse.dataBody?.cards?.sortedWith(compareBy({ it.cardName }, { it.cardNumber })) ?: mutableListOf()

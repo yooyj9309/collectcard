@@ -4,5 +4,5 @@ import com.rainist.common.util.DateTimeUtil
 import java.time.LocalDateTime
 
 class NowUtcLocalDatetime(
-    val now: LocalDateTime = DateTimeUtil.utcNowLocalDateTime()
+    val now: LocalDateTime = DateTimeUtil.utcNowLocalDateTime().withNano(0)
 )

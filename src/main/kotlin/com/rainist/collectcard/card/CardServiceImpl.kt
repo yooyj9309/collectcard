@@ -147,13 +147,12 @@ class CardServiceImpl(
         if (entityDto.unequals(card)) {
             /* update field */
             cardMapper.merge(card, cardEntity)
-            cardEntity.lastCheckAt = now
-
-            cardRepository.save(cardEntity)
 
             val cardHistoryEntity = cardMapper.toCardHistoryEntity(cardEntity)
             cardHistoryRepository.save(cardHistoryEntity)
         }
+        cardEntity.lastCheckAt = now
+        cardRepository.save(cardEntity)
     }
 
     /* 신규 카드 */

@@ -307,6 +307,8 @@ class CollectcardGrpcService(
             .With("last_check_at", res.lastCheckAt)
             .With("execution_request_id", res.executionRequestId)
             .With("is_diff", res.isDiff)
+            .With("old_list", res.oldList)
+            .With("new_list", res.dbList)
             .Info()
 
         val tags = Tags.of("execution_name", res.executionName).and("is_diff", res.isDiff.toString())
