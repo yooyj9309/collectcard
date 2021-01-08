@@ -47,6 +47,8 @@ data class CardLoanEntity(
     @Column(nullable = true, name = "payment_account_number_encrypted")
     var paymentAccountNumber: String? = null,
 
+    var issuedDay: String? = null,
+
     @Column(nullable = false)
     var expirationDay: String? = null,
 
@@ -119,6 +121,7 @@ fun CardLoanEntity.makeCardLoanEntity(
     this.loanStatus = loan.loanStatus.name
     this.loanStatusOrigin = loan.loanStatusOrigin
     this.paymentAccountNumber = loan.paymentAccountNumber
+    this.issuedDay = loan.issuedDay
     this.repaymentMethod = loan.repaymentMethod.name
     this.repaymentMethodOrigin = loan.repaymentMethodOrigin
     this.withdrawalDay = loan.withdrawalDay

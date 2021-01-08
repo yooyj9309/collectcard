@@ -70,7 +70,6 @@ class CardLoanPublishTest {
         val response = cardLoanService.listCardLoans(executionContext, now)
 
         val shadowingResponse = cardLoanPublishService.shadowing(banksaladUserId.toLong(), organizationId, now, executionContext.executionRequestId, response)
-        // false 여야하나 issueDate 가 없으며, 매칭이 안디기에 true
         Assert.assertEquals(false, shadowingResponse.isDiff)
 
         val listSize = shadowingResponse.oldList.size
@@ -86,9 +85,7 @@ class CardLoanPublishTest {
                 oldLoans[i].remainingAmount == loans[i].remainingAmount,
                 oldLoans[i].paymentBankId == loans[i].paymentBankId,
                 oldLoans[i].paymentAccountNumber == loans[i].paymentAccountNumber,
-
-                // TODO [FLOW] db field 해제후 주석해제
-                // oldLoans[i].issuedDay == loans[i].issuedDay,
+                oldLoans[i].issuedDay == loans[i].issuedDay,
                 oldLoans[i].expirationDay == loans[i].expirationDay,
                 oldLoans[i].loanStatus == loans[i].loanStatus,
                 oldLoans[i].loanStatusOrigin == loans[i].loanStatusOrigin,

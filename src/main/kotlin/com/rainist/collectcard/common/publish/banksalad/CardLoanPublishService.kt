@@ -1,6 +1,5 @@
 package com.rainist.collectcard.common.publish.banksalad
 
-import com.rainist.collectcard.card.dto.Card
 import com.rainist.collectcard.cardloans.dto.ListLoansResponse
 import com.rainist.collectcard.cardloans.dto.Loan
 import com.rainist.collectcard.cardloans.mapper.CardLoanMapper
@@ -17,11 +16,6 @@ class CardLoanPublishService(
 ) {
 
     val cardLoanMapper = Mappers.getMapper(CardLoanMapper::class.java)
-
-    // TODO [FLOW] 해당부분을 제외하고 Diff 비교, 추후 필수로 추가필요.
-    val LOAN_SHADOWING_EXCLUDE_EQUALS_FIELD = mutableListOf(
-        Card::issuedDay.name
-    )
 
     fun sync(banksaladUserId: Long, organizationId: String, lastCheckAt: LocalDateTime) {
         TODO()
@@ -55,7 +49,7 @@ class CardLoanPublishService(
             return true
 
         for (i in lhs.indices) {
-            if (!EqualsBuilder.reflectionEquals(lhs[i], rhs[i], LOAN_SHADOWING_EXCLUDE_EQUALS_FIELD)) {
+            if (!EqualsBuilder.reflectionEquals(lhs[i], rhs[i])) {
                 return true
             }
         }
