@@ -95,7 +95,7 @@ class CardServiceTest {
                 cardType = CardType.CREDIT
                 cardTypeOrigin = "1"
                 isBusinessCard = false
-                trafficSupported = true
+                isTrafficSupported = true
             }
             ))
 
@@ -128,6 +128,7 @@ class CardServiceTest {
                     cardType = CardType.CREDIT.name,
                     cardTypeOrigin = "1",
                     isBusinessCard = false,
+                    isTrafficSupported = true,
                     createdAt = now,
                     updatedAt = now
                 )
@@ -181,7 +182,7 @@ class CardServiceTest {
                 cardType = CardType.CREDIT
                 cardTypeOrigin = "1"
                 isBusinessCard = false
-                trafficSupported = true
+                isTrafficSupported = true
             }
             ))
 
@@ -215,6 +216,7 @@ class CardServiceTest {
                     cardType = "CREDIT",
                     cardTypeOrigin = "1",
                     isBusinessCard = false,
+                    isTrafficSupported = true,
                     createdAt = now,
                     updatedAt = now
                 )
@@ -262,6 +264,7 @@ class CardServiceTest {
                 cardType = "CREDIT",
                 cardTypeOrigin = "1",
                 isBusinessCard = false,
+                isTrafficSupported = true,
                 createdAt = now,
                 updatedAt = now
             )
@@ -286,7 +289,7 @@ class CardServiceTest {
                 cardType = CardType.DEBIT
                 cardTypeOrigin = "5"
                 isBusinessCard = false
-                trafficSupported = true
+                isTrafficSupported = true
             }
             ))
 
@@ -318,6 +321,7 @@ class CardServiceTest {
                     cardType = "DEBIT",
                     cardTypeOrigin = "5",
                     isBusinessCard = false,
+                    isTrafficSupported = true,
                     createdAt = now,
                     updatedAt = now
                 )

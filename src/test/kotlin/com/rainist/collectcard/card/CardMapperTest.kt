@@ -47,7 +47,7 @@ class CardMapperTest {
         Assert.assertEquals(dto.paymentBankId, "SHBANK")
         Assert.assertEquals(dto.paymentAccountNumber, "accountNumber")
         Assert.assertEquals(dto.isBusinessCard, false)
-        Assert.assertEquals(dto.trafficSupported, false)
+        Assert.assertEquals(dto.isTrafficSupported, false)
     }
 
     @Test
@@ -238,7 +238,7 @@ class CardMapperTest {
             this.paymentBankId = "SHBANK"
             this.paymentAccountNumber = "accountNumber"
             this.isBusinessCard = false
-            this.trafficSupported = false
+            this.isTrafficSupported = false
         }
     }
 }

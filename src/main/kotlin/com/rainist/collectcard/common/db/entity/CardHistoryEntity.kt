@@ -86,6 +86,9 @@ data class CardHistoryEntity(
     @Column(columnDefinition = "BIT", length = 1)
     var isBusinessCard: Boolean? = false,
 
+    @Column(columnDefinition = "BIT", length = 1)
+    var isTrafficSupported: Boolean? = false,
+
     @CreatedDate
     var createdAt: LocalDateTime? = null,
 

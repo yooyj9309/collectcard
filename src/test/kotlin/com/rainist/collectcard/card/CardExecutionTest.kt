@@ -66,7 +66,7 @@ class CardExecutionTest {
             this.cardType = CardType.CREDIT
             this.cardTypeOrigin = "1"
             this.isBusinessCard = false
-            this.trafficSupported = true
+            this.isTrafficSupported = true
         })
 
         assertThat(cards[1]).isEqualToComparingFieldByField(Card().apply {
@@ -81,7 +81,7 @@ class CardExecutionTest {
             this.cardType = CardType.DEBIT
             this.cardTypeOrigin = "5"
             this.isBusinessCard = false
-            this.trafficSupported = false
+            this.isTrafficSupported = false
         })
     }
 

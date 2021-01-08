@@ -64,7 +64,7 @@ let cardholder_name = .dataBody.clnHgNm
                 "cardType": get-key($CardType, .cardgubun, "UNKNOWN"),
                 "cardTypeOrigin": .cardgubun,
                 "internationalBrandName": get-key($brands, .cardbrand, "CARD_INTERNATIONAL_BRAND_UNKNOWN"),
-                "trafficSupported" : if( .trafficyn == "Y") true else false
+                "isTrafficSupported" : if( .trafficyn == "Y") true else false
             }
         ],
         "nextKey" : .dataBody.nxtQyKey

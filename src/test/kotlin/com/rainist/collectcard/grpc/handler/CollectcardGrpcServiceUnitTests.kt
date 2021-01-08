@@ -189,7 +189,7 @@ internal class CollectcardGrpcServiceUnitTests {
                     this.cardType = CardType.CREDIT
                     this.cardTypeOrigin = "1"
                     this.isBusinessCard = false
-                    this.trafficSupported = true
+                    this.isTrafficSupported = true
                 })
             ),
             dataHeader = ListCardsResponseDataHeader(

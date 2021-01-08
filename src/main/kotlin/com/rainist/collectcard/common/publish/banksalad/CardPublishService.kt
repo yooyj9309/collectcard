@@ -17,8 +17,7 @@ class CardPublishService(
 
     // TODO [FLOW] 해당부분을 제외하고 Diff 비교, 추후 필수로 제거필요.
     val CARD_SHADOWING_EXCLUDE_EQUALS_FIELD = mutableListOf(
-        Card::cardId.name,
-        Card::trafficSupported.name
+        Card::cardId.name
     )
 
     val cardMapper = Mappers.getMapper(CardMapper::class.java)

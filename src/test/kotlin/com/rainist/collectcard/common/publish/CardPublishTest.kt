@@ -105,7 +105,8 @@ class CardPublishTest {
                 oldCards[i].annualFee == cards[i].annualFee,
                 oldCards[i].paymentBankId == cards[i].paymentBankId,
                 oldCards[i].paymentAccountNumber == cards[i].paymentAccountNumber,
-                oldCards[i].isBusinessCard == cards[i].isBusinessCard
+                oldCards[i].isBusinessCard == cards[i].isBusinessCard,
+                oldCards[i].isTrafficSupported == cards[i].isTrafficSupported
             ).all { it }
             assertEquals(true, isDiffObject)
         }

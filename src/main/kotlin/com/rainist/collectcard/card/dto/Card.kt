@@ -60,13 +60,12 @@ data class Card(
     var isBusinessCard: Boolean = false,
 
     // 교통카드 지원여부 ( db에는 없으나, 현재 신한카드 응답값으로 내리는중)
-    var trafficSupported: Boolean = false
+    var isTrafficSupported: Boolean = false
 ) {
 
     companion object : Log {
         val EXCLUDE_EQUALS_FIELD = mutableListOf(
-            Card::cardId.name,
-            Card::trafficSupported.name
+            Card::cardId.name
         )
     }
 
