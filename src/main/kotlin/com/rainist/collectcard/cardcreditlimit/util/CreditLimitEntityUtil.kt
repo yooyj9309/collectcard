@@ -11,7 +11,8 @@ class CreditLimitEntityUtil {
 
         fun isUpdated(from: CreditLimitEntity, to: CreditLimitEntity): Boolean {
             if (from.onetimePaymentLimitAmount?.compareTo(to.onetimePaymentLimitAmount) != 0) return true
-            if (from.onetimePaymentLimitAmount?.compareTo(to.onetimePaymentLimitAmount) != 0) return true
+            if (from.onetimePaymentLimitUsedAmount?.compareTo(to.onetimePaymentLimitUsedAmount) != 0) return true
+            if (from.onetimePaymentLimitRemainingAmount?.compareTo(to.onetimePaymentLimitRemainingAmount) != 0) return true
             if (from.creditCardLimitTotalAmount?.compareTo(to.creditCardLimitTotalAmount) != 0) return true
             if (from.creditCardLimitUsedAmount?.compareTo(to.creditCardLimitUsedAmount) != 0) return true
             if (from.creditCardLimitRemainingAmount?.compareTo(to.creditCardLimitRemainingAmount) != 0) return true
@@ -30,6 +31,9 @@ class CreditLimitEntityUtil {
             if (from.debitCardTotalAmount?.compareTo(to.debitCardTotalAmount) != 0) return true
             if (from.debitCardUsedAmount?.compareTo(to.debitCardUsedAmount) != 0) return true
             if (from.debitCardRemainingAmount?.compareTo(to.debitCardRemainingAmount) != 0) return true
+            if (from.installmentLimitTotalAmount?.compareTo(to.installmentLimitTotalAmount) != 0) return true
+            if (from.installmentLimitUsedAmount?.compareTo(to.installmentLimitUsedAmount) != 0) return true
+            if (from.installmentLimitRemainingAmount?.compareTo(to.installmentLimitRemainingAmount) != 0) return true
 
             return false
         }
@@ -43,6 +47,8 @@ class CreditLimitEntityUtil {
                 this.banksaladUserId = sourceCreditLimitEntity.banksaladUserId
                 this.cardCompanyId = sourceCreditLimitEntity.cardCompanyId
                 this.onetimePaymentLimitAmount = sourceCreditLimitEntity.onetimePaymentLimitAmount
+                this.onetimePaymentLimitUsedAmount = sourceCreditLimitEntity.onetimePaymentLimitUsedAmount
+                this.onetimePaymentLimitRemainingAmount = sourceCreditLimitEntity.onetimePaymentLimitRemainingAmount
                 this.creditCardLimitTotalAmount = sourceCreditLimitEntity.creditCardLimitTotalAmount
                 this.creditCardLimitUsedAmount = sourceCreditLimitEntity.creditCardLimitUsedAmount
                 this.creditCardLimitRemainingAmount = sourceCreditLimitEntity.creditCardLimitRemainingAmount
@@ -61,6 +67,9 @@ class CreditLimitEntityUtil {
                 this.debitCardTotalAmount = sourceCreditLimitEntity.debitCardTotalAmount
                 this.debitCardUsedAmount = sourceCreditLimitEntity.debitCardUsedAmount
                 this.debitCardRemainingAmount = sourceCreditLimitEntity.debitCardRemainingAmount
+                this.installmentLimitTotalAmount = sourceCreditLimitEntity.installmentLimitTotalAmount
+                this.installmentLimitUsedAmount = sourceCreditLimitEntity.installmentLimitUsedAmount
+                this.installmentLimitRemainingAmount = sourceCreditLimitEntity.installmentLimitRemainingAmount
                 this.lastCheckAt = lastCheckAt
             }
         }
@@ -75,13 +84,18 @@ class CreditLimitEntityUtil {
             return CreditLimitEntity().apply {
                 this.banksaladUserId = banksaladUserId
                 this.cardCompanyId = cardCompanyId
-                this.onetimePaymentLimitAmount = getNonNullBigDecimal(creditLimit?.onetimePaymentLimit?.totalLimitAmount)
+                this.onetimePaymentLimitAmount =
+                    getNonNullBigDecimal(creditLimit?.onetimePaymentLimit?.totalLimitAmount)
+                this.onetimePaymentLimitUsedAmount = getNonNullBigDecimal(creditLimit?.onetimePaymentLimit?.usedAmount)
+                this.onetimePaymentLimitRemainingAmount =
+                    getNonNullBigDecimal(creditLimit?.onetimePaymentLimit?.remainedAmount)
                 this.creditCardLimitTotalAmount = getNonNullBigDecimal(creditLimit?.creditCardLimit?.totalLimitAmount)
                 this.creditCardLimitUsedAmount = getNonNullBigDecimal(creditLimit?.creditCardLimit?.usedAmount)
                 this.creditCardLimitRemainingAmount = getNonNullBigDecimal(creditLimit?.creditCardLimit?.remainedAmount)
                 this.cashAdvanceLimitTotalAmount = getNonNullBigDecimal(creditLimit?.cashServiceLimit?.totalLimitAmount)
                 this.cashAdvanceLimitUsedAmount = getNonNullBigDecimal(creditLimit?.cashServiceLimit?.usedAmount)
-                this.cashAdvanceLimitRemainingAmount = getNonNullBigDecimal(creditLimit?.cashServiceLimit?.remainedAmount)
+                this.cashAdvanceLimitRemainingAmount =
+                    getNonNullBigDecimal(creditLimit?.cashServiceLimit?.remainedAmount)
                 this.overseaLimitTotalAmount = getNonNullBigDecimal(creditLimit?.overseaLimit?.totalLimitAmount)
                 this.overseaLimitUsedAmount = getNonNullBigDecimal(creditLimit?.overseaLimit?.usedAmount)
                 this.overseaLimitRemainingAmount = getNonNullBigDecimal(creditLimit?.overseaLimit?.remainedAmount)
@@ -94,6 +108,10 @@ class CreditLimitEntityUtil {
                 this.debitCardTotalAmount = getNonNullBigDecimal(creditLimit?.debitCardLimit?.totalLimitAmount)
                 this.debitCardUsedAmount = getNonNullBigDecimal(creditLimit?.debitCardLimit?.usedAmount)
                 this.debitCardRemainingAmount = getNonNullBigDecimal(creditLimit?.debitCardLimit?.remainedAmount)
+                this.installmentLimitTotalAmount = getNonNullBigDecimal(creditLimit?.installmentLimit?.totalLimitAmount)
+                this.installmentLimitUsedAmount = getNonNullBigDecimal(creditLimit?.installmentLimit?.usedAmount)
+                this.installmentLimitRemainingAmount =
+                    getNonNullBigDecimal(creditLimit?.installmentLimit?.remainedAmount)
                 this.lastCheckAt = lastCheckAt
             }
         }
@@ -105,6 +123,8 @@ class CreditLimitEntityUtil {
                 this.cardCompanyId = creditLimitEntity.cardCompanyId
                 this.lastCheckAt = creditLimitEntity.lastCheckAt
                 this.onetimePaymentLimitAmount = creditLimitEntity.onetimePaymentLimitAmount
+                this.onetimePaymentLimitUsedAmount = creditLimitEntity.onetimePaymentLimitUsedAmount
+                this.onetimePaymentLimitRemainingAmount = creditLimitEntity.onetimePaymentLimitRemainingAmount
                 this.creditCardLimitTotalAmount = creditLimitEntity.creditCardLimitTotalAmount
                 this.creditCardLimitUsedAmount = creditLimitEntity.creditCardLimitUsedAmount
                 this.creditCardLimitRemainingAmount = creditLimitEntity.creditCardLimitRemainingAmount
@@ -123,6 +143,9 @@ class CreditLimitEntityUtil {
                 this.debitCardTotalAmount = creditLimitEntity.debitCardTotalAmount
                 this.debitCardUsedAmount = creditLimitEntity.debitCardUsedAmount
                 this.debitCardRemainingAmount = creditLimitEntity.debitCardRemainingAmount
+                this.installmentLimitTotalAmount = creditLimitEntity.installmentLimitTotalAmount
+                this.installmentLimitUsedAmount = creditLimitEntity.installmentLimitUsedAmount
+                this.installmentLimitRemainingAmount = creditLimitEntity.installmentLimitRemainingAmount
             }
         }
 

@@ -39,6 +39,12 @@ data class CreditLimitEntity(
     @Column(nullable = false)
     var onetimePaymentLimitAmount: BigDecimal? = null,
 
+    // 일회결제 사용한도금액
+    var onetimePaymentLimitUsedAmount: BigDecimal? = null,
+
+    // 일회결제 잔여한도금액
+    var onetimePaymentLimitRemainingAmount: BigDecimal? = null,
+
     // 신용카드 총 한도금액
     @Column(nullable = false)
     var creditCardLimitTotalAmount: BigDecimal? = null,
@@ -97,6 +103,15 @@ data class CreditLimitEntity(
 
     // 직불카드 잔여금액
     var debitCardRemainingAmount: BigDecimal? = null,
+
+    // 할부 총한도금액
+    var installmentLimitTotalAmount: BigDecimal? = null,
+
+    // 할부 사용한도금액
+    var installmentLimitUsedAmount: BigDecimal? = null,
+
+    // 할부 잔여한도금액
+    var installmentLimitRemainingAmount: BigDecimal? = null,
 
     // 생성일시
     @CreatedDate

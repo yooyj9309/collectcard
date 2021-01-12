@@ -64,7 +64,7 @@ class CardCreditLimitServiceTest {
             executionContext
         )
 
-        val creditLimit = cardCreditLimitService.cardCreditLimit(executionContext)
+        val creditLimit = cardCreditLimitService.cardCreditLimit(executionContext, DateTimeUtil.utcNowLocalDateTime())
         Assert.assertEquals(
             creditLimit.dataBody?.creditLimitInfo?.onetimePaymentLimit?.totalLimitAmount,
             BigDecimal(10000000)
@@ -83,7 +83,7 @@ class CardCreditLimitServiceTest {
             "classpath:mock/shinhancard/creditlimit/card_credit_limit_expected_2.json",
             executionContext
         )
-        val creditLimit2 = cardCreditLimitService.cardCreditLimit(executionContext)
+        val creditLimit2 = cardCreditLimitService.cardCreditLimit(executionContext, DateTimeUtil.utcNowLocalDateTime())
         Assert.assertEquals(
             creditLimit2.dataBody?.creditLimitInfo?.onetimePaymentLimit?.totalLimitAmount,
             BigDecimal(7100000)
@@ -113,11 +113,20 @@ class CardCreditLimitServiceTest {
             executionContext
         )
 
-        val creditLimit = cardCreditLimitService.cardCreditLimit(executionContext).toCreditLimitResponseProto()
-        Assert.assertEquals(com.github.banksalad.idl.apis.v1.collectcard.CollectcardProto.CreditLimit.getDefaultInstance(), creditLimit.data)
+        val creditLimit = cardCreditLimitService.cardCreditLimit(executionContext, DateTimeUtil.utcNowLocalDateTime())
+            .toCreditLimitResponseProto()
+        Assert.assertEquals(
+            com.github.banksalad.idl.apis.v1.collectcard.CollectcardProto.CreditLimit.getDefaultInstance(),
+            creditLimit.data
+        )
     }
 
-    fun setserver(server: MockRestServiceServer, api: Api, filePath: String, executionContext: CollectExecutionContext) {
+    fun setserver(
+        server: MockRestServiceServer,
+        api: Api,
+        filePath: String,
+        executionContext: CollectExecutionContext
+    ) {
         given(headerService.makeHeader(executionContext.userId, executionContext.organizationId))
             .willReturn(
                 mutableMapOf(

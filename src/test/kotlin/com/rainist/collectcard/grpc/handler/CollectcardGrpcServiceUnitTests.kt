@@ -49,6 +49,7 @@ import com.rainist.collectcard.common.meters.CollectMeterRegistry
 import com.rainist.collectcard.common.publish.banksalad.CardLoanPublishService
 import com.rainist.collectcard.common.publish.banksalad.CardPublishService
 import com.rainist.collectcard.common.publish.banksalad.CardTransactionPublishService
+import com.rainist.collectcard.common.publish.banksalad.CreditLimitPublishService
 import com.rainist.collectcard.common.service.CardOrganization
 import com.rainist.collectcard.common.service.LocalDatetimeService
 import com.rainist.collectcard.common.service.OrganizationService
@@ -114,6 +115,9 @@ internal class CollectcardGrpcServiceUnitTests {
 
     @MockBean
     lateinit var cardPublishService: CardPublishService
+
+    @MockBean
+    lateinit var creditLimitPublishService: CreditLimitPublishService
 
     @MockBean
     lateinit var cardTransactionPublishService: CardTransactionPublishService
@@ -376,6 +380,7 @@ internal class CollectcardGrpcServiceUnitTests {
     fun creditLimitUnitTest() {
         //  given
         val responseObserver: StreamRecorder<CollectcardProto.GetCreditLimitResponse> = StreamRecorder.create()
+        val nowLocalDateTime = NowUtcLocalDatetime()
 
         val request = CollectcardProto.GetCreditLimitRequest
             .newBuilder()
@@ -422,7 +427,8 @@ internal class CollectcardGrpcServiceUnitTests {
             )
         )
 
-        given(cardCreditLimitService.cardCreditLimit(executionContext)).willReturn(response)
+        given(localDatetimeService.generateNowLocalDatetime()).willReturn(nowLocalDateTime)
+        given(cardCreditLimitService.cardCreditLimit(executionContext, nowLocalDateTime.now)).willReturn(response)
 
         // when
         collectcardGrpcService.getCreditLimit(request, responseObserver)

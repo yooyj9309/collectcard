@@ -23,6 +23,7 @@ import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.common.log.Log
 import com.rainist.common.model.ObjectOf
 import com.rainist.common.util.DateTimeUtil
+import java.time.LocalDateTime
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -40,9 +41,8 @@ class CardCreditLimitServiceImpl(
     companion object : Log
 
     @Transactional
-    override fun cardCreditLimit(executionContext: CollectExecutionContext): CreditLimitResponse {
+    override fun cardCreditLimit(executionContext: CollectExecutionContext, now: LocalDateTime): CreditLimitResponse {
         val banksaladUserId = executionContext.userId.toLong()
-        val now = DateTimeUtil.utcNowLocalDateTime()
 
         /* request header */
         val header = headerService.makeHeader(executionContext.userId, executionContext.organizationId)

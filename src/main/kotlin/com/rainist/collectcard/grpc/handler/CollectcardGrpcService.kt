@@ -14,12 +14,14 @@ import com.rainist.collectcard.cardtransactions.CardTransactionService
 import com.rainist.collectcard.cardtransactions.dto.toListCardsTransactionResponseProto
 import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.dto.CollectShadowingResponse
+import com.rainist.collectcard.common.dto.SingleCollectShadowingResponse
 import com.rainist.collectcard.common.dto.toSyncStatusResponseProto
 import com.rainist.collectcard.common.exception.CollectcardServiceExceptionHandler
 import com.rainist.collectcard.common.exception.HealthCheckException
 import com.rainist.collectcard.common.publish.banksalad.CardLoanPublishService
 import com.rainist.collectcard.common.publish.banksalad.CardPublishService
 import com.rainist.collectcard.common.publish.banksalad.CardTransactionPublishService
+import com.rainist.collectcard.common.publish.banksalad.CreditLimitPublishService
 import com.rainist.collectcard.common.service.LocalDatetimeService
 import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.common.service.UserSyncStatusService
@@ -49,6 +51,7 @@ class CollectcardGrpcService(
     val cardPublishService: CardPublishService,
     val cardTransactionPublishService: CardTransactionPublishService,
     val cardLoanPublishService: CardLoanPublishService,
+    val creditLimitPublishService: CreditLimitPublishService,
     val meterRegistry: MeterRegistry,
     val localDatetimeService: LocalDatetimeService
 ) : CollectcardGrpc.CollectcardImplBase() {
@@ -80,7 +83,8 @@ class CollectcardGrpcService(
 
         val executionContext = CollectExecutionContext(
             executionRequestId = uuidService.generateExecutionRequestId(),
-            organizationId = organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: "",
+            organizationId = organizationService.getOrganizationByObjectId(request.companyId.value).organizationId
+                ?: "",
             userId = request.userId
         )
 
@@ -116,7 +120,8 @@ class CollectcardGrpcService(
         /* Execution Context */
         val executionContext: CollectExecutionContext = CollectExecutionContext(
             executionRequestId = uuidService.generateExecutionRequestId(),
-            organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
+            organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId
+                ?: "",
             userId = request.userId
         )
 
@@ -156,7 +161,8 @@ class CollectcardGrpcService(
         /* Execution Context */
         val executionContext: CollectExecutionContext = CollectExecutionContext(
             executionRequestId = uuidService.generateExecutionRequestId(),
-            organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
+            organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId
+                ?: "",
             userId = request.userId
         )
 
@@ -183,7 +189,8 @@ class CollectcardGrpcService(
         /* Execution Context */
         val executionContext: CollectExecutionContext = CollectExecutionContext(
             executionRequestId = uuidService.generateExecutionRequestId(),
-            organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
+            organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId
+                ?: "",
             userId = request.userId
         )
 
@@ -202,8 +209,8 @@ class CollectcardGrpcService(
             }
             listLoanResponse.toListCardLoansResponseProto()
         }.onSuccess {
-                responseObserver.onNext(it)
-                responseObserver.onCompleted()
+            responseObserver.onNext(it)
+            responseObserver.onCompleted()
         }.onFailure {
 //                logger.error("[사용자 대출 내역 조회 에러 : {}]", it.localizedMessage, it)
             CollectcardServiceExceptionHandler.handle(executionContext, "listCardLoans", "사용자대출내역조회", it)
@@ -216,15 +223,31 @@ class CollectcardGrpcService(
         request: CollectcardProto.GetCreditLimitRequest,
         responseObserver: StreamObserver<CollectcardProto.GetCreditLimitResponse>
     ) {
+        val now = localDatetimeService.generateNowLocalDatetime().now
+
         /* Execution Context */
         val executionContext: CollectExecutionContext = CollectExecutionContext(
             executionRequestId = uuidService.generateExecutionRequestId(),
-            organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
+            organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId
+                ?: "",
             userId = request.userId
         )
 
         kotlin.runCatching {
-            cardCreditLimitService.cardCreditLimit(executionContext).toCreditLimitResponseProto()
+            val cardCreditLimitResponse = cardCreditLimitService.cardCreditLimit(executionContext, now)
+
+            GlobalScope.launch {
+                val res: SingleCollectShadowingResponse = creditLimitPublishService.shadowing(
+                    executionContext.userId.toLong(),
+                    executionContext.organizationId,
+                    now,
+                    executionContext.executionRequestId,
+                    cardCreditLimitResponse
+                )
+                singleShadowingLogging(res)
+            }
+
+            cardCreditLimitResponse.toCreditLimitResponseProto()
         }.onSuccess {
             responseObserver.onNext(it)
             responseObserver.onCompleted()
@@ -248,7 +271,8 @@ class CollectcardGrpcService(
         } else {
             CollectExecutionContext(
                 executionRequestId = uuidService.generateExecutionRequestId(),
-                organizationId = organizationService.getOrganizationByObjectId(request.companyId.value).organizationId ?: "",
+                organizationId = organizationService.getOrganizationByObjectId(request.companyId.value).organizationId
+                    ?: "",
                 userId = request.userId
             )
         }
@@ -270,7 +294,8 @@ class CollectcardGrpcService(
     ) {
         val executionContext = CollectExecutionContext(
             executionRequestId = uuidService.generateExecutionRequestId(),
-            organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId ?: "",
+            organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId
+                ?: "",
             userId = request.userId
         )
 
@@ -309,6 +334,21 @@ class CollectcardGrpcService(
             .With("is_diff", res.isDiff)
             .With("old_list", res.oldList)
             .With("new_list", res.dbList)
+            .Info()
+
+        val tags = Tags.of("execution_name", res.executionName).and("is_diff", res.isDiff.toString())
+        meterRegistry.counter("shadowing.all", tags).increment()
+    }
+
+    private fun singleShadowingLogging(res: SingleCollectShadowingResponse) {
+        logger.With("shadowing_target", res.executionName)
+            .With("banksalad_user_id", res.banksaladUserId)
+            .With("organization_id", res.organizationId)
+            .With("last_check_at", res.lastCheckAt)
+            .With("execution_request_id", res.executionRequestId)
+            .With("is_diff", res.isDiff)
+            .With("old_response", res.oldResponse)
+            .With("new_response", res.shadowingResponse)
             .Info()
 
         val tags = Tags.of("execution_name", res.executionName).and("is_diff", res.isDiff.toString())
