@@ -127,7 +127,8 @@ class CardTransactionServiceTest {
         val sourceEntity = CardTransactionUtil.makeCardTransactionEntity(
             executionContext.userId.toLong(),
             executionContext.organizationId,
-            cardTransaction
+            cardTransaction,
+            now
         )
 
         val approvalYearMonth = try {

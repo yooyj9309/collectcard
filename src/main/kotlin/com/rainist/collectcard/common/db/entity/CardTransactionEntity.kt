@@ -96,6 +96,8 @@ data class CardTransactionEntity(
     @Column(nullable = false, columnDefinition = "BIT", length = 1)
     var isOverseaUse: Boolean? = false,
 
+    var lastCheckAt: LocalDateTime? = null,
+
     @CreatedDate
     var createdAt: LocalDateTime? = null,
 

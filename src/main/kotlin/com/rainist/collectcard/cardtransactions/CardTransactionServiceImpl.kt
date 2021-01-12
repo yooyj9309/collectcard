@@ -114,9 +114,12 @@ class CardTransactionServiceImpl(
                     CardTransactionUtil.makeCardTransactionEntity(
                         banksaladUserId,
                         executionContext.organizationId,
-                        cardTransaction
+                        cardTransaction,
+                        now
                     )
                 )
+            } else {
+                cardTransactionEntity.apply { this.lastCheckAt = now }.let { cardTransactionRepository.save(it) }
             }
         }
 

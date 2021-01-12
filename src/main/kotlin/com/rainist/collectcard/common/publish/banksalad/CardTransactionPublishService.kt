@@ -29,7 +29,7 @@ class CardTransactionPublishService(
 
     fun shadowing(banksaladUserId: Long, organizationId: String, lastCheckAt: LocalDateTime?, executionRequestId: String, oldResponse: ListTransactionsResponse): CollectShadowingResponse {
         // Transaction은 lastCheckAt이 없어서 임시로 lastCheckAt 보다 이후에 적재된 내용을 조회
-        val transactions = cardTransactionRepository.findAllByBanksaladUserIdAndCardCompanyIdAndCreatedAtGreaterThan(
+        val transactions = cardTransactionRepository.findAllByBanksaladUserIdAndCardCompanyIdAndLastCheckAt(
             banksaladUserId, organizationId, lastCheckAt
         ).map {
             transactionMapper.toTransactionDto(it)
@@ -37,12 +37,13 @@ class CardTransactionPublishService(
 
         var oldTransactions = oldResponse.dataBody?.transactions?.sortedWith(compareBy({ it.approvalNumber }, { it.cardNumber })) ?: mutableListOf()
 
-        // 현재 null로 내려주는 부분이 있으며.
         oldTransactions.forEach {
             it.isInstallmentPayment = it.isInstallmentPayment ?: false
             it.amount = it.amount?.setScale(4)
             it.canceledAmount = it.canceledAmount?.setScale(4)
             it.partialCanceledAmount = it.partialCanceledAmount?.setScale(4)
+            // installment를 넘겨주는 값은 golang에선 int32로 디폴트값 0
+            it.installment = it.installment ?: 0
         }
 
         val isShadowingDiff = unequals(transactions, oldTransactions)
@@ -64,8 +65,9 @@ class CardTransactionPublishService(
             return true
 
         for (i in transactions.indices) {
-            // installment를 넘겨주는 값은 golang에선 int32로 디폴트값 0
-            oldTransactions[i].installment == oldTransactions[i].installment ?: 0
+
+            val rh = oldTransactions[i]
+            val lh = transactions[i]
             if (!EqualsBuilder.reflectionEquals(transactions[i], oldTransactions[i], EXCLUDE_EQUALS_FIELD)) {
                 return true
             }

@@ -15,7 +15,7 @@ interface CardTransactionRepository : JpaRepository<CardTransactionEntity, Long>
         approvalTime: String?
     ): CardTransactionEntity?
 
-    fun findAllByBanksaladUserIdAndCardCompanyIdAndCreatedAtGreaterThan(
+    fun findAllByBanksaladUserIdAndCardCompanyIdAndLastCheckAt(
         banksaladUserId: Long,
         cardCompanyId: String,
         lastCheckAt: LocalDateTime?

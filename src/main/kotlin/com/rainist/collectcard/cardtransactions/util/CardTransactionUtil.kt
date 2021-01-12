@@ -2,12 +2,13 @@ package com.rainist.collectcard.cardtransactions.util
 
 import com.rainist.collectcard.cardtransactions.dto.CardTransaction
 import com.rainist.collectcard.common.db.entity.CardTransactionEntity
+import java.time.LocalDateTime
 
 class CardTransactionUtil {
 
     companion object {
 
-        fun makeCardTransactionEntity(banksaladUserId: Long, organizationObjectId: String, cardTransaction: CardTransaction): CardTransactionEntity {
+        fun makeCardTransactionEntity(banksaladUserId: Long, organizationObjectId: String, cardTransaction: CardTransaction, now: LocalDateTime): CardTransactionEntity {
             return CardTransactionEntity().apply {
                 this.banksaladUserId = banksaladUserId
                 this.approvalYearMonth = cardTransaction.approvalDay?.substring(0, 6)
@@ -39,6 +40,7 @@ class CardTransactionUtil {
                 this.installment = cardTransaction.installment
                 this.paymentDay = cardTransaction.paymentDay
                 this.isOverseaUse = cardTransaction.isOverseaUse ?: false
+                this.lastCheckAt = now
             }
         }
 
