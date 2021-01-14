@@ -17,8 +17,6 @@ import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.db.repository.CardBillHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardBillRepository
-import com.rainist.collectcard.common.db.repository.CardBillScheduledHistoryRepository
-import com.rainist.collectcard.common.db.repository.CardBillScheduledRepository
 import com.rainist.collectcard.common.db.repository.CardBillTransactionHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardBillTransactionRepository
 import com.rainist.collectcard.common.db.repository.CardPaymentScheduledRepository
@@ -41,8 +39,6 @@ class CardBillServiceImpl(
     val collectExecutorService: CollectExecutorService,
     val cardBillRepository: CardBillRepository,
     val cardBillHistoryRepository: CardBillHistoryRepository,
-    val cardBillScheduledRepository: CardBillScheduledRepository,
-    val cardBillScheduledHistoryRepository: CardBillScheduledHistoryRepository,
     val cardBillTransactionRepository: CardBillTransactionRepository,
     val cardBillTransactionHistoryRepository: CardBillTransactionHistoryRepository,
     val cardPaymentScheduledRepository: CardPaymentScheduledRepository,
@@ -162,8 +158,8 @@ class CardBillServiceImpl(
 
         // 결제 예정 내역 DB IO
         cardBillExpectedExecutionResponse.response.dataBody?.cardBills?.map {
-            upsertCardBillScheduled(banksaladUserId, executionContext.organizationId, it, now)
-            deleteAndInsertCardBillExpectedTransactions(banksaladUserId, executionContext.organizationId, it.transactions ?: mutableListOf(), now)
+            deleteAndInsertCardBillExpectedTransactions(banksaladUserId, executionContext.organizationId, it.transactions
+                ?: mutableListOf(), now)
         }
 
         userSyncStatusService.upsertUserSyncStatus(
@@ -222,7 +218,7 @@ class CardBillServiceImpl(
             banksaladUserId,
             organizationId,
             cardBill.billNumber
-        ).forEach { transacitonEntity ->
+        )?.forEach { transacitonEntity ->
             cardBillTransactionRepository.delete(transacitonEntity)
         }
 
@@ -252,45 +248,6 @@ class CardBillServiceImpl(
                 val entity = cardBillTransactionRepository.save(it)
                 cardBillTransactionHistoryRepository.save(CardBillUtil.makeCardBillTransactionHistoryEntity(entity))
             }
-        }
-    }
-
-    private fun upsertCardBillScheduled(banksaladUserId: Long, organizationId: String?, cardBill: CardBill, now: LocalDateTime) {
-        val newCardBillScheduledEntity = CardBillUtil.makeCardBillScheduledEntity(banksaladUserId, organizationId ?: "", cardBill, now)
-        val oldCardBillScheduledEntity = cardBillScheduledRepository.findByBanksaladUserIdAndCardCompanyIdAndBillNumberAndBillTypeAndCardType(
-            banksaladUserId,
-            organizationId ?: "",
-            cardBill.billNumber ?: "",
-            cardBill.billType ?: "",
-            cardBill.cardType?.name ?: ""
-        )
-
-        // new
-        // insert bill scheduled, history
-        if (oldCardBillScheduledEntity == null) {
-            cardBillScheduledRepository.save(newCardBillScheduledEntity)
-            CardBillUtil.makeCardBillScheduledHistoryEntityFromCardBillScheduledEntity(newCardBillScheduledEntity).let {
-                cardBillScheduledHistoryRepository.save(it)
-            }
-            return
-        }
-
-        // no changes
-        if (newCardBillScheduledEntity.equal(oldCardBillScheduledEntity)) {
-            return
-        }
-
-        // update bill scheduled
-        val billEntity = newCardBillScheduledEntity.apply {
-            this.cardBillScheduledId = oldCardBillScheduledEntity.cardBillScheduledId
-            this.createdAt = oldCardBillScheduledEntity.createdAt
-            this.updatedAt = oldCardBillScheduledEntity.updatedAt
-        }
-        cardBillScheduledRepository.save(billEntity)
-
-        // insert history
-        CardBillUtil.makeCardBillScheduledHistoryEntityFromCardBillScheduledEntity(billEntity).let {
-            cardBillScheduledHistoryRepository.save(it)
         }
     }
 

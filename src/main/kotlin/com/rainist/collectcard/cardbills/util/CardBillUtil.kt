@@ -4,8 +4,6 @@ import com.rainist.collectcard.cardbills.dto.CardBill
 import com.rainist.collectcard.cardbills.dto.CardBillTransaction
 import com.rainist.collectcard.common.db.entity.CardBillEntity
 import com.rainist.collectcard.common.db.entity.CardBillHistoryEntity
-import com.rainist.collectcard.common.db.entity.CardBillScheduledEntity
-import com.rainist.collectcard.common.db.entity.CardBillScheduledHistoryEntity
 import com.rainist.collectcard.common.db.entity.CardBillTransactionEntity
 import com.rainist.collectcard.common.db.entity.CardBillTransactionHistoryEntity
 import com.rainist.collectcard.common.db.entity.CardPaymentScheduledEntity
@@ -211,53 +209,6 @@ class CardBillUtil {
                 this.cashbackAmount = entity.cashbackAmount
                 this.pointsRate = entity.pointsRate
                 this.lastCheckAt = entity.lastCheckAt
-            }
-        }
-
-        fun makeCardBillScheduledEntity(banksaladUserId: Long, organizationId: String, cardBill: CardBill, now: LocalDateTime): CardBillScheduledEntity {
-            return CardBillScheduledEntity().apply {
-                this.banksaladUserId = banksaladUserId
-                this.cardCompanyId = organizationId
-                this.billNumber = cardBill.billNumber
-                this.billType = cardBill.billType
-                this.cardType = cardBill.cardType?.name ?: ""
-                this.lastCheckAt = now
-                this.userName = cardBill.userName
-                this.userGrade = cardBill.userGrade
-                this.userGradeOrigin = cardBill.userGradeOrigin
-                this.paymentDay = cardBill.paymentDay ?: ""
-                this.billedYearMonth = cardBill.billedYearMonth ?: ""
-                this.nextPaymentDay = cardBill.nextPaymentDay
-                this.billingAmount = cardBill.billingAmount?.setScale(4) ?: BigDecimal("0.0000").setScale(4)
-                this.prepaidAmount = cardBill.prepaidAmount?.setScale(4) ?: BigDecimal("0.0000").setScale(4)
-                this.paymentBankId = cardBill.paymentBankId
-                this.paymentAccountNumber = cardBill.paymentAccountNumber
-                this.totalPoint = cardBill.totalPoints?.toBigDecimal()?.setScale(4)
-                this.expiringPoints = cardBill.expiringPoints?.toBigDecimal()?.setScale(4)
-            }
-        }
-
-        fun makeCardBillScheduledHistoryEntityFromCardBillScheduledEntity(cardScheduledBill: CardBillScheduledEntity): CardBillScheduledHistoryEntity {
-            return CardBillScheduledHistoryEntity().apply {
-                this.cardBillScheduledId = cardScheduledBill.cardBillScheduledId
-                this.banksaladUserId = cardScheduledBill.banksaladUserId
-                this.cardCompanyId = cardScheduledBill.cardCompanyId
-                this.billNumber = cardScheduledBill.billNumber
-                this.billType = cardScheduledBill.billType
-                this.cardType = cardScheduledBill.cardType
-                this.lastCheckAt = cardScheduledBill.lastCheckAt
-                this.userName = cardScheduledBill.userName
-                this.userGrade = cardScheduledBill.userGrade
-                this.userGradeOrigin = cardScheduledBill.userGradeOrigin
-                this.paymentDay = cardScheduledBill.paymentDay
-                this.billedYearMonth = cardScheduledBill.billedYearMonth
-                this.nextPaymentDay = cardScheduledBill.nextPaymentDay
-                this.billingAmount = cardScheduledBill.billingAmount?.setScale(4)
-                this.prepaidAmount = cardScheduledBill.prepaidAmount?.setScale(4)
-                this.paymentBankId = cardScheduledBill.paymentBankId
-                this.paymentAccountNumber = cardScheduledBill.paymentAccountNumber
-                this.totalPoint = cardScheduledBill.totalPoint?.setScale(4)
-                this.expiringPoints = cardScheduledBill.expiringPoints?.setScale(4)
             }
         }
     }
