@@ -42,7 +42,8 @@ fun ListCardsResponse.toListCardsResponseProto(): CollectcardProto.ListCardsResp
 //                card.expiresDay?.format(DateTimeFormatter.ISO_LOCAL_DATE)?.let { StringValue.of(it) }
 //                    ?: StringValue.getDefaultInstance()
 //            )
-            .setTrafficSupported(BoolValue.of(card.isTrafficSupported))
+            .setTrafficSupported(BoolValue.of(card.isTrafficSupported ?: false))
+
             .build()
     }.let {
         CollectcardProto.ListCardsResponse

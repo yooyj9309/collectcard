@@ -40,6 +40,7 @@ let CardTransactionType = {
                 "currencyCode" : .engcrcycd,                                            // 통화코드
                 "transactionCountry" : .nation,                                         // 사용국가
                 "cardType" : "CREDIT",
+                "installment": 0,                                                       // not null field default 0
                 "cardTransactionType": get-key($CardTransactionType, .trantype, "CARD_TRANSACTION_TYPE_UNKNOWN"),  // 상태
                 "cardTransactionTypeOrigin" : .trantype,
                 "isOverseaUse": true                                                    // 해외 내역이므로 항상 true

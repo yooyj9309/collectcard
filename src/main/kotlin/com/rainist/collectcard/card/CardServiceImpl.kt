@@ -149,6 +149,7 @@ class CardServiceImpl(
             cardMapper.merge(card, cardEntity)
 
             val cardHistoryEntity = cardMapper.toCardHistoryEntity(cardEntity)
+            cardHistoryEntity.lastCheckAt = now
             cardHistoryRepository.save(cardHistoryEntity)
         }
         cardEntity.lastCheckAt = now

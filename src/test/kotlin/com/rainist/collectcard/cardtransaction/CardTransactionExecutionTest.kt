@@ -107,6 +107,7 @@ class CardTransactionExecutionTest {
             this.cardTransactionTypeOrigin = "1"
             this.currencyCode = "USD"
             this.amount = BigDecimal("35.0")
+            this.installment = 0
             this.canceledAmount = BigDecimal("0")
             this.approvalNumber = "283905"
             this.approvalDay = "20190614"
@@ -143,6 +144,7 @@ class CardTransactionExecutionTest {
             this.cardTransactionTypeOrigin = "1"
             this.currencyCode = "KRW"
             this.amount = BigDecimal("6000")
+            this.installment = 0
             this.canceledAmount = BigDecimal("0")
             this.approvalNumber = "43462070"
             this.approvalDay = "20190923"
@@ -175,6 +177,7 @@ class CardTransactionExecutionTest {
             this.cardTransactionType = CardTransactionType.APPROVAL
             this.currencyCode = "인도루피"
             this.amount = BigDecimal("129.00")
+            this.installment = 0
             this.canceledAmount = BigDecimal("0")
             this.approvalNumber = "455685"
             this.approvalDay = "20200104"

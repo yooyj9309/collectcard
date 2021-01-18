@@ -37,7 +37,7 @@ class CardTransactionUtil {
                 this.currencyCode = cardTransaction.currencyCode ?: "KRW"
                 this.transactionCountry = cardTransaction.transactionCountry
                 this.isInstallmentPayment = cardTransaction.isInstallmentPayment ?: false
-                this.installment = cardTransaction.installment
+                this.installment = cardTransaction.installment ?: 0
                 this.paymentDay = cardTransaction.paymentDay
                 this.isOverseaUse = cardTransaction.isOverseaUse ?: false
                 this.lastCheckAt = now

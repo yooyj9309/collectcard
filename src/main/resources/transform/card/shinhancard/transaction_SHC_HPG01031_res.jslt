@@ -40,6 +40,7 @@ let CardType = {
                 "transactionCountry" : .ntn,                                      // 사용국가
                 //"cardType" : get-key($CardType, .ccd, "CARD_TYPE_UNKNOWN"),     // 거래구분 TODO 예상국 이게 여기서 왜 필요한지 내부 처리 로직 확인 ccd? cusccd?
                 "cardType" : "DEBIT",
+                "installment": 0,                                                 // not null field default 0
                 "cardTransactionType" : if(number(replace(.apva, ",", "")) > 0) "APPROVAL" else "APPROVAL_CANCEL",
                 "canceledAmount" : if(number(replace(.apva, ",", "")) > 0) "0" else string(-1 * number(replace(.apva, ",", ""))),
                 "isOverseaUse": true                                              // 해외 내역이므로 항상 true
