@@ -4,6 +4,7 @@ import com.rainist.collectcard.cardcreditlimit.dto.CreditLimit
 import com.rainist.collectcard.cardcreditlimit.dto.CreditLimitResponse
 import com.rainist.collectcard.cardcreditlimit.dto.Limit
 import com.rainist.collectcard.cardcreditlimit.mapper.CreditLimitMapper
+import com.rainist.collectcard.common.db.entity.CreditLimitEntity
 import com.rainist.collectcard.common.db.repository.CreditLimitRepository
 import com.rainist.collectcard.common.dto.SingleCollectShadowingResponse
 import com.rainist.common.log.Log
@@ -40,7 +41,7 @@ class CreditLimitPublishService(
             banksaladUserId,
             organizationId,
             lastCheckAt
-        )
+        ) ?: CreditLimitEntity()
 
         val creditLimit = creditLimitMapper.toCreditLimitDto(
             Limit.toLoanLimit(creditLimitEntity),

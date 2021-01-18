@@ -14,5 +14,5 @@ interface CreditLimitRepository : JpaRepository<CreditLimitEntity, Long> {
         banksaladUserId: Long,
         cardCompanyId: String,
         lastCheckAt: LocalDateTime?
-    ): CreditLimitEntity
+    ): CreditLimitEntity?
 }
