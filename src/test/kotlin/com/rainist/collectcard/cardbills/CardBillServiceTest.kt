@@ -68,7 +68,8 @@ class CardBillServiceTest {
     @Transactional
     @Rollback
     fun listUserCardBills_success() {
-        val executionContext: CollectExecutionContext = ExecutionTestUtil.getExecutionContext("1", "shinhancard") as CollectExecutionContext
+        val now = DateTimeUtil.utcNowLocalDateTime()
+        val executionContext: CollectExecutionContext = ExecutionTestUtil.getExecutionContext("1", "shinhancard", now) as CollectExecutionContext
         BDDMockito.given(headerService.makeHeader(executionContext.userId, executionContext.organizationId))
             .willReturn(
                 mutableMapOf(
@@ -90,7 +91,7 @@ class CardBillServiceTest {
         )
 
         setupServer()
-        var res = cardBillService.listUserCardBills(executionContext)
+        var res = cardBillService.listUserCardBills(executionContext, now)
         var bills = res?.dataBody ?: ListCardBillsResponseDataBody()
 
         assertEquals(3, bills.cardBills?.size) // 청구서(2) + 결제예정금액(1)
@@ -130,7 +131,7 @@ class CardBillServiceTest {
         )
 
         setupServer_withUpdate()
-        res = cardBillService.listUserCardBills(executionContext)
+        res = cardBillService.listUserCardBills(executionContext, now)
         bills = res?.dataBody ?: ListCardBillsResponseDataBody()
 
         billEntities = cardBillRepository.findAll()

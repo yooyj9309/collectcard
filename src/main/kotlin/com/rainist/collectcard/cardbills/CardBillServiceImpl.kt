@@ -55,8 +55,7 @@ class CardBillServiceImpl(
     companion object : Log
 
     @Transactional
-    override fun listUserCardBills(executionContext: CollectExecutionContext): ListCardBillsResponse {
-        val now = DateTimeUtil.utcNowLocalDateTime()
+    override fun listUserCardBills(executionContext: CollectExecutionContext, now: LocalDateTime): ListCardBillsResponse {
         val banksaladUserId = executionContext.userId.toLong()
         val organizationId = executionContext.organizationId
         /* request header */
@@ -212,6 +211,24 @@ class CardBillServiceImpl(
 
         // no changes
         if (newCardBillEntity.equal(oldCardBillEntity)) {
+            // last check at 만 update
+            oldCardBillEntity.apply {
+                lastCheckAt = now
+            }.let {
+                cardBillRepository.save(it)
+            }
+            cardBillTransactionRepository.findAllByBilledYearMonthAndBanksaladUserIdAndCardCompanyIdAndBillNumber(
+                oldCardBillEntity.billedYearMonth ?: "",
+                banksaladUserId,
+                organizationId,
+                cardBill.billNumber
+            ).map { transacitonEntity ->
+                transacitonEntity.apply {
+                    lastCheckAt = now
+                }
+            }.let {
+                cardBillTransactionRepository.saveAll(it)
+            }
             return
         }
 
@@ -277,6 +294,12 @@ class CardBillServiceImpl(
 
         // no changes
         if (newCardBillScheduledEntity.equal(oldCardBillScheduledEntity)) {
+            // last check at 만 update
+            oldCardBillScheduledEntity.apply {
+                lastCheckAt = now
+            }.let {
+                cardBillScheduledRepository.save(it)
+            }
             return
         }
 
@@ -325,7 +348,8 @@ class CardBillServiceImpl(
                     }
                 }
             }
-            else -> {}
+            else -> {
+            }
         }
     }
 }

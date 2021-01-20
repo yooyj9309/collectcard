@@ -46,6 +46,7 @@ import com.rainist.collectcard.common.enums.CardType
 import com.rainist.collectcard.common.enums.ResultCode
 import com.rainist.collectcard.common.exception.CollectcardServiceExceptionHandler
 import com.rainist.collectcard.common.meters.CollectMeterRegistry
+import com.rainist.collectcard.common.publish.banksalad.CardBillPublishService
 import com.rainist.collectcard.common.publish.banksalad.CardLoanPublishService
 import com.rainist.collectcard.common.publish.banksalad.CardPublishService
 import com.rainist.collectcard.common.publish.banksalad.CardTransactionPublishService
@@ -56,6 +57,7 @@ import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.collectcard.common.service.UuidService
 import com.rainist.collectcard.grpc.client.ConnectClientServiceTest
+import com.rainist.common.util.DateTimeUtil
 import io.grpc.internal.testing.StreamRecorder
 import io.micrometer.core.instrument.MeterRegistry
 import java.math.BigDecimal
@@ -123,8 +125,11 @@ internal class CollectcardGrpcServiceUnitTests {
     lateinit var cardTransactionPublishService: CardTransactionPublishService
 
     @MockBean
-    lateinit var cardLoanPublishService: CardLoanPublishService
+    lateinit var cardBillPublishService: CardBillPublishService
 
+    @MockBean
+    lateinit var cardLoanPublishService: CardLoanPublishService
+    val now = DateTimeUtil.utcNowLocalDateTime()
     val executionContext = CollectExecutionContext(
         executionRequestId = "UUID",
         organizationId = "card",
@@ -308,7 +313,9 @@ internal class CollectcardGrpcServiceUnitTests {
                 })
             )
         )
-        given(cardBillService.listUserCardBills(executionContext)).willReturn(response)
+        val nowLocalDateTime = NowUtcLocalDatetime()
+        given(localDatetimeService.generateNowLocalDatetime()).willReturn(nowLocalDateTime)
+        given(cardBillService.listUserCardBills(executionContext, nowLocalDateTime.now)).willReturn(response)
 
         // when
         collectcardGrpcService.listCardBills(request, responseObserver)
