@@ -17,6 +17,7 @@ class CipherClientServiceTestConfig {
     val cardBillCipherKey = "AQIDAHj7+3rJ/PnKcdxwp2TjDtYsrEO+KLSrAtcFx+Cr5AN8gAEM7C4H7jYSZZaDvfiglcKeAAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQM9QzO+mRAx+8iT5zbAgEQgDuzoBGRavKAtgREPk2Nuzn5nMLN7qLRLo1hBcjt8du+G+ZsdnTk9i970Q52uD6HKUCqDKmow5Q3eDbqBg=="
     val cardBillTransactionCipherKey = "AQIDAHj7+3rJ/PnKcdxwp2TjDtYsrEO+KLSrAtcFx+Cr5AN8gAFWWIC6ipaH1nByiXkqhjfwAAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMpTa7VsogukYDzSMiAgEQgDtCZXT6BWzkiwFHQaFmB5xpDPAhepRiKPaBsWx9/njHIOV6JCGwFRJe3iLZI0XNUjTa8ofKIcbbvHoVBA=="
     val cardLoanCipherKey = "AQIDAHj7+3rJ/PnKcdxwp2TjDtYsrEO+KLSrAtcFx+Cr5AN8gAGOrxDln2W5gMcupUN77W3qAAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMEPajrf41qALSkLdrAgEQgDsj6a0wD8OVec1qFev2Be1Mq3EHMsSESb33W13yWYsqC+IkKCBKy7sNOc8DsIWosoLjRMDwbPuayx8CnQ=="
+    val cardBillScheduledCipherKey = "AQIDAHj7+3rJ/PnKcdxwp2TjDtYsrEO+KLSrAtcFx+Cr5AN8gAHcE78EgXa7Dh6LjQrGWWpgAAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMe3GfaeaQhEDRuFTAAgEQgDuAZUdzhHcq+rrAA5e+EEE6gGl1QmQBZF0R7lSK4bKbBhlojQ8VW6FLQulQxSVwzbhEF+mpAHx5cqpoPw=="
     val cardPaymentScheduledCipherKey = "AQIDAHj7+3rJ/PnKcdxwp2TjDtYsrEO+KLSrAtcFx+Cr5AN8gAFKy1Ukv6qWiA9fCROWXO2+AAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMYYLo903l5U+BJTMFAgEQgDtEolmiglnZ8KKqu7N6r5Lt6CWmz0QSDhsEocEEtc5qNwDad20NnGaiPm1fOK5N8+lc0YqAFmfQzwwltw=="
     val cardTransactionCipherKey = "AQIDAHj7+3rJ/PnKcdxwp2TjDtYsrEO+KLSrAtcFx+Cr5AN8gAFjJYSQdnMFECexxJn39AylAAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMR9IDKzCUDK/fk6mFAgEQgDvyvSOFa/UWOxaq5egiSazBOCHpwg+RN1SgrhPRZhI4r3UY4033HEjDaXIBBxM5qKLoAbHfV7nOYw6jkw=="
     val apiLogCipherKey = "AQIDAHj7+3rJ/PnKcdxwp2TjDtYsrEO+KLSrAtcFx+Cr5AN8gAFVZZ3/xqEiWq7FuP7NLqb7AAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMVq5HgJgC2fFXJjcoAgEQgDvMgRR6j5Ri1i1BBp+YqXTS1KnIErW+EqmWmkleN+NNRw291ltFR68ZcZFXgzIa+zL65XWMBH7RmTxcWw=="
@@ -60,6 +61,15 @@ class CipherClientServiceTestConfig {
             )
             .thenReturn(
                 GetEncryptedDbTableCipherKeyResponse.newBuilder().setCipherKey(cardLoanCipherKey).build()
+            )
+
+        Mockito
+            .`when`(cipherClientService.getEncryptedDbTableCipherKey(
+                KeyManagementServiceImpl.COLLECTCARD_DB_NAME,
+                KeyManagementServiceImpl.TableNameForCipher.card_bill_scheduled.name)
+            )
+            .thenReturn(
+                GetEncryptedDbTableCipherKeyResponse.newBuilder().setCipherKey(cardBillScheduledCipherKey).build()
             )
 
         Mockito

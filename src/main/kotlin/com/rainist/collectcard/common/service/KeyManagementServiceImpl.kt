@@ -26,6 +26,7 @@ class KeyManagementServiceImpl(
         card_bill, // 카드 청구서
         card_bill_transaction, // 카드 청구서 상세 내역
         card_loan, // 카드론 (대출)
+        card_bill_scheduled, // 카드 결제 예정 내역 청구서
         card_payment_scheduled, // 카드 결제 예정
         card_transaction // 카드 승인 상세 내역
     }
@@ -43,7 +44,6 @@ class KeyManagementServiceImpl(
     @Value("\${aws.iam.collectcard.access-token}")
     private val awsAccessToken: String? = null
 
-    // IV 7 개
     @Value("\${cipher.iv.api_log}")
     private val apiLogIv: String? = null
 
@@ -59,6 +59,9 @@ class KeyManagementServiceImpl(
     @Value("\${cipher.iv.card_loan}")
     private val cardLoanIv: String? = null
 
+    @Value("\${cipher.iv.card_bill_scheduled}")
+    private val cardBillScheduledIv: String? = null
+
     @Value("\${cipher.iv.card_payment_scheduled}")
     private val cardPaymentScheduledIv: String? = null
 
@@ -70,6 +73,7 @@ class KeyManagementServiceImpl(
     private var cardBillSecret: String? = null
     private var cardBillTransactionSecret: String? = null
     private var cardLoanSecret: String? = null
+    private var cardBillScheduledSecret: String? = null
     private var cardPaymentScheduledSecret: String? = null
     private var cardTransactionSecret: String? = null
 
@@ -102,6 +106,10 @@ class KeyManagementServiceImpl(
             cipherClientService.getEncryptedDbTableCipherKey(COLLECTCARD_DB_NAME, TableNameForCipher.card_loan.name)?.cipherKey
         )
 
+        cardBillScheduledSecret = decryptSecret(
+            cipherClientService.getEncryptedDbTableCipherKey(COLLECTCARD_DB_NAME, TableNameForCipher.card_bill_scheduled.name)?.cipherKey
+        )
+
         cardPaymentScheduledSecret = decryptSecret(
             cipherClientService.getEncryptedDbTableCipherKey(COLLECTCARD_DB_NAME, TableNameForCipher.card_payment_scheduled.name)?.cipherKey
         )
@@ -127,6 +135,7 @@ class KeyManagementServiceImpl(
             KeyManagementService.KeyAlias.card_bill -> cardBillSecret
             KeyManagementService.KeyAlias.card_bill_transaction -> cardBillTransactionSecret
             KeyManagementService.KeyAlias.card_loan -> cardLoanSecret
+            KeyManagementService.KeyAlias.card_bill_scheduled -> cardBillScheduledSecret
             KeyManagementService.KeyAlias.card_payment_scheduled -> cardPaymentScheduledSecret
             KeyManagementService.KeyAlias.card_transaction -> cardTransactionSecret
             else -> throw CollectcardException("invalid key alias")
@@ -140,6 +149,7 @@ class KeyManagementServiceImpl(
             KeyManagementService.KeyAlias.card_bill -> cardBillIv
             KeyManagementService.KeyAlias.card_bill_transaction -> cardBillTransactionIv
             KeyManagementService.KeyAlias.card_loan -> cardLoanIv
+            KeyManagementService.KeyAlias.card_bill_scheduled -> cardBillScheduledIv
             KeyManagementService.KeyAlias.card_payment_scheduled -> cardPaymentScheduledIv
             KeyManagementService.KeyAlias.card_transaction -> cardTransactionIv
             else -> throw CollectcardException("invalid key alias")

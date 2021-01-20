@@ -45,6 +45,7 @@ cipher:
     card_loan: 8MMjf/dQOLJUfALa
     card_payment_scheduled: SAb3UHd1u8EXad8H
     card_transaction: VJYyG4WMmo50Lsno
+    card_bill_scheduled: lMlHVu0KRK6KLZbn
 
 aws:
   region: ap-northeast-2
