@@ -1,7 +1,6 @@
 package com.rainist.collectcard.common.publish.banksalad
 
 import com.rainist.collectcard.cardbills.dto.CardBill
-import com.rainist.collectcard.cardbills.dto.CardBillTransaction
 import com.rainist.collectcard.cardbills.dto.ListCardBillsResponse
 import com.rainist.collectcard.cardbills.mapper.CardBillMapper
 import com.rainist.collectcard.cardbills.mapper.CardBillScheduledMapper
@@ -114,7 +113,7 @@ class CardBillPublishService(
 
         sortedDescending?.forEach { bill ->
             val sortedByDescending = bill.transactions?.sortedByDescending { t -> t.approvalDay }
-            bill.transactions = sortedByDescending as MutableList<CardBillTransaction>
+            bill.transactions = sortedByDescending?.toMutableList() ?: mutableListOf()
         }
 
         return sortedDescending ?: emptyList()
