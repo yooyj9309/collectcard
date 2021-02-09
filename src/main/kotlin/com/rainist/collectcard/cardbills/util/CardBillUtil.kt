@@ -9,12 +9,20 @@ import com.rainist.collectcard.common.db.entity.CardBillScheduledHistoryEntity
 import com.rainist.collectcard.common.db.entity.CardBillTransactionEntity
 import com.rainist.collectcard.common.db.entity.CardBillTransactionHistoryEntity
 import com.rainist.collectcard.common.db.entity.CardPaymentScheduledEntity
+import com.rainist.common.log.Log
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
 class CardBillUtil {
-    companion object {
-        fun makeCardBillEntity(banksaladUserId: Long, organizationId: String, cardBill: CardBill, now: LocalDateTime): CardBillEntity {
+
+    companion object : Log {
+
+        fun makeCardBillEntity(
+            banksaladUserId: Long,
+            organizationId: String,
+            cardBill: CardBill,
+            now: LocalDateTime
+        ): CardBillEntity {
             return CardBillEntity().apply {
                 this.banksaladUserId = banksaladUserId
                 this.cardCompanyId = organizationId
@@ -37,7 +45,14 @@ class CardBillUtil {
             }
         }
 
-        fun makeCardBillTransactionEntity(banksaladUserId: Long, organizationId: String, billedYearMonth: String?, cardBillTransactionNo: Int, cardBillTransaction: CardBillTransaction, now: LocalDateTime): CardBillTransactionEntity {
+        fun makeCardBillTransactionEntity(
+            banksaladUserId: Long,
+            organizationId: String,
+            billedYearMonth: String?,
+            cardBillTransactionNo: Int,
+            cardBillTransaction: CardBillTransaction,
+            now: LocalDateTime
+        ): CardBillTransactionEntity {
             return CardBillTransactionEntity().apply {
                 this.banksaladUserId = banksaladUserId
                 this.billedYearMonth = billedYearMonth ?: ""
@@ -48,7 +63,7 @@ class CardBillUtil {
                 this.cardCompanyCardId = cardBillTransaction.cardCompanyCardId ?: ""
                 this.cardName = cardBillTransaction.cardName
                 this.cardNumber = cardBillTransaction.cardNumber?.replace("-", "")?.trim()
-                this.cardNumberMask = cardBillTransaction.cardNumberMasked?.replace("-", "")?.trim()
+                this.cardNumberMask = cardBillTransaction.cardNumberMasked?.trim()
                 this.businessLicenseNumber = cardBillTransaction.businessLicenseNumber
                 this.storeName = cardBillTransaction.storeName
                 this.storeNumber = cardBillTransaction.storeNumber
@@ -60,6 +75,9 @@ class CardBillUtil {
                 this.isInstallmentPayment = cardBillTransaction.isInstallmentPayment ?: false
                 this.installment = cardBillTransaction.installment ?: 0
                 this.installmentRound = cardBillTransaction.installmentRound
+                // TODO : diff 위해 추가
+                logger.info(">>>>>amount = {}", cardBillTransaction.amount)
+                this.amount = cardBillTransaction.amount?.setScale(4)
                 this.netSalesAmount = cardBillTransaction.netSalesAmount?.setScale(4) ?: BigDecimal("0.0000")
                 this.serviceChargeAmount = cardBillTransaction.serviceChargeAmount?.setScale(4)
                 this.taxAmount = cardBillTransaction.tax?.setScale(4)
@@ -88,7 +106,13 @@ class CardBillUtil {
             }
         }
 
-        fun makeCardPaymentScheduledEntity(banksaladUserId: Long, organizationId: String, indexNo: Int, scheduledPayment: CardBillTransaction, now: LocalDateTime): CardPaymentScheduledEntity {
+        fun makeCardPaymentScheduledEntity(
+            banksaladUserId: Long,
+            organizationId: String,
+            indexNo: Int,
+            scheduledPayment: CardBillTransaction,
+            now: LocalDateTime
+        ): CardPaymentScheduledEntity {
             return CardPaymentScheduledEntity().apply {
                 this.banksaladUserId = banksaladUserId
                 this.cardCompanyId = organizationId
@@ -98,7 +122,7 @@ class CardBillUtil {
                 this.cardCompanyCardId = scheduledPayment.cardCompanyCardId ?: ""
                 this.cardName = scheduledPayment.cardName
                 this.cardNumber = scheduledPayment.cardNumber?.replace("-", "")?.trim()
-                this.cardNumberMask = scheduledPayment.cardNumberMasked?.replace("-", "")?.trim()
+                this.cardNumberMask = scheduledPayment.cardNumberMasked?.trim()
                 this.businessLicenseNumber = scheduledPayment.businessLicenseNumber
                 this.storeName = scheduledPayment.storeName
                 this.storeNumber = scheduledPayment.storeNumber
@@ -110,6 +134,9 @@ class CardBillUtil {
                 this.isInstallmentPayment = scheduledPayment.isInstallmentPayment ?: false
                 this.installment = scheduledPayment.installment ?: 0
                 this.installmentRound = scheduledPayment.installmentRound
+                // TODO : diff 위해 추가
+                logger.info(">>>>>amount = {}", scheduledPayment.amount)
+                this.amount = scheduledPayment.amount?.setScale(4)
                 this.netSalesAmount = scheduledPayment.netSalesAmount?.setScale(4) ?: BigDecimal("0.0000")
                 this.serviceChargeAmount = scheduledPayment.serviceChargeAmount?.setScale(4)
                 this.taxAmount = scheduledPayment.tax?.setScale(4)
@@ -186,6 +213,7 @@ class CardBillUtil {
                 this.isInstallmentPayment = entity.isInstallmentPayment
                 this.installment = entity.installment
                 this.installmentRound = entity.installmentRound
+                this.amount = entity.amount
                 this.netSalesAmount = entity.netSalesAmount
                 this.serviceChargeAmount = entity.serviceChargeAmount
                 this.taxAmount = entity.taxAmount
@@ -214,7 +242,12 @@ class CardBillUtil {
             }
         }
 
-        fun makeCardBillScheduledEntity(banksaladUserId: Long, organizationId: String, cardBill: CardBill, now: LocalDateTime): CardBillScheduledEntity {
+        fun makeCardBillScheduledEntity(
+            banksaladUserId: Long,
+            organizationId: String,
+            cardBill: CardBill,
+            now: LocalDateTime
+        ): CardBillScheduledEntity {
             return CardBillScheduledEntity().apply {
                 this.banksaladUserId = banksaladUserId
                 this.cardCompanyId = organizationId

@@ -14,5 +14,17 @@ class CustomStringUtil {
                 builder.toString()
             } ?: ""
         }
+
+        // maskedNumber의 경우 '-'가 들어가서 5,6번째를 변경해준다.
+        fun replaceMaskedNumberToMask(cardNumber: String?): String {
+            return cardNumber?.let {
+                var builder = StringBuilder(it)
+                if (builder.length >= 7) {
+                    builder.setCharAt(5, '*')
+                    builder.setCharAt(6, '*')
+                }
+                builder.toString()
+            } ?: ""
+        }
     }
 }

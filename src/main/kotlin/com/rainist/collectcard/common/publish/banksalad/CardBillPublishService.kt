@@ -1,6 +1,7 @@
 package com.rainist.collectcard.common.publish.banksalad
 
 import com.rainist.collectcard.cardbills.dto.CardBill
+import com.rainist.collectcard.cardbills.dto.CardBillTransaction
 import com.rainist.collectcard.cardbills.dto.ListCardBillsResponse
 import com.rainist.collectcard.cardbills.mapper.CardBillMapper
 import com.rainist.collectcard.cardbills.mapper.CardBillScheduledMapper
@@ -11,6 +12,7 @@ import com.rainist.collectcard.common.db.repository.CardBillScheduledRepository
 import com.rainist.collectcard.common.db.repository.CardBillTransactionRepository
 import com.rainist.collectcard.common.db.repository.CardPaymentScheduledRepository
 import com.rainist.collectcard.common.dto.CollectShadowingResponse
+import com.rainist.common.log.Log
 import java.time.LocalDateTime
 import org.apache.commons.lang3.builder.EqualsBuilder
 import org.mapstruct.factory.Mappers
@@ -28,11 +30,19 @@ class CardBillPublishService(
     val cardBillScheduledMapper = Mappers.getMapper(CardBillScheduledMapper::class.java)
     val cardPaymentScheduledMapper = Mappers.getMapper(CardPaymentScheduledMapper::class.java)
 
+    companion object : Log
+
     fun sync(banksaladUserId: Long, organizationId: String, lastCheckAt: LocalDateTime) {
         TODO()
     }
 
-    fun shadowing(banksaladUserId: Long, organizationId: String, lastCheckAt: LocalDateTime, executionRequestId: String, oldResponse: ListCardBillsResponse): CollectShadowingResponse {
+    fun shadowing(
+        banksaladUserId: Long,
+        organizationId: String,
+        lastCheckAt: LocalDateTime,
+        executionRequestId: String,
+        oldResponse: ListCardBillsResponse
+    ): CollectShadowingResponse {
         val cardBills = makeCardBills(banksaladUserId, organizationId, lastCheckAt)
         val cardBillScheduled = makeCardBillScheduled(banksaladUserId, organizationId, lastCheckAt)
 
@@ -59,49 +69,55 @@ class CardBillPublishService(
             organizationId,
             lastCheckAt
         ).map { billEntity ->
-            val transactions = cardBillTransactionRepository.findAllByBanksaladUserIdAndCardCompanyIdAndBillNumberAndLastCheckAt(
-                banksaladUserId,
-                organizationId,
-                billEntity.billNumber,
-                lastCheckAt
-            ).map {
-                cardBillTransactionMapper.toBillTransactionDto(it)
-            }.toMutableList()
+            val transactions =
+                cardBillTransactionRepository.findAllByBanksaladUserIdAndCardCompanyIdAndBillNumberAndLastCheckAt(
+                    banksaladUserId,
+                    organizationId,
+                    billEntity.billNumber,
+                    lastCheckAt
+                ).map {
+                    cardBillTransactionMapper.toBillTransactionDto(it)
+                }.toMutableList()
             cardBillMapper.toCardBillDto(billEntity).copy(transactions = transactions)
         }
     }
 
-    fun makeCardBillScheduled(banksaladUserId: Long, organizationId: String, lastCheckAt: LocalDateTime): List<CardBill> {
+    fun makeCardBillScheduled(
+        banksaladUserId: Long,
+        organizationId: String,
+        lastCheckAt: LocalDateTime
+    ): List<CardBill> {
         return cardBillScheduledRepository.findAllByBanksaladUserIdAndCardCompanyIdAndLastCheckAt(
             banksaladUserId,
             organizationId,
             lastCheckAt
         ).map { billEntity ->
-            val transactions = cardPaymentScheduledRepository.findAllByBanksaladUserIdAndCardCompanyIdAndBillNumberAndLastCheckAt(
-                banksaladUserId,
-                organizationId,
-                billEntity.billNumber,
-                lastCheckAt
-            ).map {
-                cardPaymentScheduledMapper.toBillTransactionDto(it)
-            }.toMutableList()
+            val transactions =
+                cardPaymentScheduledRepository.findAllByBanksaladUserIdAndCardCompanyIdAndBillNumberAndLastCheckAt(
+                    banksaladUserId,
+                    organizationId,
+                    billEntity.billNumber,
+                    lastCheckAt
+                ).map {
+                    cardPaymentScheduledMapper.toBillTransactionDto(it)
+                }.toMutableList()
             cardBillScheduledMapper.toCardBilldDto(billEntity).copy(transactions = transactions)
         }
     }
 
     fun sortedCardBill(cardBill: List<CardBill>?): List<CardBill> {
-        val sortedBill = cardBill?.sortedWith(
-            compareBy({ it.billNumber }, { it.billingAmount }, { it.cardType })
-        )
+        /*
+            bill은 paymentDay 기준 descending, transaction은 approvalDay 기준 descending
+            이유는 old 데이터와 같은 기준으로 sort를 하기 위함.
+         */
+        val sortedDescending = cardBill?.sortedByDescending { it.paymentDay }
 
-        sortedBill?.forEach() { bill ->
-            val transactions = bill.transactions?.sortedWith(
-                compareBy({ it.approvalDay }, { it.billedAmount }, { it.storeName })
-            )?.toMutableList()
-            bill.transactions = transactions
+        sortedDescending?.forEach { bill ->
+            val sortedByDescending = bill.transactions?.sortedByDescending { t -> t.approvalDay }
+            bill.transactions = sortedByDescending as MutableList<CardBillTransaction>
         }
 
-        return cardBill ?: emptyList()
+        return sortedDescending ?: emptyList()
     }
 
     private fun unequals(oldBill: List<CardBill>, newBill: List<CardBill>): Boolean {

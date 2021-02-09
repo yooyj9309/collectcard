@@ -75,6 +75,8 @@ data class CardPaymentScheduledEntity(
 
     var installmentRound: Int? = null,
 
+    var amount: BigDecimal? = null,
+
     @Column(nullable = false, precision = 17, scale = 4)
     var netSalesAmount: BigDecimal? = null,
 

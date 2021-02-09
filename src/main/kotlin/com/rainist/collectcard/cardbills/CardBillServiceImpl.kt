@@ -55,7 +55,10 @@ class CardBillServiceImpl(
     companion object : Log
 
     @Transactional
-    override fun listUserCardBills(executionContext: CollectExecutionContext, now: LocalDateTime): ListCardBillsResponse {
+    override fun listUserCardBills(
+        executionContext: CollectExecutionContext,
+        now: LocalDateTime
+    ): ListCardBillsResponse {
         val banksaladUserId = executionContext.userId.toLong()
         val organizationId = executionContext.organizationId
         /* request header */
@@ -83,6 +86,19 @@ class CardBillServiceImpl(
             bill.transactions?.sortByDescending { transaction -> transaction.approvalDay }
         }
 
+        bills.forEach { bill ->
+            bill.transactions?.forEach { cardTranscation ->
+                // isOverSea가 null일 경우 false로 변경. db는 not null로 false, true만 존재
+                if (cardTranscation.isOverseaUse == null) {
+                    cardTranscation.isOverseaUse = false
+                }
+                // 체크카드일 경우 isInstallmentPayment가 null이기 때문에 false로 변경
+                if (cardTranscation.isInstallmentPayment == null) {
+                    cardTranscation.isInstallmentPayment = false
+                }
+            }
+        }
+
         // 신한카드 카드번호 masking 작업 진행.
         postProgress(organizationId, bills)
 
@@ -91,7 +107,12 @@ class CardBillServiceImpl(
         }
     }
 
-    private fun executeCardBill(executionContext: CollectExecutionContext, header: MutableMap<String, String?>, request: ListCardBillsRequest, now: LocalDateTime): ListCardBillsResponse {
+    private fun executeCardBill(
+        executionContext: CollectExecutionContext,
+        header: MutableMap<String, String?>,
+        request: ListCardBillsRequest,
+        now: LocalDateTime
+    ): ListCardBillsResponse {
         /* set startAt */
         val maxMonth = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).maxMonth
         val defaultCheckStartTime = DateTimeUtil.kstNowLocalDateTime().minusMonths(maxMonth.toLong())
@@ -120,7 +141,12 @@ class CardBillServiceImpl(
 
         // 청구서 DB IO
         cardBillsExecutionResponse.response.dataBody?.cardBills?.forEach { cardBill ->
-            upsertCardBillAndTransactions(executionContext.userId.toLong(), executionContext.organizationId, cardBill, now)
+            upsertCardBillAndTransactions(
+                executionContext.userId.toLong(),
+                executionContext.organizationId,
+                cardBill,
+                now
+            )
         }
 
         userSyncStatusService.upsertUserSyncStatus(
@@ -134,7 +160,13 @@ class CardBillServiceImpl(
         return cardBillsExecutionResponse.response
     }
 
-    private fun executeCardBillExpected(executionContext: CollectExecutionContext, header: MutableMap<String, String?>, request: ListCardBillsRequest, banksaladUserId: Long, now: LocalDateTime): ListCardBillsResponse {
+    private fun executeCardBillExpected(
+        executionContext: CollectExecutionContext,
+        header: MutableMap<String, String?>,
+        request: ListCardBillsRequest,
+        banksaladUserId: Long,
+        now: LocalDateTime
+    ): ListCardBillsResponse {
         /* set startAt */
         val maxMonth = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).maxMonth
         val defaultCheckStartTime = DateTimeUtil.kstNowLocalDateTime().minusMonths(maxMonth.toLong())
@@ -162,7 +194,12 @@ class CardBillServiceImpl(
         // 결제 예정 내역 DB IO
         cardBillExpectedExecutionResponse.response.dataBody?.cardBills?.map {
             upsertCardBillScheduled(banksaladUserId, executionContext.organizationId, it, now)
-            deleteAndInsertCardBillExpectedTransactions(banksaladUserId, executionContext.organizationId, it.transactions ?: mutableListOf(), now)
+            deleteAndInsertCardBillExpectedTransactions(
+                banksaladUserId,
+                executionContext.organizationId,
+                it.transactions ?: mutableListOf(),
+                now
+            )
         }
 
         userSyncStatusService.upsertUserSyncStatus(
@@ -176,15 +213,21 @@ class CardBillServiceImpl(
         return cardBillExpectedExecutionResponse.response
     }
 
-    private fun upsertCardBillAndTransactions(banksaladUserId: Long, organizationId: String?, cardBill: CardBill, now: LocalDateTime) {
+    private fun upsertCardBillAndTransactions(
+        banksaladUserId: Long,
+        organizationId: String?,
+        cardBill: CardBill,
+        now: LocalDateTime
+    ) {
         val newCardBillEntity = CardBillUtil.makeCardBillEntity(banksaladUserId, organizationId ?: "", cardBill, now)
-        val oldCardBillEntity = cardBillRepository.findByBanksaladUserIdAndCardCompanyIdAndBillNumberAndBillTypeAndCardType(
-            banksaladUserId,
-            organizationId ?: "",
-            cardBill.billNumber ?: "",
-            cardBill.billType ?: "",
-            cardBill.cardType?.name ?: ""
-        )
+        val oldCardBillEntity =
+            cardBillRepository.findByBanksaladUserIdAndCardCompanyIdAndBillNumberAndBillTypeAndCardType(
+                banksaladUserId,
+                organizationId ?: "",
+                cardBill.billNumber ?: "",
+                cardBill.billType ?: "",
+                cardBill.cardType?.name ?: ""
+            )
 
         // new
         // insert bill, transactions, history
@@ -272,15 +315,22 @@ class CardBillServiceImpl(
         }
     }
 
-    private fun upsertCardBillScheduled(banksaladUserId: Long, organizationId: String?, cardBill: CardBill, now: LocalDateTime) {
-        val newCardBillScheduledEntity = CardBillUtil.makeCardBillScheduledEntity(banksaladUserId, organizationId ?: "", cardBill, now)
-        val oldCardBillScheduledEntity = cardBillScheduledRepository.findByBanksaladUserIdAndCardCompanyIdAndBillNumberAndBillTypeAndCardType(
-            banksaladUserId,
-            organizationId ?: "",
-            cardBill.billNumber ?: "",
-            cardBill.billType ?: "",
-            cardBill.cardType?.name ?: ""
-        )
+    private fun upsertCardBillScheduled(
+        banksaladUserId: Long,
+        organizationId: String?,
+        cardBill: CardBill,
+        now: LocalDateTime
+    ) {
+        val newCardBillScheduledEntity =
+            CardBillUtil.makeCardBillScheduledEntity(banksaladUserId, organizationId ?: "", cardBill, now)
+        val oldCardBillScheduledEntity =
+            cardBillScheduledRepository.findByBanksaladUserIdAndCardCompanyIdAndBillNumberAndBillTypeAndCardType(
+                banksaladUserId,
+                organizationId ?: "",
+                cardBill.billNumber ?: "",
+                cardBill.billType ?: "",
+                cardBill.cardType?.name ?: ""
+            )
 
         // new
         // insert bill scheduled, history
@@ -343,8 +393,15 @@ class CardBillServiceImpl(
             shinhancardOrganizationId -> {
                 bills.map { cardBill ->
                     cardBill.transactions?.map { cardBillTransaction ->
-                        cardBillTransaction.cardNumber = CustomStringUtil.replaceNumberToMask(cardBillTransaction.cardNumber)
-                        cardBillTransaction.cardNumberMasked = CustomStringUtil.replaceNumberToMask(cardBillTransaction.cardNumberMasked)
+                        cardBillTransaction.cardNumber =
+                            CustomStringUtil.replaceNumberToMask(cardBillTransaction.cardNumber)
+                        /*
+                           cardNumberMasked의 4,5번째를 *로 변경하니
+                           4221-*5**-****-6249 -> 4221**5**-****-6249처럼 변경되고 6번째 번호가 안지워짐.
+                           5,6번째를 바꾸는 메서드 추가.
+                         */
+                        cardBillTransaction.cardNumberMasked =
+                            CustomStringUtil.replaceMaskedNumberToMask(cardBillTransaction.cardNumberMasked)
                     }
                 }
             }

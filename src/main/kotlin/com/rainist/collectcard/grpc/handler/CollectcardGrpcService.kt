@@ -346,6 +346,9 @@ class CollectcardGrpcService(
             .With("last_check_at", res.lastCheckAt)
             .With("execution_request_id", res.executionRequestId)
             .With("is_diff", res.isDiff)
+            // TODO : production 배포 전 지우기
+            .With("old", res.oldList)
+            .With("shadowing", res.dbList)
             .Info()
 
         val tags = Tags.of("execution_name", res.executionName).and("is_diff", res.isDiff.toString())
@@ -359,6 +362,9 @@ class CollectcardGrpcService(
             .With("last_check_at", res.lastCheckAt)
             .With("execution_request_id", res.executionRequestId)
             .With("is_diff", res.isDiff)
+            // TODO : production 배포 전 지우기
+            .With("old", res.oldResponse)
+            .With("shadowing", res.shadowingResponse)
             .Info()
 
         val tags = Tags.of("execution_name", res.executionName).and("is_diff", res.isDiff.toString())

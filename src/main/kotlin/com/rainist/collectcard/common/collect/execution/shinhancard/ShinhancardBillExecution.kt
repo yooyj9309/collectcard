@@ -26,7 +26,8 @@ class ShinhancardBillExecution {
                 val nextCardBill = next.dataBody?.cardBills ?: mutableListOf()
                 prevCardBill.addAll(nextCardBill)
 
-                prev.dataBody = ListCardBillsResponseDataBody(cardBills = prevCardBill, nextKey = next.dataBody?.nextKey)
+                prev.dataBody =
+                    ListCardBillsResponseDataBody(cardBills = prevCardBill, nextKey = next.dataBody?.nextKey)
                 prev
             }
 
@@ -36,7 +37,10 @@ class ShinhancardBillExecution {
                 val nextTransaction = next.dataBody?.billTransactions ?: mutableListOf()
                 prevTransaction.addAll(nextTransaction)
 
-                prev.dataBody = ListBillTransactionsResponseDataBody(billTransactions = prevTransaction, nextKey = next.dataBody?.nextKey)
+                prev.dataBody = ListBillTransactionsResponseDataBody(
+                    billTransactions = prevTransaction,
+                    nextKey = next.dataBody?.nextKey
+                )
                 prev
             }
 
@@ -90,7 +94,8 @@ class ShinhancardBillExecution {
                 // transactions 없는 리스트 제거
                 prevCardBills = prevCardBills.filter { it.transactions != null }.toMutableList()
 
-                prev.dataBody = ListCardBillsResponseDataBody(cardBills = prevCardBills, nextKey = next.dataBody?.nextKey)
+                prev.dataBody =
+                    ListCardBillsResponseDataBody(cardBills = prevCardBills, nextKey = next.dataBody?.nextKey)
                 prev
             }
 
@@ -121,7 +126,8 @@ class ShinhancardBillExecution {
                     executionContext as ExecutionContext
                     val paymentDay = DateTimeUtil.localDatetimeToString(executionContext.startAt, "yyyyMMdd")
 
-                    listCardBillsResponse.dataBody?.cardBills?.filter { it -> it.paymentDay!! >= paymentDay }?.iterator()
+                    listCardBillsResponse.dataBody?.cardBills?.filter { it -> it.paymentDay!! >= paymentDay }
+                        ?.iterator()
                         ?: mutableListOf<CardBill>().iterator()
                 }
                 .then(
@@ -175,7 +181,8 @@ class ShinhancardBillExecution {
                             executionContext as ExecutionContext
                             val paymentDay = DateTimeUtil.localDatetimeToString(executionContext.startAt, "yyyyMMdd")
 
-                            listCardBillsResponse.dataBody?.cardBills?.filter { it -> it.paymentDay!! >= paymentDay }?.iterator()
+                            listCardBillsResponse.dataBody?.cardBills?.filter { it -> it.paymentDay!! >= paymentDay }
+                                ?.iterator()
                                 ?: mutableListOf<CardBill>().iterator()
                         }
                         .then(

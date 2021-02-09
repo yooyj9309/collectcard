@@ -122,7 +122,8 @@ class CardBillRepositoryTest {
     fun cardBillTransactionTest() {
         val cardBillTransaction = makeMockCardBillTransaction()
         val now = LocalDateTime.now()
-        val cardBillTransactionEntity = CardBillUtil.makeCardBillTransactionEntity(1, "shinhancard", "202008", 1, cardBillTransaction, now)
+        val cardBillTransactionEntity =
+            CardBillUtil.makeCardBillTransactionEntity(1, "shinhancard", "202008", 1, cardBillTransaction, now)
 
         assertThat(cardBillTransactionEntity).isEqualToComparingFieldByField(CardBillTransactionEntity().apply {
             this.banksaladUserId = 1
@@ -145,6 +146,7 @@ class CardBillRepositoryTest {
             this.isInstallmentPayment = true
             this.installment = 1
             this.installmentRound = 1
+            this.amount = BigDecimal("10000.0000")
             this.netSalesAmount = BigDecimal("10000.0000")
             this.serviceChargeAmount = BigDecimal("10000.0000")
             this.taxAmount = BigDecimal("10000.0000")
@@ -183,7 +185,8 @@ class CardBillRepositoryTest {
     fun cardPaymentScheduledEntityTest() {
         val cardBillTransaction = makeMockCardBillTransaction()
         val now = LocalDateTime.now()
-        val paymentScheduledEntity = CardBillUtil.makeCardPaymentScheduledEntity(1, "shinhancard", 1, cardBillTransaction, now)
+        val paymentScheduledEntity =
+            CardBillUtil.makeCardPaymentScheduledEntity(1, "shinhancard", 1, cardBillTransaction, now)
 
         assertThat(paymentScheduledEntity).isEqualToComparingFieldByField(CardPaymentScheduledEntity().apply {
             this.banksaladUserId = 1
@@ -205,6 +208,7 @@ class CardBillRepositoryTest {
             this.isInstallmentPayment = true
             this.installment = 1
             this.installmentRound = 1
+            this.amount = BigDecimal("10000.0000")
             this.netSalesAmount = BigDecimal("10000.0000")
             this.serviceChargeAmount = BigDecimal("10000.0000")
             this.taxAmount = BigDecimal("10000.0000")

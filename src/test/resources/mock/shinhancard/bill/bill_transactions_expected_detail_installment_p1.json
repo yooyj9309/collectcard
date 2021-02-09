@@ -1,80 +1,80 @@
 {
-  "dataHeader":{
-    "successCode":"0",
-    "resultCode":"0010",
-    "reqKey":null,
-    "resultMessage":"다음 조회건이 존재 합니다."
+  "dataHeader": {
+    "successCode": "0",
+    "resultCode": "0010",
+    "reqKey": null,
+    "resultMessage": "다음 조회건이 존재 합니다."
   },
-  "dataBody":{
-    "nxtQyKey":"20200617;20200618;0069KGH895518",
-    "remainAmt":"000000001611400",
-    "grp001":[
+  "dataBody": {
+    "nxtQyKey": "20200617;20200618;0069KGH895518",
+    "remainAmt": "000000001611400",
+    "grp001": [
       {
-        "amount":"000000000082613",
-        "point":"00090",
-        "useMonth":"012",
-        "dueReamin":"000000000006800",
-        "monthAmt":"000000000006800",
-        "pntChk":"",
-        "merchant":"롯데홈)폴스미스유니코 ..",
-        "crdN":"4221-****-****-4437",
-        "useDate":"20191120",
-        "monthCount":"011",
-        "monthFee":"000000000000201"
+        "amount": "000000000082613",
+        "point": "00090",
+        "useMonth": "012",
+        "dueReamin": "000000000006800",
+        "monthAmt": "000000000006800",
+        "pntChk": "",
+        "merchant": "롯데홈)폴스미스유니코 ..",
+        "crdN": "4221-****-****-4437",
+        "useDate": "20191120",
+        "monthCount": "011",
+        "monthFee": "000000000000201"
       },
       {
-        "amount":"000000000076950",
-        "point":"00090",
-        "useMonth":"012",
-        "dueReamin":"000000000006400",
-        "monthAmt":"000000000006400",
-        "pntChk":"",
-        "merchant":"롯데E커머스",
-        "crdN":"4221-****-****-4437",
-        "useDate":"20191120",
-        "monthCount":"011",
-        "monthFee":"000000000000189"
+        "amount": "000000000076950",
+        "point": "00090",
+        "useMonth": "012",
+        "dueReamin": "000000000006400",
+        "monthAmt": "000000000006400",
+        "pntChk": "",
+        "merchant": "롯데E커머스",
+        "crdN": "4221-****-****-4437",
+        "useDate": "20191120",
+        "monthCount": "011",
+        "monthFee": "000000000000189"
       },
       {
-        "amount":"000000000575000",
-        "point":"00000",
-        "useMonth":"010",
-        "dueReamin":"000000000172500",
-        "monthAmt":"000000000057500",
-        "pntChk":"",
-        "merchant":"네이버파이낸셜(주)",
-        "crdN":"4221-****-****-1019",
-        "useDate":"20200308",
-        "monthCount":"007",
-        "monthFee":"000000000000000"
+        "amount": "000000000575000",
+        "point": "00000",
+        "useMonth": "010",
+        "dueReamin": "000000000172500",
+        "monthAmt": "000000000057500",
+        "pntChk": "",
+        "merchant": "네이버파이낸셜(주)",
+        "crdN": "4221-****-****-1019",
+        "useDate": "20200308",
+        "monthCount": "007",
+        "monthFee": "000000000000000"
       },
       {
-        "amount":"000000000095296",
-        "point":"00000",
-        "useMonth":"006",
-        "dueReamin":"000000000000000",
-        "monthAmt":"000000000015800",
-        "pntChk":"",
-        "merchant":"네이버파이낸셜(주)",
-        "crdN":"4221-****-****-1019",
-        "useDate":"20200401",
-        "monthCount":"006",
-        "monthFee":"000000000000000"
+        "amount": "000000000095296",
+        "point": "00000",
+        "useMonth": "006",
+        "dueReamin": "000000000000000",
+        "monthAmt": "000000000015800",
+        "pntChk": "",
+        "merchant": "네이버파이낸셜(주)",
+        "crdN": "4221-****-****-1019",
+        "useDate": "20200401",
+        "monthCount": "006",
+        "monthFee": "000000000000000"
       },
       {
-        "amount":"000000000189000",
-        "point":"00000",
-        "useMonth":"006",
-        "dueReamin":"000000000000000",
-        "monthAmt":"000000000031500",
-        "pntChk":"",
-        "merchant":"네이버파이낸셜(주)",
-        "crdN":"4221-****-****-1019",
-        "useDate":"20200416",
-        "monthCount":"006",
-        "monthFee":"000000000000000"
+        "amount": "000000000189000",
+        "point": "00000",
+        "useMonth": "006",
+        "dueReamin": "000000000000000",
+        "monthAmt": "000000000031500",
+        "pntChk": "",
+        "merchant": "네이버파이낸셜(주)",
+        "crdN": "4221-****-****-1019",
+        "useDate": "20200416",
+        "monthCount": "006",
+        "monthFee": "000000000000000"
       }
     ],
-    "resCd":"0010"
+    "resCd": "0010"
   }
 }
