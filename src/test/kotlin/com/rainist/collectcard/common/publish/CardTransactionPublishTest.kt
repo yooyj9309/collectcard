@@ -91,8 +91,6 @@ class CardTransactionPublishTest {
             executionContext.executionRequestId,
             response
         )
-        // TODO : 전체 테스트를 돌릴 시 isDiff가 true로 나오고 개별 테스트 시 false가 나와서 우선 주석으로 지정
-        // Assert.assertEquals(true, shadowingResponse.isDiff)
 
         val listSize = shadowingResponse.oldList.size
         val oldTransactions = shadowingResponse.oldList as List<CardTransaction>

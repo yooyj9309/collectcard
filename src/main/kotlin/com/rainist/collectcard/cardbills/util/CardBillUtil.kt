@@ -75,8 +75,6 @@ class CardBillUtil {
                 this.isInstallmentPayment = cardBillTransaction.isInstallmentPayment ?: false
                 this.installment = cardBillTransaction.installment ?: 0
                 this.installmentRound = cardBillTransaction.installmentRound
-                // TODO : diff 위해 추가
-                logger.info(">>>>>amount = {}", cardBillTransaction.amount)
                 this.amount = cardBillTransaction.amount?.setScale(4)
                 this.netSalesAmount = cardBillTransaction.netSalesAmount?.setScale(4) ?: BigDecimal("0.0000")
                 this.serviceChargeAmount = cardBillTransaction.serviceChargeAmount?.setScale(4)
@@ -134,8 +132,6 @@ class CardBillUtil {
                 this.isInstallmentPayment = scheduledPayment.isInstallmentPayment ?: false
                 this.installment = scheduledPayment.installment ?: 0
                 this.installmentRound = scheduledPayment.installmentRound
-                // TODO : diff 위해 추가
-                logger.info(">>>>>amount = {}", scheduledPayment.amount)
                 this.amount = scheduledPayment.amount?.setScale(4)
                 this.netSalesAmount = scheduledPayment.netSalesAmount?.setScale(4) ?: BigDecimal("0.0000")
                 this.serviceChargeAmount = scheduledPayment.serviceChargeAmount?.setScale(4)
