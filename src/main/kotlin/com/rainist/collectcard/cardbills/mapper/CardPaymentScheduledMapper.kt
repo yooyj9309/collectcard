@@ -39,6 +39,7 @@ abstract class CardPaymentScheduledMapper {
         cardBillTransaction.discountAmount = cardBillTransaction.discountAmount?.setScale(0, RoundingMode.DOWN)
         cardBillTransaction.amount = cardBillTransaction.amount?.setScale(0, RoundingMode.DOWN)
         cardBillTransaction.canceledAmount = cardBillTransaction.canceledAmount?.setScale(0, RoundingMode.DOWN)
+        cardBillTransaction.netSalesAmount = cardBillTransaction.netSalesAmount?.setScale(0, RoundingMode.DOWN)
         cardBillTransaction.serviceChargeAmount =
             cardBillTransaction.serviceChargeAmount?.setScale(0, RoundingMode.DOWN)
         cardBillTransaction.tax = cardBillTransaction.tax?.setScale(0, RoundingMode.DOWN)
@@ -63,7 +64,7 @@ abstract class CardPaymentScheduledMapper {
         }
 
         // netSalesAmount == 0 이면 null로 변경
-        if (cardBillTransaction.netSalesAmount == BigDecimal("0.0000")) {
+        if (cardBillTransaction.netSalesAmount == BigDecimal("0")) {
             cardBillTransaction.netSalesAmount = null
         }
 
