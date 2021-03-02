@@ -5,6 +5,7 @@ import com.rainist.collect.common.execution.ExecutionKey
 import com.rainist.collectcard.common.collect.api.BusinessType
 import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
+import com.rainist.collectcard.common.collect.execution.lottecard.plcc.LottecardPlccTransactionExecution.Companion.lottecardPlccTransactions
 import com.rainist.collectcard.common.collect.execution.shinhancard.ShinhancardBillExecution.Companion.cardShinhancardBills
 import com.rainist.collectcard.common.collect.execution.shinhancard.ShinhancardBillTransactionExpectedExecution.Companion.cardShinhancardBillTransactionExpected
 import com.rainist.collectcard.common.collect.execution.shinhancard.ShinhancardCardExecution.Companion.cardShinhancardCards
@@ -66,12 +67,21 @@ class Executions() {
                 .transaction(Transaction.loan.name)
                 .build() to cardShinhancardLoan,
 
-                // 개인한도조회
+            // 개인한도조회
             ExecutionKey.builder()
                 .business(BusinessType.card.name)
                 .organization(Organization.shinhancard.name)
                 .transaction(Transaction.creditLimit.name)
-                .build() to cardShinhancardCreditLimit
+                .build() to cardShinhancardCreditLimit,
+
+            // ** 롯데카드 PLCC **//
+
+            // 혜택적용내역 조회
+            ExecutionKey.builder()
+                .business(BusinessType.card.name)
+                .organization(Organization.lottecard.name)
+                .transaction(Transaction.plccCardTransaction.name)
+                .build() to lottecardPlccTransactions
         )
     }
 }

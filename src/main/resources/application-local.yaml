@@ -38,6 +38,10 @@ shinhancard:
   host: https://devopenapi.shinhancard.com:8443
   clientId: ${DEVELOPMENT_SHINHANCARD_CLIENT_ID}
 
+lottecard:
+  plcc:
+    host: https://124.243.96.60
+
 cipher-server:
   uri: localhost:9999
   host: localhost

@@ -36,6 +36,10 @@ shinhancard:
   host: https://openapi.shinhancard.com:8443
   clientId: ${PRODUCTION_SHINHANCARD_CLIENT_ID}
 
+lottecard:
+  plcc:
+    host: https://124.243.96.33
+
 cipher:
   iv:
     api_log: JO1/nc1T/JcN1IUZ

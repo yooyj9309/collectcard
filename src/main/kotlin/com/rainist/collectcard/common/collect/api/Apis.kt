@@ -7,11 +7,18 @@ enum class BusinessType {
 }
 
 enum class Organization {
-    shinhancard,
+    shinhancard, lottecard
 }
 
 enum class Transaction {
-    userInfo, cards, cardbills, cardTransaction, billTransactionExpected, loan, creditLimit
+    userInfo,
+    cards,
+    cardbills,
+    cardTransaction,
+    billTransactionExpected,
+    loan,
+    creditLimit,
+    plccCardTransaction
 }
 
 class Apis {

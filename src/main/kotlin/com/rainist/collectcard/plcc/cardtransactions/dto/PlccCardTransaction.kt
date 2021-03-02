@@ -9,6 +9,9 @@ import javax.validation.constraints.NotNull
 data class PlccCardTransaction(
 
     @NotEmpty
+    var serviceCode: String? = null,
+
+    @NotEmpty
     var serviceName: String? = null,
 
     @NotEmpty
@@ -30,7 +33,7 @@ data class PlccCardTransaction(
     var discountAmount: BigDecimal? = null,
 
     @NotNull
-    var discountRate: Float? = null,
+    var discountRate: BigDecimal? = null,
 
     @NotNull
     var isInstallmentPayment: Boolean? = null,

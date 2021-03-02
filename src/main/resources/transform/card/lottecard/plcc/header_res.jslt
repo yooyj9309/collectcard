@@ -1,0 +1,6 @@
+{
+    "Date": .Date,
+    "Content-Type": .Content-Type,
+    "Content-Length": .Content-Length,
+    "Content-Encoding": .Content-Encoding
+}
