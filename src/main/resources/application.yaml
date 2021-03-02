@@ -41,6 +41,8 @@ loan-server:
 accountbook-server:
   uri: dns:///accountbook-headless:18081
 
+plcc-server:
+  uri: dns:///plcc-headless:18081
 
 shinhancard:
   clientId: ${DEVELOPMENT_SHINHANCARD_CLIENT_ID}

@@ -1,6 +1,6 @@
 package com.rainist.collectcard.common.service
 
-import com.github.banksalad.idl.apis.external.v1.connect.ConnectProto
+import com.github.banksalad.idl.apis.v1.connect.ConnectProto
 import com.rainist.collectcard.grpc.client.ConnectClient
 import org.junit.Assert.assertEquals
 import org.junit.jupiter.api.DisplayName

@@ -1,7 +1,7 @@
 package com.rainist.collectcard.grpc.client
 
-import com.github.banksalad.idl.apis.external.v1.connect.ConnectGrpc
-import com.github.banksalad.idl.apis.external.v1.connect.ConnectProto
+import com.github.banksalad.idl.apis.v1.connect.ConnectGrpc
+import com.github.banksalad.idl.apis.v1.connect.ConnectProto
 import com.rainist.common.log.Log
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service

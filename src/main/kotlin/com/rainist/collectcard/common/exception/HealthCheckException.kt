@@ -1,6 +1,6 @@
 package com.rainist.collectcard.common.exception
 
-import com.github.banksalad.idl.apis.external.v1.result.ErrorProto
+import com.github.banksalad.idl.apis.v1.result.ErrorProto
 import io.grpc.Status
 
 class HealthCheckException(

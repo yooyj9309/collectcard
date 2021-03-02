@@ -1,5 +1,6 @@
 package com.rainist.collectcard.plcc.controller
 
+import com.rainist.collectcard.plcc.dto.PlccIssueCardRequestDto
 import com.rainist.collectcard.plcc.dto.PlccResponseDto
 import com.rainist.common.log.Log
 import org.springframework.http.HttpEntity
@@ -16,7 +17,7 @@ class PlccApiController {
     companion object : Log
 
     @PostMapping("/lottecard/card/issue")
-    fun issue(entity: HttpEntity<String>): ResponseEntity<PlccResponseDto> {
+    fun issue(entity: HttpEntity<PlccIssueCardRequestDto>): ResponseEntity<PlccResponseDto> {
         logger.Warn("PLCC lotte card issue : {}", entity.body)
 
         return ResponseEntity.ok(

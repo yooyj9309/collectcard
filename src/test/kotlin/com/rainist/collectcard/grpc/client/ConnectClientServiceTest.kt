@@ -1,7 +1,7 @@
 package com.rainist.collectcard.grpc.client
 
-import com.github.banksalad.idl.apis.external.v1.connect.ConnectGrpc
-import com.github.banksalad.idl.apis.external.v1.connect.ConnectProto
+import com.github.banksalad.idl.apis.v1.connect.ConnectGrpc
+import com.github.banksalad.idl.apis.v1.connect.ConnectProto
 import io.grpc.ManagedChannel
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DisplayName
