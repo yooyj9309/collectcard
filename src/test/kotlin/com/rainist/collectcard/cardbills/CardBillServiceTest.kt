@@ -1,33 +1,20 @@
 package com.rainist.collectcard.cardbills
 
-import com.rainist.collectcard.cardbills.dto.ListCardBillsResponseDataBody
-import com.rainist.collectcard.cardbills.dto.toListCardBillsResponseProto
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
-import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.db.repository.CardBillHistoryRepository
 import com.rainist.collectcard.common.db.repository.CardBillRepository
 import com.rainist.collectcard.common.db.repository.CardBillTransactionRepository
 import com.rainist.collectcard.common.db.repository.CardPaymentScheduledRepository
-import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.collectcard.common.util.ExecutionTestUtil
-import com.rainist.common.util.DateTimeUtil
-import java.math.BigDecimal
-import java.time.LocalDateTime
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.BDDMockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.http.MediaType
-import org.springframework.test.annotation.Rollback
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.client.MockRestServiceServer
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.ResourceUtils
 import org.springframework.web.client.RestTemplate
 
@@ -64,7 +51,7 @@ class CardBillServiceTest {
      * 거래내역은 페이징이 있도록 설정한 후 테스트
      * TODO 295 머지후, MOCK filePath 업데이트 필요
      */
-    @Test
+/*    @Test
     @Transactional
     @Rollback
     fun listUserCardBills_success() {
@@ -78,9 +65,9 @@ class CardBillServiceTest {
                     "clientId" to "596d66692c4069c168b57c59"
                 )
             )
-        /**
+        *//**
          *  데이터가 적재되어있지 않은 상태에서 최초조회.
-         */
+         *//*
 
         userSyncStatusService.upsertUserSyncStatus(
             executionContext.userId.toLong(),
@@ -118,9 +105,9 @@ class CardBillServiceTest {
         assertEquals(281731.toDouble(), protoRes.getData(0).totalAmount)
         assertEquals(12, protoRes.getData(0).transactionsList.size)
 
-        /**
+        *//**
          * entity가 적재된 상태에서 재조회
-         */
+         *//*
 
         userSyncStatusService.upsertUserSyncStatus(
             executionContext.userId.toLong(),
@@ -146,7 +133,7 @@ class CardBillServiceTest {
         // assertEquals(15, billTransactionEntites.size) // transaction : 15 // 삭제된 내역 5개
         // assertEquals(10, billTransactionEntites.filter { it.isDeleted == false }.size) // 현재 오픈된 내용 10개
         assertEquals(12, cardPaymentScheduledEntities.size) // 결제예정금액 : 12개
-    }
+    }*/
 
     private fun setupServer() {
         val server = MockRestServiceServer.bindTo(commonRestTemplate).ignoreExpectOrder(true).build()

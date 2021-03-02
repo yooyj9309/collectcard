@@ -1,11 +1,8 @@
 spring:
   profiles:
     active: local
-  main:
-    web-application-type: none
   application:
     name: collectcard
-
 logging:
   config: classpath:logback/logback-${spring.profiles.active}.xml
   level:
@@ -62,3 +59,6 @@ aws:
     collectcard:
       access-key: ${PRODUCTION_AWS_IAM_COLLECTCARD_ACCESS_KEY}
       access-token: ${PRODUCTION_AWS_IAM_COLLECTCARD_ACCESS_TOKEN}
+
+server:
+  port: 9090

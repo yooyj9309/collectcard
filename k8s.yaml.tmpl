@@ -1,5 +1,6 @@
 {{ $service_name := "collectcard" }}
 
+{{ $application_http_port := "9090" }}
 {{ $service_grpc_port := "18081" }}
 {{ $service_http_port := "18082" }}
 
@@ -246,6 +247,8 @@ spec:
               protocol: TCP
             - containerPort: {{ $service_http_port }}
               protocol: TCP
+            - containerPort: {{ $application_http_port }}
+              protocol: TCP
           env:
             - name: ENV
               value: {{ $env }}
@@ -381,6 +384,10 @@ spec:
       protocol: TCP
       port: 8080
       targetPort: {{ $service_grpc_port }}
+    - name: application
+      protocol: TCP
+      port: 9090
+      targetPort: {{ $application_http_port }}
   selector:
     app: {{ $service_name }}
   type: ClusterIP
