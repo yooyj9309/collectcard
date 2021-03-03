@@ -12,9 +12,9 @@ data class PlccCardTransactionResponseDataHeader(
 )
 
 data class PlccCardTransactionResponseDataBody(
-    var totalBenefitCount: Int? = null, // 총 혜택 건수
-    var totalBenefitAmount: BigDecimal? = null, // 총 혜택 금액
-    var totalSalesAmount: BigDecimal? = null, // 총 혜택 매출 금액
+    var totalBenefitCount: Int = 0, // 총 혜택 건수
+    var totalBenefitAmount: BigDecimal = BigDecimal.ZERO, // 총 혜택 금액
+    var totalSalesAmount: BigDecimal = BigDecimal.ZERO, // 총 혜택 매출 금액
     var responseCode: String? = null, // 응답코드
     var transactionListCount: Int = 0, // 상품별할인서비스 적용내역 건수
     var transactionList: List<PlccCardTransaction> = listOf() // 상품별 할인 서비스 적용 내역

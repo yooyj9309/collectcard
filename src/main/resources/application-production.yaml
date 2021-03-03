@@ -37,6 +37,8 @@ shinhancard:
   clientId: ${PRODUCTION_SHINHANCARD_CLIENT_ID}
 
 lottecard:
+  organizationId: lottecard
+  objectId:
   plcc:
     host: https://124.243.96.33
 

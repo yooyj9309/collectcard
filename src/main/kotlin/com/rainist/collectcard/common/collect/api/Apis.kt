@@ -3,7 +3,7 @@ package com.rainist.collectcard.common.collect.api
 import org.springframework.core.io.ClassPathResource
 
 enum class BusinessType {
-    card
+    card, plcc
 }
 
 enum class Organization {

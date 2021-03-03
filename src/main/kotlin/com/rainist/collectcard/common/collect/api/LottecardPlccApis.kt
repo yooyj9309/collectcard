@@ -24,7 +24,7 @@ class LottecardPlccApis {
                 .name("03-1 혜택 적용내역 조회 (실시간)")
                 .signaturePolicy(signaturePolicyLottecard)
                 .endpoint("$lottecardHost/banksalad/service-benefit-info")
-                .method(Api.HttpMethod.GET)
+                .method(Api.HttpMethod.POST)
                 .transform(
                     request(
                         "transform/card/lottecard/plcc/header_req.jslt",

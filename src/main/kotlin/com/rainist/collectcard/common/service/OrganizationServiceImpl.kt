@@ -18,6 +18,13 @@ class OrganizationServiceImpl : OrganizationService {
     @Value("\${shinhancard.objectId}")
     private lateinit var shinhancardObjectId: String
 
+    @Value("\${lottecard.organizationId}")
+    private lateinit var lottecardOrganizationId: String
+
+    // TODO 롯데카드 organization objectid 추가하기
+    @Value("\${lottecard.objectId}")
+    private lateinit var lottecardObjectId: String
+
     private val organizationsByOrganizationId = LinkedHashMap<String, CardOrganization>()
     private val organizationsByOrganizationObjectId = LinkedHashMap<String, CardOrganization>()
 
@@ -35,8 +42,19 @@ class OrganizationServiceImpl : OrganizationService {
             this.division = 2
         }
 
+        val lottecardOrganization = CardOrganization().apply {
+            this.name = lottecardOrganizationId
+            this.code = "LTC"
+            this.clientId = ""
+            this.organizationId = lottecardOrganizationId
+            this.organizationObjectId = lottecardObjectId
+        }
+
         organizationsByOrganizationId[shinhancardOrganizationId] = shinhancardOrganization
         organizationsByOrganizationObjectId[shinhancardObjectId] = shinhancardOrganization
+
+        organizationsByOrganizationId[lottecardOrganizationId] = lottecardOrganization
+        organizationsByOrganizationObjectId[lottecardObjectId] = lottecardOrganization
     }
 
     override fun getOrganizationByOrganizationId(organizationId: String): CardOrganization {

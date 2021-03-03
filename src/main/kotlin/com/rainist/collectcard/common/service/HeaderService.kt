@@ -16,6 +16,16 @@ class HeaderService(
     val AUTHORIZATION = "authorization"
     val CALIENT_ID = "clientId"
 
+    fun makeHeader(): MutableMap<String, String?> {
+        return mutableMapOf()
+    }
+
+    fun makeHeader(mediaType: String): MutableMap<String, String?> {
+        return mutableMapOf(
+            CONTENT_TYPE to MediaType.APPLICATION_JSON_VALUE
+        )
+    }
+
     fun makeHeader(banksaladUserId: String, organizationId: String): MutableMap<String, String?> {
         val organization = organizationService.getOrganizationByOrganizationId(organizationId)
         val accessToken =

@@ -11,7 +11,11 @@ data class CardOrganization(
 
     var maxMonth: Int = DEFAULT_MAX_MONTH,
     var division: Int = DEFAULT_DIVISION,
-    var researchInterval: Int = DEFAULT_RESEARCH_INTERVAL
+    var researchInterval: Int = DEFAULT_RESEARCH_INTERVAL,
+
+    // TODO PLCC 롯데카드로 부터 전달 받아서 사용
+    var benefitProductCode: String = "",
+    var screenInquiryCode: String = ""
 ) {
     companion object {
         var DEFAULT_MAX_MONTH = 12 // 초기 조회 최대 범위

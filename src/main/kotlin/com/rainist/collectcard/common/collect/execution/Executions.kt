@@ -78,7 +78,7 @@ class Executions() {
 
             // 혜택적용내역 조회
             ExecutionKey.builder()
-                .business(BusinessType.card.name)
+                .business(BusinessType.plcc.name)
                 .organization(Organization.lottecard.name)
                 .transaction(Transaction.plccCardTransaction.name)
                 .build() to lottecardPlccTransactions
