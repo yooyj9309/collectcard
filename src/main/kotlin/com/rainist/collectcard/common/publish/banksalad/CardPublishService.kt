@@ -6,6 +6,8 @@ import com.rainist.collectcard.card.mapper.CardMapper
 import com.rainist.collectcard.common.db.repository.CardRepository
 import com.rainist.collectcard.common.dto.CollectShadowingResponse
 import com.rainist.collectcard.common.util.CustomStringUtil
+import com.rainist.collectcard.common.util.ReflectionCompareUtil
+import com.rainist.common.log.Log
 import java.time.LocalDateTime
 import org.apache.commons.lang3.builder.EqualsBuilder
 import org.mapstruct.factory.Mappers
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Service
 class CardPublishService(
     val cardRepository: CardRepository
 ) {
+
+    companion object : Log
 
     // TODO [FLOW] 해당부분을 제외하고 Diff 비교, 추후 필수로 제거필요.
     val CARD_SHADOWING_EXCLUDE_EQUALS_FIELD = mutableListOf(
@@ -27,17 +31,29 @@ class CardPublishService(
         TODO()
     }
 
-    fun shadowing(banksaladUserId: Long, organizationId: String, lastCheckAt: LocalDateTime?, executionRequestId: String, oldResponse: ListCardsResponse): CollectShadowingResponse {
+    fun shadowing(
+        banksaladUserId: Long,
+        organizationId: String,
+        lastCheckAt: LocalDateTime?,
+        executionRequestId: String,
+        oldResponse: ListCardsResponse
+    ): CollectShadowingResponse {
         val cards = cardRepository.findAllByBanksaladUserIdAndCardCompanyIdAndLastCheckAt(
             banksaladUserId, organizationId, lastCheckAt
         ).map {
-            var card = cardMapper.toCardDto(it)
+            val card = cardMapper.toCardDto(it)
             card.cardNumber = CustomStringUtil.replaceNumberToMask(card.cardNumber)
             card
         }.sortedWith(compareBy({ it.cardName }, { it.cardNumber }))
 
-        val oldCards = oldResponse.dataBody?.cards?.sortedWith(compareBy({ it.cardName }, { it.cardNumber })) ?: mutableListOf()
+        val oldCards =
+            oldResponse.dataBody?.cards?.sortedWith(compareBy({ it.cardName }, { it.cardNumber })) ?: mutableListOf()
         val isShadowingDiff = unequals(cards, oldCards)
+
+        if (isShadowingDiff && (cards.size == oldCards.size)) {
+            val reflectionCompareCards = ReflectionCompareUtil.reflectionCompareCards(oldCards, cards)
+            logger.With("diff_field_map", reflectionCompareCards.toString())
+        }
 
         return CollectShadowingResponse(
             banksaladUserId = banksaladUserId,

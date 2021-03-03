@@ -10,10 +10,11 @@ import com.rainist.collectcard.common.publish.banksalad.CardTransactionPublishSe
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.collectcard.common.util.ExecutionTestUtil
+import com.rainist.collectcard.common.util.ReflectionCompareUtil
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import java.util.UUID
-import org.junit.Assert
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -92,61 +93,11 @@ class CardTransactionPublishTest {
             response
         )
 
-        val listSize = shadowingResponse.oldList.size
         val oldTransactions = shadowingResponse.oldList as List<CardTransaction>
-        val transactions = shadowingResponse.dbList as List<CardTransaction>
+        val newTransactions = shadowingResponse.dbList as List<CardTransaction>
 
-        for (i in 0 until listSize) {
-            val isEqualObject = isEqualDiff(oldTransactions, i, transactions)
-            if (!isEqualObject) {
-                logger.info("transaction diff index = {}", i)
-                logger.info("transaction diff old = {}", oldTransactions[i])
-                logger.info("transaction diff shadowing = {}", transactions[i])
-            }
-            Assert.assertEquals(true, isEqualObject)
-        }
-    }
-
-    private fun isEqualDiff(
-        oldTransactions: List<CardTransaction>,
-        i: Int,
-        transactions: List<CardTransaction>
-    ): Boolean {
-        return listOf(
-            oldTransactions[i].cardTransactionId == transactions[i].cardTransactionId,
-            oldTransactions[i].cardName == transactions[i].cardName,
-            oldTransactions[i].cardNumber == transactions[i].cardNumber,
-            oldTransactions[i].cardNumberMask == transactions[i].cardNumberMask,
-            oldTransactions[i].cardCompanyCardId == transactions[i].cardCompanyCardId,
-            oldTransactions[i].businessLicenseNumber == transactions[i].businessLicenseNumber,
-            oldTransactions[i].storeName == transactions[i].storeName,
-            oldTransactions[i].storeNumber == transactions[i].storeNumber,
-            oldTransactions[i].cardType == transactions[i].cardType,
-            oldTransactions[i].cardTypeOrigin == transactions[i].cardTypeOrigin,
-            oldTransactions[i].cardTransactionType == transactions[i].cardTransactionType,
-            oldTransactions[i].cardTransactionTypeOrigin == transactions[i].cardTransactionTypeOrigin,
-            oldTransactions[i].currencyCode == transactions[i].currencyCode,
-            oldTransactions[i].isInstallmentPayment == transactions[i].isInstallmentPayment,
-            oldTransactions[i].installment == transactions[i].installment,
-            oldTransactions[i].installmentRound == transactions[i].installmentRound,
-            oldTransactions[i].netSalesAmount == transactions[i].netSalesAmount,
-            oldTransactions[i].serviceChargeAmount == transactions[i].serviceChargeAmount,
-            oldTransactions[i].tax == transactions[i].tax,
-            oldTransactions[i].paidPoints == transactions[i].paidPoints,
-            oldTransactions[i].isPointPay == transactions[i].isPointPay,
-            oldTransactions[i].discountAmount == transactions[i].discountAmount,
-            oldTransactions[i].amount == transactions[i].amount,
-            oldTransactions[i].canceledAmount == transactions[i].canceledAmount,
-            oldTransactions[i].partialCanceledAmount == transactions[i].partialCanceledAmount,
-            oldTransactions[i].approvalNumber == transactions[i].approvalNumber,
-            oldTransactions[i].approvalDay == transactions[i].approvalDay,
-            oldTransactions[i].approvalTime == transactions[i].approvalTime,
-            oldTransactions[i].pointsToEarn == transactions[i].pointsToEarn,
-            oldTransactions[i].isOverseaUse == transactions[i].isOverseaUse,
-            oldTransactions[i].paymentDay == transactions[i].paymentDay,
-            oldTransactions[i].storeCategory == transactions[i].storeCategory,
-            oldTransactions[i].transactionCountry == transactions[i].transactionCountry
-        ).all { it }
+        val diffFieldMap = ReflectionCompareUtil.reflectionCompareCardTransaction(oldTransactions, newTransactions)
+        assertThat(diffFieldMap.size).isEqualTo(36)
     }
 
     private fun requestSetting(): CollectExecutionContext {

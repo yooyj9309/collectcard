@@ -7,8 +7,11 @@ import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.publish.banksalad.CardPublishService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.util.ExecutionTestUtil
+import com.rainist.collectcard.common.util.ReflectionCompareUtil
+import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import java.util.UUID
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Assert.assertEquals
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -28,6 +31,8 @@ import org.springframework.web.client.RestTemplate
 @SpringBootTest()
 @DisplayName("카드 publish 테스트")
 class CardPublishTest {
+
+    companion object : Log
 
     @Autowired
     lateinit var cardPublishService: CardPublishService
@@ -74,41 +79,14 @@ class CardPublishTest {
         val response = cardService.listCards(executionContext, now)
 
         // 같은경우.
-
-        val shadowingResponse = cardPublishService.shadowing(userId, organizationId, now, executionContext.executionRequestId, response)
+        val shadowingResponse =
+            cardPublishService.shadowing(userId, organizationId, now, executionContext.executionRequestId, response)
         assertEquals(false, shadowingResponse.isDiff)
 
-        val listSize = shadowingResponse.oldList.size
         val oldCards = shadowingResponse.oldList as List<Card>
         val cards = shadowingResponse.dbList as List<Card>
 
-        for (i in 0 until listSize) {
-            val isDiffObject = listOf(
-                oldCards[i].cardCompanyId == cards[i].cardCompanyId,
-                oldCards[i].cardCompanyCardId == cards[i].cardCompanyCardId,
-                oldCards[i].cardOwnerName == cards[i].cardOwnerName,
-                oldCards[i].cardOwnerType == cards[i].cardOwnerType,
-                oldCards[i].cardOwnerTypeOrigin == cards[i].cardOwnerTypeOrigin,
-                oldCards[i].cardName == cards[i].cardName,
-                oldCards[i].cardBrandName == cards[i].cardBrandName,
-                oldCards[i].internationalBrandName == cards[i].internationalBrandName,
-                oldCards[i].cardNumber == cards[i].cardNumber,
-                oldCards[i].cardNumberMask == cards[i].cardNumberMask,
-                oldCards[i].cardType == cards[i].cardType,
-                oldCards[i].cardTypeOrigin == cards[i].cardTypeOrigin,
-                oldCards[i].issuedDay == cards[i].issuedDay,
-                oldCards[i].expiresDay == cards[i].expiresDay,
-                oldCards[i].cardStatus == cards[i].cardStatus,
-                oldCards[i].cardStatusOrigin == cards[i].cardStatusOrigin,
-                oldCards[i].lastUseDay == cards[i].lastUseDay,
-                oldCards[i].lastUseTime == cards[i].lastUseTime,
-                oldCards[i].annualFee == cards[i].annualFee,
-                oldCards[i].paymentBankId == cards[i].paymentBankId,
-                oldCards[i].paymentAccountNumber == cards[i].paymentAccountNumber,
-                oldCards[i].isBusinessCard == cards[i].isBusinessCard,
-                oldCards[i].isTrafficSupported == cards[i].isTrafficSupported
-            ).all { it }
-            assertEquals(true, isDiffObject)
-        }
+        val diffFieldMap = ReflectionCompareUtil.reflectionCompareCards(oldCards, cards)
+        assertThat(diffFieldMap.size).isEqualTo(0)
     }
 }

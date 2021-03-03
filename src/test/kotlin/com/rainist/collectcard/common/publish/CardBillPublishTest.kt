@@ -2,7 +2,6 @@ package com.rainist.collectcard.common.publish
 
 import com.rainist.collectcard.cardbills.CardBillService
 import com.rainist.collectcard.cardbills.dto.CardBill
-import com.rainist.collectcard.cardbills.dto.CardBillTransaction
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.dto.CollectExecutionContext
@@ -10,6 +9,7 @@ import com.rainist.collectcard.common.publish.banksalad.CardBillPublishService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.collectcard.common.util.ExecutionTestUtil
+import com.rainist.collectcard.common.util.ReflectionCompareUtil
 import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import java.time.LocalDateTime
@@ -87,107 +87,11 @@ class CardBillPublishTest {
             response
         )
 
-        val listSize = shadowingResponse.oldList.size
         val oldBills = shadowingResponse.oldList as List<CardBill>
         val shadowingBills = shadowingResponse.dbList as List<CardBill>
 
-        for (i in 0 until listSize) {
-            // bill 비교
-            val isEqualBill = isEqualbill(oldBills, i, shadowingBills)
-            val transactionSize = oldBills[i].transactions?.size
-
-            for (j in 0 until transactionSize!!) {
-                // cardbilltransaction 비교
-                val isEqualBillTransaction =
-                    isEqualbillTransaction(
-                        oldBills[i].transactions?.get(j),
-                        i,
-                        shadowingBills[i].transactions?.get(j)
-                    )
-                assertThat(isEqualBillTransaction).isEqualTo(true)
-            }
-            assertThat(isEqualBill).isEqualTo(true)
-        }
-    }
-
-    // cardBillTransactions 43개 필드 비교
-    private fun isEqualbillTransaction(
-        oldTransactions: CardBillTransaction?,
-        i: Int,
-        shadowingTransactions: CardBillTransaction?
-    ): Boolean {
-        val isDiffObject = listOf(
-            oldTransactions?.cardTransactionId == shadowingTransactions?.cardTransactionId,
-            oldTransactions?.cardCompanyCardId == shadowingTransactions?.cardCompanyCardId,
-            oldTransactions?.cardNumber == shadowingTransactions?.cardNumber,
-            oldTransactions?.cardNumberMasked == shadowingTransactions?.cardNumberMasked,
-            oldTransactions?.businessLicenseNumber == shadowingTransactions?.businessLicenseNumber,
-            oldTransactions?.storeName == shadowingTransactions?.storeName,
-            oldTransactions?.storeNumber == shadowingTransactions?.storeNumber,
-            oldTransactions?.cardType == shadowingTransactions?.cardType,
-            oldTransactions?.cardTypeOrigin == shadowingTransactions?.cardTypeOrigin,
-            oldTransactions?.cardTransactionType == shadowingTransactions?.cardTransactionType,
-            oldTransactions?.cardTransactionTypeOrigin == shadowingTransactions?.cardTransactionTypeOrigin,
-            oldTransactions?.currencyCode == shadowingTransactions?.currencyCode,
-            oldTransactions?.isInstallmentPayment == shadowingTransactions?.isInstallmentPayment,
-            oldTransactions?.installment == shadowingTransactions?.installment,
-            oldTransactions?.installmentRound == shadowingTransactions?.installmentRound,
-            oldTransactions?.netSalesAmount == shadowingTransactions?.netSalesAmount,
-            oldTransactions?.serviceChargeAmount == shadowingTransactions?.serviceChargeAmount,
-            oldTransactions?.tax == shadowingTransactions?.tax,
-            oldTransactions?.paidPoints == shadowingTransactions?.paidPoints,
-            oldTransactions?.isPointPay == shadowingTransactions?.isPointPay,
-            oldTransactions?.discountAmount == shadowingTransactions?.discountAmount,
-            oldTransactions?.amount == shadowingTransactions?.amount,
-            oldTransactions?.canceledAmount == shadowingTransactions?.canceledAmount,
-            oldTransactions?.approvalNumber == shadowingTransactions?.approvalNumber,
-            oldTransactions?.approvalDay == shadowingTransactions?.approvalDay,
-            oldTransactions?.approvalTime == shadowingTransactions?.approvalTime,
-            oldTransactions?.pointsToEarn == shadowingTransactions?.pointsToEarn,
-            oldTransactions?.isOverseaUse == shadowingTransactions?.isOverseaUse,
-            oldTransactions?.paymentDay == shadowingTransactions?.paymentDay,
-            oldTransactions?.storeCategory == shadowingTransactions?.storeCategory,
-            oldTransactions?.storeCategoryOrigin == shadowingTransactions?.storeCategoryOrigin,
-            oldTransactions?.transactionCountry == shadowingTransactions?.transactionCountry,
-            oldTransactions?.billingRound == shadowingTransactions?.billingRound,
-            oldTransactions?.paidAmount == shadowingTransactions?.paidAmount,
-            oldTransactions?.billedAmount == shadowingTransactions?.billedAmount,
-            oldTransactions?.billedFee == shadowingTransactions?.billedFee,
-            oldTransactions?.remainingAmount == shadowingTransactions?.remainingAmount,
-            oldTransactions?.isPaidFull == shadowingTransactions?.isPaidFull,
-            oldTransactions?.cashback == shadowingTransactions?.cashback,
-            oldTransactions?.pointsRate == shadowingTransactions?.pointsRate,
-            oldTransactions?.billNumber == shadowingTransactions?.billNumber,
-            oldTransactions?.billType == shadowingTransactions?.billType
-
-        ).all { it }
-        return isDiffObject
-    }
-
-    // cardbill 15개 필드 비교
-    private fun isEqualbill(
-        oldTransactions: List<CardBill>,
-        i: Int,
-        shadowingTransactions: List<CardBill>
-    ): Boolean {
-        return listOf(
-            oldTransactions[i].billId == shadowingTransactions[i].billId,
-            oldTransactions[i].billNumber == shadowingTransactions[i].billNumber,
-            oldTransactions[i].billType == shadowingTransactions[i].billType,
-            oldTransactions[i].cardType == shadowingTransactions[i].cardType,
-            oldTransactions[i].userName == shadowingTransactions[i].userName,
-            oldTransactions[i].userGrade == shadowingTransactions[i].userGrade,
-            oldTransactions[i].userGradeOrigin == shadowingTransactions[i].userGradeOrigin,
-            oldTransactions[i].paymentDay == shadowingTransactions[i].paymentDay,
-            oldTransactions[i].billedYearMonth == shadowingTransactions[i].billedYearMonth,
-            oldTransactions[i].nextPaymentDay == shadowingTransactions[i].nextPaymentDay,
-            oldTransactions[i].billingAmount == shadowingTransactions[i].billingAmount,
-            oldTransactions[i].prepaidAmount == shadowingTransactions[i].prepaidAmount,
-            oldTransactions[i].paymentBankId == shadowingTransactions[i].paymentBankId,
-            oldTransactions[i].paymentAccountNumber == shadowingTransactions[i].paymentAccountNumber,
-            oldTransactions[i].totalPoints == shadowingTransactions[i].totalPoints,
-            oldTransactions[i].expiringPoints == shadowingTransactions[i].expiringPoints
-        ).all { it }
+        val diffFieldMap = ReflectionCompareUtil.reflectionCompareBills(oldBills, shadowingBills)
+        assertThat(diffFieldMap.size).isEqualTo(0)
     }
 
     private fun setupServerPaging() {

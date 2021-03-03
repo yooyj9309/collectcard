@@ -7,6 +7,7 @@ import com.rainist.collectcard.cardcreditlimit.mapper.CreditLimitMapper
 import com.rainist.collectcard.common.db.entity.CreditLimitEntity
 import com.rainist.collectcard.common.db.repository.CreditLimitRepository
 import com.rainist.collectcard.common.dto.SingleCollectShadowingResponse
+import com.rainist.collectcard.common.util.ReflectionCompareUtil
 import com.rainist.common.log.Log
 import io.micrometer.core.instrument.MeterRegistry
 import java.time.LocalDateTime
@@ -56,6 +57,12 @@ class CreditLimitPublishService(
 
         val oldCreditLimit = oldResponse.dataBody?.creditLimitInfo ?: CreditLimit()
         val isShadowingDiff = !EqualsBuilder.reflectionEquals(creditLimit, oldCreditLimit)
+
+        if (isShadowingDiff) {
+            val diffFieldMap =
+                ReflectionCompareUtil.reflectionCompareCreditLimit(oldCreditLimit, creditLimit)
+            logger.With("diff_field_map", diffFieldMap.toString())
+        }
 
         return SingleCollectShadowingResponse(
             banksaladUserId = banksaladUserId,

@@ -11,6 +11,7 @@ import com.rainist.collectcard.common.db.repository.CardBillScheduledRepository
 import com.rainist.collectcard.common.db.repository.CardBillTransactionRepository
 import com.rainist.collectcard.common.db.repository.CardPaymentScheduledRepository
 import com.rainist.collectcard.common.dto.CollectShadowingResponse
+import com.rainist.collectcard.common.util.ReflectionCompareUtil
 import com.rainist.common.log.Log
 import java.time.LocalDateTime
 import org.apache.commons.lang3.builder.EqualsBuilder
@@ -49,6 +50,11 @@ class CardBillPublishService(
         val oldCardBill = sortedCardBill(oldResponse.dataBody?.cardBills)
 
         val isShadowingDiff = unequals(oldCardBill, newCardBills)
+
+        if (isShadowingDiff and (newCardBills.size == oldCardBill.size)) {
+            val diffFieldMap = ReflectionCompareUtil.reflectionCompareBills(oldCardBill, newCardBills)
+            logger.With("diff_field_map", diffFieldMap.toString())
+        }
 
         return CollectShadowingResponse(
             banksaladUserId = banksaladUserId,

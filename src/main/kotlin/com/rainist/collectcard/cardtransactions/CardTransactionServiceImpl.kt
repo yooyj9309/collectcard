@@ -53,7 +53,10 @@ class CardTransactionServiceImpl(
     companion object : Log
 
     @Transactional
-    override fun listTransactions(executionContext: CollectExecutionContext, now: LocalDateTime): ListTransactionsResponse {
+    override fun listTransactions(
+        executionContext: CollectExecutionContext,
+        now: LocalDateTime
+    ): ListTransactionsResponse {
         val banksaladUserId = executionContext.userId.toLong()
         val organizationId = executionContext.organizationId
         /* request header */
@@ -68,8 +71,10 @@ class CardTransactionServiceImpl(
             }
         }
 
-        logger.With("banksaladUserId", executionContext.userId).With("startAt", request.dataBody?.startAt
-            ?: "startAtNull").Warn("")
+        logger.With("banksaladUserId", executionContext.userId).With(
+            "startAt", request.dataBody?.startAt
+            ?: "startAtNull"
+        ).Warn("")
 
         val executionResponses = getListTransactionsByDivision(executionContext, header, request)
 
@@ -88,6 +93,12 @@ class CardTransactionServiceImpl(
         transactions?.map { transaction ->
             transaction.apply {
                 this.cardNumber = this.cardNumber?.replace("-", "")?.trim()
+                /**
+                 * 체크승인(해외, 국내), 신용승인(해외)의 경우 jslt에서 isInstallmentPayment가 없어서
+                 * 매핑 이후 여기서 일괄적으로 null일 경우 false로 바꾸기
+                 * 사실, rpc 타입이 bool이라 자동으로 변환은 되는데 diff를 줄이기 위해 잡을 것인가 의문.
+                 */
+                this.isInstallmentPayment = this.isInstallmentPayment ?: false
             }
         }
 
@@ -193,20 +204,24 @@ class CardTransactionServiceImpl(
      * @param 2020.01.01 ~ 2020.12.01
      * @return [ [2020.01.01~2020.03.31],[2020.04.01~2020.08.31],[2020.09.01~2020.12.31] ]
      */
-    fun getSearchDateList(executionContext: ExecutionContext, request: ListTransactionsRequest): MutableList<DateTimeUtil.LocalDateRange> {
+    fun getSearchDateList(
+        executionContext: ExecutionContext,
+        request: ListTransactionsRequest
+    ): MutableList<DateTimeUtil.LocalDateRange> {
 
         return request.let { request ->
             validationService.validateOrThrows(request.dataBody)
         }
-        ?.let { dataBody ->
-            val startDate = DateTimeUtil.stringToLocalDate(dataBody.startAt, "yyyyMMdd")
-            val endDate = DateTimeUtil.stringToLocalDate(dataBody.endAt, "yyyyMMdd")
-            val division = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).division
+            ?.let { dataBody ->
+                val startDate = DateTimeUtil.stringToLocalDate(dataBody.startAt, "yyyyMMdd")
+                val endDate = DateTimeUtil.stringToLocalDate(dataBody.endAt, "yyyyMMdd")
+                val division =
+                    organizationService.getOrganizationByOrganizationId(executionContext.organizationId).division
 
-            DateTimeUtil.splitLocalDateRangeByMonth(startDate, endDate, division)
-        }
-        ?.toMutableList()
-        ?: mutableListOf()
+                DateTimeUtil.splitLocalDateRangeByMonth(startDate, endDate, division)
+            }
+            ?.toMutableList()
+            ?: mutableListOf()
     }
 
     /**
@@ -222,7 +237,8 @@ class CardTransactionServiceImpl(
         val checkStartTime = userSyncStatusService.getUserSyncStatusLastCheckAt(
             executionContext.userId.toLong(), executionContext.organizationId, Transaction.cardTransaction.name
         )?.let { lastCheckAt ->
-            val researchInterval = organizationService.getOrganizationByOrganizationId(executionContext.organizationId).researchInterval
+            val researchInterval =
+                organizationService.getOrganizationByOrganizationId(executionContext.organizationId).researchInterval
             DateTimeUtil.epochMilliSecondToKSTLocalDateTime(lastCheckAt).minusDays(researchInterval.toLong())
         }?.takeIf {
             defaultCheckStartTime.isBefore(it)
@@ -238,7 +254,8 @@ class CardTransactionServiceImpl(
                     transaction.cardNumber = CustomStringUtil.replaceNumberToMask(transaction.cardNumber)
                 }
             }
-            else -> {}
+            else -> {
+            }
         }
     }
 }

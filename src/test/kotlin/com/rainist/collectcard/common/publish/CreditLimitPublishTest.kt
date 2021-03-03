@@ -7,6 +7,8 @@ import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.publish.banksalad.CreditLimitPublishService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.util.ExecutionTestUtil
+import com.rainist.collectcard.common.util.ReflectionCompareUtil
+import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import java.util.UUID
 import javax.transaction.Transactional
@@ -29,6 +31,8 @@ import org.springframework.web.client.RestTemplate
 @SpringBootTest
 @DisplayName("CreditLimitPublish 테스트")
 class CreditLimitPublishTest {
+
+    companion object : Log
 
     @Autowired
     lateinit var creditLimitPublishService: CreditLimitPublishService
@@ -83,10 +87,17 @@ class CreditLimitPublishTest {
         )
 
         // DTO에 있지만 엔티티에 없는 field 추가로 isDiff 결과는 false
-        assertThat(shadowingResponse.isDiff).isFalse()
+        val isDiff = shadowingResponse.isDiff
+        assertThat(isDiff).isFalse()
 
         val oldCreditLimit = shadowingResponse.oldResponse as CreditLimit
         val shadowingCreditLimit = shadowingResponse.shadowingResponse as CreditLimit
+
+        if (isDiff) {
+            val diffFieldMap =
+                ReflectionCompareUtil.reflectionCompareCreditLimit(oldCreditLimit, shadowingCreditLimit)
+            logger.info("diffFieldMap = {}", diffFieldMap.toString())
+        }
 
         // loanLimit
         val loanLimit = oldCreditLimit.loanLimit
