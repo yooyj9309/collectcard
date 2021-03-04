@@ -5,6 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
 data class PlccIssueCardRequestDto(
-    val ci: String? = null,
-    val cardList: List<PlccCardDto>? = null
+    val ci: String,
+    val cardList: List<PlccCardDto>
 )

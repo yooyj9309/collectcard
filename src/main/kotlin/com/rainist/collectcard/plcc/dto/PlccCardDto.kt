@@ -5,16 +5,16 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
 data class PlccCardDto(
-    val cardNumberMask: String? = null,
-    val cardType: String? = null,
-    val cardIssueStatus: String? = null,
-    val cid: String? = null,
-    val cardName: String? = null,
-    val internationalBrandName: String? = null,
-    val cardProductName: String? = null,
-    val cardApplicationDay: String? = null,
-    val issuedDay: String? = null,
-    val expiresYearMonth: String? = null,
-    val ownerCard: String? = null,
-    val cardOwnerName: String? = null
+    val cardNumberMask: String,
+    val cardType: String,
+    val cardIssueStatus: String,
+    val cid: String,
+    val cardName: String,
+    val internationalBrandName: String,
+    val cardProductName: String,
+    val cardApplicationDay: String,
+    val issuedDay: String,
+    val expiresYearMonth: String,
+    val ownerCard: String,
+    val cardOwnerName: String
 )
