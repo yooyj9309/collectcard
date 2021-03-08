@@ -64,3 +64,6 @@ aws:
 
 server:
   port: 9090
+  servlet:
+    encoding:
+      force: false

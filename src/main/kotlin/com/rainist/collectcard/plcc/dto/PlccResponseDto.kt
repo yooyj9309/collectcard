@@ -8,12 +8,21 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming
 data class PlccResponseDto(
 
     @JsonProperty("result")
-    var plccResultDto: PlccResultDto? = null
+    var plccResultDto: PlccResultDto? = null,
+
+    @JsonProperty("cid")
+    var cid: String? = null
 
 ) {
 
     fun success(): PlccResponseDto {
         this.plccResultDto = PlccResultDto().success()
+        return this
+    }
+
+    fun success(cid: String?): PlccResponseDto {
+        this.plccResultDto = PlccResultDto().success()
+        this.cid = cid
         return this
     }
 }

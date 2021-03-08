@@ -3,7 +3,6 @@ package com.rainist.collectcard.grpc.client
 import com.github.banksalad.idl.apis.v1.card.CardProto
 import com.github.banksalad.idl.apis.v1.plcc.PlccGrpc
 import com.github.banksalad.idl.apis.v1.plcc.PlccProto
-import com.google.protobuf.StringValue
 import com.rainist.collectcard.plcc.dto.PlccCardDto
 import com.rainist.collectcard.plcc.dto.SyncType
 import com.rainist.common.util.DateTimeUtil
@@ -31,11 +30,11 @@ class PlccClientService(
             .addAllData(
                 data.map {
                     PlccProto.CollectcardPlccData.newBuilder()
-                        .setName(it.cardName)
+                        // .setName(it.cardName)
                         .setNumber(it.cardNumberMask)
-                        .setProductName(StringValue.of(it.cardProductName))
+                        // .setProductName(StringValue.of(it.cardProductName))
                         .setInternationalBrand(CardProto.CardInternationalBrand.valueOf(it.internationalBrandName ?: "UNKNOWN"))
-                        .setOwnerName(StringValue.of(it.cardOwnerName))
+                        // .setOwnerName(StringValue.of(it.cardOwnerName))
 //                        .setExternalState(StringValue.of(parseExternalState()))
                         .setStatus(cardIssueStatusToProtoEnum(it.cardIssueStatus))
                         .setIssuedAtMs(DateTimeUtil.stringDateTimeToEpochMilliSecond(it.issuedDay, "yyyyMMdd", ZoneOffset.UTC))

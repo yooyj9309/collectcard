@@ -5,13 +5,19 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
 data class PlccResultDto(
-    var code: String? = null,
-    var message: String? = null
+    var message: String? = null,
+    var code: String? = null
 ) {
 
     fun success(): PlccResultDto {
-        this.code = "OK"
         this.message = "정상처리되었습니다."
+        this.code = "OK"
+        return this
+    }
+
+    fun success(cid: String?): PlccResultDto {
+        this.message = "정상처리되었습니다."
+        this.code = "OK"
         return this
     }
 }
