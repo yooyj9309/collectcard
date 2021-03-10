@@ -410,6 +410,32 @@ class CollectcardGrpcService(
         }
     }
 
+    override fun listPlccRewardsTypeLimit(
+        request: CollectcardProto.ListPlccRewardsTypeLimitRequest,
+        responseObserver: StreamObserver<CollectcardProto.ListPlccRewardsTypeLimitResponse>
+    ) {
+        /* ExecutionContext */
+        val executionContext = CollectExecutionContext(
+            executionRequestId = uuidService.generateExecutionRequestId(),
+            organizationId = organizationService.getOrganizationByOrganizationId(request.companyId.value)?.organizationId
+                ?: "",
+            userId = request.userId
+        )
+
+        val plccRpcRequest = PlccRpcRequest(request.cardId.toString(), request.requestMonthMs.toString())
+
+        kotlin.runCatching {
+            plccCardRewardsService.getPlccCardRewards(executionContext, plccRpcRequest)
+            plccCardRewardsPublishService.rewardsTypeLimitPublish(executionContext, plccRpcRequest)
+        }.onSuccess {
+            responseObserver.onNext(it)
+            responseObserver.onCompleted()
+        }.onFailure {
+            CollectcardServiceExceptionHandler.handle(executionContext, "listPlccRewardsTypeLimit", "타입별 한도 조회", it)
+            responseObserver.onError(it)
+        }
+    }
+
     private fun shadowingLogging(res: CollectShadowingResponse) {
         logger.With("shadowing_target", res.executionName)
             .With("banksalad_user_id", res.banksaladUserId)

@@ -8,6 +8,7 @@ import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.dto.CollectExecutionContext
+import com.rainist.collectcard.common.service.EncodeService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.LocalDatetimeService
 import com.rainist.collectcard.common.service.OrganizationService
@@ -15,8 +16,8 @@ import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsRequest
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsRequestDataBody
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsRequestDataHeader
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsResponse
-import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsThreshold
-import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsTypeLimit
+import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardThreshold
+import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardTypeLimit
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccRpcRequest
 import com.rainist.collectcard.plcc.cardtransactions.convertStringYearMonth
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardThresholdHistoryRepository
@@ -26,6 +27,7 @@ import com.rainist.collectcard.plcc.common.db.repository.PlccCardTypeLimitReposi
 import com.rainist.collectcard.plcc.common.util.PlccCardRewardsUtil
 import com.rainist.common.service.ValidationService
 import com.rainist.common.util.DateTimeUtil
+import java.nio.charset.Charset
 import java.time.LocalDateTime
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
@@ -40,7 +42,8 @@ class PlccCardRewardsServiceImpl(
     val plccCardThresholdRepository: PlccCardThresholdRepository,
     val plccCardThresholdHistoryRepository: PlccCardThresholdHistoryRepository,
     val plccCardTypeLimitRepository: PlccCardTypeLimitRepository,
-    val plccCardTypeLimitHistoryRepository: PlccCardTypeLimitHistoryRepository
+    val plccCardTypeLimitHistoryRepository: PlccCardTypeLimitHistoryRepository,
+    val encodeService: EncodeService
 ) : PlccCardRewardsService {
 
     override fun getPlccCardRewards(
@@ -58,7 +61,7 @@ class PlccCardRewardsServiceImpl(
         val execution = Executions.valueOf(
             BusinessType.plcc,
             Organization.lottecard,
-            Transaction.cardTransaction
+            Transaction.plccCardReward
         )
 
         // request
@@ -88,6 +91,19 @@ class PlccCardRewardsServiceImpl(
         val executionResponse: ExecutionResponse<PlccCardRewardsResponse> =
             collectExecutorService.execute(executionContext, execution, executionRequest)
 
+        val encodingflag = false
+        if (encodingflag) {
+            // response_message, benefit_name
+            executionResponse.response?.dataBody?.plccCardThreshold?.apply {
+                this.responseMessage = encodeService.base64Decode(this.responseMessage, Charset.forName("MS949"))
+            }
+
+            executionResponse.response?.dataBody?.benefitList?.forEach { plccCardTypeLimit ->
+                plccCardTypeLimit.benefitName =
+                    encodeService.base64Decode(plccCardTypeLimit.benefitName, Charset.forName("MS949"))
+            }
+        }
+
         // TODO : DTO에 validation 어노테이션 추가 필요
         val benefitList = (executionResponse.response?.dataBody?.benefitList?.mapNotNull { plccCardRewardsTypeLimit ->
             validateService.validateOrNull(plccCardRewardsTypeLimit)
@@ -100,7 +116,7 @@ class PlccCardRewardsServiceImpl(
 
         /* 실적(RewardsThreshold) save */
         // 실적 데이터 조회
-        val rewardsThreshold = executionResponse.response?.dataBody?.plccCardPlccCardRewardsThreshold
+        val rewardsThreshold = executionResponse.response?.dataBody?.plccCardThreshold
         upsertRewardsThreshold(
             executionContext,
             rpcRequest,
@@ -131,8 +147,8 @@ class PlccCardRewardsServiceImpl(
         executionContext: CollectExecutionContext,
         rpcRequest: PlccRpcRequest,
         plccCardRewardsRequest: PlccCardRewardsRequest,
-        plccCardRewardsTypeLimit: PlccCardRewardsTypeLimit,
-        plccCardRewardsThreshold: PlccCardRewardsThreshold?,
+        plccCardTypeLimit: PlccCardTypeLimit,
+        plccCardThreshold: PlccCardThreshold?,
         now: LocalDateTime
     ) {
         val prevEntity =
@@ -141,18 +157,20 @@ class PlccCardRewardsServiceImpl(
                 cardCompanyId = executionContext.organizationId,
                 cardCompanyCardId = rpcRequest.cardId,
                 benefitYearMonth = plccCardRewardsRequest.dataBody?.inquiryYearMonth ?: "",
-                benefitCode = plccCardRewardsTypeLimit.benefitCode ?: ""
+                benefitCode = plccCardTypeLimit.benefitCode ?: ""
             )
 
-        val newEntity = plccCardRewardsTypeLimit.toEntity(
+        val newEntity = PlccCardRewardsUtil.makePlccCardTypeLimitEntity(
             banksaladUserId = executionContext.userId.toLong(),
             cardCompanyId = executionContext.organizationId,
             cardCompanyCardId = rpcRequest.cardId,
             benefitYearMonth = plccCardRewardsRequest.dataBody?.inquiryYearMonth,
-            outcomeStartDay = plccCardRewardsThreshold?.outcomeStartDate ?: "",
-            outcomeEndDay = plccCardRewardsThreshold?.outcomeEndDate ?: "",
+            outcomeStartDay = plccCardThreshold?.outcomeStartDate ?: "",
+            outcomeEndDay = plccCardThreshold?.outcomeEndDate ?: "",
+            plccCardTypeLimit = plccCardTypeLimit,
             now = now
         )
+
         // 없다면 insert
         if (prevEntity == null) {
             plccCardTypeLimitRepository.save(newEntity)
@@ -192,7 +210,7 @@ class PlccCardRewardsServiceImpl(
         executionContext: CollectExecutionContext,
         rpcRequest: PlccRpcRequest,
         plccCardRewardsRequest: PlccCardRewardsRequest,
-        rewardsThreshold: PlccCardRewardsThreshold?,
+        rewardsThreshold: PlccCardThreshold?,
         now: LocalDateTime
     ) {
         val prevEntity =
@@ -203,11 +221,12 @@ class PlccCardRewardsServiceImpl(
                 benefitYearMonth = plccCardRewardsRequest.dataBody?.inquiryYearMonth ?: ""
             )
         val newEntity =
-            rewardsThreshold?.toEntity(
+            PlccCardRewardsUtil.makeThresholdEntity(
                 executionContext.userId.toLong(),
                 executionContext.organizationId,
                 rpcRequest.cardId,
                 plccCardRewardsRequest.dataBody?.inquiryYearMonth,
+                rewardsThreshold,
                 now
             )
 
@@ -216,7 +235,7 @@ class PlccCardRewardsServiceImpl(
             newEntity?.let {
                 plccCardThresholdRepository.save(it)
                 plccCardThresholdHistoryRepository.save(
-                    PlccCardRewardsUtil.makeThresholdHisotryEntity(
+                    PlccCardRewardsUtil.makeThresholdHistoryEntity(
                         it
                     )
                 )
@@ -224,15 +243,12 @@ class PlccCardRewardsServiceImpl(
             return
         }
 
-        // 있지만 데이터가 같다면 lastCheckAt만 업데이트, history insert
+        // 있지만 데이터가 같다면 lastCheckAt만 업데이트
         if (prevEntity?.equal(newEntity)) {
             prevEntity.apply {
                 lastCheckAt = now
             }.let {
                 plccCardThresholdRepository.save(it)
-                plccCardThresholdHistoryRepository.save(
-                    PlccCardRewardsUtil.makeThresholdHisotryEntity(it)
-                )
             }
             return
         }
@@ -245,7 +261,7 @@ class PlccCardRewardsServiceImpl(
         }?.let {
             plccCardThresholdRepository.save(it)
             plccCardThresholdHistoryRepository.save(
-                PlccCardRewardsUtil.makeThresholdHisotryEntity(
+                PlccCardRewardsUtil.makeThresholdHistoryEntity(
                     it
                 )
             )

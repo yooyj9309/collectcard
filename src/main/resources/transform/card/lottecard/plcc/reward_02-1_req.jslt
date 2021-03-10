@@ -1,0 +1,6 @@
+{
+    "inquiry_month" : .dataBody.inquiryYearMonth,
+    "card_number" : .dataBody.cardNumber,
+    "benefit_product_code" : "A224",
+    "screen_inquiry_code" : "B324"
+}

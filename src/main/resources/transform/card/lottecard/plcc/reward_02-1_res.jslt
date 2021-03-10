@@ -1,0 +1,51 @@
+let promotionCode = {
+  "" : "UNKNOWN",
+  "0" : "NO_PROMOTION",
+  "1" : "ISSUED"
+}
+
+let serviceType = {
+  "" : "UNKNOWN",
+  "01" : "CHARGE_DISCOUNT",
+  "02" : "POINT",
+  "03" : "INSTALLMENT_REDUCT"
+}
+
+{
+  "dataBody" : {
+    "plccCardRewardsThreshold" : {
+        "outcomeStartDate" : .outcome_start_date,
+        "outcomeEndDate" : .outcome_end_date,
+        "isOutcomeDelay" : .is_outcome_delay,
+        "beforeMonthCriteriaUseAmount" : .before_month_criteria_use_amount,
+        "outcomeCriteriaAmount" : .outcome_criteria_amount,
+        "totalBenefitAmount" : .total_benefit_amount,
+        "totalBenefitCount" : .total_benefit_count,
+        "totalSalesAmount" : .total_sales_amount,
+        "monthlyBenefitRate" : .monthly_benefit_rate,
+        "monthlyBenefitLimit" : .monthly_benefit_limit,
+        "cashbackAmount" : .cashback_amount,
+        "message" : .message,
+        "promotionCode" : [get-key($promotionCode, .promotion_code, "UNKNOWN")],
+        "responseCode" : .response_code,
+        "responseMessage" : .response_message,
+        "benefitListCount" : .benefit_list_count
+    },
+    "benefitList" : [for (.benefit_list)
+    {
+       "benefitName" : .benefit_name,
+       "benefitCode" : .benefit_code,
+       "discountRate" : .discount_rate,
+       "totalLimitAmount" : .total_limit_amount,
+       "appliedAmount" : .apply_amount,
+       "limitRemainingAmount" : .remain_limit_amount,
+       "totalLimitCount" : .total_limit_count,
+       "appliedCount" : .apply_count,
+       "limitRemainingCount" : .remain_limit_count,
+       "totalSalesLimitAmount" : .total_sales_amount,
+       "appliedSalesAmount" : .apply_sales_amount,
+       "limitRemainingSalesAmount" : .remain_limit_sales_amount,
+       "service_type" : [get-key($serviceType, .service_type, "UNKNOWN")]
+    }
+  }
+}

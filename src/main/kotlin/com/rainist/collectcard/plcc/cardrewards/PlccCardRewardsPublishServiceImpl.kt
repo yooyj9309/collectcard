@@ -34,16 +34,32 @@ class PlccCardRewardsPublishServiceImpl(
             return plccCardRewardsConvertService.toThresholdProto(it)
         }
 
-        val newBuilder = CollectcardProto.GetPlccRewardsThresholdResponse.newBuilder()
-        newBuilder.rewardsThreshold = null
-
-        return newBuilder.build()
+        // TODO (hyunjun) : DB 조회 시 null이 나올 수 있는데 처리를 어떻게 할지? -> null이 나오면 exception을 날리기.
+        throw IllegalArgumentException()
     }
 
     override fun rewardsTypeLimitPublish(
         executionContext: CollectExecutionContext,
-        request: PlccRpcRequest
+        rpcRequest: PlccRpcRequest
     ): CollectcardProto.ListPlccRewardsTypeLimitResponse {
-        TODO("Not yet implemented")
+
+        val requestYearMonth =
+            DateTimeUtil.epochMilliSecondToKSTLocalDateTime(rpcRequest.requestMonthMs.toLong())
+        val stringYearMonth = convertStringYearMonth(requestYearMonth)
+
+        val typeLimits =
+            plccCardTypeLimitRepository.findAllByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardIdAndBenefitYearMonth(
+                banksaladUserId = executionContext.userId.toLong(),
+                cardCompanyId = executionContext.organizationId,
+                cardCompanyCardId = rpcRequest.cardId,
+                benefitYearMonth = stringYearMonth.yearMonth ?: ""
+            )
+
+        val protoTypeLimits = typeLimits.map { plccCardRewardsConvertService.toTypeLimitProto(it) }.toList()
+
+        return CollectcardProto.ListPlccRewardsTypeLimitResponse
+            .newBuilder()
+            .addAllRewardsTypeLimit(protoTypeLimits)
+            .build()
     }
 }

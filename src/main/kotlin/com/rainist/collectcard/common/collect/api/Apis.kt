@@ -18,7 +18,8 @@ enum class Transaction {
     billTransactionExpected,
     loan,
     creditLimit,
-    plccCardTransaction
+    plccCardTransaction,
+    plccCardReward
 }
 
 class Apis {

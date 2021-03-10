@@ -1,14 +1,18 @@
 package com.rainist.collectcard.plcc.common.util
 
+import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardThreshold
+import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardTypeLimit
 import com.rainist.collectcard.plcc.common.db.entity.PlccCardThresholdEntity
 import com.rainist.collectcard.plcc.common.db.entity.PlccCardThresholdHistoryEntity
 import com.rainist.collectcard.plcc.common.db.entity.PlccCardTypeLimitEntity
 import com.rainist.collectcard.plcc.common.db.entity.PlccCardTypeLimitHistoryEntity
+import java.math.BigDecimal
+import java.time.LocalDateTime
 
 class PlccCardRewardsUtil {
 
     companion object {
-        fun makeThresholdHisotryEntity(entity: PlccCardThresholdEntity): PlccCardThresholdHistoryEntity {
+        fun makeThresholdHistoryEntity(entity: PlccCardThresholdEntity): PlccCardThresholdHistoryEntity {
             return PlccCardThresholdHistoryEntity().apply {
                 this.plccCardBenefitLimitId = entity.plccCardBenefitLimitId
                 this.banksaladUserId = entity.banksaladUserId
@@ -61,6 +65,79 @@ class PlccCardRewardsUtil {
                 this.lastCheckAt = entity.lastCheckAt
                 this.createdAt = entity.createdAt
                 this.updatedAt = entity.updatedAt
+            }
+        }
+
+        fun makeThresholdEntity(
+            banksaladUserId: Long,
+            organizationId: String,
+            cardId: String,
+            inquiryYearMonth: String?,
+            threshold: PlccCardThreshold?,
+            now: LocalDateTime
+        ): PlccCardThresholdEntity {
+            return PlccCardThresholdEntity().also { entity ->
+                entity.banksaladUserId = banksaladUserId
+                entity.cardCompanyId = organizationId
+                entity.cardCompanyCardId = cardId
+                entity.benefitYearMonth = inquiryYearMonth
+                entity.outcomeStartDay = threshold?.outcomeStartDate ?: ""
+                entity.outcomeEndDay = threshold?.outcomeEndDate ?: ""
+                entity.isOutcomeDelay = threshold?.isOutcomeDelay
+                // not null
+                entity.beforeMonthCriteriaUseAmount = threshold?.beforeMonthCriteriaUseAmount ?: BigDecimal("0.0000")
+                entity.outcomeCriteriaAmount = threshold?.outcomeCriteriaAmount
+                // not null
+                entity.totalBenefitAmount = threshold?.totalBenefitAmount ?: BigDecimal("0.0000")
+                entity.totalBenefitCount = threshold?.totalBenefitCount
+                entity.totalSalesAmount = threshold?.totalSalesAmount
+                entity.monthlyBenefitRate = threshold?.monthlyBenefitRate
+                entity.monthlyBenefitAmount = null
+                // not null
+                entity.monthlyBenefitLimit = threshold?.monthlyBenefitLimit ?: BigDecimal("0.0000")
+                entity.cashbackAmount = threshold?.cashbackAmount
+                entity.benefitMessage = threshold?.message
+                entity.promotionCode = threshold?.promotionCode?.name.toString()
+                entity.lastCheckAt = now
+            }
+        }
+
+        fun makePlccCardTypeLimitEntity(
+            banksaladUserId: Long,
+            cardCompanyId: String,
+            cardCompanyCardId: String,
+            benefitYearMonth: String?,
+            outcomeStartDay: String,
+            outcomeEndDay: String,
+            plccCardTypeLimit: PlccCardTypeLimit,
+            now: LocalDateTime
+        ): PlccCardTypeLimitEntity {
+            return PlccCardTypeLimitEntity().also { entity ->
+                entity.banksaladUserId = banksaladUserId
+                entity.cardCompanyId = cardCompanyId
+                entity.cardCompanyCardId = cardCompanyCardId
+                entity.benefitYearMonth = benefitYearMonth
+                entity.outcomeStartDay = outcomeStartDay
+                entity.outcomeEndDay = outcomeEndDay
+                // not null
+                entity.benefitName = plccCardTypeLimit.benefitName ?: ""
+                entity.benefitCode = plccCardTypeLimit.benefitCode
+                entity.discountAmount = null
+                entity.discountRate = plccCardTypeLimit.discountRate
+                // not null
+                entity.totalLimitAmount = plccCardTypeLimit.totalLimitAmount ?: BigDecimal("0.0000")
+                // not null
+                entity.appliedAmount = plccCardTypeLimit.appliedAmount ?: BigDecimal("0.0000")
+                // not null
+                entity.limitRemainingAmount = plccCardTypeLimit.limitRemainingAmount ?: BigDecimal("0.0000")
+                entity.totalLimitCount = plccCardTypeLimit.totalLimitCount
+                entity.appliedCount = plccCardTypeLimit.appliedCount
+                entity.limitRemainingCount = plccCardTypeLimit.limitRemainingCount
+                entity.totalSalesLimitAmount = plccCardTypeLimit.totalSalesLimitAmount
+                entity.appliedSaleAmount = plccCardTypeLimit.appliedSalesAmount
+                entity.limitRemainingSalesAmount = plccCardTypeLimit.limitRemainingSalesAmount
+                entity.serviceType = plccCardTypeLimit.serviceType?.code.toString()
+                entity.lastCheckAt = now
             }
         }
     }
