@@ -44,7 +44,7 @@ lottecard:
   organizationId: lottecard
   objectId:
   plcc:
-    host: https://124.243.96.60
+    host: https://lottecard.co.kr:8443
 
 cipher:
   iv:

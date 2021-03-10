@@ -11,7 +11,5 @@ data class PlccCardTransactionRequestDataHeader(
 
 data class PlccCardTransactionRequestDataBody(
     var inquiryYearMonth: String? = null, // 조회년월
-    var cardNumber: String? = null, // 카드번호
-    var productCode: String? = null, // 상품코드
-    var inquiryCode: String? = null // 조회코드
+    var cardNumber: String? = null // 카드번호
 )

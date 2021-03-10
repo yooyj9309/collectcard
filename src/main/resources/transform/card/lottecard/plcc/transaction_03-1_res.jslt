@@ -1,5 +1,30 @@
-{
-    {
+let CardTransactionType = {
+    "": "APPROVAL",                         //  승인
+    "2": "APPROVAL_CANCEL",                 //  승인취소
+}
 
-    }
+{
+    "totalBenefitCount" : .total_benefit_count,
+    "totalBenefitAmount" : .total_benefit_amount,
+    "totalSalesAmount" : .total_sales_amount,
+    "responseCode" : .response_code,
+    "transactionListCount" : .transaction_list_count,
+    "transactionList": [for (.transaction_list)
+        {
+            "serviceCode" : .service_code,
+            "serviceName" : .service_name,
+            "serviceType" : .service_type,
+            "approvalDay" : .approval_day,
+            "approvalTime" : .approval_time,
+            "approvalNumber" : .approval_number,
+            "amount" : .amount,
+            "discount_amount" : .discount_amount,
+            "discount_rate" : .discount_rate,
+            "isInstallmentPayment" : .is_installment_payment,
+            "installment" : .installment,
+            "storeNumber" : .store_number,
+            "storeName" : .store_name,
+            "approvalCancelType" : .approval_cancel_type
+        }
+    ]
 }

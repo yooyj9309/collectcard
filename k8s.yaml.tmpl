@@ -60,6 +60,13 @@
   {{ $mysql_cidr_c = "10.131.3.224/28" }}
 {{ end }}
 
+{{ $lottecard_hostalias_name := "lottecard.co.kr" }}
+{{ $lottecard_hostalias_ip := "124.243.96.60" }}
+{{ if eq $env "production" }}
+  {{ $lottecard_hostalias_name = "lottecard.co.kr" }}
+  {{ $lottecard_hostalias_ip = "124.243.96.33" }}
+{{ end }}
+
 
 ---
 kind: ConfigMap
@@ -172,6 +179,10 @@ spec:
           configMap:
             name: {{ $service_name }}-telegraf
             defaultMode: 420
+      hostAliases:
+      - ip: {{ $lottecard_hostalias_ip }}
+        hostnames:
+        - {{ $lottecard_hostalias_name }}
       containers:
         - name: telegraf
           image: telegraf:{{ $telegraf_tag }}

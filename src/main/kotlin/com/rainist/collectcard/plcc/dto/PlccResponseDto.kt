@@ -20,8 +20,8 @@ data class PlccResponseDto(
         return this
     }
 
-    fun success(cid: String?): PlccResponseDto {
-        this.plccResultDto = PlccResultDto().success()
+    fun success(cid: String?, message: String?): PlccResponseDto {
+        this.plccResultDto = PlccResultDto().success(message)
         this.cid = cid
         return this
     }

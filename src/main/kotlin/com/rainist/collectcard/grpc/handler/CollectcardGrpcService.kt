@@ -28,6 +28,8 @@ import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.collectcard.common.service.UuidService
 import com.rainist.collectcard.config.grpc.onException
+import com.rainist.collectcard.plcc.cardtransactions.PlccCardTransactionPublishService
+import com.rainist.collectcard.plcc.cardtransactions.PlccCardTransactionService
 import com.rainist.common.interceptor.StatsUnaryServerInterceptor
 import com.rainist.common.log.Log
 import io.grpc.stub.StreamObserver
@@ -55,7 +57,9 @@ class CollectcardGrpcService(
     val cardLoanPublishService: CardLoanPublishService,
     val creditLimitPublishService: CreditLimitPublishService,
     val meterRegistry: MeterRegistry,
-    val localDatetimeService: LocalDatetimeService
+    val localDatetimeService: LocalDatetimeService,
+    val plccCardTransactionService: PlccCardTransactionService,
+    val plccCardTransactionPublishService: PlccCardTransactionPublishService
 ) : CollectcardGrpc.CollectcardImplBase() {
 
     companion object : Log
@@ -335,6 +339,33 @@ class CollectcardGrpcService(
             responseObserver.onCompleted()
         }.onFailure {
             // CollectcardServiceExceptionHandler.handle(executionContext, "getSyncStatus", "유저데이터초기화", it)
+            responseObserver.onError(it)
+        }
+    }
+
+    override fun listPlccRewardsTransactions(
+        request: CollectcardProto.ListPlccRewardsTransactionsRequest,
+        responseObserver: StreamObserver<CollectcardProto.ListPlccRewardsTransactionsResponse>
+    ) {
+
+        val executionContext = CollectExecutionContext(
+            executionRequestId = uuidService.generateExecutionRequestId(),
+            organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId
+                ?: "",
+            userId = request.userId
+        )
+
+        // TODO Log 삭제
+        logger.Warn("PLCC listPlccRewardsTransactions context : {}", executionContext)
+
+        kotlin.runCatching {
+            plccCardTransactionService.plccCardTransactions(executionContext, request)
+            plccCardTransactionPublishService.plccCardTransactionPublish(executionContext, request)
+        }.onSuccess {
+            responseObserver.onNext(it)
+            responseObserver.onCompleted()
+        }.onFailure {
+            CollectcardServiceExceptionHandler.handle(executionContext, "listPlccRewardsTransactions", "PLCC 혜택 거래적용내역 오류", it)
             responseObserver.onError(it)
         }
     }

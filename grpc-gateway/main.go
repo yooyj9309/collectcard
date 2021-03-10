@@ -5,13 +5,12 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/banksalad/idl/gen/go/apis/v1/collectcard"
+	"github.com/banksalad/idl/gen/go/apis/v1/result"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
-
-	"github.com/rainist/idl/gen/go/apis/external/v1/result"
-	"github.com/rainist/idl/gen/go/apis/v1/collectcard"
 )
 
 func wildcardHeaderMatcher(key string) (string, bool) {

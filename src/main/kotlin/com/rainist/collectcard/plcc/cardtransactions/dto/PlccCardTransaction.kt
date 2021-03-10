@@ -48,5 +48,5 @@ data class PlccCardTransaction(
     var storeName: String? = null,
 
     @NotNull
-    var approvalCancelType: String? = null
+    var approvalCancelType: String? = null // 정상 0, 취소 1
 )

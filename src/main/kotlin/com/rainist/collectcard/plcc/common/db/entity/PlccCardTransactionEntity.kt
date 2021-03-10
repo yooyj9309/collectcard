@@ -100,6 +100,7 @@ data class PlccCardTransactionEntity(
 
     var benefitName: String? = null,
 
+    @Column(name = "serviceType")
     var benefitType: String? = null,
 
     var lastCheckAt: LocalDateTime? = null,

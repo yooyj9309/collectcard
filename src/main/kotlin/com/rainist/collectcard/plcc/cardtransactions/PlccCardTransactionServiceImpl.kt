@@ -1,5 +1,7 @@
 package com.rainist.collectcard.plcc.cardtransactions
 
+import com.github.banksalad.idl.apis.v1.collectcard.CollectcardProto
+import com.rainist.collect.common.execution.Execution
 import com.rainist.collect.common.execution.ExecutionRequest
 import com.rainist.collect.common.execution.ExecutionResponse
 import com.rainist.collect.executor.CollectExecutorService
@@ -10,11 +12,18 @@ import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.OrganizationService
+import com.rainist.collectcard.common.service.UuidService
+import com.rainist.collectcard.grpc.handler.CollectcardGrpcService
+import com.rainist.collectcard.grpc.handler.CollectcardGrpcService.Companion.Warn
+import com.rainist.collectcard.plcc.cardtransactions.dto.PlccCardTransaction
 import com.rainist.collectcard.plcc.cardtransactions.dto.PlccCardTransactionRequest
 import com.rainist.collectcard.plcc.cardtransactions.dto.PlccCardTransactionRequestDataBody
-import com.rainist.collectcard.plcc.cardtransactions.dto.PlccCardTransactionRequestDataHeader
 import com.rainist.collectcard.plcc.cardtransactions.dto.PlccCardTransactionResponse
+import com.rainist.collectcard.plcc.common.db.repository.PlccCardTransactionRepository
 import com.rainist.common.service.ValidationService
+import com.rainist.common.util.DateTimeUtil
+import java.time.LocalDate
+import java.time.LocalDateTime
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 
@@ -23,44 +32,95 @@ class PlccCardTransactionServiceImpl(
     val headerService: HeaderService,
     val organizationService: OrganizationService,
     val collectExecutorService: CollectExecutorService,
-    val validationService: ValidationService
+    val validationService: ValidationService,
+    val uuidService: UuidService,
+    val plccCardTransactionRepository: PlccCardTransactionRepository,
+    val plccCardTransactionConvertService: PlccCardTransactionConvertService
 
 ) : PlccCardTransactionService {
 
-    override fun plccCardTransactions(executionContext: CollectExecutionContext): PlccCardTransactionResponse {
-        val banksaladUserId = executionContext.userId.toLong()
-        val organizationId = executionContext.organizationId
-        val organization = organizationService.getOrganizationByObjectId(organizationId)
+    override fun plccCardTransactions(executionContext: CollectExecutionContext, plccCardTransactionRequest: CollectcardProto.ListPlccRewardsTransactionsRequest) {
 
         val executions = Executions.valueOf(
-            BusinessType.card,
+            BusinessType.plcc,
             Organization.lottecard,
             Transaction.plccCardTransaction
         )
 
-        val request = ExecutionRequest.builder<PlccCardTransactionRequest>()
+        // req
+        val request = makePlccTransactionRequest(plccCardTransactionRequest)
+
+        // TODO Log 삭제
+        CollectcardGrpcService.logger.Warn("PLCC listPlccRewardsTransactions request : {}", request)
+
+        // send
+        val executionResponse: ExecutionResponse<PlccCardTransactionResponse> = plccTransactionExecute(executionContext, executions, request)
+
+        CollectcardGrpcService.logger.Warn("PLCC listPlccRewardsTransactions res : {}", executionResponse)
+
+        // validation
+        val transactions = plccTransactionValidate(executionResponse)
+
+        // DB Insert
+        savePlccTransactions(executionContext, plccCardTransactionRequest, transactions)
+    }
+
+    // insert ( 혜택, 적용내역의 경우 데이터가 변경되지 않음으로(취소내역은 새로운 row 한줄, 승인시간이 변경 된다.), insert 만 진행 )
+    fun savePlccTransactions(
+        executionContext: CollectExecutionContext,
+        plccCardTransactionRequest: CollectcardProto.ListPlccRewardsTransactionsRequest,
+        transactions: List<PlccCardTransaction>
+    ) {
+        transactions.forEach { plccCardTransaction ->
+            val approvalDay = DateTimeUtil.stringToLocalDate(plccCardTransaction.approvalDay.toString(), "yyyyMMdd")
+            val yearMonth = convertStringYearMonth(approvalDay)
+            val now = DateTimeUtil.utcNowLocalDateTime()
+
+            val prevEntity = plccCardTransactionRepository.findByApprovalYearMonthAndBanksaladUserIdAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
+                yearMonth.yearMonth,
+                executionContext.userId.toLong(),
+                executionContext.organizationId,
+                plccCardTransactionRequest.cardId.value,
+                plccCardTransaction.approvalNumber,
+                plccCardTransaction.approvalDay,
+                plccCardTransaction.approvalTime
+            )
+
+            if (prevEntity == null) {
+                val entity = plccCardTransactionConvertService.plccCardTransactionToEntity(plccCardTransaction, executionContext.userId.toLong(), executionContext.organizationId, plccCardTransactionRequest.cardId.value, yearMonth.yearMonth, now)
+                plccCardTransactionRepository.save(entity)
+            } else {
+                prevEntity.lastCheckAt = now
+                plccCardTransactionRepository.save(prevEntity)
+            }
+        }
+    }
+
+    fun makePlccTransactionRequest(plccCardTransactionRequest: CollectcardProto.ListPlccRewardsTransactionsRequest): ExecutionRequest<PlccCardTransactionRequest> {
+        return ExecutionRequest.builder<PlccCardTransactionRequest>()
             .headers(
                 headerService.makeHeader(MediaType.APPLICATION_JSON_VALUE)
             )
             .request(
                 PlccCardTransactionRequest().apply {
-                this.dataHeader = PlccCardTransactionRequestDataHeader()
-                this.dataBody = PlccCardTransactionRequestDataBody().apply {
-                        // TODO STEVE GRPC Request Mapping
-                        this.cardNumber = ""
-                        this.inquiryYearMonth = ""
-                        this.inquiryCode = organization.screenInquiryCode
-                        this.productCode = organization.benefitProductCode
+                    val requestYearMonth = DateTimeUtil.epochMilliSecondToKSTLocalDateTime(plccCardTransactionRequest.requestMonthMs.value)
+                    val stringYearMonth = convertStringYearMonth(requestYearMonth)
+
+                    this.dataBody = PlccCardTransactionRequestDataBody().apply {
+                        this.cardNumber = plccCardTransactionRequest.cardId.value
+                        this.inquiryYearMonth = stringYearMonth.yearMonth
                     }
                 }
             )
             .build()
+    }
 
-        // Req
-        val executionResponse: ExecutionResponse<PlccCardTransactionResponse> = collectExecutorService.execute(executionContext, executions, request)
+    fun plccTransactionExecute(executionContext: CollectExecutionContext, executions: Execution, request: ExecutionRequest<PlccCardTransactionRequest>): ExecutionResponse<PlccCardTransactionResponse> {
+        return collectExecutorService.execute(executionContext, executions, request)
+    }
 
-        // Validation
-        val transactions = executionResponse.response?.dataBody
+    fun plccTransactionValidate(executionResponse: ExecutionResponse<PlccCardTransactionResponse>): List<PlccCardTransaction> {
+        return executionResponse.response?.dataBody
             .let { plccCardTransactionResponseDataBody ->
                 plccCardTransactionResponseDataBody?.transactionList
             }
@@ -69,11 +129,29 @@ class PlccCardTransactionServiceImpl(
             }
             ?.toList()
             ?: listOf()
+    }
+}
 
-        // TODO DB SAVE
+// TODO DateTimeUtil 로 옮기기
 
-        return executionResponse.response.apply {
-            dataBody?.transactionList = transactions
-        }
+data class StringYearMonth(
+    var year: String? = null,
+    var month: String? = null,
+    var yearMonth: String? = null
+)
+
+fun convertStringYearMonth(date: LocalDate): StringYearMonth {
+    return StringYearMonth().apply {
+        this.year = date.year.toString()
+        this.month = if (date.monthValue.toString().length == 2) date.monthValue.toString() else "0${date.monthValue}"
+    }
+}
+
+fun convertStringYearMonth(date: LocalDateTime): StringYearMonth {
+    return StringYearMonth().apply {
+        this.year = date.year.toString()
+        // mm 의 경우 01,02,03,04 로 보내야 하므로, length() 2가 아닌 경우 0 padding
+        this.month = if (date.monthValue.toString().length == 2) date.monthValue.toString() else "0${date.monthValue}"
+        this.yearMonth = "${this.year}${this.month}"
     }
 }

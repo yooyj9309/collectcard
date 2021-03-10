@@ -57,6 +57,8 @@ import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.collectcard.common.service.UuidService
 import com.rainist.collectcard.grpc.client.ConnectClientServiceTest
+import com.rainist.collectcard.plcc.cardtransactions.PlccCardTransactionPublishService
+import com.rainist.collectcard.plcc.cardtransactions.PlccCardTransactionService
 import com.rainist.common.util.DateTimeUtil
 import io.grpc.internal.testing.StreamRecorder
 import io.micrometer.core.instrument.MeterRegistry
@@ -136,6 +138,12 @@ internal class CollectcardGrpcServiceUnitTests {
         userId = "1",
         startAt = null
     )
+
+    @MockBean
+    lateinit var plccCardTransactionService: PlccCardTransactionService
+
+    @MockBean
+    lateinit var plccCardTransactionPublishService: PlccCardTransactionPublishService
 
     @BeforeEach
     fun before() {
@@ -528,5 +536,10 @@ internal class CollectcardGrpcServiceUnitTests {
 
         Assertions.assertEquals(1, results.size)
         Assertions.assertEquals(expect, results[0])
+    }
+
+    @Test
+    @DisplayName("PLCC 혜택 적용 내역 테스트")
+    fun plccTransactionUnitTest() {
     }
 }

@@ -1,15 +1,18 @@
 package com.rainist.collectcard.plcc.controller
 
+import com.rainist.collectcard.common.service.EncodeService
+import com.rainist.collectcard.plcc.cardchange.dto.PlccCardChangeRequestDto
 import com.rainist.collectcard.plcc.dto.PlccIssueCardRequestDto
 import com.rainist.collectcard.plcc.dto.PlccResponseDto
 import com.rainist.collectcard.plcc.service.PlccCardService
 import com.rainist.common.log.Log
 import com.rainist.common.service.ObjectMapperService
-import org.springframework.http.HttpEntity
+import java.nio.charset.Charset
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -17,18 +20,43 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/v1/plcc")
 class PlccApiController(
     val plccCardService: PlccCardService,
-    val objectMapperService: ObjectMapperService
+    val objectMapperService: ObjectMapperService,
+    val encodeService: EncodeService
 ) {
 
     companion object : Log
 
     @PostMapping(path = ["/lottecard/card/issue"])
-    fun issue(entity: HttpEntity<String>): ResponseEntity<String> {
+    fun issue(@RequestBody plccIssueCardRequestDto: PlccIssueCardRequestDto): ResponseEntity<PlccResponseDto> {
 
-        val request = objectMapperService.toObject(entity.body.toString(), PlccIssueCardRequestDto::class.java)
+        logger.Warn("PlccApiController issue before : {}", plccIssueCardRequestDto)
 
-        val cid = request?.cardList?.getOrNull(0)?.cid
-        return ResponseEntity(objectMapperService.toJson(PlccResponseDto().success(cid)), HttpStatus.OK)
+        // TODO 테스트를 위해서 BASE64로 통신중 롯데카드 완료되면 수정 필요
+        plccIssueCardRequestDto.cardList.forEach {
+            it.ownerType = encodeService.base64Decode(it.ownerType, Charset.forName("MS949"))
+            it.cardProductName = encodeService.base64Decode(it.cardProductName, Charset.forName("MS949"))
+            it.cardOwnerName = encodeService.base64Decode(it.cardOwnerName, Charset.forName("MS949"))
+        }
+
+        logger.Warn("PlccApiController issue after : {}", plccIssueCardRequestDto)
+
+        val cid = plccIssueCardRequestDto.cardList.getOrNull(0)?.cid
+
+        return ResponseEntity(
+            PlccResponseDto().success(cid, encodeService.base64Encode("정상처리 되었습니다", Charset.forName("MS949"))),
+            HttpStatus.OK
+        )
+    }
+
+    @PostMapping(path = ["/lottecard/card/change"])
+    fun change(@RequestBody plccCardChangeRequestDto: PlccCardChangeRequestDto): ResponseEntity<PlccResponseDto> {
+        logger.Warn("PLCC Change Req : {}", plccCardChangeRequestDto)
+
+        val cid = plccCardChangeRequestDto.cid
+        return ResponseEntity(
+            PlccResponseDto().success(cid, encodeService.base64Encode("정상처리 되었습니다", Charset.forName("MS949"))),
+            HttpStatus.OK
+        )
     }
 
     @GetMapping("/ping")

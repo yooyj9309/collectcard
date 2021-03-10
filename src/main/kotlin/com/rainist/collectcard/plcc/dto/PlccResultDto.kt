@@ -15,8 +15,8 @@ data class PlccResultDto(
         return this
     }
 
-    fun success(cid: String?): PlccResultDto {
-        this.message = "정상처리되었습니다."
+    fun success(message: String?): PlccResultDto {
+        this.message = message
         this.code = "OK"
         return this
     }

@@ -5,8 +5,6 @@ import com.github.banksalad.idl.apis.v1.plcc.PlccGrpc
 import com.github.banksalad.idl.apis.v1.plcc.PlccProto
 import com.rainist.collectcard.plcc.dto.PlccCardDto
 import com.rainist.collectcard.plcc.dto.SyncType
-import com.rainist.common.util.DateTimeUtil
-import java.time.ZoneOffset
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
@@ -37,8 +35,8 @@ class PlccClientService(
                         // .setOwnerName(StringValue.of(it.cardOwnerName))
 //                        .setExternalState(StringValue.of(parseExternalState()))
                         .setStatus(cardIssueStatusToProtoEnum(it.cardIssueStatus))
-                        .setIssuedAtMs(DateTimeUtil.stringDateTimeToEpochMilliSecond(it.issuedDay, "yyyyMMdd", ZoneOffset.UTC))
-                        .setExpiresAtMs(DateTimeUtil.stringDateTimeToEpochMilliSecond(it.expiresYearMonth, "yyyyMM", ZoneOffset.UTC))
+                        // .setIssuedAtMs(DateTimeUtil.stringDateTimeToEpochMilliSecond(it.issuedDay, "yyyyMMdd", ZoneOffset.UTC))
+                        // .setExpiresAtMs(DateTimeUtil.stringDateTimeToEpochMilliSecond(it.expiresYearMonth, "yyyyMM", ZoneOffset.UTC))
                         .build()
                 }
             )
@@ -47,7 +45,7 @@ class PlccClientService(
         return plccBlockingStub.syncPlccsByCollectcardData(request)
     }
 
-    private fun syncTypetoProtoEnum(syncType: SyncType): PlccProto.SyncUserPlccType {
+    private fun syncTypetoProtoEnum(syncType: SyncType?): PlccProto.SyncUserPlccType {
         return when (syncType) {
             SyncType.ISSUED -> PlccProto.SyncUserPlccType.SYNC_PLCC_TYPE_ISSUED
             SyncType.STATUS_UPDATED -> PlccProto.SyncUserPlccType.SYNC_PLCC_TYPE_STATUS_UPDATED
@@ -55,7 +53,7 @@ class PlccClientService(
         }
     }
 
-    private fun cardIssueStatusToProtoEnum(statusCode: String): CardProto.CardStatus {
+    private fun cardIssueStatusToProtoEnum(statusCode: String?): CardProto.CardStatus {
         return when (statusCode) {
             "00" -> CardProto.CardStatus.CARD_STATUS_REGISTERED
             "01" -> CardProto.CardStatus.CARD_STATUS_REGISTERED
