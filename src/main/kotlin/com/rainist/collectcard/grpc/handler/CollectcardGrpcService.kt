@@ -28,6 +28,9 @@ import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.collectcard.common.service.UuidService
 import com.rainist.collectcard.config.grpc.onException
+import com.rainist.collectcard.plcc.cardrewards.PlccCardRewardsPublishService
+import com.rainist.collectcard.plcc.cardrewards.PlccCardRewardsService
+import com.rainist.collectcard.plcc.cardrewards.dto.PlccRpcRequest
 import com.rainist.collectcard.plcc.cardtransactions.PlccCardTransactionPublishService
 import com.rainist.collectcard.plcc.cardtransactions.PlccCardTransactionService
 import com.rainist.common.interceptor.StatsUnaryServerInterceptor
@@ -59,7 +62,9 @@ class CollectcardGrpcService(
     val meterRegistry: MeterRegistry,
     val localDatetimeService: LocalDatetimeService,
     val plccCardTransactionService: PlccCardTransactionService,
-    val plccCardTransactionPublishService: PlccCardTransactionPublishService
+    val plccCardTransactionPublishService: PlccCardTransactionPublishService,
+    val plccCardRewardsService: PlccCardRewardsService,
+    val plccCardRewardsPublishService: PlccCardRewardsPublishService
 ) : CollectcardGrpc.CollectcardImplBase() {
 
     companion object : Log
@@ -365,7 +370,42 @@ class CollectcardGrpcService(
             responseObserver.onNext(it)
             responseObserver.onCompleted()
         }.onFailure {
-            CollectcardServiceExceptionHandler.handle(executionContext, "listPlccRewardsTransactions", "PLCC 혜택 거래적용내역 오류", it)
+            CollectcardServiceExceptionHandler.handle(
+                executionContext,
+                "listPlccRewardsTransactions",
+                "PLCC 혜택 거래적용내역 오류",
+                it
+            )
+            responseObserver.onError(it)
+        }
+    }
+
+    override fun getPlccRewardsThreshold(
+        request: CollectcardProto.GetPlccRewardsThresholdRequest,
+        responseObserver: StreamObserver<CollectcardProto.GetPlccRewardsThresholdResponse>
+    ) {
+        /* ExecutionContext */
+        val executionContext = CollectExecutionContext(
+            executionRequestId = uuidService.generateExecutionRequestId(),
+            organizationId = organizationService.getOrganizationByOrganizationId(request.companyId.value)?.organizationId
+                ?: "",
+            userId = request.userId
+        )
+
+        /** getPlccCardRewards는 하나의 api로 요청하지만 rpc는 2개로 나눠져서
+         *  매개변수의 타입을 rpc request 하나로 특정할 수 없다.
+         *  공통적으로 사용하는 cardId, requestMonthMs를 담은 plccRpcRequest를 생성해 넘긴다.
+         */
+        val plccRpcRequest = PlccRpcRequest(request.cardId.toString(), request.requestMonthMs.toString())
+
+        kotlin.runCatching {
+            plccCardRewardsService.getPlccCardRewards(executionContext, plccRpcRequest)
+            plccCardRewardsPublishService.rewardsThresholdPublish(executionContext, plccRpcRequest)
+        }.onSuccess {
+            responseObserver.onNext(it)
+            responseObserver.onCompleted()
+        }.onFailure {
+            CollectcardServiceExceptionHandler.handle(executionContext, "getPlccRewardsThreshold", "혜택별 실적조회", it)
             responseObserver.onError(it)
         }
     }

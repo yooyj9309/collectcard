@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Profile
 
 @Configuration
 @DependsOn("nettyPidSetting")
-@Profile(value = ["development", "staging", "production"])
+@Profile(value = ["local", "development", "staging", "production"])
 class PlccClientConfig(
     @Value("\${plcc-server.uri}")
     private var plccUri: String,
