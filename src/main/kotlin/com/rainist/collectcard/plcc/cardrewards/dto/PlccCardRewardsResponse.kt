@@ -11,5 +11,5 @@ data class PlccCardRewardsResponseDataHeader(
 
 data class PlccCardRewardsResponseDataBody(
     var plccCardThreshold: PlccCardThreshold? = null,
-    var benefitList: MutableList<PlccCardTypeLimit>? = null // 혜택실적한도적용내역
+    var benefitList: List<PlccCardTypeLimit> = listOf() // 혜택실적한도적용내역
 )

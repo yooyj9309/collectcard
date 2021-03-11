@@ -8,7 +8,9 @@ import com.rainist.collectcard.cardcreditlimit.dto.CreditLimitResponse
 import com.rainist.collectcard.cardloans.dto.ListLoansResponse
 import com.rainist.collectcard.cardloans.dto.Loan
 import com.rainist.collectcard.cardtransactions.dto.ListTransactionsResponse
+import com.rainist.collectcard.common.collect.api.LottecardPlccApis
 import com.rainist.collectcard.common.collect.api.ShinhancardApis
+import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsResponse
 
 class MockExecutions {
     companion object {
@@ -116,6 +118,13 @@ class MockExecutions {
             Execution.create()
                 .exchange(ShinhancardApis.card_shinhancard_credit_limit)
                 .to(CreditLimitResponse::class.java)
+                .build()
+
+        // 02-1. 혜택별 실적한도 조회(API)
+        val lottecardPlccRewards =
+            Execution.create()
+                .exchange(LottecardPlccApis.card_lottecard_plcc_rewards)
+                .to(PlccCardRewardsResponse::class.java)
                 .build()
     }
 }

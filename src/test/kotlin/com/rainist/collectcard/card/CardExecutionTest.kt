@@ -25,7 +25,7 @@ import org.springframework.web.client.RestTemplate
 
 @ExtendWith(SpringExtension::class)
 @SpringBootTest()
-@DisplayName("카Execution 테스트")
+@DisplayName("카드 Execution 테스트")
 class CardExecutionTest {
 
     @Autowired

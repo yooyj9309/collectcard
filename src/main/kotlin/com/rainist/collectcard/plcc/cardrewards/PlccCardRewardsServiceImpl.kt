@@ -91,18 +91,7 @@ class PlccCardRewardsServiceImpl(
         val executionResponse: ExecutionResponse<PlccCardRewardsResponse> =
             collectExecutorService.execute(executionContext, execution, executionRequest)
 
-        val encodingflag = false
-        if (encodingflag) {
-            // response_message, benefit_name
-            executionResponse.response?.dataBody?.plccCardThreshold?.apply {
-                this.responseMessage = encodeService.base64Decode(this.responseMessage, Charset.forName("MS949"))
-            }
-
-            executionResponse.response?.dataBody?.benefitList?.forEach { plccCardTypeLimit ->
-                plccCardTypeLimit.benefitName =
-                    encodeService.base64Decode(plccCardTypeLimit.benefitName, Charset.forName("MS949"))
-            }
-        }
+        decodeKoreanFields(executionResponse)
 
         // TODO : DTO에 validation 어노테이션 추가 필요
         val benefitList = (executionResponse.response?.dataBody?.benefitList?.mapNotNull { plccCardRewardsTypeLimit ->
@@ -140,6 +129,21 @@ class PlccCardRewardsServiceImpl(
 
         return executionResponse.response.apply {
             dataBody?.benefitList = benefitList
+        }
+    }
+
+    private fun decodeKoreanFields(executionResponse: ExecutionResponse<PlccCardRewardsResponse>) {
+        val encodingflag = false
+        if (encodingflag) {
+            // response_message, benefit_name
+            executionResponse.response?.dataBody?.plccCardThreshold?.apply {
+                this.responseMessage = encodeService.base64Decode(this.responseMessage, Charset.forName("MS949"))
+            }
+
+            executionResponse.response?.dataBody?.benefitList?.forEach { plccCardTypeLimit ->
+                plccCardTypeLimit.benefitName =
+                    encodeService.base64Decode(plccCardTypeLimit.benefitName, Charset.forName("MS949"))
+            }
         }
     }
 

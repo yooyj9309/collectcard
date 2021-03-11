@@ -13,10 +13,10 @@ let serviceType = {
 
 {
   "dataBody" : {
-    "plccCardRewardsThreshold" : {
+    "plccCardThreshold" : {
         "outcomeStartDate" : .outcome_start_date,
         "outcomeEndDate" : .outcome_end_date,
-        "isOutcomeDelay" : .is_outcome_delay,
+        "isOutcomeDelay" : if(.is_outcome_delay == "Y") true else false,
         "beforeMonthCriteriaUseAmount" : .before_month_criteria_use_amount,
         "outcomeCriteriaAmount" : .outcome_criteria_amount,
         "totalBenefitAmount" : .total_benefit_amount,
@@ -26,13 +26,13 @@ let serviceType = {
         "monthlyBenefitLimit" : .monthly_benefit_limit,
         "cashbackAmount" : .cashback_amount,
         "message" : .message,
-        "promotionCode" : [get-key($promotionCode, .promotion_code, "UNKNOWN")],
+        "promotionCode" : get-key($promotionCode, .promotion_code, "UNKNOWN"),
         "responseCode" : .response_code,
         "responseMessage" : .response_message,
         "benefitListCount" : .benefit_list_count
     },
     "benefitList" : [for (.benefit_list)
-    {
+      {
        "benefitName" : .benefit_name,
        "benefitCode" : .benefit_code,
        "discountRate" : .discount_rate,
@@ -45,7 +45,8 @@ let serviceType = {
        "totalSalesLimitAmount" : .total_sales_amount,
        "appliedSalesAmount" : .apply_sales_amount,
        "limitRemainingSalesAmount" : .remain_limit_sales_amount,
-       "service_type" : [get-key($serviceType, .service_type, "UNKNOWN")]
-    }
+       "serviceType" : get-key($serviceType, .service_type, "UNKNOWN")
+      }
+    ]
   }
 }
