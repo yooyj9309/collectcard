@@ -7,6 +7,7 @@ import com.rainist.collectcard.plcc.dto.PlccResponseDto
 import com.rainist.collectcard.plcc.service.PlccCardService
 import com.rainist.common.log.Log
 import com.rainist.common.service.ObjectMapperService
+import com.rainist.common.util.DateTimeUtil
 import java.nio.charset.Charset
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -38,7 +39,7 @@ class PlccApiController(
             it.cardOwnerName = encodeService.base64Decode(it.cardOwnerName, Charset.forName("MS949"))
         }
 
-        logger.Warn("PlccApiController issue after : {}", plccIssueCardRequestDto)
+        plccCardService.issuePlccCard("lottecard", plccIssueCardRequestDto.ci, plccIssueCardRequestDto.cardList, DateTimeUtil.utcNowLocalDateTime())
 
         val cid = plccIssueCardRequestDto.cardList.getOrNull(0)?.cid
 

@@ -44,6 +44,9 @@ accountbook-server:
 plcc-server:
   uri: dns:///plcc-headless:18081
 
+userv2-server:
+  uri: dns:///userv2-headless:18081
+
 shinhancard:
   clientId: ${DEVELOPMENT_SHINHANCARD_CLIENT_ID}
   organizationObjectid: 596d66692c4069c168b57c59
