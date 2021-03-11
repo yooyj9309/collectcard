@@ -1,10 +1,15 @@
 package com.rainist.collectcard.plcc.common.db.entity
 
+import com.rainist.collectcard.common.enums.CardTransactionType
+import com.rainist.collectcard.common.enums.CardType
+import com.rainist.collectcard.plcc.cardtransactions.enums.PlccCardServiceType
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.EntityListeners
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
@@ -43,7 +48,7 @@ data class PlccCardTransactionEntity(
 
     var cardName: String? = null,
 
-    @Column(nullable = false, name = "card_number_encrypted")
+    @Column(nullable = true, name = "card_number_encrypted")
     var cardNumber: String? = null,
 
     @Column(nullable = true, name = "card_number_mask_encrypted")
@@ -53,6 +58,7 @@ data class PlccCardTransactionEntity(
 
     var canceledAmount: BigDecimal? = null,
 
+    @Column(nullable = false)
     var discountAmount: BigDecimal? = null,
 
     var discountRate: BigDecimal? = null,
@@ -73,12 +79,14 @@ data class PlccCardTransactionEntity(
 
     var storeCategory: String? = null,
 
-    var cardType: String? = null,
+    @Enumerated(EnumType.STRING)
+    var cardType: CardType? = null,
 
     var cardTypeOrigin: String? = null,
 
     @Column(nullable = false)
-    var cardTransactionType: String? = null,
+    @Enumerated(EnumType.STRING)
+    var cardTransactionType: CardTransactionType? = null,
 
     var cardTransactionTypeOrigin: String? = null,
 
@@ -89,6 +97,7 @@ data class PlccCardTransactionEntity(
     @Column(nullable = false, columnDefinition = "BIT", length = 1)
     var isInstallmentPayment: Boolean? = false,
 
+    @Column(nullable = false)
     var installment: Int? = null,
 
     var paymentDay: String? = null,
@@ -98,10 +107,15 @@ data class PlccCardTransactionEntity(
 
     var benefitCode: String? = null,
 
+    var benefitCodeOrigin: String? = null,
+
+    @Column(nullable = false)
     var benefitName: String? = null,
 
-    @Column(name = "serviceType")
-    var benefitType: String? = null,
+    @Enumerated(EnumType.STRING)
+    var serviceType: PlccCardServiceType? = null,
+
+    var serviceTypeOrigin: String? = null,
 
     var lastCheckAt: LocalDateTime? = null,
 

@@ -1,30 +1,55 @@
 let CardTransactionType = {
-    "": "APPROVAL",                         //  승인
-    "2": "APPROVAL_CANCEL",                 //  승인취소
+    "0": "APPROVAL",                        //  승인
+    "1": "APPROVAL_CANCEL",                 //  승인취소
+}
+
+let PlccCardServiceType = {
+    "" : "REWARDS_SERVICE_TYPE_UNKNOWN", // 알수없음
+    "01": "REWARDS_SERVICE_TYPE_CHARGE_DISCOUNT",   // 청구할인
+    "02" : "REWARDS_SERVICE_TYPE_POINT",  // 포인트
+    "03" : "REWARDS_SERVICE_TYPE_INSTALLMENT_REDUCT",  // 할부감면
+}
+
+let ResultCodes = {
+    "": "UNKNOWN",
+    "0000": "OK",
 }
 
 {
-    "totalBenefitCount" : .total_benefit_count,
-    "totalBenefitAmount" : .total_benefit_amount,
-    "totalSalesAmount" : .total_sales_amount,
-    "responseCode" : .response_code,
-    "transactionListCount" : .transaction_list_count,
-    "transactionList": [for (.transaction_list)
-        {
-            "serviceCode" : .service_code,
-            "serviceName" : .service_name,
-            "serviceType" : .service_type,
-            "approvalDay" : .approval_day,
-            "approvalTime" : .approval_time,
-            "approvalNumber" : .approval_number,
-            "amount" : .amount,
-            "discount_amount" : .discount_amount,
-            "discount_rate" : .discount_rate,
-            "isInstallmentPayment" : .is_installment_payment,
-            "installment" : .installment,
-            "storeNumber" : .store_number,
-            "storeName" : .store_name,
-            "approvalCancelType" : .approval_cancel_type
-        }
-    ]
+    "dataHeader": {
+
+    },
+    "dataBody" : {
+        "totalBenefitCount" : .total_benefit_count,
+        "totalBenefitAmount" : .total_benefit_amount,
+        "totalSalesAmount" : .total_sales_amount,
+        "responseCode" : get-key($ResultCodes, .response_code, "UNKNOWN"), // 결과코드
+        "responseMessage" : .response_message,
+        "transactionListCount" : .transaction_list_count,
+        "transactionList": [for (.transaction_list)
+            {
+                "serviceCode" : .service_code,          // 혜택 적용 코드
+                "serviceCodeOrigin" : .service_code,    // 혜택적용코드 원본값
+                "serviceName" : .service_name,          // 서비스명 ( ex. 커피할인, 편의점할인 )
+                "serviceType" : get-key($PlccCardServiceType, .service_type, "REWARDS_SERVICE_TYPE_UNKNOWN"),      // 서비스유형
+                "serviceTypeOrigin" : .service_type,    // 서비스 유형 원본
+                "approvalDay" : .approval_day,          // 승인일자
+                "approvalTime" : .approval_time,        // 승인시간
+                "approvalNumber" : .approval_number,    // 승인번호
+                "amount" : .amount,                     // 매출금액
+                "discountAmount" : .discount_amount,   // 할인금액
+                "discountRate" : .discount_rate,       // 할인율
+                "isInstallmentPayment" : if (.is_installment_payment == "A") false else true,   // 할부여부 A = 일시불, B = 할부
+                "installment" : .installment,   // 할부개월수
+                "storeNumber" : .store_number,  // 가맹점 번호
+                "storeName" : .store_name,      // 가맹점명
+                "cardTransactionType" : get-key($CardTransactionType, .approval_cancel_type, "CARD_TRANSACTION_TYPE_UNKNOWN"),    // 승인 취소 여부
+                "cardTransactionTypeOrigin" : .approval_cancel_type, // 승인 취소 원본값
+                "isOverseaUse" : false, // PLCC 는 국내만
+                "currencyCode" : "KRW", // PLCC 는 국내만
+                "transactionCountry" : "KOREA",  // PLCC 는 국내만
+                "cardType" : "CREDIT" // PLCC 는 신용만
+            }
+        ]
+    }
 }

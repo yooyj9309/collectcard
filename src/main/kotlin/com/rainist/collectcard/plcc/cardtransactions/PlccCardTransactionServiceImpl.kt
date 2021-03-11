@@ -10,6 +10,7 @@ import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.dto.CollectExecutionContext
+import com.rainist.collectcard.common.service.EncodeService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.common.service.UuidService
@@ -22,6 +23,7 @@ import com.rainist.collectcard.plcc.cardtransactions.dto.PlccCardTransactionResp
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardTransactionRepository
 import com.rainist.common.service.ValidationService
 import com.rainist.common.util.DateTimeUtil
+import java.nio.charset.Charset
 import java.time.LocalDate
 import java.time.LocalDateTime
 import org.springframework.http.MediaType
@@ -35,7 +37,8 @@ class PlccCardTransactionServiceImpl(
     val validationService: ValidationService,
     val uuidService: UuidService,
     val plccCardTransactionRepository: PlccCardTransactionRepository,
-    val plccCardTransactionConvertService: PlccCardTransactionConvertService
+    val plccCardTransactionConvertService: PlccCardTransactionConvertService,
+    val encodeService: EncodeService
 
 ) : PlccCardTransactionService {
 
@@ -56,13 +59,29 @@ class PlccCardTransactionServiceImpl(
         // send
         val executionResponse: ExecutionResponse<PlccCardTransactionResponse> = plccTransactionExecute(executionContext, executions, request)
 
-        CollectcardGrpcService.logger.Warn("PLCC listPlccRewardsTransactions res : {}", executionResponse)
-
         // validation
         val transactions = plccTransactionValidate(executionResponse)
 
+        decode(executionResponse)
+
         // DB Insert
         savePlccTransactions(executionContext, plccCardTransactionRequest, transactions)
+    }
+
+    // TODO 인코딩 제거후에는 삭제
+    fun decode(executionResponse: ExecutionResponse<PlccCardTransactionResponse>) {
+
+        executionResponse.response.dataBody?.responseMessage?.let {
+            executionResponse.response.dataBody?.responseMessage = encodeService.base64Decode(it, Charset.forName("MS949"))
+        }
+
+        executionResponse.response.dataBody?.transactionList?.forEach {
+            it.serviceName = encodeService.base64Decode(it.serviceName, Charset.forName("MS949"))
+            it.storeName = encodeService.base64Decode(it.storeName, Charset.forName("MS949"))
+        }
+
+        // TODO Log 삭제
+        CollectcardGrpcService.logger.Warn("PLCC Decode : {}", executionResponse.response)
     }
 
     // insert ( 혜택, 적용내역의 경우 데이터가 변경되지 않음으로(취소내역은 새로운 row 한줄, 승인시간이 변경 된다.), insert 만 진행 )
@@ -144,6 +163,7 @@ fun convertStringYearMonth(date: LocalDate): StringYearMonth {
     return StringYearMonth().apply {
         this.year = date.year.toString()
         this.month = if (date.monthValue.toString().length == 2) date.monthValue.toString() else "0${date.monthValue}"
+        this.yearMonth = "${this.year}${this.month}"
     }
 }
 

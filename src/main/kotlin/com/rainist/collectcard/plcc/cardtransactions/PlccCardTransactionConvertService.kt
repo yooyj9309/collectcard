@@ -3,9 +3,12 @@ package com.rainist.collectcard.plcc.cardtransactions
 import com.github.banksalad.idl.apis.v1.card.CardProto
 import com.github.banksalad.idl.apis.v1.collectcard.CollectcardProto
 import com.github.banksalad.idl.apis.v1.plcc.PlccProto
+import com.rainist.collectcard.common.enums.CardTransactionType
 import com.rainist.collectcard.plcc.cardtransactions.dto.PlccCardTransaction
+import com.rainist.collectcard.plcc.cardtransactions.enums.PlccCardServiceType
 import com.rainist.collectcard.plcc.common.db.entity.PlccCardTransactionEntity
 import com.rainist.common.util.DateTimeUtil
+import java.math.BigDecimal
 import java.time.LocalDateTime
 import org.springframework.stereotype.Service
 
@@ -21,34 +24,36 @@ class PlccCardTransactionConvertService {
             entity.approvalNumber = plccCardTransaction.approvalNumber
             entity.approvalDay = plccCardTransaction.approvalDay
             entity.approvalTime = plccCardTransaction.approvalTime
-            entity.cardName = ""
-            entity.cardNumber = ""
-            entity.cardNumberMask = ""
+            entity.cardName = plccCardTransaction.cardName
+            entity.cardNumber = plccCardTransaction.cardNumber
+            entity.cardNumberMask = plccCardTransaction.cardNumberMask
             entity.amount = plccCardTransaction.amount
-            entity.canceledAmount = if (plccCardTransaction.approvalCancelType == "1") plccCardTransaction.amount else null
+            entity.canceledAmount = if (plccCardTransaction.cardTransactionType == CardTransactionType.APPROVAL_CANCEL) plccCardTransaction.amount else null
             entity.discountAmount = plccCardTransaction.discountAmount
             entity.discountRate = plccCardTransaction.discountRate
-            entity.partialCanceledAmount = null
-            entity.tax = null
-            entity.serviceChargeAmount = null
-            entity.netSalesAmount = null
-            entity.businessLicenseNumber = null
+            entity.partialCanceledAmount = plccCardTransaction.partialCanceledAmount
+            entity.tax = plccCardTransaction.tax
+            entity.serviceChargeAmount = plccCardTransaction.serviceChargeAmount
+            entity.netSalesAmount = plccCardTransaction.netSalesAmount
+            entity.businessLicenseNumber = plccCardTransaction.businessLicenseNumber
             entity.storeName = plccCardTransaction.storeName
             entity.storeNumber = plccCardTransaction.storeNumber
-            entity.storeCategory = null
-            entity.cardType = null
-            entity.cardTypeOrigin = null
-            entity.cardTransactionType = null // PLCC 현재는 국내만 적용 TODO 신용만 존재 하는지 확인
-            entity.cardTransactionTypeOrigin = null
-            entity.currencyCode = "KRW" // PLCC 현재는 국내만 적용
-            entity.transactionCountry = "KOREA" // PLCC 현재는 국내만 적용
+            entity.storeCategory = plccCardTransaction.storeCategory
+            entity.cardType = plccCardTransaction.cardType
+            entity.cardTypeOrigin = plccCardTransaction.cardTypeOrigin
+            entity.cardTransactionType = plccCardTransaction.cardTransactionType
+            entity.cardTransactionTypeOrigin = plccCardTransaction.cardTransactionTypeOrigin
+            entity.currencyCode = plccCardTransaction.currencyCode
+            entity.transactionCountry = plccCardTransaction.transactionCountry
             entity.isInstallmentPayment = plccCardTransaction.isInstallmentPayment
             entity.installment = plccCardTransaction.installment
-            entity.paymentDay = null
-            entity.isOverseaUse = false // PLCC 현재는 국내만 적용
+            entity.paymentDay = plccCardTransaction.paymentDay
+            entity.isOverseaUse = plccCardTransaction.isOverseaUse
             entity.benefitCode = plccCardTransaction.serviceCode
+            entity.benefitCodeOrigin = plccCardTransaction.serviceCodeOrigin
             entity.benefitName = plccCardTransaction.serviceName
-            entity.benefitType = plccCardTransaction.serviceType
+            entity.serviceType = plccCardTransaction.serviceType
+            entity.serviceTypeOrigin = plccCardTransaction.serviceTypeOrigin
             entity.lastCheckAt = now
         }
     }
@@ -61,11 +66,11 @@ class PlccCardTransactionConvertService {
 
         builder.serviceCode = plccCardTransactionEntity.benefitCode
         builder.serviceName = getRewardsBenefitType(plccCardTransactionEntity.benefitName)
-        builder.serviceType = getRewardsPromotionType(plccCardTransactionEntity.benefitType)
+        builder.serviceType = getRewardsPromotionType(plccCardTransactionEntity.serviceType)
         builder.approvedAtMs = approvalMs
         builder.approvalNumber = plccCardTransactionEntity.approvalNumber
-        builder.amount2F = plccCardTransactionEntity.discountAmount?.toLong() ?: 0L
-        builder.discountAmount2F = plccCardTransactionEntity.discountAmount?.toLong() ?: 0L
+        builder.amount2F = plccCardTransactionEntity.discountAmount?.multiply(BigDecimal(100))?.toLong() ?: 0L
+        builder.discountAmount2F = plccCardTransactionEntity.discountAmount?.multiply(BigDecimal(100))?.toLong() ?: 0L
         builder.isInstallmentPayment = plccCardTransactionEntity.isInstallmentPayment ?: false
         builder.installment = plccCardTransactionEntity.installment ?: 0
         builder.affiliatedStoreName = plccCardTransactionEntity.storeName
@@ -84,19 +89,19 @@ class PlccCardTransactionConvertService {
         }
     }
 
-    private fun getRewardsPromotionType(type: String?): PlccProto.RewardsServiceType {
+    private fun getRewardsPromotionType(type: PlccCardServiceType?): PlccProto.RewardsServiceType {
         return when (type) {
-            "01" -> PlccProto.RewardsServiceType.REWARDS_SERVICE_TYPE_CHARGE_DISCOUNT
-            "02" -> PlccProto.RewardsServiceType.REWARDS_SERVICE_TYPE_POINT
-            "03" -> PlccProto.RewardsServiceType.REWARDS_SERVICE_TYPE_INSTALLMENT_REDUCT
+            PlccCardServiceType.REWARDS_SERVICE_TYPE_CHARGE_DISCOUNT -> PlccProto.RewardsServiceType.REWARDS_SERVICE_TYPE_CHARGE_DISCOUNT
+            PlccCardServiceType.REWARDS_SERVICE_TYPE_POINT -> PlccProto.RewardsServiceType.REWARDS_SERVICE_TYPE_POINT
+            PlccCardServiceType.REWARDS_SERVICE_TYPE_INSTALLMENT_REDUCT -> PlccProto.RewardsServiceType.REWARDS_SERVICE_TYPE_INSTALLMENT_REDUCT
             else -> PlccProto.RewardsServiceType.REWARDS_SERVICE_TYPE_UNKNOWN
         }
     }
 
-    private fun getApprovalType(type: String?): CardProto.CardTransactionApprovalStatus {
+    private fun getApprovalType(type: CardTransactionType?): CardProto.CardTransactionApprovalStatus {
         return when (type) {
-            "0" -> CardProto.CardTransactionApprovalStatus.CARD_TRANSACTION_APPROVAL_STATUS_APPROVED
-            "1" -> CardProto.CardTransactionApprovalStatus.CARD_TRANSACTION_APPROVAL_STATUS_ENTIRELY_CANCELED
+            CardTransactionType.APPROVAL -> CardProto.CardTransactionApprovalStatus.CARD_TRANSACTION_APPROVAL_STATUS_APPROVED
+            CardTransactionType.APPROVAL_CANCEL -> CardProto.CardTransactionApprovalStatus.CARD_TRANSACTION_APPROVAL_STATUS_ENTIRELY_CANCELED
             else -> CardProto.CardTransactionApprovalStatus.CARD_TRANSACTION_APPROVAL_STATUS_UNKNOWN
         }
     }
