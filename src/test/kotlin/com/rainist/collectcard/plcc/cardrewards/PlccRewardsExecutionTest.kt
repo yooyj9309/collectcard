@@ -9,7 +9,9 @@ import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsRequest
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsRequestDataBody
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsResponse
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardThreshold
+import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardTypeLimit
 import com.rainist.collectcard.plcc.cardrewards.dto.PromotionCode
+import com.rainist.collectcard.plcc.cardrewards.dto.ServiceType
 import java.math.BigDecimal
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
@@ -70,6 +72,21 @@ class PlccRewardsExecutionTest {
             this.responseCode = "0000"
             this.responseMessage = "waS788OzuK61x776vcC0z7TZLg=="
             this.benefitListCount = 5
+        })
+        assertThat(plccTypeLimits[0]).isEqualToComparingFieldByField(PlccCardTypeLimit().apply {
+            this.benefitName = "u6G068SrteUgxKvG5CDH0sDO"
+            this.benefitCode = "C292"
+            this.discountRate = BigDecimal("000005000.00")
+            this.totalLimitAmount = BigDecimal("000000025000")
+            this.appliedAmount = BigDecimal("000000005000")
+            this.limitRemainingAmount = BigDecimal("000000020000")
+            this.totalLimitCount = 999
+            this.appliedCount = 1
+            this.limitRemainingCount = 999
+            this.totalSalesLimitAmount = BigDecimal("999999999999")
+            this.appliedSalesAmount = BigDecimal("000000020500")
+            this.limitRemainingSalesAmount = BigDecimal("999999999999")
+            this.serviceType = ServiceType.CHARGE_DISCOUNT
         })
     }
 

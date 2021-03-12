@@ -42,7 +42,10 @@ class PlccCardTransactionServiceImpl(
 
 ) : PlccCardTransactionService {
 
-    override fun plccCardTransactions(executionContext: CollectExecutionContext, plccCardTransactionRequest: CollectcardProto.ListPlccRewardsTransactionsRequest) {
+    override fun plccCardTransactions(
+        executionContext: CollectExecutionContext,
+        plccCardTransactionRequest: CollectcardProto.ListPlccRewardsTransactionsRequest
+    ) {
 
         val executions = Executions.valueOf(
             BusinessType.plcc,
@@ -54,10 +57,12 @@ class PlccCardTransactionServiceImpl(
         val request = makePlccTransactionRequest(plccCardTransactionRequest)
 
         // TODO Log 삭제
-        CollectcardGrpcService.logger.Warn("PLCC listPlccRewardsTransactions request : {}", request)
+        CollectcardGrpcService.logger.Warn("PLCC listPlccRewardsTransactions request : {}", request.headers)
+        CollectcardGrpcService.logger.Warn("PLCC listPlccRewardsTransactions request : {}", request.request)
 
         // send
-        val executionResponse: ExecutionResponse<PlccCardTransactionResponse> = plccTransactionExecute(executionContext, executions, request)
+        val executionResponse: ExecutionResponse<PlccCardTransactionResponse> =
+            plccTransactionExecute(executionContext, executions, request)
 
         // validation
         val transactions = plccTransactionValidate(executionResponse)
@@ -72,7 +77,8 @@ class PlccCardTransactionServiceImpl(
     fun decode(executionResponse: ExecutionResponse<PlccCardTransactionResponse>) {
 
         executionResponse.response.dataBody?.responseMessage?.let {
-            executionResponse.response.dataBody?.responseMessage = encodeService.base64Decode(it, Charset.forName("MS949"))
+            executionResponse.response.dataBody?.responseMessage =
+                encodeService.base64Decode(it, Charset.forName("MS949"))
         }
 
         executionResponse.response.dataBody?.transactionList?.forEach {
@@ -95,18 +101,26 @@ class PlccCardTransactionServiceImpl(
             val yearMonth = convertStringYearMonth(approvalDay)
             val now = DateTimeUtil.utcNowLocalDateTime()
 
-            val prevEntity = plccCardTransactionRepository.findByApprovalYearMonthAndBanksaladUserIdAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
-                yearMonth.yearMonth,
-                executionContext.userId.toLong(),
-                executionContext.organizationId,
-                plccCardTransactionRequest.cardId.value,
-                plccCardTransaction.approvalNumber,
-                plccCardTransaction.approvalDay,
-                plccCardTransaction.approvalTime
-            )
+            val prevEntity =
+                plccCardTransactionRepository.findByApprovalYearMonthAndBanksaladUserIdAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
+                    yearMonth.yearMonth,
+                    executionContext.userId.toLong(),
+                    executionContext.organizationId,
+                    plccCardTransactionRequest.cardId.value,
+                    plccCardTransaction.approvalNumber,
+                    plccCardTransaction.approvalDay,
+                    plccCardTransaction.approvalTime
+                )
 
             if (prevEntity == null) {
-                val entity = plccCardTransactionConvertService.plccCardTransactionToEntity(plccCardTransaction, executionContext.userId.toLong(), executionContext.organizationId, plccCardTransactionRequest.cardId.value, yearMonth.yearMonth, now)
+                val entity = plccCardTransactionConvertService.plccCardTransactionToEntity(
+                    plccCardTransaction,
+                    executionContext.userId.toLong(),
+                    executionContext.organizationId,
+                    plccCardTransactionRequest.cardId.value,
+                    yearMonth.yearMonth,
+                    now
+                )
                 plccCardTransactionRepository.save(entity)
             } else {
                 prevEntity.lastCheckAt = now
@@ -122,7 +136,8 @@ class PlccCardTransactionServiceImpl(
             )
             .request(
                 PlccCardTransactionRequest().apply {
-                    val requestYearMonth = DateTimeUtil.epochMilliSecondToKSTLocalDateTime(plccCardTransactionRequest.requestMonthMs.value)
+                    val requestYearMonth =
+                        DateTimeUtil.epochMilliSecondToKSTLocalDateTime(plccCardTransactionRequest.requestMonthMs.value)
                     val stringYearMonth = convertStringYearMonth(requestYearMonth)
 
                     this.dataBody = PlccCardTransactionRequestDataBody().apply {
@@ -134,7 +149,11 @@ class PlccCardTransactionServiceImpl(
             .build()
     }
 
-    fun plccTransactionExecute(executionContext: CollectExecutionContext, executions: Execution, request: ExecutionRequest<PlccCardTransactionRequest>): ExecutionResponse<PlccCardTransactionResponse> {
+    fun plccTransactionExecute(
+        executionContext: CollectExecutionContext,
+        executions: Execution,
+        request: ExecutionRequest<PlccCardTransactionRequest>
+    ): ExecutionResponse<PlccCardTransactionResponse> {
         return collectExecutorService.execute(executionContext, executions, request)
     }
 

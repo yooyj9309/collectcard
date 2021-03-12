@@ -2,7 +2,6 @@ package com.rainist.collectcard.common.db.entity
 
 import java.math.BigDecimal
 import java.time.LocalDateTime
-import java.util.Date
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.EntityListeners
@@ -60,7 +59,7 @@ data class PlccCardEntity(
 
     var cardTypeOrigin: String? = null,
 
-    var cardApplicationDay: Date? = null,
+    var cardApplicationDay: String? = null,
 
     var issuedDay: String? = null,
 
@@ -82,10 +81,10 @@ data class PlccCardEntity(
     @Column(nullable = true, name = "payment_account_number_encrypted")
     var paymentAccountNumber: String? = null,
 
-    @Column(columnDefinition = "BIT", length = 1)
+    @Column(columnDefinition = "TINYINT(1)", length = 1)
     var isBusinessCard: Boolean? = false,
 
-    @Column(columnDefinition = "BIT", length = 1)
+    @Column(columnDefinition = "TINYINT(1)", length = 1)
     var isTrafficSupported: Boolean? = false,
 
     @CreatedDate

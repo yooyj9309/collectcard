@@ -3,8 +3,12 @@ package com.rainist.collectcard.grpc.client
 import com.github.banksalad.idl.apis.v1.card.CardProto
 import com.github.banksalad.idl.apis.v1.plcc.PlccGrpc
 import com.github.banksalad.idl.apis.v1.plcc.PlccProto
+import com.google.protobuf.StringValue
 import com.rainist.collectcard.plcc.dto.PlccCardDto
 import com.rainist.collectcard.plcc.dto.SyncType
+import com.rainist.common.util.DateTimeUtil
+import java.time.ZoneId
+import java.time.ZoneOffset
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
@@ -28,15 +32,21 @@ class PlccClientService(
             .addAllData(
                 data.map {
                     PlccProto.CollectcardPlccData.newBuilder()
-                        // .setName(it.cardName)
+                        .setName(it.cardName)
                         .setNumber(it.cardNumberMask)
-                        // .setProductName(StringValue.of(it.cardProductName))
-                        .setInternationalBrand(CardProto.CardInternationalBrand.valueOf(it.internationalBrandName ?: "UNKNOWN"))
-                        // .setOwnerName(StringValue.of(it.cardOwnerName))
+                        .setExternalId(it.cid)
+                        .setProductName(StringValue.of(it.cardProductName))
+                        .setInternationalBrand(CardProto.CardInternationalBrand.valueOf(it.internationalBrandName
+                            ?: "UNKNOWN"))
+                        .setOwnerName(StringValue.of(it.cardOwnerName))
 //                        .setExternalState(StringValue.of(parseExternalState()))
                         .setStatus(cardIssueStatusToProtoEnum(it.cardIssueStatus))
-                        // .setIssuedAtMs(DateTimeUtil.stringDateTimeToEpochMilliSecond(it.issuedDay, "yyyyMMdd", ZoneOffset.UTC))
-                        // .setExpiresAtMs(DateTimeUtil.stringDateTimeToEpochMilliSecond(it.expiresYearMonth, "yyyyMM", ZoneOffset.UTC))
+                        .setIssuedAtMs(DateTimeUtil.stringDateToEpochMilliSecond(it.issuedDay
+                            ?: "", "yyyyMMdd", ZoneId.systemDefault(), ZoneOffset.UTC))
+                        .setExpiresAtMs(DateTimeUtil.stringDateToEpochMilliSecond(it.expiresYearMonth + "01"
+                            ?: "", "yyyyMMdd", ZoneId.systemDefault(), ZoneOffset.UTC))
+                        .setAgreedAtMs(DateTimeUtil.stringDateToEpochMilliSecond(it.cardApplicationDay
+                            ?: "", "yyyyMMdd", ZoneId.systemDefault(), ZoneOffset.UTC))
                         .build()
                 }
             )

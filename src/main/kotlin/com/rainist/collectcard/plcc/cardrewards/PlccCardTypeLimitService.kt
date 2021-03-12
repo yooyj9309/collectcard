@@ -1,13 +1,13 @@
 package com.rainist.collectcard.plcc.cardrewards
 
 import com.rainist.collectcard.common.dto.CollectExecutionContext
-import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsResponse
+import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardTypeLimit
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccRpcRequest
 
-interface PlccCardRewardsService {
+interface PlccCardTypeLimitService {
 
-    fun getPlccCardRewards(
+    fun getPlccCardTypeLimit(
         executionContext: CollectExecutionContext,
         rpcRequest: PlccRpcRequest
-    ): PlccCardRewardsResponse
+    ): List<PlccCardTypeLimit>
 }

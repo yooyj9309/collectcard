@@ -12,6 +12,9 @@ let serviceType = {
 }
 
 {
+  "dataHeader": {
+
+  },
   "dataBody" : {
     "plccCardThreshold" : {
         "outcomeStartDate" : .outcome_start_date,

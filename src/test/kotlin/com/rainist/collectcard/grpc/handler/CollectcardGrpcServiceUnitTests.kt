@@ -58,7 +58,8 @@ import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.collectcard.common.service.UuidService
 import com.rainist.collectcard.grpc.client.ConnectClientServiceTest
 import com.rainist.collectcard.plcc.cardrewards.PlccCardRewardsPublishService
-import com.rainist.collectcard.plcc.cardrewards.PlccCardRewardsService
+import com.rainist.collectcard.plcc.cardrewards.PlccCardThresholdService
+import com.rainist.collectcard.plcc.cardrewards.PlccCardTypeLimitService
 import com.rainist.collectcard.plcc.cardtransactions.PlccCardTransactionPublishService
 import com.rainist.collectcard.plcc.cardtransactions.PlccCardTransactionService
 import com.rainist.common.util.DateTimeUtil
@@ -135,10 +136,13 @@ internal class CollectcardGrpcServiceUnitTests {
     lateinit var cardLoanPublishService: CardLoanPublishService
 
     @MockBean
-    lateinit var plccCardRewardsService: PlccCardRewardsService
+    lateinit var plccCardThresholdService: PlccCardThresholdService
 
     @MockBean
     lateinit var plccCardRewardsPublishService: PlccCardRewardsPublishService
+
+    @MockBean
+    lateinit var plccCardTypeLimitService: PlccCardTypeLimitService
 
     val now = DateTimeUtil.utcNowLocalDateTime()
     val executionContext = CollectExecutionContext(

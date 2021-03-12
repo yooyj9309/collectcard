@@ -40,7 +40,7 @@ shinhancard:
 
 lottecard:
   organizationId: lottecard
-  objectId:
+  objectId: 596d66692c4069c168b57c77
   plcc:
     host: https://lottecard.co.kr:8443
 

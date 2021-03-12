@@ -29,7 +29,8 @@ import com.rainist.collectcard.common.service.UserSyncStatusService
 import com.rainist.collectcard.common.service.UuidService
 import com.rainist.collectcard.config.grpc.onException
 import com.rainist.collectcard.plcc.cardrewards.PlccCardRewardsPublishService
-import com.rainist.collectcard.plcc.cardrewards.PlccCardRewardsService
+import com.rainist.collectcard.plcc.cardrewards.PlccCardThresholdService
+import com.rainist.collectcard.plcc.cardrewards.PlccCardTypeLimitService
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccRpcRequest
 import com.rainist.collectcard.plcc.cardtransactions.PlccCardTransactionPublishService
 import com.rainist.collectcard.plcc.cardtransactions.PlccCardTransactionService
@@ -63,8 +64,9 @@ class CollectcardGrpcService(
     val localDatetimeService: LocalDatetimeService,
     val plccCardTransactionService: PlccCardTransactionService,
     val plccCardTransactionPublishService: PlccCardTransactionPublishService,
-    val plccCardRewardsService: PlccCardRewardsService,
-    val plccCardRewardsPublishService: PlccCardRewardsPublishService
+    val plccCardThresholdService: PlccCardThresholdService,
+    val plccCardRewardsPublishService: PlccCardRewardsPublishService,
+    val plccCardTypeLimitService: PlccCardTypeLimitService
 ) : CollectcardGrpc.CollectcardImplBase() {
 
     companion object : Log
@@ -387,7 +389,7 @@ class CollectcardGrpcService(
         /* ExecutionContext */
         val executionContext = CollectExecutionContext(
             executionRequestId = uuidService.generateExecutionRequestId(),
-            organizationId = organizationService.getOrganizationByOrganizationId(request.companyId.value)?.organizationId
+            organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId
                 ?: "",
             userId = request.userId
         )
@@ -396,10 +398,10 @@ class CollectcardGrpcService(
          *  매개변수의 타입을 rpc request 하나로 특정할 수 없다.
          *  공통적으로 사용하는 cardId, requestMonthMs를 담은 plccRpcRequest를 생성해 넘긴다.
          */
-        val plccRpcRequest = PlccRpcRequest(request.cardId.toString(), request.requestMonthMs.toString())
+        val plccRpcRequest = PlccRpcRequest(request.cardId.value, request.requestMonthMs.value)
 
         kotlin.runCatching {
-            plccCardRewardsService.getPlccCardRewards(executionContext, plccRpcRequest)
+            plccCardThresholdService.getPlccCardThreshold(executionContext, plccRpcRequest)
             plccCardRewardsPublishService.rewardsThresholdPublish(executionContext, plccRpcRequest)
         }.onSuccess {
             responseObserver.onNext(it)
@@ -417,15 +419,15 @@ class CollectcardGrpcService(
         /* ExecutionContext */
         val executionContext = CollectExecutionContext(
             executionRequestId = uuidService.generateExecutionRequestId(),
-            organizationId = organizationService.getOrganizationByOrganizationId(request.companyId.value)?.organizationId
+            organizationId = organizationService.getOrganizationByObjectId(request.companyId.value)?.organizationId
                 ?: "",
             userId = request.userId
         )
 
-        val plccRpcRequest = PlccRpcRequest(request.cardId.toString(), request.requestMonthMs.toString())
+        val plccRpcRequest = PlccRpcRequest(request.cardId.value, request.requestMonthMs.value)
 
         kotlin.runCatching {
-            plccCardRewardsService.getPlccCardRewards(executionContext, plccRpcRequest)
+            plccCardTypeLimitService.getPlccCardTypeLimit(executionContext, plccRpcRequest)
             plccCardRewardsPublishService.rewardsTypeLimitPublish(executionContext, plccRpcRequest)
         }.onSuccess {
             responseObserver.onNext(it)

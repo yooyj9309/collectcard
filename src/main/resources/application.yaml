@@ -45,7 +45,7 @@ plcc-server:
   uri: dns:///plcc-headless:18081
 
 userv2-server:
-  uri: dns:///userv2-headless:18081
+  uri: dns:///user-headless:18081
 
 shinhancard:
   clientId: ${DEVELOPMENT_SHINHANCARD_CLIENT_ID}

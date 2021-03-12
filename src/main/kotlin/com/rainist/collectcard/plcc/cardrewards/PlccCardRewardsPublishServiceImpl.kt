@@ -6,6 +6,7 @@ import com.rainist.collectcard.plcc.cardrewards.dto.PlccRpcRequest
 import com.rainist.collectcard.plcc.cardtransactions.convertStringYearMonth
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardThresholdRepository
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardTypeLimitRepository
+import com.rainist.collectcard.plcc.common.util.PlccCardRewardsUtil
 import com.rainist.common.util.DateTimeUtil
 import org.springframework.stereotype.Service
 
@@ -22,14 +23,15 @@ class PlccCardRewardsPublishServiceImpl(
     ): CollectcardProto.GetPlccRewardsThresholdResponse {
 
         val requestYearMonth =
-            DateTimeUtil.epochMilliSecondToKSTLocalDateTime(rpcRequest.requestMonthMs.toLong())
+            DateTimeUtil.epochMilliSecondToKSTLocalDateTime(rpcRequest.requestMonthMs)
         val stringYearMonth = convertStringYearMonth(requestYearMonth)
 
         plccCardThresholdRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardIdAndBenefitYearMonth(
             banksaladUserId = executionContext.userId.toLong(),
             cardCompanyId = executionContext.organizationId,
             cardCompanyCardId = rpcRequest.cardId,
-            benefitYearMonth = stringYearMonth.yearMonth ?: ""
+            // inquiryYearMonth의 1달 전을 입력해야함.
+            benefitYearMonth = PlccCardRewardsUtil.minusAMonth(stringYearMonth.yearMonth) ?: ""
         )?.let {
             return plccCardRewardsConvertService.toThresholdProto(it)
         }
@@ -44,7 +46,7 @@ class PlccCardRewardsPublishServiceImpl(
     ): CollectcardProto.ListPlccRewardsTypeLimitResponse {
 
         val requestYearMonth =
-            DateTimeUtil.epochMilliSecondToKSTLocalDateTime(rpcRequest.requestMonthMs.toLong())
+            DateTimeUtil.epochMilliSecondToKSTLocalDateTime(rpcRequest.requestMonthMs)
         val stringYearMonth = convertStringYearMonth(requestYearMonth)
 
         val typeLimits =

@@ -9,6 +9,7 @@ import com.rainist.collectcard.grpc.client.UserV2ClientService
 import com.rainist.collectcard.plcc.dto.PlccCardDto
 import com.rainist.collectcard.plcc.dto.SyncType
 import java.time.LocalDateTime
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 @Service
@@ -18,6 +19,10 @@ class PlccCardServiceImpl(
     val plccCardRepository: PlccCardRepository,
     val plccCardHistoryRepository: PlccCardHistoryRepository
 ) : PlccCardService {
+
+    @Value("\${lottecard.objectId}")
+    private lateinit var lottecardOrganizationObjectId: String
+
     override fun issuePlccCard(organizationId: String, ci: String, cards: List<PlccCardDto>, now: LocalDateTime) {
         val user = userV2ClientService.getUserByCi(ci)
         if (user != null) {
@@ -27,7 +32,7 @@ class PlccCardServiceImpl(
         }
 
         plccClientService.syncPlccsByCollectcardData(
-            organizationId,
+            lottecardOrganizationObjectId,
             ci,
             cards,
             SyncType.ISSUED
