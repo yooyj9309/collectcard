@@ -2,6 +2,7 @@ package com.rainist.collectcard.grpc.client
 
 import com.github.banksalad.idl.apis.v2.user.UserGrpc
 import com.github.banksalad.idl.apis.v2.user.UserProto
+import com.rainist.common.log.Log
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
@@ -12,6 +13,8 @@ class UserV2ClientService(
     @Qualifier("userV2BlockingStub")
     val userV2BlockingStub: UserGrpc.UserBlockingStub
 ) {
+
+    companion object : Log
 
     fun getUserByCi(ci: String): UserProto.UserMessage? {
         val request = UserProto.FindOneUserByCiRequest.newBuilder()

@@ -23,10 +23,11 @@ class PlccClientService(
     fun syncPlccsByCollectcardData(
         organizationId: String,
         ci: String,
+        userId: String?,
         data: List<PlccCardDto>,
         syncType: SyncType
     ): PlccProto.SyncPlccsByCollectcardDataResponse? {
-        val request = PlccProto.SyncPlccsByCollectcardDataRequest.newBuilder()
+        val requestBuilder = PlccProto.SyncPlccsByCollectcardDataRequest.newBuilder()
             .setOrganizationId(organizationId)
             .setCi(ci)
             .addAllData(
@@ -51,8 +52,12 @@ class PlccClientService(
                 }
             )
             .setSyncType(syncTypetoProtoEnum(syncType))
-            .build()
-        return plccBlockingStub.syncPlccsByCollectcardData(request)
+
+        if (userId != null) {
+            requestBuilder.setUserId(StringValue.of(userId))
+        }
+
+        return plccBlockingStub.syncPlccsByCollectcardData(requestBuilder.build())
     }
 
     private fun syncTypetoProtoEnum(syncType: SyncType?): PlccProto.SyncUserPlccType {

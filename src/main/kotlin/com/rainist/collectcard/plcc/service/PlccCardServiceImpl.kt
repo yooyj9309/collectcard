@@ -34,6 +34,7 @@ class PlccCardServiceImpl(
         plccClientService.syncPlccsByCollectcardData(
             lottecardOrganizationObjectId,
             ci,
+            user?.userId,
             cards,
             SyncType.ISSUED
         )
@@ -84,10 +85,10 @@ class PlccCardServiceImpl(
             this.cardCompanyId = organizationId
             this.cardCompanyCardId = card.cid
             this.lastCheckAt = now
-//                this.cardOwnerName = card.cardOwnerName
+            this.cardOwnerName = card.cardOwnerName
             this.cardOwnerType = card.ownerType
             this.cardOwnerTypeOrigin = card.ownerType
-//                this.cardName = card.cardName
+            this.cardName = card.cardName
 //                this.cardBrandName =
             this.internationalBrandName = card.internationalBrandName
             this.cardNumber = card.cardNumberMask
