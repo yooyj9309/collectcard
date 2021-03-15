@@ -84,9 +84,9 @@ class PlccCardRewardsConvertService {
 
     private fun getServiceType(serviceType: String?): PlccProto.RewardsServiceType {
         return when (serviceType) {
-            "01" -> PlccProto.RewardsServiceType.REWARDS_SERVICE_TYPE_CHARGE_DISCOUNT
-            "02" -> PlccProto.RewardsServiceType.REWARDS_SERVICE_TYPE_POINT
-            "03" -> PlccProto.RewardsServiceType.REWARDS_SERVICE_TYPE_INSTALLMENT_REDUCT
+            "CHARGE_DISCOUNT" -> PlccProto.RewardsServiceType.REWARDS_SERVICE_TYPE_CHARGE_DISCOUNT
+            "POINT" -> PlccProto.RewardsServiceType.REWARDS_SERVICE_TYPE_POINT
+            "INSTALLMENT_REDUCT" -> PlccProto.RewardsServiceType.REWARDS_SERVICE_TYPE_INSTALLMENT_REDUCT
             else -> PlccProto.RewardsServiceType.REWARDS_SERVICE_TYPE_UNKNOWN
         }
     }
