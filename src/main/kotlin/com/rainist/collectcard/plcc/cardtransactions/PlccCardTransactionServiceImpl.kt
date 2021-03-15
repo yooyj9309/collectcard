@@ -20,6 +20,8 @@ import com.rainist.collectcard.plcc.cardtransactions.dto.PlccCardTransaction
 import com.rainist.collectcard.plcc.cardtransactions.dto.PlccCardTransactionRequest
 import com.rainist.collectcard.plcc.cardtransactions.dto.PlccCardTransactionRequestDataBody
 import com.rainist.collectcard.plcc.cardtransactions.dto.PlccCardTransactionResponse
+import com.rainist.collectcard.plcc.common.db.entity.PlccCardTransactionBenefitSummaryEntity
+import com.rainist.collectcard.plcc.common.db.repository.PlccCardTransactionBenefitSummaryRepository
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardTransactionRepository
 import com.rainist.common.service.ValidationService
 import com.rainist.common.util.DateTimeUtil
@@ -38,7 +40,8 @@ class PlccCardTransactionServiceImpl(
     val uuidService: UuidService,
     val plccCardTransactionRepository: PlccCardTransactionRepository,
     val plccCardTransactionConvertService: PlccCardTransactionConvertService,
-    val encodeService: EncodeService
+    val encodeService: EncodeService,
+    val plccCardTransactionBenefitSummaryRepository: PlccCardTransactionBenefitSummaryRepository
 
 ) : PlccCardTransactionService {
 
@@ -71,6 +74,42 @@ class PlccCardTransactionServiceImpl(
 
         // DB Insert
         savePlccTransactions(executionContext, plccCardTransactionRequest, transactions)
+
+        // DB Summary Insert
+        savePlccTransactionSummary(
+            request.request.dataBody?.inquiryYearMonth,
+            executionContext.userId.toLong(),
+            executionContext.organizationId,
+            plccCardTransactionRequest.cardId.value,
+            executionResponse
+        )
+    }
+
+    fun savePlccTransactionSummary(yearMonth: String?, banksaladUserId: Long, organizationId: String, cardCompanyCardId: String, executionResponse: ExecutionResponse<PlccCardTransactionResponse>) {
+
+        val prevSummary = plccCardTransactionBenefitSummaryRepository.findByApprovalYearMonthAndBanksaladUserIdAndCardCompanyIdAndCardCompanyCardId(
+            yearMonth,
+            banksaladUserId,
+            organizationId,
+            cardCompanyCardId
+        )
+
+        prevSummary?.let {
+            it.totalBenefitCount = executionResponse.response.dataBody?.totalBenefitCount
+            it.totalBenefitAmount = executionResponse.response.dataBody?.totalBenefitAmount
+            it.totalSalesAmount = executionResponse.response.dataBody?.totalSalesAmount
+            plccCardTransactionBenefitSummaryRepository.save(it)
+        } ?: kotlin.run {
+            // 신규생성
+            PlccCardTransactionBenefitSummaryEntity().apply {
+                this.approvalYearMonth = yearMonth
+                this.totalBenefitCount = executionResponse.response.dataBody?.totalBenefitCount
+                this.totalBenefitAmount = executionResponse.response.dataBody?.totalBenefitAmount
+                this.totalSalesAmount = executionResponse.response.dataBody?.totalSalesAmount
+            }.run {
+                plccCardTransactionBenefitSummaryRepository.save(this)
+            }
+        }
     }
 
     // TODO 인코딩 제거후에는 삭제

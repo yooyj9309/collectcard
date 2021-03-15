@@ -65,7 +65,7 @@ class PlccCardTransactionConvertService {
         val builder = CollectcardProto.RewardsTransaction.newBuilder()
 
         builder.serviceCode = plccCardTransactionEntity.benefitCode
-        builder.serviceName = getRewardsBenefitType(plccCardTransactionEntity.benefitName)
+        builder.serviceName = plccCardTransactionEntity.benefitName
         builder.serviceType = getRewardsPromotionType(plccCardTransactionEntity.serviceType)
         builder.approvedAtMs = approvalMs
         builder.approvalNumber = plccCardTransactionEntity.approvalNumber
