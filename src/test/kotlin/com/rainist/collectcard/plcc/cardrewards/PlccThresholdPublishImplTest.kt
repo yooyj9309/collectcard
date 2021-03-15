@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.client.RestTemplate
 
 @SpringBootTest
-class PlccRewardsPublishImplTest {
+class PlccThresholdPublishImplTest {
 
     @Autowired
     lateinit var commonRestTemplate: RestTemplate
@@ -49,7 +49,7 @@ class PlccRewardsPublishImplTest {
         ExecutionTestUtil.serverSetting(
             server,
             LottecardPlccApis.card_lottecard_plcc_rewards,
-            "classpath:mock/lottecard/rewards/rewards_expected_1.json"
+            "classpath:mock/lottecard/rewards/rewards_threshold_expected_1.json"
         )
 
         collectExecutionContext = CollectExecutionContext(

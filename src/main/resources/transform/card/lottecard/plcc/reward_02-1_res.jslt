@@ -39,15 +39,15 @@ let serviceType = {
        "benefitName" : .benefit_name,
        "benefitCode" : .benefit_code,
        "discountRate" : .discount_rate,
-       "totalLimitAmount" : .total_limit_amount,
+       "totalLimitAmount" : if(.total_limit_amount == "999999999999") "0" else .total_limit_amount,
        "appliedAmount" : .apply_amount,
-       "limitRemainingAmount" : .remain_limit_amount,
-       "totalLimitCount" : .total_limit_count,
+       "limitRemainingAmount" : if(.remain_limit_amount == "999999999999") "0" else .remain_limit_amount,
+       "totalLimitCount" : if(.total_limit_count == "999") "0" else .total_limit_count,
        "appliedCount" : .apply_count,
-       "limitRemainingCount" : .remain_limit_count,
-       "totalSalesLimitAmount" : .total_sales_amount,
+       "limitRemainingCount" : if(.remain_limit_count == "999") "0" else .remain_limit_count,
+       "totalSalesLimitAmount" : if(.total_sales_amount == "999999999999") "0" else .total_sales_amount,
        "appliedSalesAmount" : .apply_sales_amount,
-       "limitRemainingSalesAmount" : .remain_limit_sales_amount,
+       "limitRemainingSalesAmount" : if(.remain_limit_sales_amount == "999999999999") "0" else .remain_limit_sales_amount,
        "serviceType" : get-key($serviceType, .service_type, "UNKNOWN")
       }
     ]

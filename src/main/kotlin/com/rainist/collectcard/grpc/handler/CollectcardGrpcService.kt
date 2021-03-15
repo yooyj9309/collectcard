@@ -386,6 +386,10 @@ class CollectcardGrpcService(
         request: CollectcardProto.GetPlccRewardsThresholdRequest,
         responseObserver: StreamObserver<CollectcardProto.GetPlccRewardsThresholdResponse>
     ) {
+
+        // TODO : 삭제
+        logger.info("request = {}", request)
+
         /* ExecutionContext */
         val executionContext = CollectExecutionContext(
             executionRequestId = uuidService.generateExecutionRequestId(),
@@ -416,6 +420,10 @@ class CollectcardGrpcService(
         request: CollectcardProto.ListPlccRewardsTypeLimitRequest,
         responseObserver: StreamObserver<CollectcardProto.ListPlccRewardsTypeLimitResponse>
     ) {
+
+        // TODO : 삭제
+        logger.info("request = {}", request)
+
         /* ExecutionContext */
         val executionContext = CollectExecutionContext(
             executionRequestId = uuidService.generateExecutionRequestId(),
@@ -427,7 +435,7 @@ class CollectcardGrpcService(
         val plccRpcRequest = PlccRpcRequest(request.cardId.value, request.requestMonthMs.value)
 
         kotlin.runCatching {
-            plccCardTypeLimitService.getPlccCardTypeLimit(executionContext, plccRpcRequest)
+            plccCardTypeLimitService.listPlccCardTypeLimit(executionContext, plccRpcRequest)
             plccCardRewardsPublishService.rewardsTypeLimitPublish(executionContext, plccRpcRequest)
         }.onSuccess {
             responseObserver.onNext(it)

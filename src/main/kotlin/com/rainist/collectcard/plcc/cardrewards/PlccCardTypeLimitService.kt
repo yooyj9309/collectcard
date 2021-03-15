@@ -6,7 +6,7 @@ import com.rainist.collectcard.plcc.cardrewards.dto.PlccRpcRequest
 
 interface PlccCardTypeLimitService {
 
-    fun getPlccCardTypeLimit(
+    fun listPlccCardTypeLimit(
         executionContext: CollectExecutionContext,
         rpcRequest: PlccRpcRequest
     ): List<PlccCardTypeLimit>

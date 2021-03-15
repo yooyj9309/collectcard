@@ -73,6 +73,10 @@ data class PlccCardThresholdEntity(
 
     var promotionCode: String? = null,
 
+    var responseCode: String? = null,
+
+    var responseMessage: String? = null,
+
     @Column(nullable = false)
     var lastCheckAt: LocalDateTime? = null,
 

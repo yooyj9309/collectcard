@@ -1,6 +1,6 @@
 {
-  "outcome_start_date": "20210201",
-  "outcome_end_date": "20210228",
+  "outcome_start_date": "20210101",
+  "outcome_end_date": "20210131",
   "is_outcome_delay": "N",
   "before_month_criteria_use_amount": "000001550000",
   "outcome_criteria_amount": "000000500000",
@@ -78,7 +78,7 @@
     },
     {
       "benefit_name": "ufDFqbv4t6+15SC7obTrxKu15SDH0sDOIMPRsOg=",
-      "benefit_code": "0000",
+      "benefit_code": "CXXX",
       "discount_rate": "999999999.00",
       "total_limit_amount": "000000050000",
       "apply_amount": "000000017000",

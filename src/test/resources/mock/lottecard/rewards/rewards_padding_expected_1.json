@@ -1,0 +1,35 @@
+{
+  "outcome_start_date": "20210101",
+  "outcome_end_date": "20210131",
+  "is_outcome_delay": "N",
+  "before_month_criteria_use_amount": "000001550000",
+  "outcome_criteria_amount": "000000500000",
+  "total_benefit_amount": "000000017000",
+  "total_benefit_count": "004",
+  "total_sales_amount": "000000081500",
+  "monthly_benefit_rate": "00.00",
+  "monthly_benefit_limit": "000000050000",
+  "cashback_amount": "00000000",
+  "message": "",
+  "promotion_code": "1",
+  "response_code": "0000",
+  "response_message": "waS788OzuK61x776vcC0z7TZLg==",
+  "benefit_list_count": "0005",
+  "benefit_list": [
+    {
+      "benefit_name": "u6G068SrteUgxKvG5CDH0sDO",
+      "benefit_code": "C292",
+      "discount_rate": "000005000.00",
+      "total_limit_amount": "999999999999",
+      "apply_amount": "000000005000",
+      "remain_limit_amount": "999999999999",
+      "total_limit_count": "999",
+      "apply_count": "001",
+      "remain_limit_count": "999",
+      "total_sales_amount": "999999999999",
+      "apply_sales_amount": "000000020500",
+      "remain_limit_sales_amount": "999999999999",
+      "service_type": "01"
+    }
+  ]
+}

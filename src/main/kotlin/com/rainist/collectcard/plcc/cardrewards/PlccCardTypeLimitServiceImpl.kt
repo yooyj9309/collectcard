@@ -15,10 +15,11 @@ import com.rainist.collectcard.grpc.handler.CollectcardGrpcService
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsRequest
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsRequestDataBody
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsResponse
-import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardThreshold
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardTypeLimit
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccRpcRequest
 import com.rainist.collectcard.plcc.cardtransactions.convertStringYearMonth
+import com.rainist.collectcard.plcc.common.db.entity.PlccCardThresholdEntity
+import com.rainist.collectcard.plcc.common.db.repository.PlccCardThresholdRepository
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardTypeLimitHistoryRepository
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardTypeLimitRepository
 import com.rainist.collectcard.plcc.common.util.PlccCardRewardsUtil
@@ -38,12 +39,13 @@ class PlccCardTypeLimitServiceImpl(
     val validateService: ValidationService,
     val encodeService: EncodeService,
     val plccCardTypeLimitRepository: PlccCardTypeLimitRepository,
-    val plccCardTypeLimitHistoryRepository: PlccCardTypeLimitHistoryRepository
+    val plccCardTypeLimitHistoryRepository: PlccCardTypeLimitHistoryRepository,
+    val plccCardThresholdRepository: PlccCardThresholdRepository
 ) : PlccCardTypeLimitService {
 
     companion object : Log
 
-    override fun getPlccCardTypeLimit(
+    override fun listPlccCardTypeLimit(
         executionContext: CollectExecutionContext,
         rpcRequest: PlccRpcRequest
     ): List<PlccCardTypeLimit> {
@@ -106,20 +108,35 @@ class PlccCardTypeLimitServiceImpl(
         }?.toMutableList()
             ?: mutableListOf())
 
-        val rewardsThreshold = executionResponse.response?.dataBody?.plccCardThreshold
+        /** TypeLimit과 Threshold의 outcomeStartDay, outcomeEndDay의 정합성을 맞추기 위해
+         *  TypeLimit을 저장할 때 같은 혜택년월의 Threshold를 조회해 outcomeDays를 넣어준다.
+         */
+
+        val requestYearMonth =
+            DateTimeUtil.epochMilliSecondToKSTLocalDateTime(rpcRequest.requestMonthMs)
+        val stringYearMonth = convertStringYearMonth(requestYearMonth)
+
+        val rewardsThreshold =
+            plccCardThresholdRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardIdAndBenefitYearMonth(
+                banksaladUserId = executionContext.userId.toLong(),
+                cardCompanyId = executionContext.organizationId,
+                cardCompanyCardId = rpcRequest.cardId,
+                benefitYearMonth = stringYearMonth.yearMonth ?: ""
+            )
 
         /* 혜택(RewardsTypeLimit) save */
         benefitList.forEach { plccCardRewardsTypeLimit ->
-            upsertRewardsTypeLimit(
-                executionContext,
-                rpcRequest,
-                plccCardRewardsRequest,
-                plccCardRewardsTypeLimit,
-                rewardsThreshold,
-                now
-            )
+            if (!plccCardRewardsTypeLimit.benefitCode.equals("CXXX")) {
+                upsertRewardsTypeLimit(
+                    executionContext,
+                    rpcRequest,
+                    plccCardRewardsRequest,
+                    plccCardRewardsTypeLimit,
+                    rewardsThreshold,
+                    now
+                )
+            }
         }
-
         return benefitList
     }
 
@@ -128,7 +145,7 @@ class PlccCardTypeLimitServiceImpl(
         rpcRequest: PlccRpcRequest,
         plccCardRewardsRequest: PlccCardRewardsRequest,
         plccCardTypeLimit: PlccCardTypeLimit,
-        plccCardThreshold: PlccCardThreshold?,
+        plccCardThreshold: PlccCardThresholdEntity?,
         now: LocalDateTime
     ) {
         val prevEntity =
@@ -145,8 +162,8 @@ class PlccCardTypeLimitServiceImpl(
             cardCompanyId = executionContext.organizationId,
             cardCompanyCardId = rpcRequest.cardId,
             benefitYearMonth = plccCardRewardsRequest.dataBody?.inquiryYearMonth,
-            outcomeStartDay = plccCardThreshold?.outcomeStartDate ?: "",
-            outcomeEndDay = plccCardThreshold?.outcomeEndDate ?: "",
+            outcomeStartDay = plccCardThreshold?.outcomeStartDay ?: "",
+            outcomeEndDay = plccCardThreshold?.outcomeEndDay ?: "",
             plccCardTypeLimit = plccCardTypeLimit,
             now = now
         )
@@ -159,30 +176,27 @@ class PlccCardTypeLimitServiceImpl(
             plccCardTypeLimitRepository.save(newEntity)
             plccCardTypeLimitHistoryRepository.save(
                 PlccCardRewardsUtil.makeTypeLimitHisotryEntity(newEntity)
-            )
-            return
-        }
 
-        // 있지만, 값의 차이가 없을 때 lastCheckAt만 업데이트
-        if (prevEntity.equal(newEntity)) {
+            )
+            // 있지만, 값의 차이가 없을 때 lastCheckAt만 업데이트
+        } else if (prevEntity.equal(newEntity)) {
             prevEntity.apply {
                 lastCheckAt = now
             }.let {
                 plccCardTypeLimitRepository.save(it)
             }
-            return
-        }
-
-        // 있지만, 값의 차이가 있을 때 변경된 값으로 저장
-        newEntity.apply {
-            plccCardBenefitLimitDetailId = prevEntity.plccCardBenefitLimitDetailId
-            createdAt = prevEntity.createdAt
-            updatedAt = prevEntity.updatedAt
-        }.let {
-            plccCardTypeLimitRepository.save(it)
-            plccCardTypeLimitHistoryRepository.save(
-                PlccCardRewardsUtil.makeTypeLimitHisotryEntity(it)
-            )
+        } else {
+            // 있지만, 값의 차이가 있을 때 변경된 값으로 저장
+            newEntity.apply {
+                plccCardBenefitLimitDetailId = prevEntity.plccCardBenefitLimitDetailId
+                createdAt = prevEntity.createdAt
+                updatedAt = prevEntity.updatedAt
+            }.let {
+                plccCardTypeLimitRepository.save(it)
+                plccCardTypeLimitHistoryRepository.save(
+                    PlccCardRewardsUtil.makeTypeLimitHisotryEntity(it)
+                )
+            }
         }
     }
 

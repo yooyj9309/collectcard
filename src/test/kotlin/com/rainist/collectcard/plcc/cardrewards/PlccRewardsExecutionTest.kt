@@ -31,6 +31,7 @@ class PlccRewardsExecutionTest {
     @Autowired
     lateinit var collectExecutorService: CollectExecutorService
 
+    @DisplayName("Threshold execution 테스트")
     @Test
     fun plccRewardsExecutionTest() {
         // given
@@ -39,7 +40,7 @@ class PlccRewardsExecutionTest {
         ExecutionTestUtil.serverSetting(
             server,
             LottecardPlccApis.card_lottecard_plcc_rewards,
-            "classpath:mock/lottecard/rewards/rewards_expected_1.json"
+            "classpath:mock/lottecard/rewards/rewards_threshold_expected_1.json"
         )
 
         // when
@@ -80,12 +81,53 @@ class PlccRewardsExecutionTest {
             this.totalLimitAmount = BigDecimal("000000025000")
             this.appliedAmount = BigDecimal("000000005000")
             this.limitRemainingAmount = BigDecimal("000000020000")
-            this.totalLimitCount = 999
+            this.totalLimitCount = 0
             this.appliedCount = 1
-            this.limitRemainingCount = 999
-            this.totalSalesLimitAmount = BigDecimal("999999999999")
+            this.limitRemainingCount = 0
+            this.totalSalesLimitAmount = BigDecimal("0")
             this.appliedSalesAmount = BigDecimal("000000020500")
-            this.limitRemainingSalesAmount = BigDecimal("999999999999")
+            this.limitRemainingSalesAmount = BigDecimal("0")
+            this.serviceType = ServiceType.CHARGE_DISCOUNT
+        })
+    }
+
+    @DisplayName("이전 달 실적이 없어 한도, 잔여금액이 99999로 패딩되어 오는 경우에 0으로 매핑 테스트")
+    @Test
+    fun tyepLimit_padding_test() {
+        // given
+        val server = MockRestServiceServer.bindTo(commonRestTemplate).ignoreExpectOrder(true).build()
+
+        ExecutionTestUtil.serverSetting(
+            server,
+            LottecardPlccApis.card_lottecard_plcc_rewards,
+            "classpath:mock/lottecard/rewards/rewards_padding_expected_1.json"
+        )
+
+        // when
+        val executionResponse = ExecutionTestUtil.getExecutionResponse<PlccCardRewardsResponse>(
+            collectExecutorService = collectExecutorService,
+            execution = MockExecutions.lottecardPlccRewards,
+            executionContext = ExecutionTestUtil.getExecutionContext("1", "lottecard"),
+            executionRequest = makeRewardsRequest()
+        )
+
+        val plccTypeLimits = executionResponse.response?.dataBody?.benefitList ?: mutableListOf()
+
+        // then
+        assertThat(plccTypeLimits.size).isEqualTo(1)
+        assertThat(plccTypeLimits[0]).isEqualToComparingFieldByField(PlccCardTypeLimit().apply {
+            this.benefitName = "u6G068SrteUgxKvG5CDH0sDO"
+            this.benefitCode = "C292"
+            this.discountRate = BigDecimal("000005000.00")
+            this.totalLimitAmount = BigDecimal("0")
+            this.appliedAmount = BigDecimal("000000005000")
+            this.limitRemainingAmount = BigDecimal("0")
+            this.totalLimitCount = 0
+            this.appliedCount = 1
+            this.limitRemainingCount = 0
+            this.totalSalesLimitAmount = BigDecimal("0")
+            this.appliedSalesAmount = BigDecimal("000000020500")
+            this.limitRemainingSalesAmount = BigDecimal("0")
             this.serviceType = ServiceType.CHARGE_DISCOUNT
         })
     }

@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Profile
 
 @Configuration
 @DependsOn("nettyPidSetting")
-@Profile(value = ["development", "staging", "production"])
+@Profile(value = ["local", "development", "staging", "production"])
 class UserClientConfig(
     @Value("\${userv2-server.uri}")
     private var userV2Uri: String,

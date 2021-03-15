@@ -97,8 +97,10 @@ class PlccCardRewardsUtil {
                 entity.benefitName = plccCardTypeLimit.benefitName ?: ""
                 entity.benefitCode = plccCardTypeLimit.benefitCode
                 entity.discountAmount = null
-                // TODO : discount_rate 이 99999999.0000이 오는 경우가 있어서 자리수를 늘려야함.
-                // entity.discountRate = plccCardTypeLimit.discountRate
+                /** discount_rate가 999999999.00가 오는 경우가 있는데,
+                 *  총계 데이터가 오는 경우라 DB에 저장하지 않기에 DB 타입을 늘리지 않는다.
+                 */
+                entity.discountRate = plccCardTypeLimit.discountRate
                 // not null
                 entity.totalLimitAmount = plccCardTypeLimit.totalLimitAmount ?: BigDecimal("0.0000")
                 // not null

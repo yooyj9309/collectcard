@@ -57,7 +57,7 @@ class PlccCardRewardsConvertService {
     fun toTypeLimitProto(entity: PlccCardTypeLimitEntity): CollectcardProto.RewardsTypeLimit {
         val rewardsTypeLimit = CollectcardProto.RewardsTypeLimit.newBuilder()
 
-        rewardsTypeLimit.rewardsTypeName = getRewardsTypeName(entity.benefitName)
+        rewardsTypeLimit.rewardsTypeName = getRewardsTypeName(entity.benefitCode)
         rewardsTypeLimit.rewardsCode = StringValue.of(entity.benefitCode)
         rewardsTypeLimit.rewardsLimitAmount2F = multiplyForAmount(entity.totalLimitAmount)
         rewardsTypeLimit.rewardsLimitUsedAmount2F = multiplyForAmount(entity.appliedAmount)
@@ -91,13 +91,12 @@ class PlccCardRewardsConvertService {
         }
     }
 
-    // TODO(hyunjun) : 혜택명은 데이터보고 확인.
-    private fun getRewardsTypeName(benefitName: String?): PlccProto.RewardsType {
-        return when (benefitName) {
-            "CAFE" -> PlccProto.RewardsType.REWARDS_TYPE_CAFE_DISCOUNT
-            "CONVENIENCE" -> PlccProto.RewardsType.REWARDS_TYPE_CONVENIENCE_STORE_DISCOUNT
-            "DELIVERY" -> PlccProto.RewardsType.REWARDS_TYPE_DELIVERY_APP_DISCOUNT
-            "STREAMING" -> PlccProto.RewardsType.REWARDS_TYPE_STREAMING_DISCOUNT
+    private fun getRewardsTypeName(benefitCode: String?): PlccProto.RewardsType {
+        return when (benefitCode) {
+            "C292" -> PlccProto.RewardsType.REWARDS_TYPE_CAFE_DISCOUNT
+            "C293" -> PlccProto.RewardsType.REWARDS_TYPE_DELIVERY_APP_DISCOUNT
+            "C294" -> PlccProto.RewardsType.REWARDS_TYPE_STREAMING_DISCOUNT
+            "C295" -> PlccProto.RewardsType.REWARDS_TYPE_CONVENIENCE_STORE_DISCOUNT
             else -> PlccProto.RewardsType.REWARDS_TYPE_UNKNOWN
         }
     }

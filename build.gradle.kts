@@ -109,7 +109,7 @@ dependencies {
     // aws
     implementation("software.amazon.awssdk:kms:2.14.21")
 
-    testImplementation ("org.mockito:mockito-inline:2.13.0")
+    testImplementation("org.mockito:mockito-inline:2.13.0")
 }
 
 tasks.withType<Test> {
@@ -145,19 +145,18 @@ tasks.withType<JacocoCoverageVerification> {
         classDirectories.setFrom(files(classDirectories.files.map {
             fileTree(it).apply {
                 val excludes = mutableListOf(
-                    "com/google/**"
-                    ,"com/github/**"
-                    ,"**/*Companion*"
-                    ,"**/*Exception"
-                    ,"**/*Exception.class"
-                    ,"**/config/**"
-                    ,"**/CollectcardApplication**"
+                    "com/google/**",
+                    "com/github/**",
+                    "**/*Companion*",
+                    "**/*Exception",
+                    "**/*Exception.class",
+                    "**/config/**",
+                    "**/CollectcardApplication**"
                 )
                 exclude(excludes)
             }
         }))
     }
-
 
 }
 
@@ -166,13 +165,13 @@ tasks.withType<JacocoReport> {
         classDirectories.setFrom(files(classDirectories.files.map {
             fileTree(it).apply {
                 val excludes = mutableListOf(
-                    "com/google/**"
-                    ,"com/github/**"
-                    ,"**/*Companion*"
-                    ,"**/*Exception"
-                    ,"**/*Exception.class"
-                    ,"**/config/**"
-                    ,"**/CollectcardApplication**"
+                    "com/google/**",
+                    "com/github/**",
+                    "**/*Companion*",
+                    "**/*Exception",
+                    "**/*Exception.class",
+                    "**/config/**",
+                    "**/CollectcardApplication**"
                 )
                 exclude(excludes)
             }
