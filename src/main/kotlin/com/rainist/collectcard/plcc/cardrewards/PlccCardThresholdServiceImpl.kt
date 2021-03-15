@@ -21,8 +21,6 @@ import com.rainist.collectcard.plcc.cardrewards.dto.PlccRpcRequest
 import com.rainist.collectcard.plcc.cardtransactions.convertStringYearMonth
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardThresholdHistoryRepository
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardThresholdRepository
-import com.rainist.collectcard.plcc.common.db.repository.PlccCardTypeLimitHistoryRepository
-import com.rainist.collectcard.plcc.common.db.repository.PlccCardTypeLimitRepository
 import com.rainist.collectcard.plcc.common.util.PlccCardRewardsUtil
 import com.rainist.common.log.Log
 import com.rainist.common.service.ValidationService
@@ -41,8 +39,6 @@ class PlccCardThresholdServiceImpl(
     val localDatetimeService: LocalDatetimeService,
     val plccCardThresholdRepository: PlccCardThresholdRepository,
     val plccCardThresholdHistoryRepository: PlccCardThresholdHistoryRepository,
-    val plccCardTypeLimitRepository: PlccCardTypeLimitRepository,
-    val plccCardTypeLimitHistoryRepository: PlccCardTypeLimitHistoryRepository,
     val encodeService: EncodeService
 ) : PlccCardThresholdService {
 
@@ -54,11 +50,6 @@ class PlccCardThresholdServiceImpl(
     ): PlccCardRewardsResponse {
 
         val now = localDatetimeService.generateNowLocalDatetime().now
-
-        // TODO (hyunjun) : 불필요한 코드, 테스트용 log.
-        // val banksaladUserId = executionContext.userId.toLong()
-        // val organizationId = executionContext.organizationId
-        // val organization = organizationService.getOrganizationByOrganizationId(organizationId)
 
         CollectcardGrpcService.logger.Warn("PLCC rewardsRequest executionContext = {}", executionContext)
 
@@ -111,10 +102,6 @@ class PlccCardThresholdServiceImpl(
         }?.toMutableList()
             ?: mutableListOf())
 
-        /** 실적(RewardsThreshold)와 혜택(RewardsTypeLimit)의 테이블이
-         *  나눠져있기 때문에 구분해서 저장
-         */
-
         /* 실적(RewardsThreshold) save */
         // 실적 데이터 조회
         val rewardsThreshold = executionResponse.response?.dataBody?.plccCardThreshold
@@ -160,7 +147,6 @@ class PlccCardThresholdServiceImpl(
                 cardCompanyCardId = rpcRequest.cardId,
                 // inquiryYearMonth 1달 빼서 조회해야함.
                 benefitYearMonth = PlccCardRewardsUtil.minusAMonth(plccCardRewardsRequest.dataBody?.inquiryYearMonth)
-                    ?: ""
             )
         val newEntity =
             PlccCardRewardsUtil.makeThresholdEntity(
@@ -201,7 +187,7 @@ class PlccCardThresholdServiceImpl(
 
         // 있지만 데이터가 다르다면 prevEntity를 새로 만든 엔티티의 값으로 변경 후 저장, history insert
         newEntity.apply {
-            this.plccCardBenefitLimitId = prevEntity?.plccCardBenefitLimitId
+            this.plccCardBenefitLimitId = prevEntity.plccCardBenefitLimitId
             this.createdAt = prevEntity.createdAt
             this.updatedAt = prevEntity.updatedAt
         }.let {

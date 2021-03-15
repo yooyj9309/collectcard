@@ -52,11 +52,6 @@ class PlccCardTypeLimitServiceImpl(
 
         val now = localDatetimeService.generateNowLocalDatetime().now
 
-        // TODO (hyunjun) : 불필요한 코드, 테스트용 log.
-        // val banksaladUserId = executionContext.userId.toLong()
-        // val organizationId = executionContext.organizationId
-        // val organization = organizationService.getOrganizationByOrganizationId(organizationId)
-
         CollectcardGrpcService.logger.Warn("PLCC rewardsRequest executionContext = {}", executionContext)
 
         // execution
@@ -111,7 +106,6 @@ class PlccCardTypeLimitServiceImpl(
         /** TypeLimit과 Threshold의 outcomeStartDay, outcomeEndDay의 정합성을 맞추기 위해
          *  TypeLimit을 저장할 때 같은 혜택년월의 Threshold를 조회해 outcomeDays를 넣어준다.
          */
-
         val requestYearMonth =
             DateTimeUtil.epochMilliSecondToKSTLocalDateTime(rpcRequest.requestMonthMs)
         val stringYearMonth = convertStringYearMonth(requestYearMonth)
