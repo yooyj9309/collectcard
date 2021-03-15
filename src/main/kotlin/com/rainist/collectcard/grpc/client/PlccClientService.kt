@@ -37,8 +37,7 @@ class PlccClientService(
                         .setNumber(it.cardNumberMask)
                         .setExternalId(it.cid)
                         .setProductName(StringValue.of(it.cardProductName))
-                        .setInternationalBrand(CardProto.CardInternationalBrand.valueOf(it.internationalBrandName
-                            ?: "UNKNOWN"))
+                        .setInternationalBrand(parseInternalBrand(it.internationalBrandName))
                         .setOwnerName(StringValue.of(it.cardOwnerName))
 //                        .setExternalState(StringValue.of(parseExternalState()))
                         .setStatus(cardIssueStatusToProtoEnum(it.cardIssueStatus))
@@ -76,6 +75,16 @@ class PlccClientService(
             "03" -> CardProto.CardStatus.CARD_STATUS_REGISTERED
             "04" -> CardProto.CardStatus.CARD_STATUS_TERMINATED
             else -> CardProto.CardStatus.CARD_STATUS_UNKNOWN
+        }
+    }
+
+    private fun parseInternalBrand(internalBrandName: String?): CardProto.CardInternationalBrand {
+        return when (internalBrandName?.toUpperCase()) {
+            "VISA" -> CardProto.CardInternationalBrand.CARD_INTERNATIONAL_BRAND_VISA
+            "AMEX" -> CardProto.CardInternationalBrand.CARD_INTERNATIONAL_BRAND_AMEX
+            "MASTER" -> CardProto.CardInternationalBrand.CARD_INTERNATIONAL_BRAND_MASTERCARD
+            "MASTERCARD" -> CardProto.CardInternationalBrand.CARD_INTERNATIONAL_BRAND_MASTERCARD
+            else -> CardProto.CardInternationalBrand.CARD_INTERNATIONAL_BRAND_UNKNOWN
         }
     }
 }
