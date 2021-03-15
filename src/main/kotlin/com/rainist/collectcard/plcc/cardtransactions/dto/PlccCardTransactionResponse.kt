@@ -18,6 +18,8 @@ data class PlccCardTransactionResponseDataBody(
     var totalSalesAmount: BigDecimal = BigDecimal.ZERO, // 총 혜택 매출 금액
     var responseCode: ResultCode = ResultCode.UNKNOWN, // 응답코드
     var responseMessage: String? = null,
+    var paginationResultCode: String? = null,
+    var nextKey: String? = null,
     var transactionListCount: Int = 0, // 상품별할인서비스 적용내역 건수
     var transactionList: List<PlccCardTransaction> = listOf() // 상품별 할인 서비스 적용 내역
 )
