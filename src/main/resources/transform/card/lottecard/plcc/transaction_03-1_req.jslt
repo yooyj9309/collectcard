@@ -2,5 +2,7 @@
     "inquiry_month" : .dataBody.inquiryYearMonth,
     "card_number" : .dataBody.cardNumber,
     "benefit_product_code" : "A224",
-    "screen_inquiry_code" : "B324"
+    "screen_inquiry_code" : "B324",
+    "pagination_result_code" : .dataBody.paginationResultCode,
+    "next_key" : .dataBody.nextKey
 }

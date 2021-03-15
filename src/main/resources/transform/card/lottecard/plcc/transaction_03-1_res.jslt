@@ -26,9 +26,9 @@ let ResultCodes = {
         "responseCode" : get-key($ResultCodes, .response_code, "UNKNOWN"), // 결과코드
         "responseMessage" : .response_message,
         "transactionListCount" : .transaction_list_count,
-        "transactionList": [for (.transaction_list),
-        "paginationResultCode": .pagination_result_code,    //
-        "nextKey" : if (.pagination_result_code == "Y") .next_key else null   // next key
+        "paginationResultCode": .pagination_result_code,    // 페이징 여부 코드 "Y" OR "F"
+        "nextKey" : if (.pagination_result_code == "Y") .next_key else null,   // next key
+        "transactionList": [for (.transaction_list)
             {
                 "serviceCode" : .service_code,          // 혜택 적용 코드
                 "serviceCodeOrigin" : .service_code,    // 혜택적용코드 원본값

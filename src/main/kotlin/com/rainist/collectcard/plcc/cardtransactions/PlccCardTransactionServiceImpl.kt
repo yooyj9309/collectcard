@@ -103,6 +103,9 @@ class PlccCardTransactionServiceImpl(
             // 신규생성
             PlccCardTransactionBenefitSummaryEntity().apply {
                 this.approvalYearMonth = yearMonth
+                this.banksaladUserId = banksaladUserId
+                this.cardCompanyId = organizationId
+                this.cardCompanyCardId = cardCompanyCardId
                 this.totalBenefitCount = executionResponse.response.dataBody?.totalBenefitCount
                 this.totalBenefitAmount = executionResponse.response.dataBody?.totalBenefitAmount
                 this.totalSalesAmount = executionResponse.response.dataBody?.totalSalesAmount

@@ -25,7 +25,11 @@ class LottecardPlccTransactionExecution {
                 val nextTransactions = next.dataBody?.transactionList?.toMutableList() ?: mutableListOf()
                 prevTransactions.addAll(nextTransactions)
 
-                prev.dataBody = PlccCardTransactionResponseDataBody(transactionList = prevTransactions, nextKey = next.dataBody?.nextKey)
+                prev.dataBody = PlccCardTransactionResponseDataBody(
+                    transactionList = prevTransactions,
+                    nextKey = next.dataBody?.nextKey,
+                    paginationResultCode = next.dataBody?.paginationResultCode
+                )
                 prev
             }
 
