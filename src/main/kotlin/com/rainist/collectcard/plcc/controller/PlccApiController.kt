@@ -53,6 +53,8 @@ class PlccApiController(
     fun change(@RequestBody plccCardChangeRequestDto: PlccCardChangeRequestDto): ResponseEntity<PlccResponseDto> {
         logger.Warn("PLCC Change Req : {}", plccCardChangeRequestDto)
 
+        plccCardService.changePlccCard("lottecard", plccCardChangeRequestDto.ci, plccCardChangeRequestDto.cardNumberMask, plccCardChangeRequestDto.cid, plccCardChangeRequestDto.statusType, plccCardChangeRequestDto.cardStatus)
+
         val cid = plccCardChangeRequestDto.cid
         return ResponseEntity(
             PlccResponseDto().success(cid, encodeService.base64Encode("정상처리 되었습니다", Charset.forName("MS949"))),

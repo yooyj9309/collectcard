@@ -40,6 +40,31 @@ class PlccCardServiceImpl(
         )
     }
 
+    override fun changePlccCard(organizationId: String, ci: String, cardNumberMask: String, cid: String, statusType: String, cardStatus: String) {
+        val user = userV2ClientService.getUserByCi(ci)
+        if (user != null) {
+            val card = plccCardRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardId(user.userId.toLong(), organizationId, cid)
+            card?.copy(
+                cardStatus = cardStatus,
+                cardStatusOrigin = cardStatus
+            )?.let {
+                updatePlccCard(card, it)
+            }
+        }
+
+        plccClientService.syncPlccsByCollectcardData(
+            lottecardOrganizationObjectId,
+            ci,
+            user?.userId,
+            mutableListOf(PlccCardDto(
+                cardNumberMask = cardNumberMask,
+                cid = cid,
+                cardIssueStatus = cardStatus
+            )),
+            SyncType.STATUS_UPDATED
+        )
+    }
+
     private fun upsertPlccCardAndHistory(organizationId: String, userId: Long, cardDto: PlccCardDto, now: LocalDateTime) {
         val newEntity = cardDtoToEntity(organizationId, userId, cardDto, now)
 

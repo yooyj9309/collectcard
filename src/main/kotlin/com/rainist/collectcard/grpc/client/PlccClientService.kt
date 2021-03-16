@@ -31,24 +31,24 @@ class PlccClientService(
             .setOrganizationId(organizationId)
             .setCi(ci)
             .addAllData(
-                data.map {
-                    PlccProto.CollectcardPlccData.newBuilder()
-                        .setName(it.cardName)
-                        .setNumber(it.cardNumberMask)
-                        .setExternalId(it.cid)
-                        .setProductName(StringValue.of(it.cardProductName))
-                        .setInternationalBrand(parseInternalBrand(it.internationalBrandName))
-                        .setOwnerName(StringValue.of(it.cardOwnerName))
-                        .setCardOwnerType(parseCardOwnerType(it.ownerType))
-//                        .setExternalState(StringValue.of(parseExternalState()))
-                        .setStatus(cardIssueStatusToProtoEnum(it.cardIssueStatus))
-                        .setIssuedAtMs(DateTimeUtil.stringDateToEpochMilliSecond(it.issuedDay
-                            ?: "", "yyyyMMdd", ZoneId.systemDefault(), ZoneOffset.UTC))
-                        .setExpiresAtMs(DateTimeUtil.stringDateToEpochMilliSecond(it.expiresYearMonth + "01"
-                            ?: "", "yyyyMMdd", ZoneId.systemDefault(), ZoneOffset.UTC))
-                        .setAgreedAtMs(DateTimeUtil.stringDateToEpochMilliSecond(it.cardApplicationDay
-                            ?: "", "yyyyMMdd", ZoneId.systemDefault(), ZoneOffset.UTC))
-                        .build()
+                data.map { cardDto ->
+                    val cardBuilder = PlccProto.CollectcardPlccData.newBuilder()
+                    cardDto.cardName?.let { cardBuilder.setName(it) }
+                    cardDto.cardNumberMask?.let { cardBuilder.setNumber(it) }
+                    cardDto.cid?.let { cardBuilder.setExternalId(it) }
+                    cardDto.cardProductName?.let { cardBuilder.setProductName(StringValue.of(it)) }
+                    cardDto.ownerType?.let { cardBuilder.setCardOwnerType(parseCardOwnerType(it)) }
+                    cardDto.internationalBrandName?.let { cardBuilder.setInternationalBrand(parseInternalBrand(it)) }
+                    cardDto.cardOwnerName?.let { cardBuilder.setOwnerName(StringValue.of(it)) }
+                    cardDto.cardIssueStatus?.let {
+                        cardBuilder.setExternalState(StringValue.of(it))
+                        cardBuilder.setStatus(cardIssueStatusToProtoEnum(it))
+                    }
+                    cardDto.issuedDay?.let { cardBuilder.setIssuedAtMs(DateTimeUtil.stringDateToEpochMilliSecond(it, "yyyyMMdd", ZoneId.systemDefault(), ZoneOffset.UTC)) }
+                    cardDto.expiresYearMonth?.let { cardBuilder.setExpiresAtMs(DateTimeUtil.stringDateToEpochMilliSecond(it + "01", "yyyyMMdd", ZoneId.systemDefault(), ZoneOffset.UTC)) }
+                    cardDto.cardApplicationDay?.let { cardBuilder.setAgreedAtMs(DateTimeUtil.stringDateToEpochMilliSecond(it, "yyyyMMdd", ZoneId.systemDefault(), ZoneOffset.UTC)) }
+
+                    cardBuilder.build()
                 }
             )
             .setSyncType(syncTypetoProtoEnum(syncType))
@@ -69,12 +69,23 @@ class PlccClientService(
     }
 
     private fun cardIssueStatusToProtoEnum(statusCode: String?): CardProto.CardStatus {
+        val lostCodes = mutableListOf("WB10", "WB20", "WD10", "WM10", "WQ10", "WY10", "WY20", "WY30", "WY40", "WY50")
+        val terminatedCodes = mutableListOf("UC10", "UC20", "UC30", "UC40")
+        val reissuedCodes = mutableListOf("UH10", "UH20", "UH30", "UH40", "UH50")
+        val expiredCodes = mutableListOf("UE10", "UE20")
+        val registeredCodes = mutableListOf("SU10", "SU20")
+
         return when (statusCode) {
             "00" -> CardProto.CardStatus.CARD_STATUS_REGISTERED
             "01" -> CardProto.CardStatus.CARD_STATUS_REGISTERED
             "02" -> CardProto.CardStatus.CARD_STATUS_REGISTERED
             "03" -> CardProto.CardStatus.CARD_STATUS_REGISTERED
             "04" -> CardProto.CardStatus.CARD_STATUS_TERMINATED
+            in lostCodes -> CardProto.CardStatus.CARD_STATUS_LOST
+            in terminatedCodes -> CardProto.CardStatus.CARD_STATUS_TERMINATED
+            in reissuedCodes -> CardProto.CardStatus.CARD_STATUS_SUSPENDED
+            in expiredCodes -> CardProto.CardStatus.CARD_STATUS_TERMINATED
+            in registeredCodes -> CardProto.CardStatus.CARD_STATUS_REGISTERED
             else -> CardProto.CardStatus.CARD_STATUS_UNKNOWN
         }
     }
