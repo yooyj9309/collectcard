@@ -111,7 +111,7 @@ class PlccCardRewardsUtil {
                 entity.totalSalesLimitAmount = plccCardTypeLimit.totalSalesLimitAmount
                 entity.appliedSaleAmount = plccCardTypeLimit.appliedSalesAmount
                 entity.limitRemainingSalesAmount = plccCardTypeLimit.limitRemainingSalesAmount
-                entity.serviceType = plccCardTypeLimit.serviceType?.code.toString()
+                entity.serviceType = plccCardTypeLimit.serviceType?.name
                 entity.lastCheckAt = now
             }
         }
