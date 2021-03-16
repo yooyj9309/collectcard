@@ -3,6 +3,7 @@ package com.rainist.collectcard.plcc.cardtransactions
 import com.github.banksalad.idl.apis.v1.card.CardProto
 import com.github.banksalad.idl.apis.v1.collectcard.CollectcardProto
 import com.github.banksalad.idl.apis.v1.plcc.PlccProto
+import com.rainist.collectcard.common.enums.CardOwnerType
 import com.rainist.collectcard.common.enums.CardTransactionType
 import com.rainist.collectcard.plcc.cardtransactions.dto.PlccCardTransaction
 import com.rainist.collectcard.plcc.cardtransactions.enums.PlccCardServiceType
@@ -54,6 +55,8 @@ class PlccCardTransactionConvertService {
             entity.benefitName = plccCardTransaction.serviceName
             entity.serviceType = plccCardTransaction.serviceType
             entity.serviceTypeOrigin = plccCardTransaction.serviceTypeOrigin
+            entity.cardOwnerType = plccCardTransaction.cardOwnerType
+            entity.cardOwnerTypeOrigin = plccCardTransaction.cardOwnerTypeOrigin
             entity.lastCheckAt = now
         }
     }
@@ -77,8 +80,17 @@ class PlccCardTransactionConvertService {
         builder.affiliatedStoreName = plccCardTransactionEntity.storeName
         builder.affiliatedStoreNumber = plccCardTransactionEntity.storeNumber
         builder.approvalType = getApprovalType(plccCardTransactionEntity.cardTransactionType)
+        builder.cardOwnerType = getOwnerType(plccCardTransactionEntity.cardOwnerType)
 
         return builder.build()
+    }
+
+    private fun getOwnerType(ownerType: CardOwnerType?): CardProto.CardOwnerType {
+        return when (ownerType) {
+            CardOwnerType.SELF -> CardProto.CardOwnerType.CARD_OWNER_TYPE_OWNER
+            CardOwnerType.FAMILY -> CardProto.CardOwnerType.CARD_OWNER_TYPE_FAMILY
+            else -> CardProto.CardOwnerType.CARD_OWNER_TYPE_UNKNOWN
+        }
     }
 
     private fun getRewardsBenefitType(type: String?): PlccProto.RewardsType {

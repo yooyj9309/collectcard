@@ -9,6 +9,8 @@ github.com/banksalad/idl v0.0.0-20210315055146-df7c48eea079 h1:P5Mf1qoRhTvbO9LUO
 github.com/banksalad/idl v0.0.0-20210315055146-df7c48eea079/go.mod h1:CJAmRVssIizf3SEtGYo7LKfdFKGQvkkIUsSvqQZpQ2Y=
 github.com/banksalad/idl v0.0.0-20210316043204-722f9c74de25 h1:OrsgrAoG4jsWZCsH8R4jjXD7je7KY30SgmwhfTygmwg=
 github.com/banksalad/idl v0.0.0-20210316043204-722f9c74de25/go.mod h1:CJAmRVssIizf3SEtGYo7LKfdFKGQvkkIUsSvqQZpQ2Y=
+github.com/banksalad/idl v0.0.0-20210316073748-e7f910b1e5fd h1:dugBLSqZ0ksUSVZT6y8qymDfIOrQL3U8lj/49gpdbs4=
+github.com/banksalad/idl v0.0.0-20210316073748-e7f910b1e5fd/go.mod h1:CJAmRVssIizf3SEtGYo7LKfdFKGQvkkIUsSvqQZpQ2Y=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=

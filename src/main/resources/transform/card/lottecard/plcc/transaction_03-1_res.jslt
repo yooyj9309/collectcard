@@ -15,6 +15,12 @@ let ResultCodes = {
     "0000": "OK",
 }
 
+let CardOwnerType = {
+    "" : "UNKNOWN",
+    "1" : "SELF",
+    "2" : "FAMILY"
+}
+
 {
     "dataHeader": {
 
@@ -47,6 +53,8 @@ let ResultCodes = {
                 "storeName" : .store_name,      // 가맹점명
                 "cardTransactionType" : get-key($CardTransactionType, .approval_cancel_type, "CARD_TRANSACTION_TYPE_UNKNOWN"),    // 승인 취소 여부
                 "cardTransactionTypeOrigin" : .approval_cancel_type, // 승인 취소 원본값
+                "cardOwnerType" : get-key($CardOwnerType, .owner_type, "UNKNOWN"),  // 본인,가족 승인 여부
+                "cardOwnerTypeOrigin" : .owner_type,
                 "isOverseaUse" : false, // PLCC 는 국내만
                 "currencyCode" : "KRW", // PLCC 는 국내만
                 "transactionCountry" : "KOREA",  // PLCC 는 국내만

@@ -1,5 +1,6 @@
 package com.rainist.collectcard.plcc.cardtransactions.dto
 
+import com.rainist.collectcard.common.enums.CardOwnerType
 import com.rainist.collectcard.common.enums.CardTransactionType
 import com.rainist.collectcard.common.enums.CardType
 import com.rainist.collectcard.plcc.cardtransactions.enums.PlccCardServiceType
@@ -87,5 +88,9 @@ data class PlccCardTransaction(
 
     var currencyCode: String? = null,
 
-    var transactionCountry: String? = null
+    var transactionCountry: String? = null,
+
+    var cardOwnerType: CardOwnerType = CardOwnerType.UNKNOWN,
+
+    var cardOwnerTypeOrigin: String? = null
 )

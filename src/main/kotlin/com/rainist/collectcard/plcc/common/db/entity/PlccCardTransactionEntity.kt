@@ -1,5 +1,6 @@
 package com.rainist.collectcard.plcc.common.db.entity
 
+import com.rainist.collectcard.common.enums.CardOwnerType
 import com.rainist.collectcard.common.enums.CardTransactionType
 import com.rainist.collectcard.common.enums.CardType
 import com.rainist.collectcard.plcc.cardtransactions.enums.PlccCardServiceType
@@ -116,6 +117,11 @@ data class PlccCardTransactionEntity(
     var serviceType: PlccCardServiceType? = null,
 
     var serviceTypeOrigin: String? = null,
+
+    @Enumerated(EnumType.STRING)
+    var cardOwnerType: CardOwnerType? = null,
+
+    var cardOwnerTypeOrigin: String? = null,
 
     var lastCheckAt: LocalDateTime? = null,
 
