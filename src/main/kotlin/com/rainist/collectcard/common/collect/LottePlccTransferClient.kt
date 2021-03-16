@@ -81,22 +81,22 @@ class LottePlccTransferClient(
                 .body(res.body)
                 .build()
         }
-        .onFailure {
-            when (it) {
-                is HttpStatusCodeException -> {
-                    transferClientLogService.loggingFailureCount(uri, it.statusCode)
+            .onFailure {
+                when (it) {
+                    is HttpStatusCodeException -> {
+                        transferClientLogService.loggingFailureCount(uri, it.statusCode)
+                    }
+                    is ResourceAccessException, is SocketTimeoutException, is ConnectTimeoutException -> {
+                        transferClientLogService.loggingTimeoutCount(uri)
+                    }
+                    else -> {
+                        transferClientLogService.loggingUnknownErrorCount(uri)
+                    }
                 }
-                is ResourceAccessException, is SocketTimeoutException, is ConnectTimeoutException -> {
-                    transferClientLogService.loggingTimeoutCount(uri)
-                }
-                else -> {
-                    transferClientLogService.loggingUnknownErrorCount(uri)
-                }
-            }
 
-            logger.withFieldError("TransferClientError", it.localizedMessage, it)
-        }
-        .getOrThrow()
+                logger.withFieldError("Lotte TransferClientError", it.localizedMessage, it)
+            }
+            .getOrThrow()
     }
 
     /**
