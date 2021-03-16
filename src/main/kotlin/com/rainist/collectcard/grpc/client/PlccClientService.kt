@@ -39,6 +39,7 @@ class PlccClientService(
                         .setProductName(StringValue.of(it.cardProductName))
                         .setInternationalBrand(parseInternalBrand(it.internationalBrandName))
                         .setOwnerName(StringValue.of(it.cardOwnerName))
+                        .setCardOwnerType(parseCardOwnerType(it.ownerType))
 //                        .setExternalState(StringValue.of(parseExternalState()))
                         .setStatus(cardIssueStatusToProtoEnum(it.cardIssueStatus))
                         .setIssuedAtMs(DateTimeUtil.stringDateToEpochMilliSecond(it.issuedDay
@@ -75,6 +76,13 @@ class PlccClientService(
             "03" -> CardProto.CardStatus.CARD_STATUS_REGISTERED
             "04" -> CardProto.CardStatus.CARD_STATUS_TERMINATED
             else -> CardProto.CardStatus.CARD_STATUS_UNKNOWN
+        }
+    }
+
+    private fun parseCardOwnerType(ownerType: String?): CardProto.CardOwnerType {
+        return when (ownerType) {
+            "본인" -> CardProto.CardOwnerType.CARD_OWNER_TYPE_OWNER
+            else -> CardProto.CardOwnerType.CARD_OWNER_TYPE_FAMILY
         }
     }
 
