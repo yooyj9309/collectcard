@@ -6,12 +6,25 @@ import com.rainist.collect.executor.ITransferClient
 import com.rainist.collectcard.common.service.TransferClientLogService
 import com.rainist.common.log.Log
 import java.net.SocketTimeoutException
+import java.nio.charset.StandardCharsets
+import java.security.cert.X509Certificate
+import java.util.concurrent.TimeUnit
+import javax.net.ssl.SSLContext
 import org.apache.http.conn.ConnectTimeoutException
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory
+import org.apache.http.conn.ssl.TrustStrategy
+import org.apache.http.impl.client.HttpClients
+import org.apache.http.ssl.SSLContexts
+import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.RequestEntity
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
+import org.springframework.http.converter.FormHttpMessageConverter
+import org.springframework.http.converter.StringHttpMessageConverter
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.stereotype.Component
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.StopWatch
@@ -21,8 +34,7 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 
 @Component
-class TransferClient(
-    val commonRestTemplate: RestTemplate,
+class LottePlccTransferClient(
     val transferClientLogService: TransferClientLogService
 ) : ITransferClient {
     companion object : Log
@@ -49,7 +61,14 @@ class TransferClient(
 
             stopWatch.start()
 
-            val res = commonRestTemplate.exchange(req, String::class.java)
+            // TODO Log 삭제
+            logger.Warn("REST TEMPLATE LOG REQ : {}", req.body)
+
+            val restTemplate = createRestTemplate()
+            val res = restTemplate.exchange(req, String::class.java)
+
+            // TODO Log 삭제
+            logger.Warn("REST TEMPLATE LOG RES : {}", res.body)
 
             stopWatch.stop()
 
@@ -78,5 +97,40 @@ class TransferClient(
             logger.withFieldError("TransferClientError", it.localizedMessage, it)
         }
         .getOrThrow()
+    }
+
+    /**
+     * 롯데카드 PLCC는 keep alive 를 지원하지 않음으로 매번 생성
+     */
+    private fun createRestTemplate(): RestTemplate {
+        val connectTimoutMs = TimeUnit.MILLISECONDS.convert(5, TimeUnit.SECONDS)
+        val readTimeoutMs = TimeUnit.MILLISECONDS.convert(60, TimeUnit.SECONDS)
+
+        val acceptingTrustStrategy = TrustStrategy { _: Array<X509Certificate?>?, _: String? -> true }
+
+        val sslContext: SSLContext = SSLContexts.custom()
+            .loadTrustMaterial(null, acceptingTrustStrategy)
+            .build()
+        val csf = SSLConnectionSocketFactory(sslContext)
+
+        val httpClient = HttpClients.custom()
+            .setConnectionTimeToLive(30, TimeUnit.SECONDS)
+            .setSSLSocketFactory(csf)
+            .build()
+
+        val factory = HttpComponentsClientHttpRequestFactory(httpClient)
+        factory.setConnectTimeout(connectTimoutMs.toInt())
+        factory.setReadTimeout(readTimeoutMs.toInt())
+
+        return RestTemplateBuilder()
+            .additionalMessageConverters(
+                StringHttpMessageConverter(StandardCharsets.UTF_8),
+                MappingJackson2HttpMessageConverter(),
+                FormHttpMessageConverter()
+            )
+            .requestFactory {
+                factory
+            }
+            .build()
     }
 }

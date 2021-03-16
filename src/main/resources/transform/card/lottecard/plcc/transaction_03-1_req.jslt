@@ -3,6 +3,6 @@
     "card_number" : .dataBody.cardNumber,
     "benefit_product_code" : "A224",
     "screen_inquiry_code" : "B324",
-    "pagination_result_code" : .dataBody.paginationResultCode,
+    "pagination_result_code" : if( size(.dataBody.nextKey) > 0) "Y" else null,
     "next_key" : .dataBody.nextKey
 }

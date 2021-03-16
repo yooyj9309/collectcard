@@ -51,6 +51,7 @@ class LottecardPlccTransactionExecution {
                         .method(Pagination.Method.NEXTKEY)
                         .nextkey(".dataBody.nextKey")
                         .merge(transactionsMerge)
+                        .max(200)
                         .build()
                 )
                 .build()

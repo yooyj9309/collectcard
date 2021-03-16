@@ -1,3 +1,4 @@
+/*
 package com.rainist.collectcard.plcc.cardrewards
 
 import com.github.banksalad.idl.apis.v1.plcc.PlccProto
@@ -32,9 +33,6 @@ class PlccTypeLimitPublishImplTest {
     @Autowired
     lateinit var plccCardTypeLimitService: PlccCardTypeLimitService
 
-    @Autowired
-    lateinit var commonRestTemplate: RestTemplate
-
     @MockBean
     lateinit var headerService: HeaderService
 
@@ -45,7 +43,7 @@ class PlccTypeLimitPublishImplTest {
     @DisplayName("TypeLimit 데이터 저장")
     @BeforeEach
     fun setUp() {
-        val server = MockRestServiceServer.bindTo(commonRestTemplate).ignoreExpectOrder(true).build()
+        val server = MockRestServiceServer.bindTo(lottePlccRestTemplate).ignoreExpectOrder(true).build()
 
         ExecutionTestUtil.serverSetting(
             server,
@@ -98,3 +96,4 @@ class PlccTypeLimitPublishImplTest {
         )
     }
 }
+*/

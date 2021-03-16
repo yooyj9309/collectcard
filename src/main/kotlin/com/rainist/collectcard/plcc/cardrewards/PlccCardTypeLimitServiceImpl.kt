@@ -35,7 +35,7 @@ import org.springframework.stereotype.Service
 class PlccCardTypeLimitServiceImpl(
     val localDatetimeService: LocalDatetimeService,
     val headerService: HeaderService,
-    val collectExecutorService: CollectExecutorService,
+    val lottePlccExecutorService: CollectExecutorService,
     val validateService: ValidationService,
     val encodeService: EncodeService,
     val plccCardTypeLimitRepository: PlccCardTypeLimitRepository,
@@ -90,7 +90,7 @@ class PlccCardTypeLimitServiceImpl(
 
         // api call
         val executionResponse: ExecutionResponse<PlccCardRewardsResponse> =
-            collectExecutorService.execute(executionContext, execution, executionRequest)
+            lottePlccExecutorService.execute(executionContext, execution, executionRequest)
 
         // TODO Log 삭제
         CollectcardGrpcService.logger.Warn("PLCC rewardsRequest response : {}", executionResponse.response)

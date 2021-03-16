@@ -1,3 +1,4 @@
+/*
 package com.rainist.collectcard.plcc.cardrewards
 
 import com.rainist.collectcard.common.collect.api.LottecardPlccApis
@@ -25,9 +26,6 @@ import org.springframework.web.client.RestTemplate
 class PlccThresholdPublishImplTest {
 
     @Autowired
-    lateinit var commonRestTemplate: RestTemplate
-
-    @Autowired
     lateinit var plccCardThresholdService: PlccCardThresholdService
 
     @Autowired
@@ -44,7 +42,7 @@ class PlccThresholdPublishImplTest {
     @BeforeEach
     fun setUp() {
         // given
-        val server = MockRestServiceServer.bindTo(commonRestTemplate).ignoreExpectOrder(true).build()
+        val server = MockRestServiceServer.bindTo(lottePlccRestTemplate).ignoreExpectOrder(true).build()
 
         ExecutionTestUtil.serverSetting(
             server,
@@ -93,3 +91,4 @@ class PlccThresholdPublishImplTest {
             .isEqualTo("REWARDS_PROMOTION_TYPE_ISSUED")
     }
 }
+*/

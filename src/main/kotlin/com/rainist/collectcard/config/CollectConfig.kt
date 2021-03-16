@@ -18,7 +18,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 class CollectConfig(
     private val transferClient: ITransferClient,
     private val idGenerator: IIdGenerator,
-    private val iApiLogger: IApiLogger
+    private val iApiLogger: IApiLogger,
+    private val lottePlccTransferClient: ITransferClient
 ) {
 
     fun collectObjectMapper(): ObjectMapper {
@@ -46,12 +47,36 @@ class CollectConfig(
     }
 
     @Bean
-    fun executorService() =
+    fun collectExecutorService() =
         CollectExecutorServiceImpl(
             transferClient,
             idGenerator,
             iApiLogger,
             threadPoolTaskExecutor(),
+            collectObjectMapper()
+        )
+
+    @Bean(name = ["lotte-plcc-thread"])
+    fun lottePlccThreadPoolTaskExecutor(): Executor {
+        val executor = ThreadPoolTaskExecutor()
+        executor.setThreadNamePrefix("Async-Thread-LottePlcc-")
+        executor.corePoolSize = 30
+        executor.maxPoolSize = 50
+        executor.setQueueCapacity(1000)
+        executor.keepAliveSeconds = 20
+        executor.setWaitForTasksToCompleteOnShutdown(true)
+        executor.setAwaitTerminationSeconds(20)
+        executor.initialize()
+        return executor
+    }
+
+    @Bean
+    fun lottePlccExecutorService() =
+        CollectExecutorServiceImpl(
+            lottePlccTransferClient,
+            idGenerator,
+            iApiLogger,
+            lottePlccThreadPoolTaskExecutor(),
             collectObjectMapper()
         )
 }

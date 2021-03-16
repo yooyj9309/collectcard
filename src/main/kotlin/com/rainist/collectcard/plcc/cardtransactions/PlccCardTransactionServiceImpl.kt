@@ -35,7 +35,7 @@ import org.springframework.stereotype.Service
 class PlccCardTransactionServiceImpl(
     val headerService: HeaderService,
     val organizationService: OrganizationService,
-    val collectExecutorService: CollectExecutorService,
+    val lottePlccExecutorService: CollectExecutorService,
     val validationService: ValidationService,
     val uuidService: UuidService,
     val plccCardTransactionRepository: PlccCardTransactionRepository,
@@ -196,7 +196,7 @@ class PlccCardTransactionServiceImpl(
         executions: Execution,
         request: ExecutionRequest<PlccCardTransactionRequest>
     ): ExecutionResponse<PlccCardTransactionResponse> {
-        return collectExecutorService.execute(executionContext, executions, request)
+        return lottePlccExecutorService.execute(executionContext, executions, request)
     }
 
     fun plccTransactionValidate(executionResponse: ExecutionResponse<PlccCardTransactionResponse>): List<PlccCardTransaction> {
