@@ -9,6 +9,7 @@ import com.rainist.collectcard.common.enums.ResultCode
 import com.rainist.collectcard.common.exception.CollectExecutionExceptionHandler
 import com.rainist.collectcard.plcc.cardtransactions.dto.PlccCardTransactionResponse
 import com.rainist.collectcard.plcc.cardtransactions.dto.PlccCardTransactionResponseDataBody
+import java.math.BigDecimal
 import java.util.function.BinaryOperator
 
 class LottecardPlccTransactionExecution {
@@ -25,7 +26,15 @@ class LottecardPlccTransactionExecution {
                 val nextTransactions = next.dataBody?.transactionList?.toMutableList() ?: mutableListOf()
                 prevTransactions.addAll(nextTransactions)
 
+                // 전체 summary 는 제일 처음에 주는 값을 사용  sum 금지
+                val totalBenefitAmount = prev.dataBody?.totalBenefitAmount ?: BigDecimal.ZERO
+                val totalBenefitCount = prev.dataBody?.totalBenefitCount ?: 0
+                val totalSalesAmount = prev.dataBody?.totalSalesAmount ?: BigDecimal.ZERO
+
                 prev.dataBody = PlccCardTransactionResponseDataBody(
+                    totalBenefitAmount = totalBenefitAmount,
+                    totalBenefitCount = totalBenefitCount,
+                    totalSalesAmount = totalSalesAmount,
                     transactionList = prevTransactions,
                     nextKey = next.dataBody?.nextKey,
                     paginationResultCode = next.dataBody?.paginationResultCode
