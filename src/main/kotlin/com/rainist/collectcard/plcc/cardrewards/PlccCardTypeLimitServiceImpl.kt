@@ -40,7 +40,8 @@ class PlccCardTypeLimitServiceImpl(
     val encodeService: EncodeService,
     val plccCardTypeLimitRepository: PlccCardTypeLimitRepository,
     val plccCardTypeLimitHistoryRepository: PlccCardTypeLimitHistoryRepository,
-    val plccCardThresholdRepository: PlccCardThresholdRepository
+    val plccCardThresholdRepository: PlccCardThresholdRepository,
+    val plccCardRewardsConvertService: PlccCardRewardsConvertService
 ) : PlccCardTypeLimitService {
 
     companion object : Log
@@ -120,6 +121,7 @@ class PlccCardTypeLimitServiceImpl(
 
         /* 혜택(RewardsTypeLimit) save */
         benefitList.forEach { plccCardRewardsTypeLimit ->
+            plccCardRewardsConvertService.setScaleTypeLimit(plccCardRewardsTypeLimit)
             if (!plccCardRewardsTypeLimit.benefitCode.equals("CXXX")) {
                 upsertRewardsTypeLimit(
                     executionContext,
@@ -164,6 +166,7 @@ class PlccCardTypeLimitServiceImpl(
 
         logger.Warn("prevEntity = {}", prevEntity)
         logger.Warn("newEntity = {}", newEntity)
+        logger.Warn("isEqual = {}", prevEntity?.equal(newEntity))
 
         // 없다면 insert
         if (prevEntity == null) {

@@ -32,7 +32,8 @@ class PlccCardRewardsUtil {
                 entity.outcomeEndDay = threshold?.outcomeEndDate ?: ""
                 entity.isOutcomeDelay = threshold?.isOutcomeDelay
                 // not null
-                entity.beforeMonthCriteriaUseAmount = threshold?.beforeMonthCriteriaUseAmount ?: BigDecimal("0.0000")
+                entity.beforeMonthCriteriaUseAmount =
+                    threshold?.beforeMonthCriteriaUseAmount ?: BigDecimal("0.0000")
                 entity.outcomeCriteriaAmount = threshold?.outcomeCriteriaAmount
                 // not null
                 entity.totalBenefitAmount = threshold?.totalBenefitAmount ?: BigDecimal("0.0000")

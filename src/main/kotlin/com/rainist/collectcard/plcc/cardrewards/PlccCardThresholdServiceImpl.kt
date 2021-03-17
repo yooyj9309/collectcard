@@ -39,6 +39,7 @@ class PlccCardThresholdServiceImpl(
     val localDatetimeService: LocalDatetimeService,
     val plccCardThresholdRepository: PlccCardThresholdRepository,
     val plccCardThresholdHistoryRepository: PlccCardThresholdHistoryRepository,
+    val plccCardRewardsConvertService: PlccCardRewardsConvertService,
     val encodeService: EncodeService
 ) : PlccCardThresholdService {
 
@@ -104,6 +105,11 @@ class PlccCardThresholdServiceImpl(
 
         /* 실적(RewardsThreshold) save */
         // 실적 데이터 조회
+
+        // dto를 setScale(4) 적용 : 엔티티와 정확한 비교를 위해
+        plccCardRewardsConvertService.setScaleThreshold(executionResponse.response?.dataBody?.plccCardThreshold)
+        logger.Warn("threshold setScale = {}", executionResponse.response?.dataBody?.plccCardThreshold)
+
         val rewardsThreshold = executionResponse.response?.dataBody?.plccCardThreshold
         upsertRewardsThreshold(
             executionContext,
@@ -161,6 +167,7 @@ class PlccCardThresholdServiceImpl(
         // TODO : 삭제
         logger.Warn("prevEntity = {}", prevEntity)
         logger.Warn("newEntity = {}", newEntity)
+        logger.Warn("isEqual = {}", prevEntity?.equal(newEntity))
 
         // 없다면, insert
         if (prevEntity == null) {
@@ -172,31 +179,27 @@ class PlccCardThresholdServiceImpl(
                     )
                 )
             }
-            return
-        }
-
-        // 있지만 데이터가 같다면 lastCheckAt만 업데이트
-        if (prevEntity.equal(newEntity)) {
+            // 있지만 데이터가 같다면 lastCheckAt만 업데이트
+        } else if (prevEntity.equal(newEntity)) {
             prevEntity.apply {
                 lastCheckAt = now
             }.let {
                 plccCardThresholdRepository.save(it)
             }
-            return
-        }
-
-        // 있지만 데이터가 다르다면 prevEntity를 새로 만든 엔티티의 값으로 변경 후 저장, history insert
-        newEntity.apply {
-            this.plccCardBenefitLimitId = prevEntity.plccCardBenefitLimitId
-            this.createdAt = prevEntity.createdAt
-            this.updatedAt = prevEntity.updatedAt
-        }.let {
-            plccCardThresholdRepository.save(it)
-            plccCardThresholdHistoryRepository.save(
-                PlccCardRewardsUtil.makeThresholdHistoryEntity(
-                    it
+            // 있지만 데이터가 다르다면 prevEntity를 새로 만든 엔티티의 값으로 변경 후 저장, history insert
+        } else {
+            newEntity.apply {
+                this.plccCardBenefitLimitId = prevEntity.plccCardBenefitLimitId
+                this.createdAt = prevEntity.createdAt
+                this.updatedAt = prevEntity.updatedAt
+            }.let {
+                plccCardThresholdRepository.save(it)
+                plccCardThresholdHistoryRepository.save(
+                    PlccCardRewardsUtil.makeThresholdHistoryEntity(
+                        it
+                    )
                 )
-            )
+            }
         }
     }
 }

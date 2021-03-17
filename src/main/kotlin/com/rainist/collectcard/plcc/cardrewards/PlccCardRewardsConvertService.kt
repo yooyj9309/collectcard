@@ -5,6 +5,8 @@ import com.github.banksalad.idl.apis.v1.plcc.PlccProto
 import com.google.protobuf.BoolValue
 import com.google.protobuf.Int64Value
 import com.google.protobuf.StringValue
+import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardThreshold
+import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardTypeLimit
 import com.rainist.collectcard.plcc.common.db.entity.PlccCardThresholdEntity
 import com.rainist.collectcard.plcc.common.db.entity.PlccCardTypeLimitEntity
 import com.rainist.common.util.DateTimeUtil
@@ -40,6 +42,9 @@ class PlccCardRewardsConvertService {
     }
 
     private fun convertEpochMils(outcomeDay: String?): Long {
+        if (outcomeDay.equals("")) {
+            return 0L
+        }
         val parsedDate = SimpleDateFormat("yyyyMMdd").parse(outcomeDay)
         val reformatDate = SimpleDateFormat("yyyy-MM-dd").format(parsedDate)
         return DateTimeUtil.kstLocalDateToEpochMilliSecond(LocalDate.parse(reformatDate))
@@ -99,5 +104,25 @@ class PlccCardRewardsConvertService {
             "C295" -> PlccProto.RewardsType.REWARDS_TYPE_CONVENIENCE_STORE_DISCOUNT
             else -> PlccProto.RewardsType.REWARDS_TYPE_UNKNOWN
         }
+    }
+
+    fun setScaleThreshold(threshold: PlccCardThreshold?) {
+        threshold?.beforeMonthCriteriaUseAmount = threshold?.beforeMonthCriteriaUseAmount?.setScale(4)
+        threshold?.outcomeCriteriaAmount = threshold?.outcomeCriteriaAmount?.setScale(4)
+        threshold?.totalBenefitAmount = threshold?.totalBenefitAmount?.setScale(4)
+        threshold?.totalSalesAmount = threshold?.totalSalesAmount?.setScale(4)
+        threshold?.monthlyBenefitRate = threshold?.monthlyBenefitRate?.setScale(4)
+        threshold?.monthlyBenefitLimit = threshold?.monthlyBenefitLimit?.setScale(4)
+        threshold?.cashbackAmount = threshold?.cashbackAmount?.setScale(4)
+    }
+
+    fun setScaleTypeLimit(typeLimit: PlccCardTypeLimit) {
+        typeLimit.discountRate = typeLimit.discountRate?.setScale(4)
+        typeLimit.totalLimitAmount = typeLimit.totalLimitAmount?.setScale(4)
+        typeLimit.appliedAmount = typeLimit.appliedAmount?.setScale(4)
+        typeLimit.limitRemainingAmount = typeLimit.limitRemainingAmount?.setScale(4)
+        typeLimit.totalSalesLimitAmount = typeLimit.totalSalesLimitAmount?.setScale(4)
+        typeLimit.appliedSalesAmount = typeLimit.appliedSalesAmount?.setScale(4)
+        typeLimit.limitRemainingSalesAmount = typeLimit.limitRemainingSalesAmount?.setScale(4)
     }
 }
