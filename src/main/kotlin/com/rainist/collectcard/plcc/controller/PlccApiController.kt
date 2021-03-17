@@ -1,7 +1,7 @@
 package com.rainist.collectcard.plcc.controller
 
 import com.rainist.collectcard.common.service.EncodeService
-import com.rainist.collectcard.plcc.cardchange.dto.PlccCardChangeRequestDto
+import com.rainist.collectcard.plcc.dto.PlccCardChangeRequestDto
 import com.rainist.collectcard.plcc.dto.PlccIssueCardRequestDto
 import com.rainist.collectcard.plcc.dto.PlccResponseDto
 import com.rainist.collectcard.plcc.service.PlccCardService
@@ -53,7 +53,14 @@ class PlccApiController(
     fun change(@RequestBody plccCardChangeRequestDto: PlccCardChangeRequestDto): ResponseEntity<PlccResponseDto> {
         logger.Warn("PLCC Change Req : {}", plccCardChangeRequestDto)
 
-        plccCardService.changePlccCard("lottecard", plccCardChangeRequestDto.ci, plccCardChangeRequestDto.cardNumberMask, plccCardChangeRequestDto.cid, plccCardChangeRequestDto.statusType, plccCardChangeRequestDto.cardStatus)
+        plccCardService.changePlccCard(
+            "lottecard",
+            plccCardChangeRequestDto.ci,
+            plccCardChangeRequestDto.cid,
+            plccCardChangeRequestDto.statusType,
+            plccCardChangeRequestDto.cardStatus,
+            DateTimeUtil.utcNowLocalDateTime()
+        )
 
         val cid = plccCardChangeRequestDto.cid
         return ResponseEntity(

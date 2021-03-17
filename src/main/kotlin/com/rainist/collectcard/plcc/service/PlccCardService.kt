@@ -5,5 +5,5 @@ import java.time.LocalDateTime
 
 interface PlccCardService {
     fun issuePlccCard(organizationId: String, ci: String, cards: List<PlccCardDto>, now: LocalDateTime)
-    fun changePlccCard(organizationId: String, ci: String, cardNumberMask: String, cid: String, statusType: String, cardStatus: String)
+    fun changePlccCard(organizationId: String, ci: String, cid: String, statusType: String, cardStatus: String, now: LocalDateTime)
 }

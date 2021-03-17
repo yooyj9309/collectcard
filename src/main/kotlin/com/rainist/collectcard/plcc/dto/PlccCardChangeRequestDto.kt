@@ -1,4 +1,4 @@
-package com.rainist.collectcard.plcc.cardchange.dto
+package com.rainist.collectcard.plcc.dto
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming

@@ -40,13 +40,14 @@ class PlccCardServiceImpl(
         )
     }
 
-    override fun changePlccCard(organizationId: String, ci: String, cardNumberMask: String, cid: String, statusType: String, cardStatus: String) {
+    override fun changePlccCard(organizationId: String, ci: String, cid: String, statusType: String, cardStatus: String, now: LocalDateTime) {
         val user = userV2ClientService.getUserByCi(ci)
         if (user != null) {
             val card = plccCardRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardId(user.userId.toLong(), organizationId, cid)
             card?.copy(
                 cardStatus = cardStatus,
-                cardStatusOrigin = cardStatus
+                cardStatusOrigin = cardStatus,
+                lastCheckAt = now
             )?.let {
                 updatePlccCard(card, it)
             }
@@ -57,7 +58,6 @@ class PlccCardServiceImpl(
             ci,
             user?.userId,
             mutableListOf(PlccCardDto(
-                cardNumberMask = cardNumberMask,
                 cid = cid,
                 cardIssueStatus = cardStatus
             )),

@@ -6,6 +6,7 @@ import com.github.banksalad.idl.apis.v1.plcc.PlccProto
 import com.google.protobuf.StringValue
 import com.rainist.collectcard.plcc.dto.PlccCardDto
 import com.rainist.collectcard.plcc.dto.SyncType
+import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -19,6 +20,8 @@ class PlccClientService(
     @Qualifier("plccBlockingStub")
     val plccBlockingStub: PlccGrpc.PlccBlockingStub
 ) {
+
+    companion object : Log
 
     fun syncPlccsByCollectcardData(
         organizationId: String,
@@ -56,6 +59,8 @@ class PlccClientService(
         if (userId != null) {
             requestBuilder.setUserId(StringValue.of(userId))
         }
+
+        logger.With("plcc_request", requestBuilder.toString()).warn("sync plccs with collectcard data")
 
         return plccBlockingStub.syncPlccsByCollectcardData(requestBuilder.build())
     }
