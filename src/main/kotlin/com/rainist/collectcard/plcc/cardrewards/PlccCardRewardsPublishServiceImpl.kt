@@ -36,8 +36,9 @@ class PlccCardRewardsPublishServiceImpl(
             return plccCardRewardsConvertService.toThresholdProto(it)
         }
 
-        // TODO (hyunjun) : DB 조회 시 null이 나올 수 있는데 처리를 어떻게 할지? -> null이 나오면 exception을 날리기.
-        throw IllegalArgumentException()
+        return CollectcardProto.GetPlccRewardsThresholdResponse
+            .newBuilder()
+            .build()
     }
 
     override fun rewardsTypeLimitPublish(
