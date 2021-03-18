@@ -60,8 +60,6 @@ class PlccClientService(
             requestBuilder.setUserId(StringValue.of(userId))
         }
 
-        logger.With("plcc_request", requestBuilder.toString()).warn("sync plccs with collectcard data")
-
         return plccBlockingStub.syncPlccsByCollectcardData(requestBuilder.build())
     }
 
