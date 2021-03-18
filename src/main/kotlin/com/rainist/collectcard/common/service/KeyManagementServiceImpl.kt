@@ -28,7 +28,10 @@ class KeyManagementServiceImpl(
         card_loan, // 카드론 (대출)
         card_bill_scheduled, // 카드 결제 예정 내역 청구서
         card_payment_scheduled, // 카드 결제 예정
-        card_transaction // 카드 승인 상세 내역
+        card_transaction, // 카드 승인 상세 내역
+
+        plcc_card, // PLCC 카드
+        plcc_card_transaction // PLCC 승인내역
     }
 
     companion object : Log {
@@ -68,6 +71,12 @@ class KeyManagementServiceImpl(
     @Value("\${cipher.iv.card_transaction}")
     private val cardTransactionIv: String? = null
 
+    @Value("\${cipher.iv.plcc_card}")
+    private val plccCardIv: String? = null
+
+    @Value("\${cipher.iv.plcc_card_transaction}")
+    private val plccCardTransactionIv: String? = null
+
     private var apiLogSecret: String? = null
     private var cardSecret: String? = null
     private var cardBillSecret: String? = null
@@ -76,46 +85,93 @@ class KeyManagementServiceImpl(
     private var cardBillScheduledSecret: String? = null
     private var cardPaymentScheduledSecret: String? = null
     private var cardTransactionSecret: String? = null
+    private var plccCardSecret: String? = null
+    private var plccCardTransactionSecret: String? = null
 
     private var kmsClient: KmsClient? = null
 
     @PostConstruct
     private fun init() {
         kmsClient = KmsClient.builder()
-            .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(awsAccessKey, awsAccessToken)))
+            .credentialsProvider(
+                StaticCredentialsProvider.create(
+                    AwsBasicCredentials.create(
+                        awsAccessKey,
+                        awsAccessToken
+                    )
+                )
+            )
             .region(Region.of(awsRegion))
             .build()
 
         apiLogSecret = decryptSecret(
-            cipherClientService.getEncryptedDbTableCipherKey(COLLECTCARD_DB_NAME, TableNameForCipher.api_log.name)?.cipherKey
+            cipherClientService.getEncryptedDbTableCipherKey(
+                COLLECTCARD_DB_NAME,
+                TableNameForCipher.api_log.name
+            )?.cipherKey
         )
 
         cardSecret = decryptSecret(
-            cipherClientService.getEncryptedDbTableCipherKey(COLLECTCARD_DB_NAME, TableNameForCipher.card.name)?.cipherKey
+            cipherClientService.getEncryptedDbTableCipherKey(
+                COLLECTCARD_DB_NAME,
+                TableNameForCipher.card.name
+            )?.cipherKey
         )
 
         cardBillSecret = decryptSecret(
-            cipherClientService.getEncryptedDbTableCipherKey(COLLECTCARD_DB_NAME, TableNameForCipher.card_bill.name)?.cipherKey
+            cipherClientService.getEncryptedDbTableCipherKey(
+                COLLECTCARD_DB_NAME,
+                TableNameForCipher.card_bill.name
+            )?.cipherKey
         )
 
         cardBillTransactionSecret = decryptSecret(
-            cipherClientService.getEncryptedDbTableCipherKey(COLLECTCARD_DB_NAME, TableNameForCipher.card_bill_transaction.name)?.cipherKey
+            cipherClientService.getEncryptedDbTableCipherKey(
+                COLLECTCARD_DB_NAME,
+                TableNameForCipher.card_bill_transaction.name
+            )?.cipherKey
         )
 
         cardLoanSecret = decryptSecret(
-            cipherClientService.getEncryptedDbTableCipherKey(COLLECTCARD_DB_NAME, TableNameForCipher.card_loan.name)?.cipherKey
+            cipherClientService.getEncryptedDbTableCipherKey(
+                COLLECTCARD_DB_NAME,
+                TableNameForCipher.card_loan.name
+            )?.cipherKey
         )
 
         cardBillScheduledSecret = decryptSecret(
-            cipherClientService.getEncryptedDbTableCipherKey(COLLECTCARD_DB_NAME, TableNameForCipher.card_bill_scheduled.name)?.cipherKey
+            cipherClientService.getEncryptedDbTableCipherKey(
+                COLLECTCARD_DB_NAME,
+                TableNameForCipher.card_bill_scheduled.name
+            )?.cipherKey
         )
 
         cardPaymentScheduledSecret = decryptSecret(
-            cipherClientService.getEncryptedDbTableCipherKey(COLLECTCARD_DB_NAME, TableNameForCipher.card_payment_scheduled.name)?.cipherKey
+            cipherClientService.getEncryptedDbTableCipherKey(
+                COLLECTCARD_DB_NAME,
+                TableNameForCipher.card_payment_scheduled.name
+            )?.cipherKey
         )
 
         cardTransactionSecret = decryptSecret(
-            cipherClientService.getEncryptedDbTableCipherKey(COLLECTCARD_DB_NAME, TableNameForCipher.card_transaction.name)?.cipherKey
+            cipherClientService.getEncryptedDbTableCipherKey(
+                COLLECTCARD_DB_NAME,
+                TableNameForCipher.card_transaction.name
+            )?.cipherKey
+        )
+
+        plccCardSecret = decryptSecret(
+            cipherClientService.getEncryptedDbTableCipherKey(
+                COLLECTCARD_DB_NAME,
+                TableNameForCipher.plcc_card.name
+            )?.cipherKey
+        )
+
+        plccCardTransactionSecret = decryptSecret(
+            cipherClientService.getEncryptedDbTableCipherKey(
+                COLLECTCARD_DB_NAME,
+                TableNameForCipher.plcc_card_transaction.name
+            )?.cipherKey
         )
     }
 
@@ -138,6 +194,8 @@ class KeyManagementServiceImpl(
             KeyManagementService.KeyAlias.card_bill_scheduled -> cardBillScheduledSecret
             KeyManagementService.KeyAlias.card_payment_scheduled -> cardPaymentScheduledSecret
             KeyManagementService.KeyAlias.card_transaction -> cardTransactionSecret
+            KeyManagementService.KeyAlias.plcc_card -> plccCardSecret
+            KeyManagementService.KeyAlias.plcc_card_transaction -> plccCardTransactionSecret
             else -> throw CollectcardException("invalid key alias")
         }
     }
@@ -152,6 +210,8 @@ class KeyManagementServiceImpl(
             KeyManagementService.KeyAlias.card_bill_scheduled -> cardBillScheduledIv
             KeyManagementService.KeyAlias.card_payment_scheduled -> cardPaymentScheduledIv
             KeyManagementService.KeyAlias.card_transaction -> cardTransactionIv
+            KeyManagementService.KeyAlias.plcc_card -> plccCardIv
+            KeyManagementService.KeyAlias.plcc_card_transaction -> plccCardTransactionIv
             else -> throw CollectcardException("invalid key alias")
         }
     }

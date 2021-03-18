@@ -1,11 +1,11 @@
 package com.rainist.collectcard.plcc.service
 
-import com.rainist.collectcard.common.db.entity.PlccCardEntity
-import com.rainist.collectcard.common.db.entity.PlccCardHistoryEntity
 import com.rainist.collectcard.common.db.repository.PlccCardHistoryRepository
 import com.rainist.collectcard.common.db.repository.PlccCardRepository
 import com.rainist.collectcard.grpc.client.PlccClientService
 import com.rainist.collectcard.grpc.client.UserV2ClientService
+import com.rainist.collectcard.plcc.common.db.entity.PlccCardEntity
+import com.rainist.collectcard.plcc.common.db.entity.PlccCardHistoryEntity
 import com.rainist.collectcard.plcc.dto.PlccCardDto
 import com.rainist.collectcard.plcc.dto.SyncType
 import java.time.LocalDateTime
@@ -40,10 +40,21 @@ class PlccCardServiceImpl(
         )
     }
 
-    override fun changePlccCard(organizationId: String, ci: String, cid: String, statusType: String, cardStatus: String, now: LocalDateTime) {
+    override fun changePlccCard(
+        organizationId: String,
+        ci: String,
+        cid: String,
+        statusType: String,
+        cardStatus: String,
+        now: LocalDateTime
+    ) {
         val user = userV2ClientService.getUserByCi(ci)
         if (user != null) {
-            val card = plccCardRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardId(user.userId.toLong(), organizationId, cid)
+            val card = plccCardRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardId(
+                user.userId.toLong(),
+                organizationId,
+                cid
+            )
             card?.copy(
                 cardStatus = cardStatus,
                 cardStatusOrigin = cardStatus,
@@ -57,15 +68,22 @@ class PlccCardServiceImpl(
             lottecardOrganizationObjectId,
             ci,
             user?.userId,
-            mutableListOf(PlccCardDto(
-                cid = cid,
-                cardIssueStatus = cardStatus
-            )),
+            mutableListOf(
+                PlccCardDto(
+                    cid = cid,
+                    cardIssueStatus = cardStatus
+                )
+            ),
             SyncType.STATUS_UPDATED
         )
     }
 
-    private fun upsertPlccCardAndHistory(organizationId: String, userId: Long, cardDto: PlccCardDto, now: LocalDateTime) {
+    private fun upsertPlccCardAndHistory(
+        organizationId: String,
+        userId: Long,
+        cardDto: PlccCardDto,
+        now: LocalDateTime
+    ) {
         val newEntity = cardDtoToEntity(organizationId, userId, cardDto, now)
 
         val oldEntity = plccCardRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardId(
@@ -104,7 +122,12 @@ class PlccCardServiceImpl(
         )
     }
 
-    private fun cardDtoToEntity(organizationId: String, userId: Long, card: PlccCardDto, now: LocalDateTime): PlccCardEntity {
+    private fun cardDtoToEntity(
+        organizationId: String,
+        userId: Long,
+        card: PlccCardDto,
+        now: LocalDateTime
+    ): PlccCardEntity {
         return PlccCardEntity().apply {
             this.banksaladUserId = userId
             this.cardCompanyId = organizationId

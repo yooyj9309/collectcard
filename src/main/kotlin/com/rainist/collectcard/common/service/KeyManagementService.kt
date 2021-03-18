@@ -10,7 +10,10 @@ interface KeyManagementService {
         card_loan, // 카드론 (대출)
         card_bill_scheduled, // 카드 결졔 예정 내역 청구서
         card_payment_scheduled, // 카드 결제 예정
-        card_transaction // 카드 승인 상세 내역
+        card_transaction, // 카드 승인 상세 내역
+
+        plcc_card, // PLCC 카드
+        plcc_card_transaction // PLCC 승인내역
     }
 
     fun getSecret(keyAlias: KeyAlias?): String?

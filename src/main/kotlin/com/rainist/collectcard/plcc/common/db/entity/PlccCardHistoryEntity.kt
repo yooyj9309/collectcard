@@ -1,8 +1,10 @@
-package com.rainist.collectcard.common.db.entity
+package com.rainist.collectcard.plcc.common.db.entity
 
+import com.rainist.collectcard.plcc.common.converter.PlccCardEncryptConverter
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import javax.persistence.Column
+import javax.persistence.Convert
 import javax.persistence.Entity
 import javax.persistence.EntityListeners
 import javax.persistence.GeneratedValue
@@ -34,7 +36,7 @@ data class PlccCardHistoryEntity(
 
     var lastCheckAt: LocalDateTime? = null,
 
-//    @Convert(converter = PlccCardEncryptConverter::class)
+    @Convert(converter = PlccCardEncryptConverter::class)
     @Column(nullable = false, name = "card_owner_name_encrypted")
     var cardOwnerName: String? = null,
 
@@ -49,11 +51,11 @@ data class PlccCardHistoryEntity(
 
     var internationalBrandName: String? = null,
 
-//    @Convert(converter = PlccCardEncryptConverter::class)
+    @Convert(converter = PlccCardEncryptConverter::class)
     @Column(nullable = false, name = "card_number_encrypted")
     var cardNumber: String? = null,
 
-//    @Convert(converter = PlccCardEncryptConverter::class)
+    @Convert(converter = PlccCardEncryptConverter::class)
     @Column(nullable = true, name = "card_number_mask_encrypted")
     var cardNumberMask: String? = null,
 
@@ -79,7 +81,7 @@ data class PlccCardHistoryEntity(
 
     var paymentBankId: String? = null,
 
-//    @Convert(converter = PlccCardEncryptConverter::class)
+    @Convert(converter = PlccCardEncryptConverter::class)
     @Column(nullable = true, name = "payment_account_number_encrypted")
     var paymentAccountNumber: String? = null,
 

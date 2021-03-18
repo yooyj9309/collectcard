@@ -52,6 +52,8 @@ cipher:
     card_payment_scheduled: SAb3UHd1u8EXad8H
     card_transaction: VJYyG4WMmo50Lsno
     card_bill_scheduled: lMlHVu0KRK6KLZbn
+    plcc_card: fS9QEBtGpp7CXBD3
+    plcc_card_transaction: Oc/XPTOaoqTBiynC
 
 aws:
   region: ap-northeast-2

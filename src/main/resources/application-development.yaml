@@ -57,6 +57,8 @@ cipher:
     card_payment_scheduled: mltdWbc2u7akgbGF
     card_transaction: IJ3A8ccSaR2mCJL/
     card_bill_scheduled: M1eoqqCG3pmM3qNQ
+    plcc_card: AcPEn+KiLL1BDJ3d
+    plcc_card_transaction: +H6Enrf7NAViHfoE
 
 aws:
   region: ap-northeast-2

@@ -19,7 +19,8 @@ object AesGcmEncrypt {
 
     fun encryptStringBase64(secret: String?, iv: String?, payload: String): String? {
         return Base64Util.encode(
-                encrypt(Base64Util.decode(secret),
+            encrypt(
+                Base64Util.decode(secret),
                 Base64Util.decode(iv),
                 payload.toByteArray(StandardCharsets.UTF_8)
             )
@@ -28,11 +29,11 @@ object AesGcmEncrypt {
 
     fun decryptStringBase64(secret: String?, iv: String?, encrypted: String?): String? {
         return String(
-                decrypt(
-                    Base64Util.decode(secret),
-                    Base64Util.decode(iv),
-                    Base64Util.decode(encrypted)
-                )
+            decrypt(
+                Base64Util.decode(secret),
+                Base64Util.decode(iv),
+                Base64Util.decode(encrypted)
+            )
         )
     }
 
@@ -77,7 +78,7 @@ object AesGcmEncrypt {
                 is InvalidAlgorithmParameterException,
                 is IllegalBlockSizeException,
                 is BadPaddingException -> {
-                    throw CipherException("encrypt fail.", e)
+                    throw CipherException("decrypt fail.", e)
                 }
                 else -> throw e
             }

@@ -4,9 +4,11 @@ import com.rainist.collectcard.common.enums.CardOwnerType
 import com.rainist.collectcard.common.enums.CardTransactionType
 import com.rainist.collectcard.common.enums.CardType
 import com.rainist.collectcard.plcc.cardtransactions.enums.PlccCardServiceType
+import com.rainist.collectcard.plcc.common.converter.PlccCardTransactionEncryptConverter
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import javax.persistence.Column
+import javax.persistence.Convert
 import javax.persistence.Entity
 import javax.persistence.EntityListeners
 import javax.persistence.EnumType
@@ -49,9 +51,11 @@ data class PlccCardTransactionEntity(
 
     var cardName: String? = null,
 
+    @Convert(converter = PlccCardTransactionEncryptConverter::class)
     @Column(nullable = true, name = "card_number_encrypted")
     var cardNumber: String? = null,
 
+    @Convert(converter = PlccCardTransactionEncryptConverter::class)
     @Column(nullable = true, name = "card_number_mask_encrypted")
     var cardNumberMask: String? = null,
 
