@@ -30,8 +30,6 @@ class PlccApiController(
     @PostMapping(path = ["/lottecard/card/issue"])
     fun issue(@RequestBody plccIssueCardRequestDto: PlccIssueCardRequestDto): ResponseEntity<PlccResponseDto> {
 
-        logger.Warn("PlccApiController issue before : {}", plccIssueCardRequestDto)
-
         // TODO 테스트를 위해서 BASE64로 통신중 롯데카드 완료되면 수정 필요
         plccIssueCardRequestDto.cardList.forEach {
             it.ownerType = encodeService.base64Decode(it.ownerType, Charset.forName("MS949"))
@@ -51,7 +49,6 @@ class PlccApiController(
 
     @PostMapping(path = ["/lottecard/card/change"])
     fun change(@RequestBody plccCardChangeRequestDto: PlccCardChangeRequestDto): ResponseEntity<PlccResponseDto> {
-        logger.Warn("PLCC Change Req : {}", plccCardChangeRequestDto)
 
         plccCardService.changePlccCard(
             "lottecard",

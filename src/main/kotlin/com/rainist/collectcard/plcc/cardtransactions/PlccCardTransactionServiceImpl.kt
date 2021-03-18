@@ -14,8 +14,6 @@ import com.rainist.collectcard.common.service.EncodeService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.OrganizationService
 import com.rainist.collectcard.common.service.UuidService
-import com.rainist.collectcard.grpc.handler.CollectcardGrpcService
-import com.rainist.collectcard.grpc.handler.CollectcardGrpcService.Companion.Warn
 import com.rainist.collectcard.plcc.cardtransactions.dto.PlccCardTransaction
 import com.rainist.collectcard.plcc.cardtransactions.dto.PlccCardTransactionRequest
 import com.rainist.collectcard.plcc.cardtransactions.dto.PlccCardTransactionRequestDataBody
@@ -58,10 +56,6 @@ class PlccCardTransactionServiceImpl(
 
         // req
         val request = makePlccTransactionRequest(plccCardTransactionRequest)
-
-        // TODO Log 삭제
-        CollectcardGrpcService.logger.Warn("PLCC listPlccRewardsTransactions request : {}", request.headers)
-        CollectcardGrpcService.logger.Warn("PLCC listPlccRewardsTransactions request : {}", request.request)
 
         // send
         val executionResponse: ExecutionResponse<PlccCardTransactionResponse> =
@@ -127,9 +121,6 @@ class PlccCardTransactionServiceImpl(
             it.serviceName = encodeService.base64Decode(it.serviceName, Charset.forName("MS949"))
             it.storeName = encodeService.base64Decode(it.storeName, Charset.forName("MS949"))
         }
-
-        // TODO Log 삭제
-        CollectcardGrpcService.logger.Warn("PLCC Decode : {}", executionResponse.response)
     }
 
     // insert ( 혜택, 적용내역의 경우 데이터가 변경되지 않음으로(취소내역은 새로운 row 한줄, 승인시간이 변경 된다.), insert 만 진행 )

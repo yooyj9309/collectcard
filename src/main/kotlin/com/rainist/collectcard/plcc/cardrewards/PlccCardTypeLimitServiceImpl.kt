@@ -11,7 +11,6 @@ import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.service.EncodeService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.LocalDatetimeService
-import com.rainist.collectcard.grpc.handler.CollectcardGrpcService
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsRequest
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsRequestDataBody
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsResponse
@@ -52,8 +51,6 @@ class PlccCardTypeLimitServiceImpl(
 
         val now = localDatetimeService.generateNowLocalDatetime().now
 
-        CollectcardGrpcService.logger.Warn("PLCC rewardsRequest executionContext = {}", executionContext)
-
         // execution
         val execution = Executions.valueOf(
             BusinessType.plcc,
@@ -73,9 +70,6 @@ class PlccCardTypeLimitServiceImpl(
             }
         }
 
-        // TODO Log 삭제
-        CollectcardGrpcService.logger.Warn("PLCC rewardsRequest request : {}", plccCardRewardsRequest)
-
         val executionRequest = ExecutionRequest.builder<PlccCardRewardsRequest>()
             .headers(
                 headerService.makeHeader(MediaType.APPLICATION_JSON_VALUE)
@@ -85,15 +79,9 @@ class PlccCardTypeLimitServiceImpl(
             )
             .build()
 
-        // TODO Log 삭제
-        CollectcardGrpcService.logger.Warn("PLCC rewardsRequest executionRequest : {}", executionRequest)
-
         // api call
         val executionResponse: ExecutionResponse<PlccCardRewardsResponse> =
             lottePlccExecutorService.execute(executionContext, execution, executionRequest)
-
-        // TODO Log 삭제
-        CollectcardGrpcService.logger.Warn("PLCC rewardsRequest response : {}", executionResponse.response)
 
         decodeKoreanFields(executionResponse)
 
@@ -158,10 +146,6 @@ class PlccCardTypeLimitServiceImpl(
             plccCardTypeLimit = plccCardTypeLimit,
             now = now
         )
-
-        logger.Warn("prevEntity = {}", prevEntity)
-        logger.Warn("newEntity = {}", newEntity)
-        logger.Warn("isEqual = {}", prevEntity?.equal(newEntity))
 
         // 없다면 insert
         if (prevEntity == null) {

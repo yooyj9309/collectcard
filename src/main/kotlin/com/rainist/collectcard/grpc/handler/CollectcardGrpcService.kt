@@ -239,7 +239,6 @@ class CollectcardGrpcService(
         }.onFailure {
 //                logger.error("[사용자 대출 내역 조회 에러 : {}]", it.localizedMessage, it)
             CollectcardServiceExceptionHandler.handle(executionContext, "listCardLoans", "사용자대출내역조회", it)
-            // TODO 예상국 exception  처리 코드 추가 하기
             responseObserver.onError(it)
         }
     }
@@ -361,9 +360,6 @@ class CollectcardGrpcService(
                 ?: "",
             userId = request.userId
         )
-
-        // TODO Log 삭제
-        logger.Warn("PLCC listPlccRewardsTransactions context : {}", executionContext)
 
         kotlin.runCatching {
             plccCardTransactionService.plccCardTransactions(executionContext, request)

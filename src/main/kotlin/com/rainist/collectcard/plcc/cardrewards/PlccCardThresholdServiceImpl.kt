@@ -12,7 +12,6 @@ import com.rainist.collectcard.common.service.EncodeService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.LocalDatetimeService
 import com.rainist.collectcard.common.service.OrganizationService
-import com.rainist.collectcard.grpc.handler.CollectcardGrpcService
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsRequest
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsRequestDataBody
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsResponse
@@ -52,8 +51,6 @@ class PlccCardThresholdServiceImpl(
 
         val now = localDatetimeService.generateNowLocalDatetime().now
 
-        CollectcardGrpcService.logger.Warn("PLCC rewardsRequest executionContext = {}", executionContext)
-
         // execution
         val execution = Executions.valueOf(
             BusinessType.plcc,
@@ -73,9 +70,6 @@ class PlccCardThresholdServiceImpl(
             }
         }
 
-        // TODO Log 삭제
-        CollectcardGrpcService.logger.Warn("PLCC rewardsRequest request : {}", plccCardRewardsRequest)
-
         val executionRequest = ExecutionRequest.builder<PlccCardRewardsRequest>()
             .headers(
                 headerService.makeHeader(MediaType.APPLICATION_JSON_VALUE)
@@ -85,15 +79,9 @@ class PlccCardThresholdServiceImpl(
             )
             .build()
 
-        // TODO Log 삭제
-        CollectcardGrpcService.logger.Warn("PLCC rewardsRequest executionRequest : {}", executionRequest)
-
         // api call
         val executionResponse: ExecutionResponse<PlccCardRewardsResponse> =
             lottePlccExecutorService.execute(executionContext, execution, executionRequest)
-
-        // TODO Log 삭제
-        CollectcardGrpcService.logger.Warn("PLCC rewardsRequest response : {}", executionResponse.response)
 
         decodeKoreanFields(executionResponse)
 
@@ -108,7 +96,6 @@ class PlccCardThresholdServiceImpl(
 
         // dto를 setScale(4) 적용 : 엔티티와 정확한 비교를 위해
         plccCardRewardsConvertService.setScaleThreshold(executionResponse.response?.dataBody?.plccCardThreshold)
-        logger.Warn("threshold setScale = {}", executionResponse.response?.dataBody?.plccCardThreshold)
 
         val rewardsThreshold = executionResponse.response?.dataBody?.plccCardThreshold
         upsertRewardsThreshold(
@@ -163,11 +150,6 @@ class PlccCardThresholdServiceImpl(
                 rewardsThreshold,
                 now
             )
-
-        // TODO : 삭제
-        logger.Warn("prevEntity = {}", prevEntity)
-        logger.Warn("newEntity = {}", newEntity)
-        logger.Warn("isEqual = {}", prevEntity?.equal(newEntity))
 
         // 없다면, insert
         if (prevEntity == null) {

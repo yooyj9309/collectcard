@@ -21,7 +21,6 @@ class OrganizationServiceImpl : OrganizationService {
     @Value("\${lottecard.organizationId}")
     private lateinit var lottecardOrganizationId: String
 
-    // TODO 롯데카드 organization objectid 추가하기
     @Value("\${lottecard.objectId}")
     private lateinit var lottecardObjectId: String
 

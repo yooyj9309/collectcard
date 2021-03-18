@@ -61,14 +61,8 @@ class LottePlccTransferClient(
 
             stopWatch.start()
 
-            // TODO Log 삭제
-            logger.Warn("REST TEMPLATE LOG REQ : {}", req.body)
-
             val restTemplate = createRestTemplate()
             val res = restTemplate.exchange(req, String::class.java)
-
-            // TODO Log 삭제
-            logger.Warn("REST TEMPLATE LOG RES : {}", res.body)
 
             stopWatch.stop()
 
