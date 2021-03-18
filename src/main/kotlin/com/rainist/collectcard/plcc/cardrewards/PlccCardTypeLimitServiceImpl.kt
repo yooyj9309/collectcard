@@ -18,7 +18,6 @@ import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsResponse
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardTypeLimit
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccRpcRequest
 import com.rainist.collectcard.plcc.cardtransactions.convertStringYearMonth
-import com.rainist.collectcard.plcc.common.db.entity.PlccCardThresholdEntity
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardThresholdRepository
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardTypeLimitHistoryRepository
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardTypeLimitRepository
@@ -128,7 +127,6 @@ class PlccCardTypeLimitServiceImpl(
                     rpcRequest,
                     plccCardRewardsRequest,
                     plccCardRewardsTypeLimit,
-                    rewardsThreshold,
                     now
                 )
             }
@@ -141,7 +139,6 @@ class PlccCardTypeLimitServiceImpl(
         rpcRequest: PlccRpcRequest,
         plccCardRewardsRequest: PlccCardRewardsRequest,
         plccCardTypeLimit: PlccCardTypeLimit,
-        plccCardThreshold: PlccCardThresholdEntity?,
         now: LocalDateTime
     ) {
         val prevEntity =
@@ -158,8 +155,6 @@ class PlccCardTypeLimitServiceImpl(
             cardCompanyId = executionContext.organizationId,
             cardCompanyCardId = rpcRequest.cardId,
             benefitYearMonth = plccCardRewardsRequest.dataBody?.inquiryYearMonth,
-            outcomeStartDay = plccCardThreshold?.outcomeStartDay ?: "",
-            outcomeEndDay = plccCardThreshold?.outcomeEndDay ?: "",
             plccCardTypeLimit = plccCardTypeLimit,
             now = now
         )

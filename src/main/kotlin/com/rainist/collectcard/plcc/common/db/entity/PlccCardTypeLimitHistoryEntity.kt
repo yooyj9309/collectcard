@@ -37,10 +37,6 @@ data class PlccCardTypeLimitHistoryEntity(
     @Column(nullable = false)
     var benefitYearMonth: String? = null,
 
-    var outcomeStartDay: String? = null,
-
-    var outcomeEndDay: String? = null,
-
     @Column(nullable = false)
     var benefitName: String? = null,
 

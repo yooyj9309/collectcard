@@ -13,7 +13,6 @@ import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardThreshold
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardTypeLimit
 import com.rainist.collectcard.plcc.cardrewards.dto.PromotionCode
 import com.rainist.collectcard.plcc.cardrewards.dto.ServiceType
-import java.math.BigDecimal
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -21,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.web.client.RestTemplate
+import java.math.BigDecimal
 
 @SpringBootTest
 @DisplayName("실적한도 Execution 테스트")
@@ -28,6 +28,9 @@ class PlccRewardsExecutionTest {
 
     @Autowired
     lateinit var lottePlccExecutorService: CollectExecutorService
+
+    @Autowired
+    lateinit var lottePlccRestTemplate: RestTemplate
 
     @DisplayName("Threshold execution 테스트")
     @Test
@@ -139,4 +142,5 @@ class PlccRewardsExecutionTest {
             .build()
     }
 }
+
 */

@@ -11,9 +11,6 @@ import com.rainist.collectcard.plcc.common.db.entity.PlccCardTypeLimitEntity
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardThresholdRepository
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardTypeLimitRepository
 import com.rainist.common.log.Log
-import java.math.BigDecimal
-import java.time.LocalDateTime
-import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -28,6 +25,9 @@ import org.springframework.test.annotation.Rollback
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.client.RestTemplate
+import java.math.BigDecimal
+import java.time.LocalDateTime
+import java.util.UUID
 
 @DisplayName("PlccRewardsService 테스트")
 @SpringBootTest
@@ -44,6 +44,9 @@ class PlccRewardsServiceTest {
 
     @Autowired
     lateinit var plccCardTypeLimitRepository: PlccCardTypeLimitRepository
+
+    @Autowired
+    lateinit var lottePlccRestTemplate: RestTemplate
 
     @MockBean
     lateinit var headerService: HeaderService
@@ -116,8 +119,8 @@ class PlccRewardsServiceTest {
         // 기존값 - totalBenefitAmount(15000 -> 17000), totalSalesAmount(80000 -> 81500)
         assertAll(
             "threshold update",
-            { assertThat(plccCardThresholdEntity.totalBenefitAmount).isEqualTo(BigDecimal(17000)) },
-            { assertThat(plccCardThresholdEntity.totalSalesAmount).isEqualTo(BigDecimal(81500)) }
+            { assertThat(plccCardThresholdEntity.totalBenefitAmount).isEqualTo(BigDecimal("17000.0000")) },
+            { assertThat(plccCardThresholdEntity.totalSalesAmount).isEqualTo(BigDecimal("81500.0000")) }
         )
     }
 
@@ -142,10 +145,9 @@ class PlccRewardsServiceTest {
 
         // then
         assertThat(savedTypeLimitEntities.size).isEqualTo(4)
-        */
-/** TypeLimit 리스트에서 마지막 데이터는 총계 데이터인데 DB에 저장하지 않는다.
+        /** TypeLimit 리스트에서 마지막 데이터는 총계 데이터인데 DB에 저장하지 않는다.
          *  마지막 데이터가 총계데이터가 아니어야 하니까 last()를 꺼내 테스트 중
-         *//*
+         */
 
         assertThat(savedTypeLimitEntities.last()).isEqualToComparingOnlyGivenFields(
             PlccCardTypeLimitEntity().apply {
@@ -153,8 +155,6 @@ class PlccRewardsServiceTest {
                 cardCompanyId = "596d66692c4069c168b57c77"
                 cardCompanyCardId = "376277600833685"
                 benefitYearMonth = "202102"
-                outcomeStartDay = "20210201"
-                outcomeEndDay = "20210228"
                 benefitName = "빨대카드 편의점 할인"
                 benefitCode = "C295"
             },
@@ -162,8 +162,6 @@ class PlccRewardsServiceTest {
             "cardCompanyId",
             "cardCompanyCardId",
             "benefitYearMonth",
-            "outcomeStartDay",
-            "outcomeEndDay",
             "benefitName",
             "benefitCode"
         )
@@ -193,8 +191,8 @@ class PlccRewardsServiceTest {
         // then : total_limit_amount(20000 -> 25000), apply_amount(3000 -> 5000)
         assertAll(
             "typeLimit update",
-            { assertThat(savedTypeLimitEntities[0].totalLimitAmount).isEqualTo(BigDecimal(25000)) },
-            { assertThat(savedTypeLimitEntities[0].appliedAmount).isEqualTo(BigDecimal(5000)) }
+            { assertThat(savedTypeLimitEntities[0].totalLimitAmount).isEqualTo(BigDecimal("25000.0000")) },
+            { assertThat(savedTypeLimitEntities[0].appliedAmount).isEqualTo(BigDecimal("5000.0000")) }
         )
     }
 
@@ -204,8 +202,6 @@ class PlccRewardsServiceTest {
             cardCompanyId = "596d66692c4069c168b57c77"
             cardCompanyCardId = "376277600833685"
             benefitYearMonth = "202102"
-            outcomeStartDay = "20210201"
-            outcomeEndDay = "20210228"
             benefitName = "u6G068SrteUgxKvG5CDH0sDO"
             benefitCode = "C292"
             discountRate = BigDecimal("000005000.00")
@@ -267,8 +263,8 @@ class PlccRewardsServiceTest {
             lastCheckAt = LocalDateTime.now()
             createdAt = LocalDateTime.now()
             updatedAt = LocalDateTime.now()
-            // response_code = "0000"
-            // response_message = "waS788OzuK61x776vcC0z7TZLg=="
+            responseCode = "0000"
+            responseMessage = "waS788OzuK61x776vcC0z7TZLg=="
         })
     }
 
@@ -289,4 +285,6 @@ class PlccRewardsServiceTest {
             )
     }
 }
-*/
+
+
+ */

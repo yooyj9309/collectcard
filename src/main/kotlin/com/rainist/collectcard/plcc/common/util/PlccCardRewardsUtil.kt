@@ -83,8 +83,6 @@ class PlccCardRewardsUtil {
             cardCompanyId: String,
             cardCompanyCardId: String,
             benefitYearMonth: String?,
-            outcomeStartDay: String,
-            outcomeEndDay: String,
             plccCardTypeLimit: PlccCardTypeLimit,
             now: LocalDateTime
         ): PlccCardTypeLimitEntity {
@@ -93,8 +91,6 @@ class PlccCardRewardsUtil {
                 entity.cardCompanyId = cardCompanyId
                 entity.cardCompanyCardId = cardCompanyCardId
                 entity.benefitYearMonth = benefitYearMonth
-                entity.outcomeStartDay = outcomeStartDay
-                entity.outcomeEndDay = outcomeEndDay
                 // not null
                 entity.benefitName = plccCardTypeLimit.benefitName ?: ""
                 entity.benefitCode = plccCardTypeLimit.benefitCode
@@ -124,8 +120,6 @@ class PlccCardRewardsUtil {
                 this.cardCompanyId = entity.cardCompanyId
                 this.cardCompanyCardId = entity.cardCompanyCardId
                 this.benefitYearMonth = entity.benefitYearMonth
-                this.outcomeStartDay = entity.outcomeStartDay
-                this.outcomeEndDay = entity.outcomeEndDay
                 this.benefitName = entity.benefitName
                 this.benefitCode = entity.benefitCode
                 this.discountAmount = entity.discountAmount
