@@ -106,7 +106,7 @@ class PlccClientService(
             "AMEX" -> CardProto.CardInternationalBrand.CARD_INTERNATIONAL_BRAND_AMEX
             "MASTER" -> CardProto.CardInternationalBrand.CARD_INTERNATIONAL_BRAND_MASTERCARD
             "MASTERCARD" -> CardProto.CardInternationalBrand.CARD_INTERNATIONAL_BRAND_MASTERCARD
-            else -> CardProto.CardInternationalBrand.CARD_INTERNATIONAL_BRAND_UNKNOWN
+            else -> CardProto.CardInternationalBrand.CARD_INTERNATIONAL_BRAND_ETC
         }
     }
 }
