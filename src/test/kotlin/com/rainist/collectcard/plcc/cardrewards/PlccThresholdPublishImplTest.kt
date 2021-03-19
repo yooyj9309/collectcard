@@ -31,6 +31,9 @@ class PlccThresholdPublishImplTest {
     @Autowired
     lateinit var plccRewardsPublishService: PlccCardRewardsPublishService
 
+    @Autowired
+    lateinit var lottePlccRestTemplate: RestTemplate
+
     @MockBean
     lateinit var headerService: HeaderService
 
@@ -91,4 +94,6 @@ class PlccThresholdPublishImplTest {
             .isEqualTo("REWARDS_PROMOTION_TYPE_ISSUED")
     }
 }
-*/
+
+
+ */

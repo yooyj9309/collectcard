@@ -8,6 +8,7 @@ import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.dto.CollectExecutionContext
+import com.rainist.collectcard.common.enums.ResultCode
 import com.rainist.collectcard.common.service.EncodeService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.LocalDatetimeService
@@ -17,7 +18,6 @@ import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsResponse
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardTypeLimit
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccRpcRequest
 import com.rainist.collectcard.plcc.cardtransactions.convertStringYearMonth
-import com.rainist.collectcard.plcc.common.db.repository.PlccCardThresholdRepository
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardTypeLimitHistoryRepository
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardTypeLimitRepository
 import com.rainist.collectcard.plcc.common.util.PlccCardRewardsUtil
@@ -38,7 +38,6 @@ class PlccCardTypeLimitServiceImpl(
     val encodeService: EncodeService,
     val plccCardTypeLimitRepository: PlccCardTypeLimitRepository,
     val plccCardTypeLimitHistoryRepository: PlccCardTypeLimitHistoryRepository,
-    val plccCardThresholdRepository: PlccCardThresholdRepository,
     val plccCardRewardsConvertService: PlccCardRewardsConvertService
 ) : PlccCardTypeLimitService {
 
@@ -47,7 +46,7 @@ class PlccCardTypeLimitServiceImpl(
     override fun listPlccCardTypeLimit(
         executionContext: CollectExecutionContext,
         rpcRequest: PlccRpcRequest
-    ): List<PlccCardTypeLimit> {
+    ) {
 
         val now = localDatetimeService.generateNowLocalDatetime().now
 
@@ -91,35 +90,24 @@ class PlccCardTypeLimitServiceImpl(
         }?.toMutableList()
             ?: mutableListOf())
 
-        /** TypeLimit과 Threshold의 outcomeStartDay, outcomeEndDay의 정합성을 맞추기 위해
-         *  TypeLimit을 저장할 때 같은 혜택년월의 Threshold를 조회해 outcomeDays를 넣어준다.
-         */
-        val requestYearMonth =
-            DateTimeUtil.epochMilliSecondToKSTLocalDateTime(rpcRequest.requestMonthMs)
-        val stringYearMonth = convertStringYearMonth(requestYearMonth)
-
-        val rewardsThreshold =
-            plccCardThresholdRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardIdAndBenefitYearMonth(
-                banksaladUserId = executionContext.userId.toLong(),
-                cardCompanyId = executionContext.organizationId,
-                cardCompanyCardId = rpcRequest.cardId,
-                benefitYearMonth = stringYearMonth.yearMonth ?: ""
-            )
-
         /* 혜택(RewardsTypeLimit) save */
-        benefitList.forEach { plccCardRewardsTypeLimit ->
-            plccCardRewardsConvertService.setScaleTypeLimit(plccCardRewardsTypeLimit)
-            if (!plccCardRewardsTypeLimit.benefitCode.equals("CXXX")) {
-                upsertRewardsTypeLimit(
-                    executionContext,
-                    rpcRequest,
-                    plccCardRewardsRequest,
-                    plccCardRewardsTypeLimit,
-                    now
-                )
+        val plccCardThreshold = executionResponse.response?.dataBody?.plccCardThreshold
+        if (plccCardThreshold?.responseCode.equals(ResultCode.OK.name)) {
+            benefitList.forEach { plccCardRewardsTypeLimit ->
+                plccCardRewardsConvertService.setScaleTypeLimit(plccCardRewardsTypeLimit)
+                if (!plccCardRewardsTypeLimit.benefitCode.equals("CXXX")) {
+                    upsertRewardsTypeLimit(
+                        executionContext,
+                        rpcRequest,
+                        plccCardRewardsRequest,
+                        plccCardRewardsTypeLimit,
+                        now
+                    )
+                }
             }
+        } else {
+            logger.Warn("plcc response Code = {}", plccCardThreshold?.responseCode)
         }
-        return benefitList
     }
 
     private fun upsertRewardsTypeLimit(

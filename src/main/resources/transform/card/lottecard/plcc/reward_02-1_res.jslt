@@ -11,6 +11,14 @@ let serviceType = {
   "03" : "INSTALLMENT_REDUCT"
 }
 
+let resultCodes = {
+  "" : "UNKNOWN",
+  "0000" : "OK",
+  "0100" : "INVALID_PARAMETER",
+  "0200" : "INVALID_PARAMETER",
+  "0300" : "EXTERNAL_SERVER_ERROR"
+}
+
 {
   "dataHeader": {
 
@@ -30,7 +38,7 @@ let serviceType = {
         "cashbackAmount" : .cashback_amount,
         "message" : .message,
         "promotionCode" : get-key($promotionCode, .promotion_code, "UNKNOWN"),
-        "responseCode" : .response_code,
+        "responseCode" : get-key($resultCodes, .response_code, "UNKNOWN"),
         "responseMessage" : .response_message,
         "benefitListCount" : .benefit_list_count
     },

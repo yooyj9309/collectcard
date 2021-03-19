@@ -8,5 +8,6 @@ enum class ResultCode(
     INVALID_USER(1, "wrong ci"),
     INVALID_ACCESS_TOKEN(2, "wrong token"),
     EXTERNAL_SERVER_ERROR(3, "error"),
+    INVALID_PARAMETER(4, "wrong parameter"),
     UNKNOWN(99, "unknown")
 }

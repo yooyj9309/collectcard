@@ -8,6 +8,7 @@ import com.rainist.collectcard.common.collect.api.Organization
 import com.rainist.collectcard.common.collect.api.Transaction
 import com.rainist.collectcard.common.collect.execution.Executions
 import com.rainist.collectcard.common.dto.CollectExecutionContext
+import com.rainist.collectcard.common.enums.ResultCode
 import com.rainist.collectcard.common.service.EncodeService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.LocalDatetimeService
@@ -47,7 +48,7 @@ class PlccCardThresholdServiceImpl(
     override fun getPlccCardThreshold(
         executionContext: CollectExecutionContext,
         rpcRequest: PlccRpcRequest
-    ): PlccCardRewardsResponse {
+    ) {
 
         val now = localDatetimeService.generateNowLocalDatetime().now
 
@@ -91,23 +92,23 @@ class PlccCardThresholdServiceImpl(
         }?.toMutableList()
             ?: mutableListOf())
 
-        /* 실적(RewardsThreshold) save */
-        // 실적 데이터 조회
-
         // dto를 setScale(4) 적용 : 엔티티와 정확한 비교를 위해
         plccCardRewardsConvertService.setScaleThreshold(executionResponse.response?.dataBody?.plccCardThreshold)
 
+        /* 실적(RewardsThreshold) save */
+        // 실적 데이터 조회
         val rewardsThreshold = executionResponse.response?.dataBody?.plccCardThreshold
-        upsertRewardsThreshold(
-            executionContext,
-            rpcRequest,
-            plccCardRewardsRequest,
-            rewardsThreshold,
-            now
-        )
-
-        return executionResponse.response.apply {
-            dataBody?.benefitList = benefitList
+        // response_code가 OK인 경우만 save로직 수행
+        if (rewardsThreshold?.responseCode.equals(ResultCode.OK.name)) {
+            upsertRewardsThreshold(
+                executionContext,
+                rpcRequest,
+                plccCardRewardsRequest,
+                rewardsThreshold,
+                now
+            )
+        } else {
+            logger.Warn("plcc response Code = {}", rewardsThreshold?.responseCode)
         }
     }
 

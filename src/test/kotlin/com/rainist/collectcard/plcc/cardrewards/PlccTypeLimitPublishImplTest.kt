@@ -33,6 +33,9 @@ class PlccTypeLimitPublishImplTest {
     @Autowired
     lateinit var plccCardTypeLimitService: PlccCardTypeLimitService
 
+    @Autowired
+    lateinit var lottePlccRestTemplate: RestTemplate
+
     @MockBean
     lateinit var headerService: HeaderService
 
@@ -96,4 +99,6 @@ class PlccTypeLimitPublishImplTest {
         )
     }
 }
-*/
+
+
+ */

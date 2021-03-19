@@ -40,12 +40,15 @@ class PlccCardRewardsUtil {
                 entity.totalBenefitCount = threshold?.totalBenefitCount
                 entity.totalSalesAmount = threshold?.totalSalesAmount
                 entity.monthlyBenefitRate = threshold?.monthlyBenefitRate
+                // 롯데카드에서 주지 않는 데이터, 다른 회사 추가될 때 필요할 수 있어 추가.
                 entity.monthlyBenefitAmount = null
                 // not null
                 entity.monthlyBenefitLimit = threshold?.monthlyBenefitLimit ?: BigDecimal("0.0000")
                 entity.cashbackAmount = threshold?.cashbackAmount
                 entity.benefitMessage = threshold?.message
                 entity.promotionCode = threshold?.promotionCode?.name.toString()
+                entity.responseCode = threshold?.responseCode
+                entity.responseMessage = threshold?.responseMessage
                 entity.lastCheckAt = now
             }
         }
@@ -71,6 +74,8 @@ class PlccCardRewardsUtil {
                 this.cashbackAmount = entity.cashbackAmount
                 this.benefitMessage = entity.benefitMessage
                 this.promotionCode = entity.promotionCode
+                this.responseCode = entity.responseCode
+                this.responseMessage = entity.responseMessage
                 this.lastCheckAt = entity.lastCheckAt
                 this.createdAt = entity.createdAt
                 this.updatedAt = entity.updatedAt

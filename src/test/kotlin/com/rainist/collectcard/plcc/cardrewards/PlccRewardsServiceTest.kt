@@ -3,6 +3,7 @@ package com.rainist.collectcard.plcc.cardrewards
 
 import com.rainist.collectcard.common.collect.api.LottecardPlccApis
 import com.rainist.collectcard.common.dto.CollectExecutionContext
+import com.rainist.collectcard.common.enums.ResultCode
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.util.ExecutionTestUtil
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccRpcRequest
@@ -11,6 +12,9 @@ import com.rainist.collectcard.plcc.common.db.entity.PlccCardTypeLimitEntity
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardThresholdRepository
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardTypeLimitRepository
 import com.rainist.common.log.Log
+import java.math.BigDecimal
+import java.time.LocalDateTime
+import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -25,9 +29,6 @@ import org.springframework.test.annotation.Rollback
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.client.RestTemplate
-import java.math.BigDecimal
-import java.time.LocalDateTime
-import java.util.UUID
 
 @DisplayName("PlccRewardsService 테스트")
 @SpringBootTest
@@ -70,6 +71,13 @@ class PlccRewardsServiceTest {
         val savedThresholdEntities = plccCardThresholdRepository.findAll()
 
         assertThat(savedThresholdEntities.size).isEqualTo(1)
+        assertThat(savedThresholdEntities.first()).isEqualToComparingOnlyGivenFields(
+            PlccCardThresholdEntity().apply {
+                responseCode = ResultCode.OK.name
+                responseMessage = "정상처리되었습니다."
+            },
+            "responseCode", "responseMessage"
+        )
     }
 
     @DisplayName("Threshold update 테스트")
@@ -122,6 +130,24 @@ class PlccRewardsServiceTest {
             { assertThat(plccCardThresholdEntity.totalBenefitAmount).isEqualTo(BigDecimal("17000.0000")) },
             { assertThat(plccCardThresholdEntity.totalSalesAmount).isEqualTo(BigDecimal("81500.0000")) }
         )
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    @DisplayName("비정상 thershold 데이터 올 때 DB 저장되는 지 확인")
+    fun threshold_wrong_data_test() {
+        // given
+        mockServerSetting("classpath:mock/lottecard/rewards/rewards_threshold_wrong_expected_1.json")
+
+        // when
+        plccCardThresholdService.getPlccCardThreshold(
+            executionContext = makeCollectExecutionContext(),
+            rpcRequest = makePlccRpcRequestOnMar()
+        )
+
+        // then
+        assertThat(plccCardThresholdRepository.findAll().size).isEqualTo(0)
     }
 
     @DisplayName("TypeLimit 송수신 후 DB 저장")
@@ -285,6 +311,5 @@ class PlccRewardsServiceTest {
             )
     }
 }
-
 
  */
