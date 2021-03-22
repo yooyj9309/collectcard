@@ -15,12 +15,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 
 @EntityListeners(AuditingEntityListener::class)
 @Entity
-@Table(name = "plcc_card_benefit_limit_detail")
-data class PlccCardTypeLimitEntity(
+@Table(name = "plcc_card_benefit_limit_detail_summary")
+data class PlccCardRewardsSummaryEntity(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var plccCardBenefitLimitDetailId: Long? = null,
+    var plccCardBenefitLimitDetailSummaryId: Long? = null,
 
     @Column(nullable = false)
     var banksaladUserId: Long? = null,
@@ -34,42 +34,33 @@ data class PlccCardTypeLimitEntity(
     @Column(nullable = false)
     var benefitYearMonth: String? = null,
 
-    @Column(nullable = false)
-    var benefitName: String? = null,
+    @Column(nullable = false, precision = 17, scale = 4)
+    var totalBenefitAmount: BigDecimal? = null,
 
-    var benefitCode: String? = null,
+    var totalBenefitCount: Int? = null,
 
     @Column(precision = 17, scale = 4)
-    var discountAmount: BigDecimal? = null,
+    var totalSalesAmount: BigDecimal? = null,
 
     @Column(precision = 9, scale = 4)
-    var discountRate: BigDecimal? = null,
-
-    @Column(nullable = false, precision = 17, scale = 4)
-    var totalLimitAmount: BigDecimal? = null,
-
-    @Column(nullable = false, precision = 17, scale = 4)
-    var appliedAmount: BigDecimal? = null,
-
-    @Column(nullable = false, precision = 17, scale = 4)
-    var limitRemainingAmount: BigDecimal? = null,
-
-    var totalLimitCount: Int? = null,
-
-    var appliedCount: Int? = null,
-
-    var limitRemainingCount: Int? = null,
+    var monthlyBenefitRate: BigDecimal? = null,
 
     @Column(precision = 17, scale = 4)
-    var totalSalesLimitAmount: BigDecimal? = null,
+    var monthlyBenefitAmount: BigDecimal? = null,
+
+    @Column(nullable = false, precision = 17, scale = 4)
+    var monthlyBenefitLimit: BigDecimal? = null,
 
     @Column(precision = 17, scale = 4)
-    var appliedSaleAmount: BigDecimal? = null,
+    var cashbackAmount: BigDecimal? = null,
 
-    @Column(precision = 17, scale = 4)
-    var limitRemainingSalesAmount: BigDecimal? = null,
+    var benefitMessage: String? = null,
 
-    var serviceType: String? = null,
+    var promotionCode: String? = null,
+
+    var responseCode: String? = null,
+
+    var responseMessage: String? = null,
 
     @Column(nullable = false)
     var lastCheckAt: LocalDateTime? = null,
@@ -80,9 +71,19 @@ data class PlccCardTypeLimitEntity(
     @LastModifiedDate
     var updatedAt: LocalDateTime? = null
 ) {
-    fun equal(other: PlccCardTypeLimitEntity): Boolean {
-        val t = this.copy(plccCardBenefitLimitDetailId = null, lastCheckAt = null, createdAt = null, updatedAt = null)
-        val o = other.copy(plccCardBenefitLimitDetailId = null, lastCheckAt = null, createdAt = null, updatedAt = null)
+    fun equal(other: PlccCardRewardsSummaryEntity): Boolean {
+        val t = this.copy(
+            plccCardBenefitLimitDetailSummaryId = null,
+            lastCheckAt = null,
+            createdAt = null,
+            updatedAt = null
+        )
+        val o = other.copy(
+            plccCardBenefitLimitDetailSummaryId = null,
+            lastCheckAt = null,
+            createdAt = null,
+            updatedAt = null
+        )
         return t == o
     }
 }

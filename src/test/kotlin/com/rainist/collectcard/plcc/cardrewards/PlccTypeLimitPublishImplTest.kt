@@ -28,10 +28,10 @@ import org.springframework.web.client.RestTemplate
 class PlccTypeLimitPublishImplTest {
 
     @Autowired
-    lateinit var plccCardTypeLimitPublishService: PlccCardRewardsPublishService
+    lateinit var plccCardRewardsPublishService: PlccCardRewardsPublishService
 
     @Autowired
-    lateinit var plccCardTypeLimitService: PlccCardTypeLimitService
+    lateinit var plccCardRewardsService: PlccCardRewardsService
 
     @Autowired
     lateinit var lottePlccRestTemplate: RestTemplate
@@ -43,7 +43,7 @@ class PlccTypeLimitPublishImplTest {
 
     lateinit var plccRpcRequest: PlccRpcRequest
 
-    @DisplayName("TypeLimit 데이터 저장")
+    @DisplayName("Rewards 데이터 저장")
     @BeforeEach
     fun setUp() {
         val server = MockRestServiceServer.bindTo(lottePlccRestTemplate).ignoreExpectOrder(true).build()
@@ -72,30 +72,32 @@ class PlccTypeLimitPublishImplTest {
             requestMonthMs = 1613026702000
         )
 
-        plccCardTypeLimitService.listPlccCardTypeLimit(
+        plccCardRewardsService.getPlccRewards(
             executionContext = collectExecutionContext,
             rpcRequest = plccRpcRequest
         )
     }
 
-    @DisplayName("TypleLimit Publish Test")
+    @DisplayName("Rewards Publish Test")
     @Transactional
     @Rollback
     @Test
-    fun typeLimit_publish_success() {
+    fun rewards_publish_success() {
         // when
-        val rewardsTypeLimitPublish = plccCardTypeLimitPublishService.rewardsTypeLimitPublish(
+        val rewardsProto = plccCardRewardsPublishService.rewardsPublish(
             executionContext = collectExecutionContext,
             request = plccRpcRequest
         )
 
         // then
-        val rewardsTypeLimit = rewardsTypeLimitPublish.rewardsTypeLimitList[0]
+        val rewardsList = rewardsProto.getRewardsTypeLimit(0)
         assertAll(
-            "typeLimit proto test",
-            { assertThat(rewardsTypeLimit.rewardsTypeName).isEqualTo(PlccProto.RewardsType.REWARDS_TYPE_CAFE_DISCOUNT) },
-            { assertThat(rewardsTypeLimit.rewardsCode.value).isEqualTo("C292") },
-            { assertThat(rewardsTypeLimit.rewardsLimitAmount2F).isEqualTo(2500000L) }
+            "rewards proto test",
+            { assertThat(rewardsProto.appliedRewardsAmount2F).isEqualTo(1700000L) },
+            { assertThat(rewardsProto.totalSalesAmount2F.value).isEqualTo(8150000) },
+            { assertThat(rewardsList.rewardsTypeName).isEqualTo(PlccProto.RewardsType.REWARDS_TYPE_CAFE_DISCOUNT) },
+            { assertThat(rewardsList.rewardsCode.value).isEqualTo("C292") },
+            { assertThat(rewardsList.rewardsLimitAmount2F).isEqualTo(2500000L) }
         )
     }
 }

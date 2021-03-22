@@ -10,6 +10,7 @@ data class PlccCardRewardsResponseDataHeader(
 )
 
 data class PlccCardRewardsResponseDataBody(
-    var plccCardThreshold: PlccCardThreshold? = null,
-    var benefitList: List<PlccCardTypeLimit> = listOf() // 혜택실적한도적용내역
+    var plccCardThreshold: PlccCardThreshold? = null, // 혜택실적
+    var plccCardRewardsSummary: PlccCardRewardsSummary? = null, // 혜택실적한도 총합
+    var plccCardRewardsList: List<PlccCardRewards> = listOf() // 혜택실적한도적용내역
 )

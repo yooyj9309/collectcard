@@ -11,8 +11,8 @@ interface PlccCardRewardsPublishService {
         request: PlccRpcRequest
     ): CollectcardProto.GetPlccRewardsThresholdResponse
 
-    fun rewardsTypeLimitPublish(
+    fun rewardsPublish(
         executionContext: CollectExecutionContext,
         request: PlccRpcRequest
-    ): CollectcardProto.ListPlccRewardsTypeLimitResponse
+    ): CollectcardProto.GetPlccRewardsResponse
 }

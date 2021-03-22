@@ -49,30 +49,6 @@ data class PlccCardThresholdEntity(
     @Column(precision = 17, scale = 4)
     var outcomeCriteriaAmount: BigDecimal? = null,
 
-    @Column(nullable = false, precision = 17, scale = 4)
-    var totalBenefitAmount: BigDecimal? = null,
-
-    var totalBenefitCount: Int? = null,
-
-    @Column(precision = 17, scale = 4)
-    var totalSalesAmount: BigDecimal? = null,
-
-    @Column(precision = 9, scale = 4)
-    var monthlyBenefitRate: BigDecimal? = null,
-
-    @Column(precision = 17, scale = 4)
-    var monthlyBenefitAmount: BigDecimal? = null,
-
-    @Column(nullable = false, precision = 17, scale = 4)
-    var monthlyBenefitLimit: BigDecimal? = null,
-
-    @Column(precision = 17, scale = 4)
-    var cashbackAmount: BigDecimal? = null,
-
-    var benefitMessage: String? = null,
-
-    var promotionCode: String? = null,
-
     var responseCode: String? = null,
 
     var responseMessage: String? = null,

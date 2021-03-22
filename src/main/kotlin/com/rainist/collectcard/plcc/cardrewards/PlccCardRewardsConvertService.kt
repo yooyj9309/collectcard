@@ -5,10 +5,12 @@ import com.github.banksalad.idl.apis.v1.plcc.PlccProto
 import com.google.protobuf.BoolValue
 import com.google.protobuf.Int64Value
 import com.google.protobuf.StringValue
+import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewards
+import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsSummary
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardThreshold
-import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardTypeLimit
+import com.rainist.collectcard.plcc.common.db.entity.PlccCardRewardsEntity
+import com.rainist.collectcard.plcc.common.db.entity.PlccCardRewardsSummaryEntity
 import com.rainist.collectcard.plcc.common.db.entity.PlccCardThresholdEntity
-import com.rainist.collectcard.plcc.common.db.entity.PlccCardTypeLimitEntity
 import com.rainist.common.util.DateTimeUtil
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
@@ -28,17 +30,52 @@ class PlccCardRewardsConvertService {
             multiplyForAmount(entity.beforeMonthCriteriaUseAmount)
         rewardsThresholdBuilder.minimumAmountForRewardsThreshold2F =
             Int64Value.of(multiplyForAmount(entity.outcomeCriteriaAmount))
-        rewardsThresholdBuilder.appliedRewardsAmount2F = multiplyForAmount(entity.totalBenefitAmount)
-        rewardsThresholdBuilder.appliedRewardsCount = Int64Value.of(entity.totalBenefitCount?.toLong() ?: 0L)
-        rewardsThresholdBuilder.totalSalesAmount2F = Int64Value.of(multiplyForAmount(entity.totalSalesAmount))
-        rewardsThresholdBuilder.earnedRewardsRate2F =
-            Int64Value.of(multiplyForAmount(entity.monthlyBenefitRate))
-        rewardsThresholdBuilder.rewardsLimitAmount2F = multiplyForAmount(entity.monthlyBenefitLimit)
-        rewardsThresholdBuilder.cashbackAmount2F = Int64Value.of(multiplyForAmount(entity.cashbackAmount))
-        rewardsThresholdBuilder.rewardsDetailMessage = StringValue.of(entity.benefitMessage)
-        rewardsThresholdBuilder.promotionType = getPromotionType(entity.promotionCode)
         getPlccRewardsThresholdResponseBuilder.rewardsThreshold = rewardsThresholdBuilder.build()
         return getPlccRewardsThresholdResponseBuilder.build()
+    }
+
+    fun toRewardsProto(
+        rewardsSummary: PlccCardRewardsSummaryEntity,
+        rewardsList: List<PlccCardRewardsEntity>
+    ): CollectcardProto.GetPlccRewardsResponse {
+        val protoRewards = rewardsList.map { toEachRewardsProto(it) }.toList()
+
+        return CollectcardProto.GetPlccRewardsResponse
+            .newBuilder()
+            .setAppliedRewardsAmount2F(multiplyForAmount(rewardsSummary.totalBenefitAmount))
+            .setAppliedRewardsCount(Int64Value.of(rewardsSummary.totalBenefitCount?.toLong() ?: 0L))
+            .setTotalSalesAmount2F(Int64Value.of(multiplyForAmount(rewardsSummary.totalSalesAmount)))
+            .setEarnedRewardsRate2F(Int64Value.of(multiplyForAmount(rewardsSummary.monthlyBenefitRate)))
+            .setRewardsLimitAmount2F(multiplyForAmount(rewardsSummary.monthlyBenefitLimit))
+            .setCashbackAmount2F(Int64Value.of(multiplyForAmount(rewardsSummary.cashbackAmount)))
+            .setRewardsDetailMessage(StringValue.of(rewardsSummary.benefitMessage))
+            .setPromotionType(getPromotionType(rewardsSummary.promotionCode))
+            .addAllRewardsTypeLimit(protoRewards)
+            .build()
+    }
+
+    fun toEachRewardsProto(rewardsEntity: PlccCardRewardsEntity): CollectcardProto.RewardsTypeLimit {
+        val rewardsTypeLimit = CollectcardProto.RewardsTypeLimit.newBuilder()
+
+        rewardsTypeLimit.rewardsTypeName = getRewardsTypeName(rewardsEntity.benefitCode)
+        rewardsTypeLimit.rewardsCode = StringValue.of(rewardsEntity.benefitCode)
+        rewardsTypeLimit.rewardsLimitAmount2F = multiplyForAmount(rewardsEntity.totalLimitAmount)
+        rewardsTypeLimit.rewardsLimitUsedAmount2F = multiplyForAmount(rewardsEntity.appliedAmount)
+        rewardsTypeLimit.rewardsLimitRemainingAmount2F = multiplyForAmount(rewardsEntity.limitRemainingAmount)
+
+        rewardsTypeLimit.rewardsLimitCount = Int64Value.of(rewardsEntity.totalLimitCount?.toLong() ?: 0L)
+        rewardsTypeLimit.rewardsLimitUsedCount = Int64Value.of(rewardsEntity.appliedCount?.toLong() ?: 0L)
+        rewardsTypeLimit.rewardsLimitRemainingCount = Int64Value.of(rewardsEntity.limitRemainingCount?.toLong() ?: 0L)
+
+        rewardsTypeLimit.rewardsLimitSalesAmount2F =
+            Int64Value.of(multiplyForAmount(rewardsEntity.totalSalesLimitAmount))
+        rewardsTypeLimit.rewardsLimitUsedSalesAmount2F =
+            Int64Value.of(multiplyForAmount(rewardsEntity.appliedSaleAmount))
+        rewardsTypeLimit.rewardsLimitRemainingSalesAmount2F =
+            Int64Value.of(multiplyForAmount(rewardsEntity.limitRemainingSalesAmount))
+        rewardsTypeLimit.serviceType = getServiceType(rewardsEntity.serviceType)
+
+        return rewardsTypeLimit.build()
     }
 
     private fun convertEpochMils(outcomeDay: String?): Long {
@@ -57,30 +94,6 @@ class PlccCardRewardsConvertService {
             "ISSUED" -> PlccProto.RewardsPromotionType.REWARDS_PROMOTION_TYPE_ISSUED
             else -> PlccProto.RewardsPromotionType.REWARDS_PROMOTION_TYPE_UNKNOWN
         }
-    }
-
-    fun toTypeLimitProto(entity: PlccCardTypeLimitEntity): CollectcardProto.RewardsTypeLimit {
-        val rewardsTypeLimit = CollectcardProto.RewardsTypeLimit.newBuilder()
-
-        rewardsTypeLimit.rewardsTypeName = getRewardsTypeName(entity.benefitCode)
-        rewardsTypeLimit.rewardsCode = StringValue.of(entity.benefitCode)
-        rewardsTypeLimit.rewardsLimitAmount2F = multiplyForAmount(entity.totalLimitAmount)
-        rewardsTypeLimit.rewardsLimitUsedAmount2F = multiplyForAmount(entity.appliedAmount)
-        rewardsTypeLimit.rewardsLimitRemainingAmount2F = multiplyForAmount(entity.limitRemainingAmount)
-
-        rewardsTypeLimit.rewardsLimitCount = Int64Value.of(entity.totalLimitCount?.toLong() ?: 0L)
-        rewardsTypeLimit.rewardsLimitUsedCount = Int64Value.of(entity.appliedCount?.toLong() ?: 0L)
-        rewardsTypeLimit.rewardsLimitRemainingCount = Int64Value.of(entity.limitRemainingCount?.toLong() ?: 0L)
-
-        rewardsTypeLimit.rewardsLimitSalesAmount2F =
-            Int64Value.of(multiplyForAmount(entity.totalSalesLimitAmount))
-        rewardsTypeLimit.rewardsLimitUsedSalesAmount2F =
-            Int64Value.of(multiplyForAmount(entity.appliedSaleAmount))
-        rewardsTypeLimit.rewardsLimitRemainingSalesAmount2F =
-            Int64Value.of(multiplyForAmount(entity.limitRemainingSalesAmount))
-        rewardsTypeLimit.serviceType = getServiceType(entity.serviceType)
-
-        return rewardsTypeLimit.build()
     }
 
     private fun multiplyForAmount(amount: BigDecimal?): Long {
@@ -109,20 +122,23 @@ class PlccCardRewardsConvertService {
     fun setScaleThreshold(threshold: PlccCardThreshold?) {
         threshold?.beforeMonthCriteriaUseAmount = threshold?.beforeMonthCriteriaUseAmount?.setScale(4)
         threshold?.outcomeCriteriaAmount = threshold?.outcomeCriteriaAmount?.setScale(4)
-        threshold?.totalBenefitAmount = threshold?.totalBenefitAmount?.setScale(4)
-        threshold?.totalSalesAmount = threshold?.totalSalesAmount?.setScale(4)
-        threshold?.monthlyBenefitRate = threshold?.monthlyBenefitRate?.setScale(4)
-        threshold?.monthlyBenefitLimit = threshold?.monthlyBenefitLimit?.setScale(4)
-        threshold?.cashbackAmount = threshold?.cashbackAmount?.setScale(4)
     }
 
-    fun setScaleTypeLimit(typeLimit: PlccCardTypeLimit) {
-        typeLimit.discountRate = typeLimit.discountRate?.setScale(4)
-        typeLimit.totalLimitAmount = typeLimit.totalLimitAmount?.setScale(4)
-        typeLimit.appliedAmount = typeLimit.appliedAmount?.setScale(4)
-        typeLimit.limitRemainingAmount = typeLimit.limitRemainingAmount?.setScale(4)
-        typeLimit.totalSalesLimitAmount = typeLimit.totalSalesLimitAmount?.setScale(4)
-        typeLimit.appliedSalesAmount = typeLimit.appliedSalesAmount?.setScale(4)
-        typeLimit.limitRemainingSalesAmount = typeLimit.limitRemainingSalesAmount?.setScale(4)
+    fun setScaleRewardsSummary(rewardsSummary: PlccCardRewardsSummary?) {
+        rewardsSummary?.totalBenefitAmount = rewardsSummary?.totalBenefitAmount?.setScale(4)
+        rewardsSummary?.totalSalesAmount = rewardsSummary?.totalSalesAmount?.setScale(4)
+        rewardsSummary?.monthlyBenefitRate = rewardsSummary?.monthlyBenefitRate?.setScale(4)
+        rewardsSummary?.monthlyBenefitLimit = rewardsSummary?.monthlyBenefitLimit?.setScale(4)
+        rewardsSummary?.cashbackAmount = rewardsSummary?.cashbackAmount?.setScale(4)
+    }
+
+    fun setScaleRewards(rewards: PlccCardRewards) {
+        rewards.discountRate = rewards.discountRate?.setScale(4)
+        rewards.totalLimitAmount = rewards.totalLimitAmount?.setScale(4)
+        rewards.appliedAmount = rewards.appliedAmount?.setScale(4)
+        rewards.limitRemainingAmount = rewards.limitRemainingAmount?.setScale(4)
+        rewards.totalSalesLimitAmount = rewards.totalSalesLimitAmount?.setScale(4)
+        rewards.appliedSalesAmount = rewards.appliedSalesAmount?.setScale(4)
+        rewards.limitRemainingSalesAmount = rewards.limitRemainingSalesAmount?.setScale(4)
     }
 }

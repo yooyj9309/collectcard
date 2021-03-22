@@ -2,7 +2,7 @@ package com.rainist.collectcard.plcc.cardrewards.dto
 
 import java.math.BigDecimal
 
-data class PlccCardTypeLimit(
+data class PlccCardRewards(
     // 한글필드
     var benefitName: String? = null, // 혜택유형명
     var benefitCode: String? = null, // 혜택코드

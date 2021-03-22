@@ -7,10 +7,12 @@ import com.rainist.collectcard.common.enums.ResultCode
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.util.ExecutionTestUtil
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccRpcRequest
+import com.rainist.collectcard.plcc.common.db.entity.PlccCardRewardsEntity
+import com.rainist.collectcard.plcc.common.db.entity.PlccCardRewardsSummaryEntity
 import com.rainist.collectcard.plcc.common.db.entity.PlccCardThresholdEntity
-import com.rainist.collectcard.plcc.common.db.entity.PlccCardTypeLimitEntity
+import com.rainist.collectcard.plcc.common.db.repository.PlccCardRewardsRepository
+import com.rainist.collectcard.plcc.common.db.repository.PlccCardRewardsSummaryRepository
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardThresholdRepository
-import com.rainist.collectcard.plcc.common.db.repository.PlccCardTypeLimitRepository
 import com.rainist.common.log.Log
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -41,10 +43,13 @@ class PlccRewardsServiceTest {
     lateinit var plccCardThresholdRepository: PlccCardThresholdRepository
 
     @Autowired
-    lateinit var plccCardTypeLimitService: PlccCardTypeLimitService
+    lateinit var plccCardRewardsService: PlccCardRewardsService
 
     @Autowired
-    lateinit var plccCardTypeLimitRepository: PlccCardTypeLimitRepository
+    lateinit var plccCardRewardsRepository: PlccCardRewardsRepository
+
+    @Autowired
+    lateinit var plccCardRewardsSummaryRepository: PlccCardRewardsSummaryRepository
 
     @Autowired
     lateinit var lottePlccRestTemplate: RestTemplate
@@ -94,16 +99,8 @@ class PlccRewardsServiceTest {
             outcomeStartDay = "20210201"
             outcomeEndDay = "20210228"
             isOutcomeDelay = false
-            beforeMonthCriteriaUseAmount = BigDecimal("1550000")
-            outcomeCriteriaAmount = BigDecimal("500000")
-            totalBenefitAmount = BigDecimal("15000")
-            totalBenefitCount = 4
-            totalSalesAmount = BigDecimal("80000")
-            monthlyBenefitRate = BigDecimal("00.00")
-            monthlyBenefitLimit = BigDecimal("50000")
-            cashbackAmount = BigDecimal("0")
-            benefitMessage = ""
-            promotionCode = "ISSUED"
+            beforeMonthCriteriaUseAmount = BigDecimal("1500000")
+            outcomeCriteriaAmount = BigDecimal("400000")
             lastCheckAt = LocalDateTime.now()
             createdAt = LocalDateTime.now()
             updatedAt = LocalDateTime.now()
@@ -124,11 +121,11 @@ class PlccRewardsServiceTest {
         // then
         val plccCardThresholdEntity = plccCardThresholdRepository.findAll()[0]
 
-        // 기존값 - totalBenefitAmount(15000 -> 17000), totalSalesAmount(80000 -> 81500)
+        // 기존값 - beforeMonthCriteriaUseAmount(1500000 -> 1550000), outcomeCriteriaAmount(400000 -> 500000)
         assertAll(
             "threshold update",
-            { assertThat(plccCardThresholdEntity.totalBenefitAmount).isEqualTo(BigDecimal("17000.0000")) },
-            { assertThat(plccCardThresholdEntity.totalSalesAmount).isEqualTo(BigDecimal("81500.0000")) }
+            { assertThat(plccCardThresholdEntity.beforeMonthCriteriaUseAmount).isEqualTo(BigDecimal("1550000.0000")) },
+            { assertThat(plccCardThresholdEntity.outcomeCriteriaAmount).isEqualTo(BigDecimal("500000.0000")) }
         )
     }
 
@@ -150,6 +147,74 @@ class PlccRewardsServiceTest {
         assertThat(plccCardThresholdRepository.findAll().size).isEqualTo(0)
     }
 
+    @Test
+    @Transactional
+    @Rollback
+    @DisplayName("RewardsSummary 송수신 후 DB저장")
+    fun rewardsSummary_db_save() {
+        // given
+        mockServerSetting("classpath:mock/lottecard/rewards/rewards_typeLimit_expected_1.json")
+
+        // when
+        plccCardRewardsService.getPlccRewards(
+            executionContext = makeCollectExecutionContext(),
+            rpcRequest = makePlccRpcRequestOnFeb()
+        )
+
+        // then
+        assertThat(plccCardRewardsSummaryRepository.findAll().size).isEqualTo(1)
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    @DisplayName("RewardsSummary update 테스트")
+    fun rewardsSummary_update_test() {
+        // given
+        mockServerSetting("classpath:mock/lottecard/rewards/rewards_threshold_expected_1.json")
+        savedARewardsSummary()
+
+        assertThat(plccCardRewardsSummaryRepository.findAll().size).isEqualTo(1)
+
+        // when
+        plccCardRewardsService.getPlccRewards(
+            executionContext = makeCollectExecutionContext(),
+            rpcRequest = makePlccRpcRequestOnFeb()
+        )
+
+        val plccCardRewardsSummaryEntity = plccCardRewardsSummaryRepository.findAll()[0]
+
+        // then
+        // 기존값 - totalBenefitAmount(15000 -> 17000), totalSalesAmount(80000 -> 81500)
+        assertAll(
+            "rewardsSummary update",
+            { assertThat(plccCardRewardsSummaryEntity.totalBenefitAmount).isEqualTo(BigDecimal("17000.0000")) },
+            { assertThat(plccCardRewardsSummaryEntity.totalSalesAmount).isEqualTo(BigDecimal("81500.0000")) }
+        )
+    }
+
+    private fun savedARewardsSummary() {
+        plccCardRewardsSummaryRepository.save(PlccCardRewardsSummaryEntity().apply {
+            banksaladUserId = 1
+            cardCompanyId = "596d66692c4069c168b57c77"
+            cardCompanyCardId = "376277600833685"
+            benefitYearMonth = "202102"
+            totalBenefitAmount = BigDecimal("15000") // 기존 15000원
+            totalBenefitCount = 4
+            totalSalesAmount = BigDecimal("80000")
+            monthlyBenefitRate = BigDecimal("00.00")
+            monthlyBenefitLimit = BigDecimal("50000")
+            cashbackAmount = BigDecimal("0")
+            benefitMessage = ""
+            promotionCode = "ISSUED"
+            lastCheckAt = LocalDateTime.now()
+            createdAt = LocalDateTime.now()
+            updatedAt = LocalDateTime.now()
+            responseCode = "0000"
+            responseMessage = "waS788OzuK61x776vcC0z7TZLg=="
+        })
+    }
+
     @DisplayName("TypeLimit 송수신 후 DB 저장")
     @Transactional
     @Rollback
@@ -162,12 +227,12 @@ class PlccRewardsServiceTest {
         assertThat(plccCardThresholdRepository.findAll().size).isEqualTo(1)
 
         // when
-        plccCardTypeLimitService.listPlccCardTypeLimit(
+        plccCardRewardsService.getPlccRewards(
             executionContext = makeCollectExecutionContext(),
             rpcRequest = makePlccRpcRequestOnFeb()
         )
 
-        val savedTypeLimitEntities = plccCardTypeLimitRepository.findAll()
+        val savedTypeLimitEntities = plccCardRewardsRepository.findAll()
 
         // then
         assertThat(savedTypeLimitEntities.size).isEqualTo(4)
@@ -176,7 +241,7 @@ class PlccRewardsServiceTest {
          */
 
         assertThat(savedTypeLimitEntities.last()).isEqualToComparingOnlyGivenFields(
-            PlccCardTypeLimitEntity().apply {
+            PlccCardRewardsEntity().apply {
                 banksaladUserId = 1
                 cardCompanyId = "596d66692c4069c168b57c77"
                 cardCompanyCardId = "376277600833685"
@@ -201,17 +266,17 @@ class PlccRewardsServiceTest {
         // given
         savedATypeLimit()
 
-        assertThat(plccCardTypeLimitRepository.findAll().size).isEqualTo(1)
+        assertThat(plccCardRewardsRepository.findAll().size).isEqualTo(1)
 
         mockServerSetting("classpath:mock/lottecard/rewards/rewards_typeLimit_expected_1.json")
 
         // when
-        plccCardTypeLimitService.listPlccCardTypeLimit(
+        plccCardRewardsService.getPlccRewards(
             executionContext = makeCollectExecutionContext(),
             rpcRequest = makePlccRpcRequestOnFeb()
         )
 
-        val savedTypeLimitEntities = plccCardTypeLimitRepository.findAll()
+        val savedTypeLimitEntities = plccCardRewardsRepository.findAll()
         assertThat(savedTypeLimitEntities.size).isEqualTo(4)
 
         // then : total_limit_amount(20000 -> 25000), apply_amount(3000 -> 5000)
@@ -223,7 +288,7 @@ class PlccRewardsServiceTest {
     }
 
     private fun savedATypeLimit() {
-        plccCardTypeLimitRepository.save(PlccCardTypeLimitEntity().apply {
+        plccCardRewardsRepository.save(PlccCardRewardsEntity().apply {
             banksaladUserId = 1
             cardCompanyId = "596d66692c4069c168b57c77"
             cardCompanyCardId = "376277600833685"
@@ -278,14 +343,6 @@ class PlccRewardsServiceTest {
             isOutcomeDelay = false
             beforeMonthCriteriaUseAmount = BigDecimal("1550000")
             outcomeCriteriaAmount = BigDecimal("500000")
-            totalBenefitAmount = BigDecimal("15000") // 기존 15000원
-            totalBenefitCount = 4
-            totalSalesAmount = BigDecimal("80000")
-            monthlyBenefitRate = BigDecimal("00.00")
-            monthlyBenefitLimit = BigDecimal("50000")
-            cashbackAmount = BigDecimal("0")
-            benefitMessage = ""
-            promotionCode = "ISSUED"
             lastCheckAt = LocalDateTime.now()
             createdAt = LocalDateTime.now()
             updatedAt = LocalDateTime.now()
@@ -311,5 +368,6 @@ class PlccRewardsServiceTest {
             )
     }
 }
+
 
  */

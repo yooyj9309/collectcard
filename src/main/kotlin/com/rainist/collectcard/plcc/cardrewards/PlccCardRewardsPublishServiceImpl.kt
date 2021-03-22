@@ -4,8 +4,9 @@ import com.github.banksalad.idl.apis.v1.collectcard.CollectcardProto
 import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccRpcRequest
 import com.rainist.collectcard.plcc.cardtransactions.convertStringYearMonth
+import com.rainist.collectcard.plcc.common.db.repository.PlccCardRewardsRepository
+import com.rainist.collectcard.plcc.common.db.repository.PlccCardRewardsSummaryRepository
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardThresholdRepository
-import com.rainist.collectcard.plcc.common.db.repository.PlccCardTypeLimitRepository
 import com.rainist.collectcard.plcc.common.util.PlccCardRewardsUtil
 import com.rainist.common.util.DateTimeUtil
 import org.springframework.stereotype.Service
@@ -13,7 +14,8 @@ import org.springframework.stereotype.Service
 @Service
 class PlccCardRewardsPublishServiceImpl(
     val plccCardThresholdRepository: PlccCardThresholdRepository,
-    val plccCardTypeLimitRepository: PlccCardTypeLimitRepository,
+    val plccCardRewardsRepository: PlccCardRewardsRepository,
+    val plccCardRewardsSummaryRepository: PlccCardRewardsSummaryRepository,
     val plccCardRewardsConvertService: PlccCardRewardsConvertService
 ) : PlccCardRewardsPublishService {
 
@@ -41,28 +43,36 @@ class PlccCardRewardsPublishServiceImpl(
             .build()
     }
 
-    override fun rewardsTypeLimitPublish(
+    override fun rewardsPublish(
         executionContext: CollectExecutionContext,
         rpcRequest: PlccRpcRequest
-    ): CollectcardProto.ListPlccRewardsTypeLimitResponse {
+    ): CollectcardProto.GetPlccRewardsResponse {
 
         val requestYearMonth =
             DateTimeUtil.epochMilliSecondToKSTLocalDateTime(rpcRequest.requestMonthMs)
         val stringYearMonth = convertStringYearMonth(requestYearMonth)
 
-        val typeLimits =
-            plccCardTypeLimitRepository.findAllByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardIdAndBenefitYearMonth(
-                banksaladUserId = executionContext.userId.toLong(),
-                cardCompanyId = executionContext.organizationId,
-                cardCompanyCardId = rpcRequest.cardId,
-                benefitYearMonth = stringYearMonth.yearMonth ?: ""
-            )
+        // 혜택 summary 조회
+        plccCardRewardsSummaryRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardIdAndBenefitYearMonth(
+            banksaladUserId = executionContext.userId.toLong(),
+            cardCompanyId = executionContext.organizationId,
+            cardCompanyCardId = rpcRequest.cardId,
+            benefitYearMonth = stringYearMonth.yearMonth ?: ""
+        )?.let { rewardsSummary ->
+            // 혜택 조회
+            val rewardsList =
+                plccCardRewardsRepository.findAllByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardIdAndBenefitYearMonth(
+                    banksaladUserId = executionContext.userId.toLong(),
+                    cardCompanyId = executionContext.organizationId,
+                    cardCompanyCardId = rpcRequest.cardId,
+                    benefitYearMonth = stringYearMonth.yearMonth ?: ""
+                )
 
-        val protoTypeLimits = typeLimits.map { plccCardRewardsConvertService.toTypeLimitProto(it) }.toList()
+            return plccCardRewardsConvertService.toRewardsProto(rewardsSummary, rewardsList)
+        }
 
-        return CollectcardProto.ListPlccRewardsTypeLimitResponse
+        return CollectcardProto.GetPlccRewardsResponse
             .newBuilder()
-            .addAllRewardsTypeLimit(protoTypeLimits)
             .build()
     }
 }

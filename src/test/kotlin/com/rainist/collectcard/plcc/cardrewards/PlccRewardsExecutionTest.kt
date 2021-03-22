@@ -7,11 +7,12 @@ import com.rainist.collectcard.common.collect.api.LottecardPlccApis
 import com.rainist.collectcard.common.enums.ResultCode
 import com.rainist.collectcard.common.execution.MockExecutions
 import com.rainist.collectcard.common.util.ExecutionTestUtil
+import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewards
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsRequest
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsRequestDataBody
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsResponse
+import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsSummary
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardThreshold
-import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardTypeLimit
 import com.rainist.collectcard.plcc.cardrewards.dto.PromotionCode
 import com.rainist.collectcard.plcc.cardrewards.dto.ServiceType
 import java.math.BigDecimal
@@ -54,7 +55,8 @@ class PlccRewardsExecutionTest {
         )
 
         val plccThreshold = executionResponse.response?.dataBody?.plccCardThreshold
-        val plccTypeLimits = executionResponse.response?.dataBody?.benefitList ?: mutableListOf()
+        val plccTypeLimitSummary = executionResponse.response?.dataBody?.plccCardRewardsSummary
+        val plccTypeLimits = executionResponse.response?.dataBody?.plccCardRewardsList ?: mutableListOf()
 
         // then
         assertThat(plccTypeLimits.size).isEqualTo(5)
@@ -64,6 +66,10 @@ class PlccRewardsExecutionTest {
             this.isOutcomeDelay = false
             this.beforeMonthCriteriaUseAmount = BigDecimal("000001550000")
             this.outcomeCriteriaAmount = BigDecimal("000000500000")
+            this.responseCode = ResultCode.OK.name
+            this.responseMessage = "waS788OzuK61x776vcC0z7TZLg=="
+        })
+        assertThat(plccTypeLimitSummary).isEqualToComparingFieldByField(PlccCardRewardsSummary().apply {
             this.totalBenefitAmount = BigDecimal("000000017000")
             this.totalBenefitCount = 4
             this.totalSalesAmount = BigDecimal("000000081500")
@@ -76,7 +82,7 @@ class PlccRewardsExecutionTest {
             this.responseMessage = "waS788OzuK61x776vcC0z7TZLg=="
             this.benefitListCount = 5
         })
-        assertThat(plccTypeLimits[0]).isEqualToComparingFieldByField(PlccCardTypeLimit().apply {
+        assertThat(plccTypeLimits[0]).isEqualToComparingFieldByField(PlccCardRewards().apply {
             this.benefitName = "u6G068SrteUgxKvG5CDH0sDO"
             this.benefitCode = "C292"
             this.discountRate = BigDecimal("000005000.00")
@@ -113,11 +119,11 @@ class PlccRewardsExecutionTest {
             executionRequest = makeRewardsRequest()
         )
 
-        val plccTypeLimits = executionResponse.response?.dataBody?.benefitList ?: mutableListOf()
+        val plccTypeLimits = executionResponse.response?.dataBody?.plccCardRewardsList ?: mutableListOf()
 
         // then
         assertThat(plccTypeLimits.size).isEqualTo(1)
-        assertThat(plccTypeLimits[0]).isEqualToComparingFieldByField(PlccCardTypeLimit().apply {
+        assertThat(plccTypeLimits[0]).isEqualToComparingFieldByField(PlccCardRewards().apply {
             this.benefitName = "u6G068SrteUgxKvG5CDH0sDO"
             this.benefitCode = "C292"
             this.discountRate = BigDecimal("000005000.00")
@@ -143,5 +149,6 @@ class PlccRewardsExecutionTest {
             .build()
     }
 }
+
 
  */

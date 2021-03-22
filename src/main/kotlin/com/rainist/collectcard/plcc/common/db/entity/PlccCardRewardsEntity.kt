@@ -15,14 +15,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 
 @EntityListeners(AuditingEntityListener::class)
 @Entity
-@Table(name = "plcc_card_benefit_limit_detail_history")
-data class PlccCardTypeLimitHistoryEntity(
+@Table(name = "plcc_card_benefit_limit_detail")
+data class PlccCardRewardsEntity(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var plccCardBenefitLimitDetailHistoryId: Long? = null,
-
-    @Column(nullable = false)
     var plccCardBenefitLimitDetailId: Long? = null,
 
     @Column(nullable = false)
@@ -82,4 +79,10 @@ data class PlccCardTypeLimitHistoryEntity(
 
     @LastModifiedDate
     var updatedAt: LocalDateTime? = null
-)
+) {
+    fun equal(other: PlccCardRewardsEntity): Boolean {
+        val t = this.copy(plccCardBenefitLimitDetailId = null, lastCheckAt = null, createdAt = null, updatedAt = null)
+        val o = other.copy(plccCardBenefitLimitDetailId = null, lastCheckAt = null, createdAt = null, updatedAt = null)
+        return t == o
+    }
+}

@@ -39,7 +39,7 @@ val grpc_spring_boot_version = "3.5.2"
 val http_client_version = "4.5.11"
 val camel_version = "3.2.0"
 val json_path_version = "2.4.0"
-val idl_version = "20210319.26e6451.RELEASE"
+val idl_version = "20210322.7d7b86c.RELEASE"
 val aws_sdk_version = "2.14.21"
 
 dependencyManagement {

@@ -15,15 +15,15 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 
 @EntityListeners(AuditingEntityListener::class)
 @Entity
-@Table(name = "plcc_card_benefit_limit_history")
-data class PlccCardThresholdHistoryEntity(
+@Table(name = "plcc_card_benefit_limit_detail_history")
+data class PlccCardRewardsHistoryEntity(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var plccCardBenefitLimitHistoryId: Long? = null,
+    var plccCardBenefitLimitDetailHistoryId: Long? = null,
 
     @Column(nullable = false)
-    var plccCardBenefitLimitId: Long? = null,
+    var plccCardBenefitLimitDetailId: Long? = null,
 
     @Column(nullable = false)
     var banksaladUserId: Long? = null,
@@ -38,23 +38,41 @@ data class PlccCardThresholdHistoryEntity(
     var benefitYearMonth: String? = null,
 
     @Column(nullable = false)
-    var outcomeStartDay: String? = null,
+    var benefitName: String? = null,
 
-    @Column(nullable = false)
-    var outcomeEndDay: String? = null,
-
-    @Column(columnDefinition = "TINYINT(1)", length = 1)
-    var isOutcomeDelay: Boolean? = false,
-
-    @Column(nullable = false, precision = 17, scale = 4)
-    var beforeMonthCriteriaUseAmount: BigDecimal? = null,
+    var benefitCode: String? = null,
 
     @Column(precision = 17, scale = 4)
-    var outcomeCriteriaAmount: BigDecimal? = null,
+    var discountAmount: BigDecimal? = null,
 
-    var responseCode: String? = null,
+    @Column(precision = 9, scale = 4)
+    var discountRate: BigDecimal? = null,
 
-    var responseMessage: String? = null,
+    @Column(nullable = false, precision = 17, scale = 4)
+    var totalLimitAmount: BigDecimal? = null,
+
+    @Column(nullable = false, precision = 17, scale = 4)
+    var appliedAmount: BigDecimal? = null,
+
+    @Column(nullable = false, precision = 17, scale = 4)
+    var limitRemainingAmount: BigDecimal? = null,
+
+    var totalLimitCount: Int? = null,
+
+    var appliedCount: Int? = null,
+
+    var limitRemainingCount: Int? = null,
+
+    @Column(precision = 17, scale = 4)
+    var totalSalesLimitAmount: BigDecimal? = null,
+
+    @Column(precision = 17, scale = 4)
+    var appliedSaleAmount: BigDecimal? = null,
+
+    @Column(precision = 17, scale = 4)
+    var limitRemainingSalesAmount: BigDecimal? = null,
+
+    var serviceType: String? = null,
 
     @Column(nullable = false)
     var lastCheckAt: LocalDateTime? = null,

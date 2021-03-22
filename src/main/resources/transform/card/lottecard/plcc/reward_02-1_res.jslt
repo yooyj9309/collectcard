@@ -30,6 +30,10 @@ let resultCodes = {
         "isOutcomeDelay" : if(.is_outcome_delay == "Y") true else false,
         "beforeMonthCriteriaUseAmount" : .before_month_criteria_use_amount,
         "outcomeCriteriaAmount" : .outcome_criteria_amount,
+        "responseCode" : get-key($resultCodes, .response_code, "UNKNOWN"),
+        "responseMessage" : .response_message
+    },
+    "plccCardRewardsSummary" : {
         "totalBenefitAmount" : .total_benefit_amount,
         "totalBenefitCount" : .total_benefit_count,
         "totalSalesAmount" : .total_sales_amount,
@@ -42,7 +46,7 @@ let resultCodes = {
         "responseMessage" : .response_message,
         "benefitListCount" : .benefit_list_count
     },
-    "benefitList" : [for (.benefit_list)
+    "plccCardRewardsList" : [for (.benefit_list)
       {
        "benefitName" : .benefit_name,
        "benefitCode" : .benefit_code,
