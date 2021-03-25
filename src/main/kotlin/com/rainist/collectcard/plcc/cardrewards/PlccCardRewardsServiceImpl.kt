@@ -121,7 +121,11 @@ class PlccCardRewardsServiceImpl(
                 }
             }
         } else {
-            logger.Warn("plcc response Code = {}", plccCardTypeLimitSummary?.responseCode)
+            logger.Warn(
+                "plcc response Code = {}, message = {}",
+                plccCardTypeLimitSummary?.responseCode,
+                plccCardTypeLimitSummary?.responseMessage
+            )
         }
     }
 
