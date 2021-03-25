@@ -101,12 +101,6 @@ class PlccCardThresholdServiceImpl(
                 rewardsThreshold,
                 now
             )
-        } else {
-            logger.Warn(
-                "plcc response Code = {}, message = {}",
-                rewardsThreshold?.responseCode,
-                rewardsThreshold?.responseMessage
-            )
         }
     }
 
