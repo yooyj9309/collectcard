@@ -21,13 +21,19 @@ jobs:
         with:
           java-version: 11
 
-      - name: Cache Gradle packages
-        uses: actions/cache@v1
+      - name: Setup Gradle Dependencies Cache
+        uses: actions/cache@v2
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          key: ${{ runner.os }}-gradle-caches-${{ hashFiles('**/*.gradle', '**/*.gradle.kts') }}
 
-      - name: Lint, Test, Coverage
+      - name: Setup Gradle Wrapper Cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}
+
+      - name: Test
         env:
           GH_USERNAME: ${{ secrets.GH_USERNAME }}
           GH_DAAS_PACKAGES_TOKEN: ${{ secrets.GH_DAAS_PACKAGES_TOKEN }}
@@ -36,12 +42,7 @@ jobs:
           DEVELOPMENT_AWS_IAM_COLLECTCARD_ACCESS_TOKEN: ${{ secrets.DEVELOPMENT_AWS_IAM_COLLECTCARD_ACCESS_TOKEN }}
           STAGING_AWS_IAM_COLLECTCARD_ACCESS_KEY: ${{ secrets.STAGING_AWS_IAM_COLLECTCARD_ACCESS_KEY }}
           STAGING_AWS_IAM_COLLECTCARD_ACCESS_TOKEN: ${{ secrets.STAGING_AWS_IAM_COLLECTCARD_ACCESS_TOKEN }}
-        run: ./gradlew -s lintKotlin check jacocoTestReport
-
-      - name: Send to codecov
-        uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+        run: ./gradlew -s test
 
   build:
     name: Build and Push
@@ -60,11 +61,17 @@ jobs:
         with:
           java-version: 11
 
-      - name: Cache Gradle packages
-        uses: actions/cache@v1
+      - name: Setup Gradle Dependencies Cache
+        uses: actions/cache@v2
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          key: ${{ runner.os }}-gradle-caches-${{ hashFiles('**/*.gradle', '**/*.gradle.kts') }}
+
+      - name: Setup Gradle Wrapper Cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}
 
       - name: Build collectcard
         env:

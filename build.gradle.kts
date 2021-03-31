@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("org.springframework.boot") version "2.2.5.RELEASE"
     id("io.spring.dependency-management") version "1.0.9.RELEASE"
-    id("org.jmailen.kotlinter") version "2.3.2"
+    //id("org.jmailen.kotlinter") version "2.3.2"
     kotlin("jvm") version "1.3.72"
     kotlin("plugin.spring") version "1.3.72"
     kotlin("plugin.jpa") version "1.3.72"
@@ -114,10 +114,12 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    /*
     maxHeapSize = "4G"
     reports {
         html.isEnabled = true
     }
+    */
 }
 
 tasks.withType<KotlinCompile> {
