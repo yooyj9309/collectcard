@@ -135,14 +135,15 @@ class PlccCardTransactionServiceImpl(
             val now = DateTimeUtil.utcNowLocalDateTime()
 
             val prevEntity =
-                plccCardTransactionRepository.findByApprovalYearMonthAndBanksaladUserIdAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTime(
+                plccCardTransactionRepository.findByApprovalYearMonthAndBanksaladUserIdAndCardCompanyIdAndCardCompanyCardIdAndApprovalNumberAndApprovalDayAndApprovalTimeAndCardTransactionType(
                     yearMonth.yearMonth,
                     executionContext.userId.toLong(),
                     executionContext.organizationId,
                     plccCardTransactionRequest.cardId.value,
                     plccCardTransaction.approvalNumber,
                     plccCardTransaction.approvalDay,
-                    plccCardTransaction.approvalTime
+                    plccCardTransaction.approvalTime,
+                    plccCardTransaction.cardTransactionType
                 )
 
             if (prevEntity == null) {
