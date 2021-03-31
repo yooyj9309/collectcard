@@ -16,7 +16,14 @@ import org.springframework.stereotype.Service
 @Service
 class PlccCardTransactionConvertService {
 
-    fun plccCardTransactionToEntity(plccCardTransaction: PlccCardTransaction, banksaladUserId: Long? = null, cardCompanyId: String? = null, cardCompanyCardId: String? = null, yearMonth: String?, now: LocalDateTime): PlccCardTransactionEntity {
+    fun plccCardTransactionToEntity(
+        plccCardTransaction: PlccCardTransaction,
+        banksaladUserId: Long? = null,
+        cardCompanyId: String? = null,
+        cardCompanyCardId: String? = null,
+        yearMonth: String?,
+        now: LocalDateTime
+    ): PlccCardTransactionEntity {
         return PlccCardTransactionEntity().also { entity ->
             entity.approvalYearMonth = yearMonth
             entity.banksaladUserId = banksaladUserId
@@ -28,8 +35,10 @@ class PlccCardTransactionConvertService {
             entity.cardName = plccCardTransaction.cardName
             entity.cardNumber = plccCardTransaction.cardNumber
             entity.cardNumberMask = plccCardTransaction.cardNumberMask
-            entity.amount = if (plccCardTransaction.cardTransactionType == CardTransactionType.APPROVAL) plccCardTransaction.amount else null
-            entity.canceledAmount = if (plccCardTransaction.cardTransactionType == CardTransactionType.APPROVAL_CANCEL) plccCardTransaction.amount else null
+            entity.amount =
+                if (plccCardTransaction.cardTransactionType == CardTransactionType.APPROVAL) plccCardTransaction.amount else null
+            entity.canceledAmount =
+                if (plccCardTransaction.cardTransactionType == CardTransactionType.APPROVAL_CANCEL) plccCardTransaction.amount else null
             entity.discountAmount = plccCardTransaction.discountAmount
             entity.discountRate = plccCardTransaction.discountRate
             entity.partialCanceledAmount = plccCardTransaction.partialCanceledAmount
@@ -64,7 +73,7 @@ class PlccCardTransactionConvertService {
     fun plccCardTransactionEntityToProto(plccCardTransactionEntity: PlccCardTransactionEntity): CollectcardProto.RewardsTransaction {
         val date = plccCardTransactionEntity.approvalDay?.let { DateTimeUtil.stringToLocalDate(it) }
         val time = plccCardTransactionEntity.approvalTime?.let { DateTimeUtil.stringToLocalTime(it) }
-        val approvalMs = DateTimeUtil.utcLocalDateTimeToEpochMilliSecond(LocalDateTime.of(date, time))
+        val approvalMs = DateTimeUtil.kstLocalDateTimeToEpochMilliSecond(LocalDateTime.of(date, time))
         val builder = CollectcardProto.RewardsTransaction.newBuilder()
 
         builder.serviceCode = plccCardTransactionEntity.benefitCode
@@ -72,7 +81,8 @@ class PlccCardTransactionConvertService {
         builder.serviceType = getRewardsPromotionType(plccCardTransactionEntity.serviceType)
         builder.approvedAtMs = approvalMs
         builder.approvalNumber = plccCardTransactionEntity.approvalNumber
-        val amount = if (plccCardTransactionEntity.cardTransactionType == CardTransactionType.APPROVAL) plccCardTransactionEntity.amount else plccCardTransactionEntity.canceledAmount
+        val amount =
+            if (plccCardTransactionEntity.cardTransactionType == CardTransactionType.APPROVAL) plccCardTransactionEntity.amount else plccCardTransactionEntity.canceledAmount
         builder.amount2F = amount?.multiply(BigDecimal(100))?.toLong() ?: 0L
         builder.discountAmount2F = plccCardTransactionEntity.discountAmount?.multiply(BigDecimal(100))?.toLong() ?: 0L
         builder.isInstallmentPayment = plccCardTransactionEntity.isInstallmentPayment ?: false
