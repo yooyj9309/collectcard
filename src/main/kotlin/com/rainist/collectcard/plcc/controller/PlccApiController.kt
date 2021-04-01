@@ -52,10 +52,7 @@ class PlccApiController(
 
         plccCardService.changePlccCard(
             "lottecard",
-            plccCardChangeRequestDto.ci,
-            plccCardChangeRequestDto.cid,
-            plccCardChangeRequestDto.statusType,
-            plccCardChangeRequestDto.cardStatus,
+            plccCardChangeRequestDto,
             DateTimeUtil.utcNowLocalDateTime()
         )
 

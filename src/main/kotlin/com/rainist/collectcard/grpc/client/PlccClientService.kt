@@ -4,6 +4,7 @@ import com.github.banksalad.idl.apis.v1.card.CardProto
 import com.github.banksalad.idl.apis.v1.plcc.PlccGrpc
 import com.github.banksalad.idl.apis.v1.plcc.PlccProto
 import com.google.protobuf.StringValue
+import com.rainist.collectcard.plcc.dto.PlccCardChangeRequestDto
 import com.rainist.collectcard.plcc.dto.PlccCardDto
 import com.rainist.collectcard.plcc.dto.SyncType
 import com.rainist.common.log.Log
@@ -45,7 +46,7 @@ class PlccClientService(
                     cardDto.cardOwnerName?.let { cardBuilder.setOwnerName(StringValue.of(it)) }
                     cardDto.cardIssueStatus?.let {
                         cardBuilder.setExternalState(StringValue.of(it))
-                        cardBuilder.setStatus(cardIssueStatusToProtoEnum(it))
+                        cardBuilder.setStatus(cardIssueStatusToProtoEnum(it, null))
                     }
                     cardDto.issuedDay?.let { cardBuilder.setIssuedAtMs(DateTimeUtil.stringDateToEpochMilliSecond(it, "yyyyMMdd", ZoneId.systemDefault(), ZoneOffset.UTC)) }
                     cardDto.expiresYearMonth?.let { cardBuilder.setExpiresAtMs(DateTimeUtil.stringDateToEpochMilliSecond(it + "01", "yyyyMMdd", ZoneId.systemDefault(), ZoneOffset.UTC)) }
@@ -63,6 +64,32 @@ class PlccClientService(
         return plccBlockingStub.syncPlccsByCollectcardData(requestBuilder.build())
     }
 
+    fun syncPlccsByCollectcardData(
+        organizationId: String,
+        userId: String?,
+        data: PlccCardChangeRequestDto,
+        syncType: SyncType
+    ): PlccProto.SyncPlccsByCollectcardDataResponse? {
+        val plccCardProto = PlccProto.CollectcardPlccData.newBuilder().apply {
+            number=data.cardNumberMask
+            externalId=data.cid
+            externalState=StringValue.of(data.statusType)
+            status=cardIssueStatusToProtoEnum(data.statusType, data.statusType)
+        }.build()
+
+        val requestBuilder = PlccProto.SyncPlccsByCollectcardDataRequest.newBuilder()
+            .setOrganizationId(organizationId)
+            .setCi(data.ci)
+            .addData(plccCardProto)
+            .setSyncType(syncTypetoProtoEnum(syncType))
+
+        if (userId != null) {
+            requestBuilder.setUserId(StringValue.of(userId))
+        }
+
+        return plccBlockingStub.syncPlccsByCollectcardData(requestBuilder.build())
+    }
+
     private fun syncTypetoProtoEnum(syncType: SyncType?): PlccProto.SyncUserPlccType {
         return when (syncType) {
             SyncType.ISSUED -> PlccProto.SyncUserPlccType.SYNC_PLCC_TYPE_ISSUED
@@ -71,12 +98,16 @@ class PlccClientService(
         }
     }
 
-    private fun cardIssueStatusToProtoEnum(statusCode: String?): CardProto.CardStatus {
+    private fun cardIssueStatusToProtoEnum(statusCode: String?, statusType: String?): CardProto.CardStatus {
         val lostCodes = mutableListOf("WB10", "WB20", "WD10", "WM10", "WQ10", "WY10", "WY20", "WY30", "WY40", "WY50")
         val terminatedCodes = mutableListOf("UC10", "UC20", "UC30", "UC40")
         val reissuedCodes = mutableListOf("UH10", "UH20", "UH30", "UH40", "UH50")
         val expiredCodes = mutableListOf("UE10", "UE20")
         val registeredCodes = mutableListOf("SU10", "SU20")
+
+        if(statusCode in lostCodes && statusType == "2") {
+            return CardProto.CardStatus.CARD_STATUS_REGISTERED
+        }
 
         return when (statusCode) {
             "00" -> CardProto.CardStatus.CARD_STATUS_REGISTERED

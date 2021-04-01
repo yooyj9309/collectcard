@@ -6,6 +6,7 @@ import com.rainist.collectcard.grpc.client.PlccClientService
 import com.rainist.collectcard.grpc.client.UserV2ClientService
 import com.rainist.collectcard.plcc.common.db.entity.PlccCardEntity
 import com.rainist.collectcard.plcc.common.db.entity.PlccCardHistoryEntity
+import com.rainist.collectcard.plcc.dto.PlccCardChangeRequestDto
 import com.rainist.collectcard.plcc.dto.PlccCardDto
 import com.rainist.collectcard.plcc.dto.SyncType
 import java.time.LocalDateTime
@@ -42,22 +43,19 @@ class PlccCardServiceImpl(
 
     override fun changePlccCard(
         organizationId: String,
-        ci: String,
-        cid: String,
-        statusType: String,
-        cardStatus: String,
+        req: PlccCardChangeRequestDto,
         now: LocalDateTime
     ) {
-        val user = userV2ClientService.getUserByCi(ci)
+        val user = userV2ClientService.getUserByCi(req.ci)
         if (user != null) {
             val card = plccCardRepository.findByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardId(
                 user.userId.toLong(),
                 organizationId,
-                cid
+                req.cid
             )
             card?.copy(
-                cardStatus = cardStatus,
-                cardStatusOrigin = cardStatus,
+                cardStatus = req.cardStatus,
+                cardStatusOrigin = req.cardStatus,
                 lastCheckAt = now
             )?.let {
                 updatePlccCard(card, it)
@@ -66,14 +64,8 @@ class PlccCardServiceImpl(
 
         plccClientService.syncPlccsByCollectcardData(
             lottecardOrganizationObjectId,
-            ci,
             user?.userId,
-            mutableListOf(
-                PlccCardDto(
-                    cid = cid,
-                    cardIssueStatus = cardStatus
-                )
-            ),
+            req,
             SyncType.STATUS_UPDATED
         )
     }
