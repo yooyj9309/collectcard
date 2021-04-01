@@ -26,10 +26,11 @@ import com.rainist.collectcard.plcc.common.util.PlccCardRewardsUtil
 import com.rainist.common.log.Log
 import com.rainist.common.service.ValidationService
 import com.rainist.common.util.DateTimeUtil
-import java.nio.charset.Charset
-import java.time.LocalDateTime
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
+import java.nio.charset.Charset
+import java.time.LocalDateTime
 
 @Service
 class PlccCardRewardsServiceImpl(
@@ -147,18 +148,37 @@ class PlccCardRewardsServiceImpl(
             now = now
         )
 
-        // 없다면 insert
-        if (prevEntity == null) {
-            plccCardRewardsSummaryRepository.save(newEntity)
+        /** ConstraintViolationException발생 시 로그 찍고 그대로 publish 진행
+         *  : 처음 연속 요청 시 Duplicate error 발생 가능성
+         */
+        try {
+            // 없다면 insert
+            if (prevEntity == null) {
+                plccCardRewardsSummaryRepository.save(newEntity)
+                return
+            }
+        } catch (e: DataIntegrityViolationException) {
+            logger.Error(
+                "[PLCC][실시간API] serviceID: {} serviceName: {} lotte tokenID: {} error message : {} stackTrace = {}",
+                "PlccCardRewardsService",
+                "롯데카드 혜택 종합(summary) 로직 Duplicate error",
+                rpcRequest.cardId,
+                e.message,
+                e.stackTrace
+            )
+        }
+
+        prevEntity?.let {
             // 있지만, 값의 차이가 없을 때 lastCheckAt만 업데이트
-        } else if (prevEntity.equal(newEntity)) {
-            prevEntity.apply {
-                this.lastCheckAt = now
-            }.let {
-                plccCardRewardsSummaryRepository.save(it)
+            if (prevEntity.equal(newEntity)) {
+                prevEntity.apply {
+                    this.lastCheckAt = now
+                }.let {
+                    plccCardRewardsSummaryRepository.save(it)
+                }
+                return
             }
             // 있지만, 값의 차이가 있을 때 변경된 값으로 저장
-        } else {
             newEntity.apply {
                 plccCardBenefitLimitDetailSummaryId = prevEntity.plccCardBenefitLimitDetailSummaryId
                 createdAt = prevEntity.createdAt
@@ -194,21 +214,38 @@ class PlccCardRewardsServiceImpl(
             now = now
         )
 
+        /** ConstraintViolationException발생 시 로그 찍고 그대로 publish 진행
+         *  : 처음 연속 요청 시 Duplicate error 발생 가능성
+         */
         // 없다면 insert
-        if (prevEntity == null) {
-            plccCardRewardsRepository.save(newEntity)
-            plccCardRewardsHistoryRepository.save(
-                PlccCardRewardsUtil.makeRewardsHisotryEntity(newEntity)
-
-            )
-            // 있지만, 값의 차이가 없을 때 lastCheckAt만 업데이트
-        } else if (prevEntity.equal(newEntity)) {
-            prevEntity.apply {
-                lastCheckAt = now
-            }.let {
-                plccCardRewardsRepository.save(it)
+        try {
+            if (prevEntity == null) {
+                plccCardRewardsRepository.save(newEntity)
+                plccCardRewardsHistoryRepository.save(
+                    PlccCardRewardsUtil.makeRewardsHisotryEntity(newEntity)
+                )
+                return
             }
-        } else {
+        } catch (e: DataIntegrityViolationException) {
+            logger.Error(
+                "[PLCC][실시간API] serviceID: {} serviceName: {} lotte tokenID: {} error message : {} stackTrace = {}",
+                "PlccCardRewardsService",
+                "롯데카드 혜택 저장 로직 Duplicate error",
+                rpcRequest.cardId,
+                e.message,
+                e.stackTrace
+            )
+        }
+        prevEntity?.let {
+            // 있지만, 값의 차이가 없을 때 lastCheckAt만 업데이트
+            if (prevEntity.equal(newEntity)) {
+                prevEntity.apply {
+                    lastCheckAt = now
+                }.let {
+                    plccCardRewardsRepository.save(it)
+                }
+                return
+            }
             // 있지만, 값의 차이가 있을 때 변경된 값으로 저장
             newEntity.apply {
                 plccCardBenefitLimitDetailId = prevEntity.plccCardBenefitLimitDetailId

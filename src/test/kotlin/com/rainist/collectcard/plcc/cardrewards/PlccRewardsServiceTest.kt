@@ -14,9 +14,6 @@ import com.rainist.collectcard.plcc.common.db.repository.PlccCardRewardsReposito
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardRewardsSummaryRepository
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardThresholdRepository
 import com.rainist.common.log.Log
-import java.math.BigDecimal
-import java.time.LocalDateTime
-import java.util.UUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -31,6 +28,9 @@ import org.springframework.test.annotation.Rollback
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.client.RestTemplate
+import java.math.BigDecimal
+import java.time.LocalDateTime
+import java.util.UUID
 
 @DisplayName("PlccRewardsService 테스트")
 @SpringBootTest
@@ -368,6 +368,5 @@ class PlccRewardsServiceTest {
             )
     }
 }
-
 
  */

@@ -6,7 +6,6 @@ import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.util.ExecutionTestUtil
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccRpcRequest
-import java.util.UUID
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -21,6 +20,7 @@ import org.springframework.test.annotation.Rollback
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.client.RestTemplate
+import java.util.UUID
 
 @SpringBootTest
 class PlccThresholdPublishImplTest {
@@ -90,10 +90,8 @@ class PlccThresholdPublishImplTest {
 
         // then
         Assertions.assertThat(rewardsThresholdPublish.rewardsThreshold.isRewardsThresholdSuspended.value).isFalse()
-        Assertions.assertThat(rewardsThresholdPublish.rewardsThreshold.promotionType.name)
-            .isEqualTo("REWARDS_PROMOTION_TYPE_ISSUED")
     }
 }
 
-
  */
+

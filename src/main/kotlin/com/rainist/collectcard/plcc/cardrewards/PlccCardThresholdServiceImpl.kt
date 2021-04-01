@@ -25,10 +25,11 @@ import com.rainist.collectcard.plcc.common.util.PlccCardRewardsUtil
 import com.rainist.common.log.Log
 import com.rainist.common.service.ValidationService
 import com.rainist.common.util.DateTimeUtil
-import java.nio.charset.Charset
-import java.time.LocalDateTime
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
+import java.nio.charset.Charset
+import java.time.LocalDateTime
 
 @Service
 class PlccCardThresholdServiceImpl(
@@ -141,25 +142,46 @@ class PlccCardThresholdServiceImpl(
                 now
             )
 
-        // 없다면, insert
-        if (prevEntity == null) {
-            newEntity.let {
-                plccCardThresholdRepository.save(it)
-                plccCardThresholdHistoryRepository.save(
-                    PlccCardRewardsUtil.makeThresholdHistoryEntity(
-                        it
+        /** ConstraintViolationException발생 시 로그 찍고 그대로 publish 진행
+         *  : 처음 연속 요청 시 Duplicate error 발생 가능성
+         */
+        try {
+            // 없다면, insert
+            if (prevEntity == null) {
+                newEntity.let {
+                    plccCardThresholdRepository.save(it)
+                    plccCardThresholdHistoryRepository.save(
+                        PlccCardRewardsUtil.makeThresholdHistoryEntity(
+                            it
+                        )
                     )
-                )
+                }
+                return
             }
+        } catch (e: DataIntegrityViolationException) {
+            logger.Warn("run?", "run")
+            logger.Error(
+                "[PLCC][실시간API] serviceID: {} serviceName: {} lotte tokenID: {} error message : {} stackTrace = {}",
+                "PlccCardThreshold",
+                "롯데카드 실적 저장 로직 Duplicate error",
+                rpcRequest.cardId,
+                e.message,
+                e.stackTrace
+            )
+        }
+
+        prevEntity?.let {
             // 있지만 데이터가 같다면 lastCheckAt만 업데이트
-        } else if (prevEntity.equal(newEntity)) {
-            prevEntity.apply {
-                lastCheckAt = now
-            }.let {
-                plccCardThresholdRepository.save(it)
+            if (prevEntity.equal(newEntity)) {
+                prevEntity.apply {
+                    lastCheckAt = now
+                }.let {
+                    plccCardThresholdRepository.save(it)
+                }
+                return
             }
+
             // 있지만 데이터가 다르다면 prevEntity를 새로 만든 엔티티의 값으로 변경 후 저장, history insert
-        } else {
             newEntity.apply {
                 this.plccCardBenefitLimitId = prevEntity.plccCardBenefitLimitId
                 this.createdAt = prevEntity.createdAt
