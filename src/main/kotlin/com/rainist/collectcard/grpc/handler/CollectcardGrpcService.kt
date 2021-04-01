@@ -398,6 +398,7 @@ class CollectcardGrpcService(
 
         kotlin.runCatching {
             plccCardThresholdService.getPlccCardThreshold(executionContext, plccRpcRequest)
+            logger.Warn(">>>>>>>>>> getPlccCardThreshold 완료")
             plccCardRewardsPublishService.rewardsThresholdPublish(executionContext, plccRpcRequest)
         }.onSuccess {
             responseObserver.onNext(it)
@@ -424,6 +425,7 @@ class CollectcardGrpcService(
 
         kotlin.runCatching {
             plccCardRewardsService.getPlccRewards(executionContext, plccRpcRequest)
+            logger.Warn(">>>>>>>>>> getPlccRewards 완료")
             plccCardRewardsPublishService.rewardsPublish(executionContext, plccRpcRequest)
         }.onSuccess {
             responseObserver.onNext(it)

@@ -8,6 +8,7 @@ import com.rainist.collectcard.plcc.common.db.repository.PlccCardRewardsReposito
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardRewardsSummaryRepository
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardThresholdRepository
 import com.rainist.collectcard.plcc.common.util.PlccCardRewardsUtil
+import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import org.springframework.stereotype.Service
 
@@ -18,6 +19,8 @@ class PlccCardRewardsPublishServiceImpl(
     val plccCardRewardsSummaryRepository: PlccCardRewardsSummaryRepository,
     val plccCardRewardsConvertService: PlccCardRewardsConvertService
 ) : PlccCardRewardsPublishService {
+
+    companion object : Log
 
     override fun rewardsThresholdPublish(
         executionContext: CollectExecutionContext,
@@ -35,6 +38,7 @@ class PlccCardRewardsPublishServiceImpl(
             // inquiryYearMonth의 1달 전을 입력해야함.
             benefitYearMonth = PlccCardRewardsUtil.minusAMonth(stringYearMonth.yearMonth) ?: ""
         )?.let {
+            logger.Warn(">>>>>>>>>> rewardsThresholdPublish 조회 완료")
             return plccCardRewardsConvertService.toThresholdProto(it)
         }
 
@@ -59,6 +63,7 @@ class PlccCardRewardsPublishServiceImpl(
             cardCompanyCardId = rpcRequest.cardId,
             benefitYearMonth = stringYearMonth.yearMonth ?: ""
         )?.let { rewardsSummary ->
+            logger.Warn(">>>>>>>>>> rewardsPublishSummary 조회 완료")
             // 혜택 조회
             val rewardsList =
                 plccCardRewardsRepository.findAllByBanksaladUserIdAndCardCompanyIdAndCardCompanyCardIdAndBenefitYearMonth(
@@ -67,6 +72,7 @@ class PlccCardRewardsPublishServiceImpl(
                     cardCompanyCardId = rpcRequest.cardId,
                     benefitYearMonth = stringYearMonth.yearMonth ?: ""
                 )
+            logger.Warn(">>>>>>>>>> rewardsPublish 조회 완료")
 
             return plccCardRewardsConvertService.toRewardsProto(rewardsSummary, rewardsList)
         }

@@ -71,11 +71,6 @@ class CardTransactionServiceImpl(
             }
         }
 
-        logger.With("banksaladUserId", executionContext.userId).With(
-            "startAt", request.dataBody?.startAt
-            ?: "startAtNull"
-        ).Warn("")
-
         val executionResponses = getListTransactionsByDivision(executionContext, header, request)
 
         val transactions = executionResponses.flatMap {
@@ -159,7 +154,6 @@ class CardTransactionServiceImpl(
     ): List<ExecutionResponse<ListTransactionsResponse>> {
 
         val searchDateList = getSearchDateList(executionContext, request)
-        logger.With("searchDateList", searchDateList).Warn("")
 
         return runBlocking(executor.asCoroutineDispatcher()) {
             // 조회 시간 분할
