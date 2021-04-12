@@ -1,18 +1,20 @@
-package com.rainist.collectcard.plcc.cardrewards
+package com.rainist.collectcard.plcc.cardrewards.testservice
 
-import com.rainist.collect.common.execution.ExecutionRequest
+import com.rainist.collect.common.execution.Execution
 import com.rainist.collect.common.execution.ExecutionResponse
 import com.rainist.collect.executor.CollectExecutorService
-import com.rainist.collectcard.common.collect.api.BusinessType
-import com.rainist.collectcard.common.collect.api.Organization
-import com.rainist.collectcard.common.collect.api.Transaction
-import com.rainist.collectcard.common.collect.execution.Executions
+import com.rainist.collectcard.common.collect.api.TestLottecardPlccApis
 import com.rainist.collectcard.common.dto.CollectExecutionContext
 import com.rainist.collectcard.common.enums.ResultCode
 import com.rainist.collectcard.common.service.EncodeService
 import com.rainist.collectcard.common.service.HeaderService
 import com.rainist.collectcard.common.service.LocalDatetimeService
-import com.rainist.collectcard.common.service.OrganizationService
+import com.rainist.collectcard.common.util.ExecutionTestUtil
+import com.rainist.collectcard.plcc.cardrewards.PlccCardRewardsConvertService
+import com.rainist.collectcard.plcc.cardrewards.PlccCardThresholdServiceImpl
+import com.rainist.collectcard.plcc.cardrewards.PlccCardThresholdServiceImpl.Companion.Error
+import com.rainist.collectcard.plcc.cardrewards.PlccCardThresholdServiceImpl.Companion.Warn
+import com.rainist.collectcard.plcc.cardrewards.RewardsApiMockSetting.Companion.makeRewardsRequest
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsRequest
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsRequestDataBody
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsResponse
@@ -22,17 +24,16 @@ import com.rainist.collectcard.plcc.cardtransactions.convertStringYearMonth
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardThresholdHistoryRepository
 import com.rainist.collectcard.plcc.common.db.repository.PlccCardThresholdRepository
 import com.rainist.collectcard.plcc.common.util.PlccCardRewardsUtil
-import com.rainist.common.log.Log
 import com.rainist.common.util.DateTimeUtil
 import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.http.MediaType
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 import java.nio.charset.Charset
 import java.time.LocalDateTime
 
-@Service
-class PlccCardThresholdServiceImpl(
-    val organizationService: OrganizationService,
+/** API 요청하는 부분을 mocking한 테스트용 클래스
+ */
+@Component
+class TestPlccCardThresholdServiceImpl(
     val headerService: HeaderService,
     val lottePlccExecutorService: CollectExecutorService,
     val localDatetimeService: LocalDatetimeService,
@@ -40,25 +41,24 @@ class PlccCardThresholdServiceImpl(
     val plccCardThresholdHistoryRepository: PlccCardThresholdHistoryRepository,
     val plccCardRewardsConvertService: PlccCardRewardsConvertService,
     val encodeService: EncodeService
-) : PlccCardThresholdService {
-
-    companion object : Log
-
-    override fun getPlccCardThreshold(
+) {
+    fun getPlccCardThreshold(
         executionContext: CollectExecutionContext,
         rpcRequest: PlccRpcRequest
     ) {
 
         val now = localDatetimeService.generateNowLocalDatetime().now
 
-        // execution
-        val execution = Executions.valueOf(
-            BusinessType.plcc,
-            Organization.lottecard,
-            Transaction.plccCardReward
+        val executionResponse = ExecutionTestUtil.getExecutionResponse<PlccCardRewardsResponse>(
+            collectExecutorService = lottePlccExecutorService,
+            execution = Execution.create()
+                .exchange(TestLottecardPlccApis.card_lottecard_plcc_rewards)
+                .to(PlccCardRewardsResponse::class.java)
+                .build(),
+            executionContext = ExecutionTestUtil.getExecutionContext("1", "lottecard"),
+            executionRequest = makeRewardsRequest("202103")
         )
 
-        // request
         val plccCardRewardsRequest = PlccCardRewardsRequest().apply {
             val requestYearMonth =
                 DateTimeUtil.epochMilliSecondToKSTLocalDateTime(rpcRequest.requestMonthMs)
@@ -69,19 +69,6 @@ class PlccCardThresholdServiceImpl(
                 this.cardNumber = rpcRequest.cardId
             }
         }
-
-        val executionRequest = ExecutionRequest.builder<PlccCardRewardsRequest>()
-            .headers(
-                headerService.makeHeader(MediaType.APPLICATION_JSON_VALUE)
-            )
-            .request(
-                plccCardRewardsRequest
-            )
-            .build()
-
-        // api call
-        val executionResponse: ExecutionResponse<PlccCardRewardsResponse> =
-            lottePlccExecutorService.execute(executionContext, execution, executionRequest)
 
         decodeKoreanFields(executionResponse)
 
@@ -157,8 +144,8 @@ class PlccCardThresholdServiceImpl(
                 return
             }
         } catch (e: DataIntegrityViolationException) {
-            logger.Warn("run?", "run")
-            logger.Error(
+            PlccCardThresholdServiceImpl.logger.Warn("run?", "run")
+            PlccCardThresholdServiceImpl.logger.Error(
                 "[PLCC][실시간API] serviceID: {} serviceName: {} lotte tokenID: {} error message : {} stackTrace = {}",
                 "PlccCardThreshold",
                 "롯데카드 실적 저장 로직 Duplicate error",

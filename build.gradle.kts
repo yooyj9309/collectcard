@@ -41,10 +41,12 @@ val camel_version = "3.2.0"
 val json_path_version = "2.4.0"
 val idl_version = "20210322.7d7b86c.RELEASE"
 val aws_sdk_version = "2.14.21"
+val springCloudVersion = "2020.0.0"
 
 dependencyManagement {
     imports {
         mavenBom("software.amazon.awssdk:bom:${aws_sdk_version}")
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}")
     }
 }
 
@@ -108,6 +110,10 @@ dependencies {
 
     // aws
     implementation("software.amazon.awssdk:kms:2.14.21")
+
+    // wiremock
+    testImplementation("com.github.tomakehurst:wiremock-jre8:2.27.2")
+    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
 
     testImplementation("org.mockito:mockito-inline:2.13.0")
 }
