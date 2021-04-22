@@ -5,11 +5,6 @@ import com.rainist.collect.common.api.ApiResponseEntity
 import com.rainist.collect.executor.ITransferClient
 import com.rainist.collectcard.common.service.TransferClientLogService
 import com.rainist.common.log.Log
-import java.net.SocketTimeoutException
-import java.nio.charset.StandardCharsets
-import java.security.cert.X509Certificate
-import java.util.concurrent.TimeUnit
-import javax.net.ssl.SSLContext
 import org.apache.http.conn.ConnectTimeoutException
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory
 import org.apache.http.conn.ssl.TrustStrategy
@@ -32,6 +27,11 @@ import org.springframework.web.client.HttpStatusCodeException
 import org.springframework.web.client.ResourceAccessException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
+import java.net.SocketTimeoutException
+import java.nio.charset.StandardCharsets
+import java.security.cert.X509Certificate
+import java.util.concurrent.TimeUnit
+import javax.net.ssl.SSLContext
 
 @Component
 class LottePlccTransferClient(

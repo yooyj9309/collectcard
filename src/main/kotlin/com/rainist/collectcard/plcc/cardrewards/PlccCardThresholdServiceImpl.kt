@@ -93,13 +93,24 @@ class PlccCardThresholdServiceImpl(
         val rewardsThreshold = executionResponse.response?.dataBody?.plccCardThreshold
         // response_code가 OK인 경우만 save로직 수행
         if (rewardsThreshold?.responseCode.equals(ResultCode.OK.name)) {
-            upsertRewardsThreshold(
-                executionContext,
-                rpcRequest,
-                plccCardRewardsRequest,
-                rewardsThreshold,
-                now
-            )
+            try {
+                upsertRewardsThreshold(
+                    executionContext,
+                    rpcRequest,
+                    plccCardRewardsRequest,
+                    rewardsThreshold,
+                    now
+                )
+            } catch (e: DataIntegrityViolationException) {
+                logger.Error(
+                    "[PLCC][실시간API] Error log : {}",
+                    "PlccCardThreshold",
+                    "롯데카드 실적 저장 로직 Duplicate error",
+                    rpcRequest.cardId,
+                    e.message,
+                    e.stackTrace
+                )
+            }
         }
     }
 
@@ -143,31 +154,18 @@ class PlccCardThresholdServiceImpl(
         /** ConstraintViolationException발생 시 로그 찍고 그대로 publish 진행
          *  : 처음 연속 요청 시 Duplicate error 발생 가능성
          */
-        try {
-            // 없다면, insert
-            if (prevEntity == null) {
-                newEntity.let {
-                    plccCardThresholdRepository.save(it)
-                    plccCardThresholdHistoryRepository.save(
-                        PlccCardRewardsUtil.makeThresholdHistoryEntity(
-                            it
-                        )
+        // 없다면, insert
+        if (prevEntity == null) {
+            newEntity.let {
+                plccCardThresholdRepository.save(it)
+                plccCardThresholdHistoryRepository.save(
+                    PlccCardRewardsUtil.makeThresholdHistoryEntity(
+                        it
                     )
-                }
-                return
+                )
             }
-        } catch (e: DataIntegrityViolationException) {
-            logger.Warn("run?", "run")
-            logger.Error(
-                "[PLCC][실시간API] serviceID: {} serviceName: {} lotte tokenID: {} error message : {} stackTrace = {}",
-                "PlccCardThreshold",
-                "롯데카드 실적 저장 로직 Duplicate error",
-                rpcRequest.cardId,
-                e.message,
-                e.stackTrace
-            )
+            return
         }
-
         prevEntity?.let {
             // 있지만 데이터가 같다면 lastCheckAt만 업데이트
             if (prevEntity.equal(newEntity)) {

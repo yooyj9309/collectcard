@@ -112,13 +112,24 @@ class PlccCardRewardsServiceImpl(
             plccCardRewardsList.forEach { plccCardRewards ->
                 plccCardRewardsConvertService.setScaleRewards(plccCardRewards)
                 if (!plccCardRewards.benefitCode.equals("CXXX")) {
-                    upsertRewardsTypeLimit(
-                        executionContext,
-                        rpcRequest,
-                        plccCardRewardsRequest,
-                        plccCardRewards,
-                        now
-                    )
+                    try {
+                        upsertRewardsTypeLimit(
+                            executionContext,
+                            rpcRequest,
+                            plccCardRewardsRequest,
+                            plccCardRewards,
+                            now
+                        )
+                    } catch (e: DataIntegrityViolationException) {
+                        logger.Error(
+                            "[PLCC][실시간API] Error log : {}",
+                            "PlccCardRewardsService",
+                            "롯데카드 혜택 종합(summary) 로직 Duplicate error",
+                            rpcRequest.cardId,
+                            e.message,
+                            e.stackTrace
+                        )
+                    }
                 }
             }
         }
@@ -151,15 +162,15 @@ class PlccCardRewardsServiceImpl(
         /** ConstraintViolationException발생 시 로그 찍고 그대로 publish 진행
          *  : 처음 연속 요청 시 Duplicate error 발생 가능성
          */
+        // 없다면 insert
         try {
-            // 없다면 insert
             if (prevEntity == null) {
                 plccCardRewardsSummaryRepository.save(newEntity)
                 return
             }
         } catch (e: DataIntegrityViolationException) {
             logger.Error(
-                "[PLCC][실시간API] serviceID: {} serviceName: {} lotte tokenID: {} error message : {} stackTrace = {}",
+                "[PLCC][실시간API] Error log : {}",
                 "PlccCardRewardsService",
                 "롯데카드 혜택 종합(summary) 로직 Duplicate error",
                 rpcRequest.cardId,
@@ -218,23 +229,12 @@ class PlccCardRewardsServiceImpl(
          *  : 처음 연속 요청 시 Duplicate error 발생 가능성
          */
         // 없다면 insert
-        try {
-            if (prevEntity == null) {
-                plccCardRewardsRepository.save(newEntity)
-                plccCardRewardsHistoryRepository.save(
-                    PlccCardRewardsUtil.makeRewardsHisotryEntity(newEntity)
-                )
-                return
-            }
-        } catch (e: DataIntegrityViolationException) {
-            logger.Error(
-                "[PLCC][실시간API] serviceID: {} serviceName: {} lotte tokenID: {} error message : {} stackTrace = {}",
-                "PlccCardRewardsService",
-                "롯데카드 혜택 저장 로직 Duplicate error",
-                rpcRequest.cardId,
-                e.message,
-                e.stackTrace
+        if (prevEntity == null) {
+            plccCardRewardsRepository.save(newEntity)
+            plccCardRewardsHistoryRepository.save(
+                PlccCardRewardsUtil.makeRewardsHisotryEntity(newEntity)
             )
+            return
         }
         prevEntity?.let {
             // 있지만, 값의 차이가 없을 때 lastCheckAt만 업데이트
