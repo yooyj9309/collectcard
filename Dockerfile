@@ -1,14 +1,6 @@
-FROM openjdk:8
-
-USER root
-RUN apt-get update -yqq \
-    && apt-get install -y --no-install-recommends openssl \
-    && sed -i 's,^\(MinProtocol[ ]*=\).*,\1'TLSv1.0',g' /etc/ssl/openssl.cnf \
-    && sed -i 's,^\(CipherString[ ]*=\).*,\1'DEFAULT@SECLEVEL=1',g' /etc/ssl/openssl.cnf\
-    && rm -rf /var/lib/apt/lists/*
+FROM openjdk:8u282
 
 RUN apt-get install vim -y; exit 0
-
 
 LABEL maintainer="Rainist Engineering <engineering@rainist.com>"
 

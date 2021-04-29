@@ -32,6 +32,6 @@ class TestLottecardPlccApis {
             .algorithm(SignaturePolicy.Algorithm.NONE)
             .build()
 
-        lateinit var card_lottecard_plcc_rewards: Api
+        var card_lottecard_plcc_rewards: Api? = null
     }
 }

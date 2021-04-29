@@ -1,9 +1,5 @@
 package com.rainist.collectcard.config.resttemplate
 
-import java.nio.charset.StandardCharsets
-import java.security.cert.X509Certificate
-import java.util.concurrent.TimeUnit
-import javax.net.ssl.SSLContext
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory
 import org.apache.http.conn.ssl.TrustStrategy
 import org.apache.http.impl.client.HttpClients
@@ -17,6 +13,10 @@ import org.springframework.http.converter.FormHttpMessageConverter
 import org.springframework.http.converter.StringHttpMessageConverter
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.web.client.RestTemplate
+import java.nio.charset.StandardCharsets
+import java.security.cert.X509Certificate
+import java.util.concurrent.TimeUnit
+import javax.net.ssl.SSLContext
 
 @Profile(value = ["local", "development", "staging", "test"])
 @Configuration
@@ -31,6 +31,7 @@ class DevelopRestTemplateConfig {
         val acceptingTrustStrategy = TrustStrategy { _: Array<X509Certificate?>?, _: String? -> true }
 
         val sslContext: SSLContext = SSLContexts.custom()
+            .setProtocol("TLSv1")
             .loadTrustMaterial(null, acceptingTrustStrategy)
             .build()
         val csf = SSLConnectionSocketFactory(sslContext)

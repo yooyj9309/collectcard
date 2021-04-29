@@ -5,7 +5,6 @@ import com.rainist.collect.common.execution.Execution
 import com.rainist.collect.executor.CollectExecutorService
 import com.rainist.collectcard.common.collect.api.TestLottecardPlccApis
 import com.rainist.collectcard.common.enums.ResultCode
-import com.rainist.collectcard.common.execution.MockExecutions
 import com.rainist.collectcard.common.util.ExecutionTestUtil
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewards
 import com.rainist.collectcard.plcc.cardrewards.dto.PlccCardRewardsResponse
@@ -115,7 +114,10 @@ class PlccRewardsExecutionTest {
         // when
         val executionResponse = ExecutionTestUtil.getExecutionResponse<PlccCardRewardsResponse>(
             collectExecutorService = lottePlccExecutorService,
-            execution = MockExecutions.lottecardPlccRewards,
+            execution = Execution.create()
+                .exchange(TestLottecardPlccApis.card_lottecard_plcc_rewards)
+                .to(PlccCardRewardsResponse::class.java)
+                .build(),
             executionContext = ExecutionTestUtil.getExecutionContext("1", "lottecard"),
             executionRequest = RewardsApiMockSetting.makeRewardsRequest("202103")
         )
